@@ -167,6 +167,7 @@
           <li data-target="#customCarousel1" data-slide-to="0" class="active"></li>
           <li data-target="#customCarousel1" data-slide-to="1"></li>
           <li data-target="#customCarousel1" data-slide-to="2"></li>
+
         </ol>
       </div>
 
@@ -177,6 +178,49 @@
 
   <!-- service section -->
 
+  <!-- Botón para mostrar/ocultar el PDF -->
+
+<div class="btn-box">
+  <center><button id="mostrarOcultarBtn" onclick="mostrarOcultarPDF()">Mostrar/Ocultar En Linea</button></center>
+  </div>
+  
+  <!-- Contenedor para el PDF -->
+  <div id="pdfContainer" style="display: none;">
+      <embed src="/Periodico/EJEMPLO.pdf" type="application/pdf" width="100%" height="1000px">
+  </div>
+  
+  <script>
+  function mostrarOcultarPDF() {
+      var pdfContainer = document.getElementById('pdfContainer');
+      if (pdfContainer.style.display === 'none') {
+          pdfContainer.style.display = 'block';
+      } else {
+          pdfContainer.style.display = 'none';
+      }
+  }
+  </script>
+  
+  <!-- Fin Botón para mostrar/ocultar el PDF -->
+
+<!-- social media -->
+
+<div class="contenedor-imagenes">
+  <a href="https://www.facebook.com/AlcaldiaDCHN?mibextid=ZbWKwL"><img src="/images/facebook.jpeg" alt="Imagen 1" class="imagen" width="46px" alt="LaNotaMDC"></a>
+  <a href="https://x.com/AlcaldiaDCHN?s=20"><img src="/images/twitter.jpeg" alt="Imagen 1" class="imagen" width="40px" alt="LaNotaMDC"></a>
+</div>
+<style>
+  .contenedor-imagenes {
+      text-align: center;
+  }
+
+  .imagen {
+      
+      height: auto; /* Altura ajustada automáticamente */
+      margin-right: 10px; /* Margen derecho para separar las imágenes */
+  }
+</style>
+
+<!-- fin social media -->
 
   <!-- end service section -->
 
