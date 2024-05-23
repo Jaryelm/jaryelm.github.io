@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>DTV</title>
   <meta content="" name="description">
@@ -14,7 +15,7 @@
   <link href="img/logo.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="vendor/aos/aos.css" rel="stylesheet">
@@ -33,71 +34,50 @@
 
 <body>
 
-  <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="img/logo.png" alt="">
-        <span>DTV</span>
+      <a href="index.html" class="logo d-flex align-items-center" id="logo">
+        <img src="img/02-1.png" alt="" id="white-logo">
+        <img src="img/02.png" alt="" id="color-logo">
+        <span><img src="img/dtvcajaazul.png"></span>
       </a>
-
+      
+      <style>
+        #color-logo {
+          display: none;
+        }
+      </style>
+      
+      <script>
+        window.addEventListener('scroll', function() {
+          var logoColor = document.getElementById('color-logo');
+          var logoWhite = document.getElementById('white-logo');
+          
+          if (window.scrollY > 0) {
+            logoColor.style.display = 'inline-block';
+            logoWhite.style.display = 'none';
+          } else {
+            logoColor.style.display = 'none';
+            logoWhite.style.display = 'inline-block';
+          }
+        });
+      </script>
+      
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="#">Home</a></li>
-          <li><a class="nav-link scrollto" href="#">Example</a></li>
-          <li><a class="nav-link scrollto" href="#">Example</a></li>
-          <li><a class="nav-link scrollto" href="#">Example</a></li>
-          <li><a class="nav-link scrollto" href="#">Example</a></li>
-          <li><a href="#">Example</a></li>
-          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+          <li><a class="nav-link scrollto active" href="index.html">Home</a></li>
+          <li class="dropdown">
+            <a href="#"><span>Network</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
+              <li><a href="#">Ecosystem</a></li>
+              <li><a href="token.html">Token</a></li>
             </ul>
           </li>
-
-          <li class="dropdown megamenu"><a href="#"><span>Mega Menu</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li>
-                <a href="#">Column 1 link 1</a>
-                <a href="#">Column 1 link 2</a>
-                <a href="#">Column 1 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 2 link 1</a>
-                <a href="#">Column 2 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 3 link 1</a>
-                <a href="#">Column 3 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 4 link 1</a>
-                <a href="#">Column 4 link 2</a>
-                <a href="#">Column 4 link 3</a>
-              </li>
-            </ul>
-          </li>
-
-          <li><a class="nav-link scrollto" href="#">Contact</a></li>
+          <li><a href="about.html">About</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
-
+  
     </div>
   </header><!-- End Header -->
 
@@ -107,80 +87,175 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-6 d-flex flex-column justify-content-center">
-          <h1 data-aos="fade-up">Revolutionizing Government Interactions,</h1>
-          <h2 data-aos="fade-up" data-aos-delay="400">We use our patent pending AI and Blockchain technology to secure data and automate transactions.</h2>
+          <h1 data-aos="fade-up">Revolutionizing Government Interactions</h1>
+          <h2 data-aos="fade-up" data-aos-delay="400">We use our proprietary automation and blockchain technology to secure your data while streamlining transacations between governments and consumers.</h2>
           <div data-aos="fade-up" data-aos-delay="600">
             <div class="text-center text-lg-start">
-              <a href="#about" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-                <span>Get Started</span>
+              <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+                <span>Pre-Sale</span>
                 <i class="bi bi-arrow-right"></i>
               </a>
             </div>
           </div>
         </div>
         <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
-          <img src="img/01.png" class="img-fluid" alt="">
-        </div>
+          <img src="img/01.png" class="img-fluid rounded-circle" alt="">
+        </div>        
       </div>
     </div>
 
   </section><!-- End Hero -->
 
   <main id="main">
-    <!-- ======= About Section ======= -->
-    <section id="about" class="about">
 
-      <div class="container" data-aos="fade-up">
-        <div class="row gx-0">
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
 
-          <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-            <div class="content">
-              <h3>Introduction:</h3>
-              <h2>In today's digital age, the need for secure, transparent, and efficient government interactions is more critical than ever. Delnorte has taken on the challenge of revolutionizing the way government data is managed, shared, and monetized through the use of patented blockchain and Non-Fungible Token (NFT) technology. This white paper explores the company's innovative approach to creating a decentralized interactive platform for Apps to be built on top of and leveraging government data.</h2>
-            </div>
+  <div class="container" data-aos="fade-up">
+    <div class="row gx-0">
+
+      <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
+        <br><br>
+        <div class="content-box"> <!-- Agregamos la clase content-box aquí -->
+          <div class="content">
+            <h2>Introduction</h2>
+            <p>In today's digital age, the need for secure, transparent, and efficient government interactions is more critical than ever. DelNorte Terra Vision (DTV) has taken on the challenge of revolutionizing the way government data is managed, shared, and monetized through the use of our blockchain and non-fungible token (NFT) technology.</p>
           </div>
-
-          <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-            <img src="img/02.png" class="img-fluid" alt="">
-          </div>
-
         </div>
       </div>
 
-    </section><!-- End About Section -->
+      <div class="col-lg-6 d-flex align-items-center justify-content-center" data-aos="zoom-out" data-aos-delay="200">
+        <div id="logo-container">
+          <img id="logo-img" src="img/logo.png" class="img-fluid logo-3d" alt="">
+        </div>
+          <style>
+/* Agrega el estilo para la caja content-box */
+.content-box {
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content h2 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 40px;
+}
+
+.content p {
+  color: #555;
+  font-size: 18px;
+}
+
+/* Estilos 3D */
+:root {
+  --perspective: 1000px;
+  --rotate-y: 30deg;
+  --scale: 1.1;
+  --animation-duration: 2s;
+}
+
+.logo-3d {
+  width: 250px;
+  transition: transform 0.5s;
+}
+
+.logo-3d:hover {
+  transform: perspective(var(--perspective)) rotateY(0deg) translateZ(0px) scale(var(--scale));
+}
+
+.logo-3d.flip {
+  transform: perspective(var(--perspective)) rotateY(180deg) translateZ(20px);
+}
+
+.logo-3d.flip:hover {
+  transform: perspective(var(--perspective)) rotateY(0deg) translateZ(0px) scale(var(--scale));
+}
+
+@keyframes flip {
+  0% {
+    transform: perspective(var(--perspective)) rotateY(0deg) translateZ(20px);
+  }
+  100% {
+    transform: perspective(var(--perspective)) rotateY(180deg) translateZ(20px);
+  }
+}
+
+@keyframes zoom {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#logo-img {
+  animation: zoom var(--animation-duration) infinite alternate;
+}
+          </style>
+      </div>
+
+    </div>
+  </div>
+
+</section><!-- End About Section -->
+
 
     <!-- ======= Values Section ======= -->
     <section id="values" class="values">
 
       <div class="container" data-aos="fade-up">
 
-        <header class="section-header">
-          <h3>Having an extensive background in international real estate, the founder, Anton Glotser was well aware of the many issues associated with paperwork quality in the developing nations. When he first learned about NFTs in 2017, he quickly identified the growing opportunity and need for this solution. Since then he has been working to educate politicians and foster confidence in Blockchain technology throughout North, Central and South America. In 2021 Delnorte convinced Honduras to adopt NFTs and implement the technology in the agricultural sector. The original contract faced so much opposition that it was shelved by the government. Next in 2022 Delnorte got their break with the government of El Salvado, getting it to recognize NFTs as valid and legally recognizable forms of documents and data. Since then Delnorte has received escalating scales of government contracts to run pilot programs to tokenize municipal data and automate government transactions in other countries including Mexico and a new contract in Honduras.</h3>
-          <p>Currently we have active pilot programs in various stages of development in El Salvador, Mexico and Honduras with a dozen more countries pending contracts. This whitepaper builds on that medium term planning and success, to offer access to this company and to the platform that will deliver interactions with the private sector.</p>
-        </header>
+        <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="contents-box">
+            <div class="content" style="margin-left: 55px;"> <!-- Añadí un margen de 10px -->
+              <h2><strong>What's New With DTV</strong></h2>
+              <br>
+              <p>In Phase I: We have pilot programs in various stages of development with the governments of El Salvador, Mexico, and Honduras. Essentially, we’re implementing transactions on a municipality level.</p>
+            </div>
+          </div>
+        </div>        
+
+        <style>
+
+        </style>
+        
+
+        <br><br>
 
         <div class="row">
 
           <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
             <div class="box">
-              <img src="img/clients/contratos1.png" class="img-fluid" alt="">
-              <h3>DelNorte Government Contracts</h3>
+              <a href="https://www.instagram.com/p/CgxPuuouEJ0/?img_index=5" target="_blank">
+                <img src="img/clients/contratos1.png" class="img-fluid" alt="">
+              </a>              
+              <h4>Government Pilot Program</h4>
               <p>El Salvador</p>
             </div>
           </div>
 
           <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="400">
             <div class="box">
-              <img src="img/clients/contratos2.png" class="img-fluid" alt="">
-              <h3>DelNorte Government Contracts</h3>
+              <a href="https://www.facebook.com/story.php?story_fbid=pfbid0M5cyGeUw4azjxZENiwBA6BfvwJ5e2pBzr183zdPVbiggjaTuTkf7bvaodQia7wJ7l&id=106535826094917&mibextid=l066kq&_rdr" target="_blank">
+                <img src="img/clients/contratos2.png" class="img-fluid" alt="">
+              </a>
+              <h4>Government Pilot Program</h4>
               <p>Honduras</p>
             </div>
           </div>
 
           <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="600">
             <div class="box">
-              <img src="img/clients/contratos3.png" class="img-fluid" alt="">
-              <h3>DelNorte Government Contracts</h3>
+              <a href="https://www.facebook.com/NDDGobiernoMunicipal/videos/591418099173129/?extid=CL-UNK-UNK-UNK-AN_GK0T-GK1C" target="_blank">
+                <img src="img/clients/contratos3.png" class="img-fluid" alt="">
+              </a>
+              <h4>Government Pilot Program</h4>
               <p>Mexico</p>
             </div>
           </div>
@@ -196,67 +271,82 @@
 
       <div class="container" data-aos="fade-up">
 
-        <!-- Feature Tabs -->
-        <div class="row feture-tabs" data-aos="fade-up">
-          <div class="col-lg-6">
-            <h3>Delnorte platform enables the creation of digital Smart Certificates, that is NFT copies of government documents.</h3>
+<!-- Feature Tabs -->
+<div class="row feture-tabs" data-aos="fade-up">
+  <div class="col-lg-6 d-flex align-items-center justify-content-center">
+    <div class="contents-box">
+      <div class="content">
+        <h3>Delnorte’s platform enables the creation of digital smart certificates that are NFT’s of government real estate documents</h3>
 
-            <!-- Tabs -->
-            <ul class="nav nav-pills mb-3">
-              <li>
-                <a class="nav-link active" data-bs-toggle="pill" href="#tab1">blockchain</a>
-              </li>
-              <li>
-                <a class="nav-link" data-bs-toggle="pill" href="#tab2">The platform</a>
-              </li>
-              <li>
-                <a class="nav-link" data-bs-toggle="pill" href="#tab3">Solution Overview</a>
-              </li>
-            </ul><!-- End Tabs -->
+        <br>
 
-            <!-- Tab Content -->
-            <div class="tab-content">
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-3">
+          <li>
+            <a class="nav-link active" data-bs-toggle="pill" href="#tab1">blockchain</a>
+          </li>
+          <li>
+            <a class="nav-link" data-bs-toggle="pill" href="#tab2">The platform</a>
+          </li>
+          <li>
+            <a class="nav-link" data-bs-toggle="pill" href="#tab3">Solution Overview</a>
+          </li>
+        </ul><!-- End Tabs -->
 
-              <div class="tab-pane fade show active" id="tab1">
-                <p>We do this by taking physical documents and converting them to digital format, afterwards they are tokenized and stored on the blockchain.</p>
-                <div class="d-flex align-items-center mb-2">
-                  <i class="bi bi-check2"></i>
-                  <h4>This approach ensures the authenticity, integrity, and security of government data, while also enabling real-time access and sharing between government agencies and the private sector.</h4>
-                </div>
-                <p>Our technology is chain agnostic, our smart contract can be effectively deployed on any blockchain.</p>
-              </div><!-- End Tab 1 Content -->
+        <br>
 
-              <div class="tab-pane fade show" id="tab2">
-                <p>The platform along with the legislation and accompanying contract allows us to automate almost any transaction including the purchase and sale of real estate and the transfer of title.</p>
-                <div class="d-flex align-items-center mb-2">
-                  <i class="bi bi-check2"></i>
-                  <h4>We also automate such things as business licensing, permitting, tax collection, benefits distribution, applications, municipal services and much more.</h4>
-                </div>
-                <p>The digital database and the applicable documents stored on the blockchain are public information and belong to either the government or the document’s individual owners. However the online access and interface to this data belongs to Delnorte. Citizens always have the option to go and pull the physical documents directly from the public office.</p>
-              </div><!-- End Tab 2 Content -->
+        <!-- Tab Content -->
+        <div class="tab-content">
 
-              <div class="tab-pane fade show" id="tab3">
-                <p>Our solution harnesses patented blockchain and NFT technology to digitize and tokenize government data, making it accessible, transparent, and immutable.</p>
-                <div class="d-flex align-items-center mb-2">
-                  <i class="bi bi-check2"></i>
-                  <h4>By creating an app store that allows developers to leverage government data, we empower developers to build compliant, accurate and endorsed applications that streamline interactions between the government and the private sector while enhancing citizen engagement.</h4>
-                </div>
-                <p>Through real-world examples and statistics, we demonstrate the potential of our platform to revolutionize governance and drive business growth.</p>
-              </div><!-- End Tab 3 Content -->
-
+          <div class="tab-pane fade show active" id="tab1">
+            <p>Proprietary processes let us utilize physical documents and convert them to a digital format thus enabling us to tokenize and store them on the blockchain.</p>
+            <br>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-check2"></i>
+              <h4>This approach ensures the authenticity, integrity, and security of government data, while also enabling real-time access and sharing between government agencies and the private sector.</h4>
             </div>
+            <br>
+            <p>Our technology is chain agnostic, creating a secure mindset to safely deploy on the blockchain.</p>
+          </div><!-- End Tab 1 Content -->
 
-          </div>
+          <div class="tab-pane fade show" id="tab2">
+            <p>Our platform, along with our cutting-edge legislation and accompanying contract, empowers you to easily automate a wide range of transactions, from buying and selling real estate to transferring titles.</p>
+            <br>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-check2"></i>
+              <h4>We automate business licensing, permits, tax collection, benefits distribution, applications, municipal services and much more.</h4>
+            </div>
+            <br>
+            <p>This database contains specific public information and documents that belong to either the government or the document's individual owners. While certain information itself is public, the online access and interface to this data is deployed by DelNorte. Citizens still will have the option to physically visit the public office and pull the documents themselves, but why should they in the future?</p>
+          </div><!-- End Tab 2 Content -->
 
-          <div class="col-lg-6">
-            <img src="img/04.png" class="img-fluid" alt="">
-          </div>
+          <div class="tab-pane fade show" id="tab3">
+            <p>Our solution harnesses proprietary blockchain and NFT processes to digitize and tokenize government data, making it accessible, transparent, and immutable.</p>
+            <br>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-check2"></i>
+              <h4>Our goal is creating an app store that allows developers specific government data to build compliant, accurate and endorsed applications that streamline interactions between the government and the private sector while enhancing citizen engagement.</h4>
+            </div>
+            <br>
+            <p>Through real-world data, we demonstrate the potential of our platform to revolutionize governance and drive business growth.</p>
+          </div><!-- End Tab 3 Content -->
 
-        </div><!-- End Feature Tabs -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <img src="img/04.png" class="img-fluid" alt="" style="border-radius: 10%;">
+  </div>
+
+</div><!-- End Feature Tabs -->
+
 
         <!-- Feature Icons -->
         <div class="row feature-icons" data-aos="fade-up">
-          <h3>Key Features and Benefits</h3>
+          <h3 style="margin-left: 14px;">Key Features and Benefits</h3>
 
           <div class="row">
 
@@ -291,7 +381,7 @@
                 <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="300">
                   <i class="ri-government-line"></i>
                   <div>
-                    <h4>App Store Leveraging Government Data: Our app store provides developers with access to government data, enabling them to create innovative applications that improve government services and citizen engagement.</h4>
+                    <h4>App Store Utilizing Government Data: Our app store provides developers with access to government data, enabling them to create innovative applications that improve government services and citizen engagement.</h4>
                   </div>
                 </div>
 
@@ -313,171 +403,33 @@
 
     </section><!-- End Features Section -->
 
-    <!-- ======= Services Section ======= -->
-    <section id="services" class="services">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <h2>The App Store</h2>
-          <p>Delnorte is in the process of designing and developing an application platform that will serve as an app store for leveraging government data.</p>
-        </header>
-
-      <div class="row gy-4"> <div class="col-12" data-aos="fade-up" data-aos-delay="200"> <div class="service-box blue"> <i class="ri-discuss-line icon"></i> <h3>The app store concept</h3> <p>Is similar to the Apple or Android app stores. That is Delnorte will provide an open source creation kit to the public, so that anyone can create and deploy applications on top of and utilizing government databases and Delnorte legal contract and framework. Using the natural authority we have developed in the region, and our existing, internal QI framework, Delnorte is creating a platform full of approved applications, compliant with and connected to the applicable government. Based on preliminary surveys, we believe over 90% of the applications will be approved.</p> <a href="#" class="read-more"><span>Read More</span> <i class="bi bi-arrow-right"></i></a> </div> </div> <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300"> <div class="service-box orange"> <i class="ri-discuss-line icon"></i> <h3>Delnorte’s development</h3> <p>kit will create apps that are managed by AI. On top of our meticulous security tools, and training, the AI will monitor all transactions across our blockchain tools to ensure that unexpected events are flagged before they occur.</p> <a href="#" class="read-more"><span>Read More</span> <i class="bi bi-arrow-right"></i></a> </div> </div> <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400"> <div class="service-box green"> <i class="ri-discuss-line icon"></i> <h3>Delnorte’s AI to support</h3> <p>Development kit will use AI to support the development of applications, providing a low friction environment which in turn will support the vibrant community such valuable infrastructure will underpin.</p> <a href="#" class="read-more"><span>Read More</span> <i class="bi bi-arrow-right"></i></a> </div> </div> <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500"> <div class="service-box red"> <i class="ri-discuss-line icon"></i> <h3>Monetization of government data</h3> <p>The app store also enables the monetization of government data, providing a new revenue stream for government agencies and promoting innovation and economic growth. It will come with a native payment solution, being able to process both crypto and fiat payments directly in the application without any additional api plugins. The established legal framework classifies the vendor and the transactions as “government contractor and government services” giving them a low risk score based on traditional banking regulations, the opposite of traditional crypto transactions.</p> <a href="#" class="read-more"><span>Read More</span> <i class="bi bi-arrow-right"></i></a> </div> </div> </div>
-
-      </div>
-
-    </section><!-- End Services Section -->
-
-        <!-- ======= About Section ======= -->
-        <section id="about" class="about">
-
-          <div class="container" data-aos="fade-up">
-            <div class="row gx-0">
-    
-              <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-                <div class="content">
-                  <h3>Introduction:</h3>
-                  <h2>We foresee the applications on Delnorte app store range from data visualization tools to predictive analytics, artificial intelligence models of economic progress, instant transactions of real movable and immovable properties and legal fractional investment and asset marketplaces. As vendors and governments gain more experience with these.</h2>
-                </div>
-              </div>
-    
-              <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-                <img src="img/05.png" class="img-fluid" alt="">
-              </div>
-    
-            </div>
-          </div>
-    
-        </section><!-- End About Section -->
-
-            <!-- ======= Values Section ======= -->
-    <section id="values" class="values">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <h3>mold breaking, and global first tools, governments themselves will be able to quantify major national and regional decisions with more accuracy, speed and transparency than has been possible up until now.</h3>
-          <p>Latin America is poised to be part of this world first for a network of deep reasons, and Delnorte has been there each step of the way until this app store has become something that is seen as directly and imminently desirable by all stakeholders.</p>
-        </header>
-
-        <header class="section-header">
-          <p>DTV (Delnorte Terra Vision)</p>
-          <h3>DTV token serves as the backbone of the Delnorte app store ecosystem, powering all applications and transactions within the platform. As the native cryptocurrency, The Token facilitates seamless and efficient transactions, providing discounts on all transaction fees for token holders. Additionally, Token holders benefit from automatic staking mechanisms, allowing them to earn rewards simply by holding a minimum amount of tokens individually or in staking pools. Special events with randomized rewards further incentivize user participation and engagement within the app store. Moreover, a significant portion of Delnorte's business gross revenue, specifically 5%, is directed back into the liquidity pool for DTV token and will be evenly spread out between all centralized and decentralized exchanges on which the token is traded. Equally buy backs will be spread out over time and unpredictable in the short term, in order to ensure that high frequency bots are not able to take advantage of the value creation mechanism. Together these features ensure continuous liquidity and stability for the cryptocurrency, enhancing its value proposition for investors and users alike. Overall, DTV token plays a pivotal role in driving the growth and sustainability of the Delnorte app store ecosystem, fostering a vibrant and thriving digital marketplace. But most of all DTV will provide an opportunity to all individuals to invest directly into their communities, vote for and financially support projects in participating nations, and directly invest and benefit from the economies of nations powered by Delnorte technology</h3>
-        </header>
-
-      </div>
-
-    </section><!-- End Values Section -->
-
-        <!-- ======= About Section ======= -->
-        <section id="about" class="about">
-
-          <div class="container" data-aos="fade-up">
-            <div class="row gx-0">
-    
-              <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-                <div class="content">
-                  <h3>Benefits:</h3>
-                  <h2>The company's patented blockchain and NFT technology provide several benefits for government agencies, private sector organizations, and citizens. These benefits include:</h2>
-                </div>
-              </div>
-    
-              <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-                <img src="img/logo.jpg" class="img-fluid" alt="">
-              </div>
-    
-            </div>
-          </div>
-    
-        </section><!-- End About Section -->
-
-<!-- ======= Services Section ======= -->
-<section id="services" class="services">
-
-  <div class="container" data-aos="fade-up">
-
-    <header class="section-header">
-      <h2>The App Store</h2>
-      <p>Delnorte is in the process of designing and developing an application platform that will serve as an app store for leveraging government data.</p>
-    </header>
-
-    <div class="row gy-4">
-      <div class="col-12" data-aos="fade-up" data-aos-delay="200">
-        <div class="service-box blue">
-          <i class="ri-discuss-line icon"></i>
-          <h3>1. Increased Security and Transparency:</h3>
-          <p>The use of blockchain and NFT technology ensures the authenticity, integrity, and security of government data, while also enabling real-time access and sharing between government agencies and the private sector.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-        <div class="service-box orange">
-          <i class="ri-discuss-line icon"></i>
-          <h3>2. Streamlined Processes and Interactions:</h3>
-          <p>The use of smart contracts automates and streamlines government processes and interactions between the government and private sector, reducing costs and improving efficiency.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-        <div class="service-box green">
-          <i class="ri-discuss-line icon"></i>
-          <h3>3. Cone of Protection:</h3>
-          <p>AI Integrated into our smart contract network will provide monitoring and alerts that ensure previously impossible levels of accuracy in government records, even in the face of user error or deliberately corrupt actions.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
-        <div class="service-box red">
-          <i class="ri-discuss-line icon"></i>
-          <h3>4. Monetization of Government Data:</h3>
-          <p>The app store enables the monetization of government data, providing a new revenue stream for government agencies and promoting innovation and economic growth.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <!-- Additional Boxes -->
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
-        <div class="service-box blue">
-          <i class="ri-discuss-line icon"></i>
-          <h3>5. Increased Innovation:</h3>
-          <p>The app store provides a platform, education, and access for developers to create and distribute applications that leverage government data, promoting innovation and economic growth.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="700">
-        <div class="service-box orange">
-          <i class="ri-discuss-line icon"></i>
-          <h3>6. Improved Public Trust:</h3>
-          <p>The use of blockchain and NFT technology promotes transparency and accountability, improving public trust in government and promoting citizen engagement.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
-        <div class="service-box green">
-          <i class="ri-discuss-line icon"></i>
-          <h3>7. Creation and monetization of existing assets in new and exciting ways:</h3>
-          <p>Instant transactions, instant kyc, guaranteed providence, and connection to 3rd party infrastructure, means anyone can sell their data on the open market at will. A farmer can connect his farm deed to a carbon credit trading platform and sell his carbon credits. A homeowner can sell his data from water and electricity usage to interested 3rd parties with just one click of a button. A government can tokenize public works and create municipal or federal bonds and publish them to an exchange in minutes. An investor can invest in a token of a whole town or a region to diversify his portfolio and lower the risks associated with individual property investment.</p>
-          <a href="#" class="read-more"><i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-      <!-- End of Additional Boxes -->
-    </div>
-
-  </div>
-
-</section><!-- End Services Section -->
-
             <!-- ======= Testimonials Section ======= -->
     <section id="testimonials" class="testimonials">
 
       <div class="container" data-aos="fade-up">
 
         <header class="section-header">
-          <h2>Testimonials</h2>
+          <p>Testimonials</p>
         </header>
 
         <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="200">
           <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <div class="stars">
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>
+                <p>
+                  Bringing Delnorte's blockchain technology to Honduras is more than an innovation, it's an exciting revolution that promises to transform our society.
+                </p>
+                <div class="profile mt-auto">
+                  <img src="img/testimonials/testimonials-05.png" class="testimonial-img" alt="">
+                  <h3>Juan Carlos Molina</h3>
+                  <h4>Vice President of the Association of Municipalities of Honduras (AMHON)</h4>
+                </div>
+              </div>
+            </div><!-- End testimonial item -->
 
             <div class="swiper-slide">
               <div class="testimonial-item">
@@ -501,26 +453,10 @@
                   <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                 </div>
                 <p>
-                  Territorial and owneship problems are factors that impede the organization and development of San Bartolome. Therefore, the implementation of DelNorte technology will great help in solving those issues.
-                </p>
-                <div class="profile mt-auto">
-                  <img src="img/testimonials/testimonials-02.png" class="testimonial-img" alt="">
-                  <h3>Ronal Ortiz</h3>
-                  <h4>MAYOR OF SAN BARTOLOME PERULAPIA, EL SALVADOR</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
                   Delnorte’s application for storing  deeds and titles on the blackchain is one of the best use cases for the blockchain.
                 </p>
                 <div class="profile mt-auto">
-                  <img src="img/testimonials/testimonials-03.png" class="testimonial-img" alt="">
+                  <img src="img/testimonials/testimonials-06.png" class="testimonial-img" alt="">
                   <h3>Francis Suarez</h3>
                   <h4>MAYOR OF MIAMI</h4>
                 </div>
@@ -568,7 +504,7 @@
                   after the 2010 earthquake in Haiti, much of the property records were lost, if DelNorte technology had existed, we would not have these problems today.
                 </p>
                 <div class="profile mt-auto">
-                  <img src="img/testimonials/testimonials-03.png" class="testimonial-img" alt="">
+                  <img src="img/testimonials/testimonials-04.png" class="testimonial-img" alt="">
                   <h3>Laurent Lamothe</h3>
                   <h4>FORMER PRIME MINISTER OF HAITI</h4>
                 </div>
@@ -583,1276 +519,101 @@
 
     </section><!-- End Testimonials Section -->
 
-                <!-- ======= Values Section ======= -->
-                <section id="values" class="values">
-
-                  <div class="container" data-aos="fade-up">
-            
-                    <header class="section-header">
-                      <p>Patent synopsis:</p>
-                      <h3>While our actual patent can not be disclosed at the moment as its still in the filing process, here is a short synopsis of what it does
-                        Our patent introduces a revolutionary system for managing Non-Fungible Tokens (NFTs) with enhanced security and flexibility. Unlike traditional NFTs, our patented technology allows for the simultaneous management of multiple copies of an NFT, each requiring signatures from the other official copies to sync in order for any changes to take effect. This ensures robust protection against unauthorized alterations or transfers. 
-                      </h3>
-                    </header>
-
-                  </div>
-            
-                </section><!-- End Values Section -->
-
-                    <!-- ======= About Section ======= -->
-    <section id="about" class="about">
-
-      <div class="container" data-aos="fade-up">
-        <div class="row gx-0">
-
-          <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-            <div class="content">
-              <h2>Moreover, our system enables the owner of an NFT to grant specific users temporary access to view and interact with the data contained within the NFT while keeping it invisible to the public. This feature enhances privacy and control over sensitive information associated with the NFT. 
-                Additionally, our patent introduces a unique digital stamp embedded within the NFT, akin to a barcode, containing unique identification data. This stamp can only be issued by authorized bodies, ensuring authenticity and traceability of the NFT. While the presence of the stamp is visible to everyone, the data within it remains invisible unless accessed through an authorized stamp reader, ensuring secure verification of the NFT's authenticity.</h2>
-            </div>
-          </div>
-
-          <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-            <img src="img/patents.jpg" class="img-fluid" alt="">
-          </div>
-
-        </div>
-      </div>
-
-    </section><!-- End About Section -->
-
-    <section id="about" class="about">
-
-      <div class="container" data-aos="fade-up">
-        <div class="row gx-0">
-
-          <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-            <div class="content">
-              <h2>Delnorte Terra Vision (DTV)</h2>
-              <p>Tokenomics Model</p>
-            </div>
-          </div>
-
-          <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-            <img src="img/logo.jpg" class="img-fluid" alt="">
-          </div>
-
-        </div>
-      </div>
-
-    </section><!-- End About Section -->
-
-    <section class="launch-info">
-      <div class="container">
-        <div class="box">
-          <p class="rainbow-text">DTV is built on TON network and will be launched on several exchanges.</p>
-          <p>DTV, herein referred to as “the token”, serves as the backbone of the Delnorte app store ecosystem, powering all applications and transactions within the platform. As the native cryptocurrency, the token facilitates seamless and efficient transactions, providing discounts on all transaction fees for token holders. Additionally, the token holders benefit from automatic staking mechanisms, allowing them to earn rewards simply by holding a minimum amount of tokens individually or in staking pools. Special events with randomized rewards further incentivize user participation and engagement within the app store. Moreover, a significant portion of Delnorte's business gross revenue, specifically 5%, is directed back into the liquidity pool for the Token and will be evenly spread out between all centralized and decentralized exchanges on which the token is traded. Equal buybacks will be spread out over time, in order to ensure that high frequency bots are not able to take advantage of the value creation mechanism. Together these features ensure continuous liquidity and stability for the cryptocurrency, enhancing its value proposition for investors and users alike. Overall, the Token plays a pivotal role in driving the growth and sustainability of the Delnorte App Store ecosystem, fostering a vibrant and thriving digital marketplace. Moreover, the Token will provide an opportunity to all individuals to invest directly into their communities, vote for and financially support projects in participating nations.</p>
-        </div>
-        <div class="box">
-          <p>Objective: Design a comprehensive tokenomics model for Tokens that fosters a vibrant, sustainable ecosystem for interacting with government data and documents, balancing the needs of users, developers, government, and long-term token value. Our concept takes Bitcoin’s principle of “proof of work” and replaces it with “proof of business”. As we are engaging in real day to day business with both private and public sectors.</p>
-        </div>
-        <div class="box">
-          <p>Utility Within the Ecosystem: The Tokens will serve as the primary medium of exchange within the Delnorte ecosystem, enabling users to access and interact with tokenized government data and documents. Token holders will enjoy various benefits, including discounted transaction fees, voting rights for governance protocols, and access to exclusive services and features within the platform. Additionally, Tokens may be used as collateral for loans,  participation in crowdfunding campaigns, and other financial services offered via the Delnorte platform.</p>
-        </div>
-      </div>
-    </section>
-
-<!-- ======= Pricing Section ======= -->
-<section id="pricing" class="pricing">
-
-  <div class="container" data-aos="fade-up">
-
-    <header class="section-header">
-      <h3>Token Distribution</h3>
-      <p>Total Supply: The total supply of Delnorte Tokens at network launch will be 1 Billion.  The max final supply of Delnorte tokens will not exceed 1 Billion.</p>
-    </header>
-
-    <div class="row gy-4" data-aos="fade-left">
-
-<!-- Caja 1 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
-  <div class="box">
-    <h3 style="color: #000000;">★ Founder Round: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>Sold to early investors and strategic partners to raise initial capital for development. 90% of the tokens are locked, meaning they cannot be accessed. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 2 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="200">
-  <div class="box">
-    <h3 style="color: #1c8663;">★ Team: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 3 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="300">
-  <div class="box">
-    <h3 style="color: #ff0000;">★ Private Pre-Sale One: 6%</h3>
-    <div class="price">(60 Million Tokens)</div>
-    <ul>
-      <li>Offered through public pre-sale. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 1.5 years / 548 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 4 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="400">
-  <div class="box">
-    <h3 style="color: #ff0071;">★ Private Pre-Sale Two: 4%</h3>
-    <div class="price">(40 Million Tokens)</div>
-    <ul>
-      <li>Offered through public pre-sale. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 1.5 years / 548 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 5 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="500">
-  <div class="box">
-    <h3 style="color: #2ecc71;">★ Public Sale: 20%</h3>
-    <div class="price">(200 Million Tokens)</div>
-    <ul>
-      <li>Offered through public token sale. On launch day 3% (30 Million Tokens) will be available, after the launch day 1% will be released every 30 days until all 26% (260 Million Tokens) are unlocked.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 6 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="600">
-  <div class="box">
-    <h3 style="color: #3498db;">★ Liquidity: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>Locked at launch and provided to exchanges for the 1st year / 365 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 7 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="700">
-  <div class="box">
-    <h3 style="color: #9b59b6;">★ Advisors: 2.5%</h3>
-    <div class="price">(25 Million Tokens)</div>
-    <ul>
-      <li>Vested over 2 years with a 3-month cliff to incentivize long-term commitment and a daily unlock for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 8 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="800">
-  <div class="box">
-    <h3 style="color: #e74c3c;">★ Ecosystem Fund: 15%</h3>
-    <div class="price">(150 Million Tokens)</div>
-    <ul>
-      <li>Allocated for ecosystem development, marketing, grants to developers, and future initiatives. 100% locked at TGE. Daily unlock over 3 years with a 6-month cliff post TGE.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 9 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="900">
-  <div class="box">
-    <h3 style="color: #f1c40f;">★ Treasury: 17.5%</h3>
-    <div class="price">(175 Million Tokens)</div>
-    <ul>
-      <li>10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 3 years / 1095 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 10 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="1000">
-  <div class="box">
-    <h3 style="color: #af6723;">★ Government Reserve and</h3>
-    <h3 style="color: #af6723;">Business Development: 5%</h3>
-    <div class="price">(50 Million Tokens)</div>
-    <ul>
-      <li>Allocated to the governments for potential future use cases within the platform and to incentivize government participation and business development. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
-
-
-    </div>
-
-  </div>
-
-</section><!-- End Pricing Section -->
-
-<!-- graficos in -->
-
-<style>
-  .launch-info {
-    display: grid;
-    place-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-
-  .boxs {
-    width: 80%;
-    max-width: 1400px;
-    height: 80%;
-    max-height: 1200px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #fff;
-    border-radius: 50px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 20px;
-  }
-
-  .graph-container {
-    width: 50%;
-    position: relative;
-    height: auto;
-  }
-
-  svg {
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .text-container {
-    width: 45%;
-  }
-
-  .text-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .text-item {
-    font-size: 22px;
-    margin-bottom: 10px;
-  }
-
-  .segment-label {
-    display: none;
-  }
-</style>
-
-
-<section class="launch-info">
-  <div class="boxs">
-    <div class="graph-container">
-      <svg id="graph"></svg>
-      <div class="pie-tooltip" id="tooltip"></div>
-    </div>
-    <div class="text-container">
-      <ul class="text-list"></ul>
-    </div>
-  </div>
-</section>
-
-<script>
-  const data = [
-    { name: '★ Founder Round', value: 10 },
-    { name: '★ Team', value: 10 },
-    { name: '★ Private Pre-Sale One', value: 6 },
-    { name: '★ Private Pre-Sale Two', value: 4 },
-    { name: '★ Public Sale', value: 20 },
-    { name: '★ Liquidity', value: 10 },
-    { name: '★ Advisors', value: 2.5 },
-    { name: '★ Ecosystem Fund', value: 15 },
-    { name: '★ Treasury', value: 17.5 },
-    { name: '★ Government Reserve and Business Development', value: 5 }
-  ];
-
-  const total = data.reduce((acc, item) => acc + item.value, 0);
-
-  const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
-
-  const width = 600;
-  const height = 600;
-  const radius = Math.min(width, height) / 2.5;
-
-  const svg = d3.select('#graph')
-    .attr('width', width)
-    .attr('height', height)
-    .append('g')
-    .attr('transform', `translate(${width / 2}, ${height / 2})`);
-
-  const pie = d3.pie()
-    .sort(null)
-    .value(d => d.value);
-
-  const arc = d3.arc()
-    .innerRadius(0)
-    .outerRadius(radius);
-
-  const arcs = svg.selectAll('.arc')
-    .data(pie(data))
-    .enter().append('g')
-    .attr('class', 'arc')
-    .on('mouseover', handleMouseOver)
-    .on('mouseout', handleMouseOut);
-
-  arcs.append('path')
-    .attr('d', arc)
-    .attr('fill', d => colorScale(d.data.name));
-
-  arcs.append('text')
-    .attr('class', 'segment-label')
-    .attr('transform', (d, i) => {
-      const [x, y] = arc.centroid(d);
-      const radius = 1.2 * Math.sqrt(x * x + y * y);
-      const angle = (d.startAngle + d.endAngle) / 2;
-      const newX = Math.sin(angle) * (radius + 10);
-      const newY = -Math.cos(angle) * (radius + 10);
-      return `translate(${newX}, ${newY})`;
-    })
-    .text(d => `${d.data.name}: ${d.data.value}%`)
-    .each(function(d) {
-      const listItem = document.createElement('li');
-      listItem.textContent = `${d.data.name}: ${d.data.value}%`;
-      listItem.classList.add('text-item');
-      document.querySelector('.text-list').appendChild(listItem);
-    });
-
-  function handleMouseOver(event, d) {
-    d3.select(this).select('.segment-label')
-      .attr('font-weight', 'bold')
-      .attr('font-size', '14px');
-
-    d3.select(this).select('path')
-      .transition()
-      .duration(200)
-      .attr('d', d => {
-        const distance = 10;
-        const angle = (d.startAngle + d.endAngle) / 2;
-        const x = Math.sin(angle) * distance;
-        const y = -Math.cos(angle) * distance;
-        return d3.arc()
-          .innerRadius(0)
-          .outerRadius(radius + 10)
-          .startAngle(d.startAngle)
-          .endAngle(d.endAngle)(d);
-      });
-
-    d3.select('#tooltip')
-      .html(`${d.data.name}: ${d.data.value}%`)
-      .style('left', `${event.pageX}px`)
-      .style('top', `${event.pageY}px`);
-  }
-
-  function handleMouseOut(event, d) {
-    d3.select(this).select('.segment-label')
-      .attr('font-weight', 'normal')
-      .attr('font-size', '12px');
-
-    d3.select(this).select('path')
-      .transition()
-      .duration(200)
-      .attr('d', arc);
-
-    d3.select('#tooltip').html('');
-  }
-</script>
-
-<!-- graficos out -->
-
-    <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <p>No mint function: The total supply of The Token is fixed at 1 Billion total</p>
-          <p>Token Burn Mechanics: No burn mechanic at the moment</p>
-          <br>
-          <h1>Utility within the Ecosystem</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Platform-Access.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Platform Access</h4>
-                <span>The Token will be the primary utility token within the Delnorte platform. Users will need The Token to:</span>
-                <p>○	Access and interact with government data and documents (including viewing Smart Certificates).
-                  ○	Pay transaction fees for data access and services on the platform at a discounted rate.
-                  ○	Participate in governance voting (see Governance Mechanisms).
-                  ○	Collect rewards both staking and randomized bonuses
-                  ○	Receive transaction and other discounts.                  
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Developer-Incentives.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Developer Incentives</h4>
-                <span>Developers building apps for the Delnorte app store can earn Token rewards through various mechanisms:</span>
-                <p>○	Grants from the Ecosystem Fund for innovative app development.
-                  ○	Revenue sharing models within their apps using The Token for in-app purchases or subscriptions.
-                  ○	The Token can be used to crowd-fund and crowd-lend tokenized assets on Delnorte platform or on 3rd party platforms that operate on top of Delnorte infrastructure.
-                  </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Governance Mechanisms</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Token-Holders-Governance.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Token Holders Governance</h4>
-                <span>The Token holders will have the right to vote on proposals impacting the Delnorte platform, including</span>
-                <p>○	Distribution of funds from the Ecosystem Fund and grant allocation to projects.
-                  ○	Future platform development priorities.
-                  ○	Bonus giveaways, staking and other rewards.
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Voting-Power.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Voting Power</h4>
-                <span>Voting power will be proportional to the amount of The Token held. Vote for new projects to be built and offered on the platform</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Staking and Rewards</h1>
-          <p>Staking</p>
-          <br>
-          <spa>In this innovative decentralized finance (DeFi) mechanism, crypto staking is integrated with NFTs representing real assets recognized by the government, leading to a transformative approach to asset-backed investments. Owners of these NFTs gain the unique ability to participate in crowdfunding projects through Delnorte's legal framework and Delnorte’s or third-party platforms, leveraging their ownership of real-world assets to fuel digital innovation. Furthermore, The Token owners can opt to stake their tokens to provide liquidity for these tokenized projects, thereby earning a dividend yield from verified businesses and assets. This symbiotic relationship between NFTs and staked tokens not only facilitates the democratization of investment opportunities but also incentivizes participation in the growth of the ecosystem both physical and digital. Additionally, owners of NFTs can further maximize their returns by staking the NFT itself, unlocking the liquidity locked behind it through staking—a concept analogous to a reverse mortgage in traditional finance. By intertwining crypto staking with NFTs representing tangible assets, this groundbreaking approach has the potential to reshape the landscape of decentralized finance, offering new avenues for asset-backed investments and fostering greater inclusivity and transparency in the financial ecosystem.</spa>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Staking Options</h4>
-                <span>The Token holders will be able to stake their tokens to earn rewards in the form of additional Tokens. Different staking options can be offered with varying lockup periods and reward rates.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4> Rewards Source</h4>
-                <span>A portion of transaction fees collected on the platform will be allocated to staking rewards, incentivizing users to hold The Token and contribute to platform security.</span>
-                <p>○	Tiered Rewards: </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Base Chance</h4>
-                <span>Every Token holder has a base chance of winning a loot box each month.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Increased Odds</h4>
-                <span>For each 1,000 Tokens held in your wallet, your win chance increases by 0.005%.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Bonus Draws</h4>
-                <span>Participate in community activities, engagement with the apps on the Delnorte app store will increase your chance for randomized draws.</span>
-                <p>●	The longer the token is held/staked the better the rewards get as well!</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Bonus Draws</h4>
-                <span>Participate in community activities, engagement with the apps on the Delnorte app store will increase your chance for randomized draws.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Transparency and Fairness</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Randomized-Algorithm.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Randomized Algorithm</h4>
-                <span>A secure and auditable algorithm determines loot box winners, ensuring complete fairness and transparency. Ensured to be randomized with crypto randomizer</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Investments-and-Grants-Transparency.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Investments and Grants Transparency</h4>
-                <span>Details about company activities will be visible on chain in real time.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Liquidity Provisions</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Profit-Sharing.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>5% Profit Sharing</h4>
-                <span>5% of Delnorte's gross profit will be used to continuously buy DGC and add it to liquidity pools on both centralized and decentralized exchanges. This process will be managed by The Token Foundation (a non-profit organization). Every quarter 5% of the gross reported profit will be directly injected evenly between participating exchanges in form of cash deposits and tokens to match from the locked 1 Billion allocated for this purpose. This ensures market liquidity, provides additional tokens to the market without changing the price and facilitates easier Token trading. Once the 1 Billion Token pool runs dry, the process of 5% gross profit injection into the liquidity will continue, except that new liquidity will flow directly into the market without having matching new tokens, thus increasing overall token value.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Liquidity-provision-Business.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Liquidity provision Business</h4>
-                <span>1 Billion will be released based on actual quarterly business, that means if we earn $1 million dollars in this quarter, we will add 5% or $50,000 into the liquidity.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Public-Pre-Sale-Lockup.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Public Pre-Sale Lockup</h4>
-                <span>75% of the The Token from the public pre-sale will be locked for a 1 year, with a 25% unlock every 90 days or 2,160 hours. This is done to prevent immediate sell-off and promote long-term token value. This will not affect any tokens purchased on the open market or exchange post official token release date.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Incentivizing Long-Term Participation and Growth</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Utility-drivenDemand.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Utility-driven Demand</h4>
-                <span>The core utility of The Token for accessing government data and platform services creates ongoing demand for the token.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Rewards.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Staking Rewards</h4>
-                <span>Staking offers a passive income stream for The Token holders, incentivizing long-term holding.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Governance-Rights.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Governance Rights</h4>
-                <span>The Token holders have a say in the platform's future, fostering a sense of ownership and community.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Limited-Supply.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Limited Supply</h4>
-                <span>The fixed total supply of The Token creates scarcity and potential for value appreciation over time.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/NFT-Crowd-funding-and-Crowd-lending.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>NFT Crowd-funding and Crowd-lending</h4>
-                <span>The Token can be used for investing in tokenized real assets and projects, creating additional use cases and demand.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section><!-- End Team Section -->
-
-                                <!-- ======= About Section ======= -->
-                                <section id="about" class="about">
-
-                                  <div class="container" data-aos="fade-up">
-                                    <div class="row gx-0">
-                            
-                                      <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-                                        <div class="content">
-                                          <h2>Private Pre-sale bonuses 10% (100 Million Tokens)</h2>
-                                        </div>
-                                      </div>
-                            
-                                      <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-                                        <img src="img/06.png" class="img-fluid" alt="">
-                                      </div>
-                            
-                                    </div>
-                                  </div>
-                            
-                                </section><!-- End About Section -->
-
-
-        <!-- ======= Recent Blog Posts Section ======= -->
-        <section id="recent-blog-posts" class="recent-blog-posts">
-
-          <div class="container" data-aos="fade-up">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Calibri", sans-serif;
+      }
     
-            <div class="row">
+      .seccion-negra {
+        background-color: #191919; /* Color de fondo negro */
+        height: 100vh; /* Toma el 100% de la altura de la ventana */
+        display: flex;
+        justify-content: center; /* Centra el contenido horizontalmente */
+        align-items: center; /* Centra el contenido verticalmente */
+        overflow: hidden; /* Evita que la imagen se desborde */
+        position: relative; /* Establece posición relativa para los elementos hijos */
+        background-image: url('img/roadmap.png'); /* Ruta de la imagen de fondo */
+        background-size: contain; /* La imagen se ajusta al contenedor manteniendo su proporción de aspecto */
+        background-position: center center; /* Centra la imagen */
+        background-repeat: no-repeat; /* No se repite la imagen */
+        background-attachment: fixed; /* La imagen de fondo permanece fija */
+      }
     
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/07.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Raising split: for the first $600,000 in presale raise we are offering bonuses to early investors. Total presale raise round 1 and 2 will be $600,000 at which point the pre-sale round will be closed. After the pre-sale at a specified time The Token will go live on several exchanges. At presale the company will be valued at $10,000,000 and the 1 Billion tokens will be issued at that same value. That means $1 will equal 100 coins at presale.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
+      /* Estilo de estrellas */
+      .estrella {
+        position: absolute;
+        width: 2px; /* Ancho de la estrella */
+        height: 2px; /* Altura de la estrella */
+        background-color: #fff; /* Color de la estrella */
+        border-radius: 50%; /* Forma circular */
+        opacity: 0; /* Inicialmente invisible */
+        animation: twinkling 5s infinite; /* Animación de parpadeo */
+      }
     
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/08.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Private Pre-sale One $300,000: will be offered at a 2X discount. That means each dollar will buy 300 coins. That is a total of 60 Million coins.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
+      /* Animación de parpadeo */
+      @keyframes twinkling {
+        0% { opacity: 0; } /* Invisible al inicio */
+        20% { opacity: 0.7; } /* Visible durante el 20% del tiempo */
+        80% { opacity: 0.7; } /* Visible durante el 80% del tiempo */
+        100% { opacity: 0; } /* Invisible al final */
+      }
+    </style>
+    </head>
+    <body>
     
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/07.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Private Pre-sale Two $300,000: will be offered at a 1.33X discount. That means each dollar will buy 1.33 coins. That is a total of 40 Million coins.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
+    <div class="seccion-negra">
+      <!-- Contenido de la sección -->
+    </div>
     
-            </div>
+    <script>
+      // Generar estrellas de forma aleatoria
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'estrella';
+        star.style.top = `${Math.random() * 100}vh`; /* Posición vertical aleatoria */
+        star.style.left = `${Math.random() * 100}vw`; /* Posición horizontal aleatoria */
+        star.style.animationDelay = `${Math.random() * 5}s`; /* Retraso aleatorio para la animación */
+        document.querySelector('.seccion-negra').appendChild(star);
+      }
+    </script>
     
-          </div>
-    
-        </section><!-- End Recent Blog Posts Section -->
 
-<div class="container">
-  <div class="section">
-    <div class="card">
-      <h3>The token distribution</h3>
-      <p>The token distribution model is designed to fairly distribute tokens among stakeholders while incentivizing early investors, team commitment, and ecosystem development.</p>
-    </div>
-    <div class="card">
-      <h3>The fixed supply </h3>
-      <p>The fixed supply and focus on utility within the platform aim to create scarcity and long-term value for The Token.</p>
-    </div>
-    <div class="card">
-      <h3>Staking rewards</h3>
-      <p>Staking rewards and governance rights incentivize users to hold The Token and participate in the ecosystem's growth.</p>
-    </div>
-    <div class="card">
-      <h3>Profit sharing</h3>
-      <p>Profit sharing for liquidity pools ensures market stability and easier trading.</p>
-    </div>
-    <div class="card">
-      <h3>The focus</h3>
-      <p>The focus on real-world use cases like NFT crowd-funding and DeFi applications expands the utility of The Token and attracts a wider user base.</p>
-    </div>
-    <div class="card">
-      <h3>2-Year Roadmap</h3>
-      <p>for Delnorte Terra Vision (DTV) 
-        Goal: Attract 1 million users and establish Delnorte and The Token as the premiere platform to mediate transactions between public and private sector.
-      </p>
-    </div>
-    <!-- Agregar más tarjetas aquí -->
-  </div>
+<!-- ======= start cajaazul ======= -->
+
+
+<div class="caja-azul">
+  <div class="caja-azul__text"> 
+    <h2>DTV TOKEN</h2> 
+    <p>We are thrilled to announce the launch of Delnorte Tokens, the key to unlocking a realm of opportunities within the Delnorte ecosystem. Designed to be the primary medium of exchange, Delnorte Tokens empower users to seamlessly access and engage with tokenized government data and documents.</p> 
+    <button class="caja-azul__button">Learn more</button> </div> 
+    <div class="caja-azul__image-container"> <img class="caja-azul__image" src="img/dtvcajaazul.png" alt="Imagen de ejemplo"> 
+  </div> 
 </div>
 
-<header class="sections-head">
-  <br>
-  <h1>2024 Roadmap</h1>
-  <img src="img/svg/2years01.png" alt="Imagen del roadmap 2024">
-</header>
 
-<style>
-
-/* Estilos para el encabezado de sección */
-.sections-head {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.sections-head h1 {
-  color: #000;
-  font-size: 28px;
-}
-
-/* Estilos para la imagen */
-.sections-head img {
-  max-width: 65%; /* Reducir el ancho máximo de la imagen al 80% del contenedor */
-  height: auto; /* La altura se ajusta automáticamente para mantener la proporción */
-  margin-top: 20px; /* Espacio superior para separar la imagen del título */
-}
-
-</style>
-
-  <header class="sections-head">
-    <br>
-    <h1>2025 Roadmap</h1>
-    <img src="img/svg/2years02.png" alt="Imagen del roadmap 2024">
-  </header>
-
-<style>
-
-/* Estilos para las tarjetas */
-.card {
-  width: 100%; /* Make cards occupy full horizontal space */
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card h3 {
-  color: #000000;
-}
-
-/* Responsive styling */
-@media screen and (min-width: 768px) {
-  .card {
-    width: calc(50% - 20px); /* Two cards per row on larger screens */
-  }
-}
-
-@media screen and (min-width: 992px) {
-  .card {
-    width: calc(33.33% - 20px); /* Three cards per row on extra-large screens */
-  }
-}
-
-/* Estilos para la sección */
-.section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-</style>
-
-    <!-- ======= Values Section ======= -->
-    <section id="values" class="values">
-
-      <div class="container" data-aos="fade-up">
-
-        <div class="row">
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="box">
-              <img src="img/svg/worst-case.png" class="img-fluid" alt="">
-              <h3>Worst Case </h3>
-              <p>200,000 users</p>
-            </div>
-          </div>
-
-          <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="400">
-            <div class="box">
-              <img src="img/svg/most-probably.png" class="img-fluid" alt="">
-              <h3>Most Probably Case</h3>
-              <p>2,000,000 users</p>
-            </div>
-          </div>
-
-          <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="600">
-            <div class="box">
-              <img src="img/svg/best-case.png" class="img-fluid" alt="">
-              <h3>Best Case</h3>
-              <p>5,000,000 users</p>
-            </div>
-          </div>
-
-        </div>
-
-        <header class="section-header">
-          <h3>7th 2021 issued every citizen a crypto wallet. So our effective user base on day one is the entire population of the country, which is estimated at 6,396,289 as of 2024. 
-            It took the Apple App Store approximately 2 years to reach 1 million apps (launched in 2008, reached 1 million apps in 2010), while user base growth is not publicly available, but estimates suggest it took several years for the Apple App Store to reach hundreds of millions of users.
-            </h3>
-            <p>We estimate user growth:</p>
-            <h4>
-              Worst case scenario: 200,000 new users per year per one million users
-              Best case scenario: 5,000,000 new users per year per one million users
-              New applications on the platform:
-              Worst case scenario: 200 new apps per year per one million users
-              Best case scenario: 5,000 new apps per year per one million users              
-              </h4>
-              <p>Revenue growth:</p>
-              <h4>Assuming an average transaction value of $5 and a 25% commission, here's a rough estimate of the potential revenue growth for a new app store:
-                Worst case scenario: $200,000 in revenue per year per one million users
-                Best case scenario: $2,500,000 in revenue per year per one million users
-                It's important to note that these estimates are based on historical data and may not reflect the actual growth of a new app store. The actual growth of the government data based app store will depend on many factors, such as the quality of the apps, market adoption, and expansion to new markets.
-                To achieve the best case scenario, we focus on building a high-quality app store with seamless user and developer experience, a strong selection of apps, a user-friendly interface, and effective marketing and promotion strategies. Additionally, we stay up-to-date with the latest trends and best practices in the app store industry, and to continuously improve and innovate to stay ahead of the competition.                             
-                </h4>
-        </header>
-
-      </div>
-
-    </section><!-- End Values Section -->
-
-    <!-- ======= Portfolio Section ======= -->
-    <section id="portfolio" class="portfolio">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <p>Industries that we aim to impact and improve via Delnorte</p>
-        </header>
-
-        <div class="row" data-aos="fade-up" data-aos-delay="100">
-          <div class="col-lg-12 d-flex justify-content-center">
-            <ul id="portfolio-flters">
-              <li data-filter="*" class="filter-active">all industries</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="row gy-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/realstate.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Applications that provide real-time access to government data on property information, such as ownership, title history, and zoning regulations. These will streamline and automate the home buying and selling process, reducing the time and cost associated with manual verification and title searches. In the USA market according to the National Association of Realtors, the real estate industry has seen a 15% increase in home sales due to the use of these applications.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/realstate.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Real State"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-wrap">
-              <img src="img/svg/transportation.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Transportation: Applications that provide real-time access to government data on traffic conditions, road closures, and public transportation schedules. This has improved transportation efficiency, reducing congestion and travel time. According to the US Department of Transportation, the use of these applications has resulted in a 10% reduction in traffic congestion and a 15% increase in public transportation usage.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/transportation.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Transportation"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/healthcare.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Healthcare: Applications that provide real-time access to government data on healthcare providers, services, and regulations. This has improved healthcare outcomes, reducing the time and cost associated with manual verification and compliance checks. According to the Centers for Medicare and Medicaid Services, the use of these applications has resulted in a 10% increase in healthcare accessibility and a 15% reduction in healthcare costs.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/healthcare.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Healthcare"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-            <div class="portfolio-wrap">
-              <img src="img/svg/finance.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Finance: Applications that provide real-time access to government data on financial regulations, tax codes, and business licenses. This has improved financial transparency, reducing the time and cost associated with manual verification and compliance checks. According to the Internal Revenue Service, the use of these applications has resulted in a 10% increase in financial transparency and a 15% reduction in financial fraud.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/finance.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Finance"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-wrap">
-              <img src="img/svg/energy.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Energy: Applications that provide real-time access to government data on energy usage, pricing, and regulations. This has improved energy efficiency, reducing energy costs and carbon emissions. According to the US Department of Energy, the use of these applications has resulted in a 10% reduction in energy costs and a 15% reduction in carbon emissions.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/energy.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Energy"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/marketsandtrading.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Markets and Trading: Tokenized real property like farms and factories will create new value and tax revenue by connecting their verified data to carbon credit markets. By tracking and verifying carbon emissions to sell, buy and offset credits associated with these assets, tokenization can increase transparency and liquidity in the carbon credit and other markets. Government validated fractional investments can be displayed and traded on new market places creating new and derivative value.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/marketsandtrading.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Markets and Trading"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section><!-- End Portfolio Section -->
-
-
-
-    <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <h1>The growth statistics and real-world examples demonstrate the significant potential of the Delnorte business model and token value. The app store has the potential to transform various industries and promote innovation and economic growth. As more developers and users adopt the app store, the potential for business growth is significant, with estimates projecting a minimum 500% increase in revenue over the next five years.</h1>
-        </header>
-
-      </div>
-
-    </section><!-- End Team Section -->
-
-      <!-- ======= Hero Section ======= -->
-  <section id="hero" class="hero d-flex align-items-center">
-
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 d-flex flex-column justify-content-center">
-          <h1 data-aos="fade-up">Conclusion:</h1>
-          <h2 data-aos="fade-up" data-aos-delay="400">Delnorte’s innovative approach to digitizing and tokenizing government data through the use of patented blockchain and NFT technology is revolutionizing the way government data is managed, shared, and monetized. The app store provides a marketplace for developers to create and distribute applications that leverage government data, promoting innovation, creating value and economic growth. The use of blockchain and NFT technology promotes transparency and accountability, improving public trust in government and promoting citizen engagement. The implementation of AI makes every interaction on the platform easy and efficient for everyone and gives everyone the ability to create custom no-code applications. Lastly having a native Token allows for a true democratized investment into the business of Delnorte and moreover the prosperity of the participating nation.</h2>
-          <div data-aos="fade-up" data-aos-delay="600">
-
-          </div>
-        </div>
-        <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
-          <img src="img/01.png" class="img-fluid" alt="">
-        </div>
-      </div>
-    </div>
-
-  </section><!-- End Hero -->
-
-      <!-- ======= About Section ======= -->
-      <section id="about" class="about">
-
-        <div class="container" data-aos="fade-up">
-          <div class="row gx-0">
-  
-            <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-              <div class="content">
-                <h3>Disclaimer:</h3>
-                <h2>This white paper provides information and material of a general nature. it is for informational purposes only and does not constitute investment advice. You are not authorized, and nor should you rely on representation for legal advice, investment advice, business advice, or advice of any kind. You act at your own risk in reliance on the contents of the representation. Readers are encouraged to conduct their own research and due diligence before making any investment decisions.</h2>
-              </div>
-            </div>
-  
-            <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-              <img src="img/svg/Disclaimer.png" class="img-fluid" alt="">
-            </div>
-  
-          </div>
-        </div>
-  
-      </section><!-- End About Section -->
-
+<!-- ======= end cajaazul ======= -->
 
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
+<footer id="footer" class="footer">
 
     <div class="footer-newsletter">
       <div class="container">
         <div class="row justify-content-center">
-          <div class="col-lg-12 text-center">
-            <h4>Our Newsletter</h4>
-            <p>Subscribe for notifications</p>
-          </div>
           <div class="col-lg-6">
+            <h4 style="text-align: left;">Subscribe to the DTV newsletter</h4>
             <form action="" method="post">
-              <input type="email" name="email"><input type="submit" value="Subscribe">
+              <input type="email" name="email" placeholder="Type your email address">
+              <input type="submit" value="Subscribe">
             </form>
           </div>
         </div>
       </div>
     </div>
+    
 
     <div class="footer-top">
       <div class="container">
@@ -1860,7 +621,7 @@
           <div class="col-lg-5 col-md-12 footer-info">
             <a href="index.html" class="logo d-flex align-items-center">
               <img src="img/logo.png" alt="">
-              <span>DTV</span>
+              <span><img src="img/dtvcajaazul.png"></span>
             </a>
             <p>DTV (Delnorte Terra Vision)</p>
             <div class="social-links mt-3">
@@ -1872,38 +633,25 @@
           </div>
 
           <div class="col-lg-2 col-6 footer-links">
-            <h4>Links</h4>
+            <h4>Platform</h4>
             <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">The App Store</a></li>
             </ul>
           </div>
 
           <div class="col-lg-2 col-6 footer-links">
-            <h4>Services</h4>
+            <h4>About</h4>
             <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
               <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
             </ul>
           </div>
 
           <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-            <h4>Contact Us</h4>
+            <h4>support</h4>
             <p>
-              example <br>
-              example<br>
-              United States <br><br>
-              <strong>Phone:</strong> +00000000000000<br>
-              <strong>Email:</strong> info@example.com<br>
+              <a href="#">Contact Us</a>
             </p>
-
-          </div>
+          </div>          
 
         </div>
       </div>
@@ -1919,6 +667,9 @@
     </div>
   </footer><!-- End Footer -->
 
+
+  <!-- End Footer -->
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
@@ -1932,6 +683,9 @@
 
   <!-- Template Main JS File -->
   <script src="js/main.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="js/win.js"></script>
 
 </body>
 
