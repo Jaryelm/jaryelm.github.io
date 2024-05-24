@@ -7,6 +7,101 @@
 */
 
 /*--------------------------------------------------------------
+# General about nuevo
+--------------------------------------------------------------*/
+
+.about-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex; /* Añadido */
+  align-items: center; /* Añadido */
+  justify-content: center; /* Añadido */
+}
+
+
+.about-img-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  margin: 10px; /* Añade un espacio entre las imágenes */
+}
+
+.about-img-container img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.5s ease;
+  border-radius: 10px;
+}
+
+.about-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 100px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  transition: 0.5s ease;
+  border-radius: 0 0 10px 10px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.about-overlay h3,
+.about-overlay p {
+  margin: 0;
+}
+
+.about-card:hover .about-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.about-card:hover img {
+  transform: scale(1.1);
+}
+
+.about-card:hover .about-overlay {
+  cursor: auto;
+  -webkit-text-size-adjust: 100%;
+  --white: white;
+  --dark-gray: #191919;
+  --blue--blue: #1048f9;
+  --greenlight: #a3f8da;
+  --black: black;
+  --blue--sky: #00baff;
+  --light-gray: #afafaf;
+  --green--light: #a3f8da;
+  --green: #74f99b;
+  --grey--gray: #efefef;
+  --orange: #f17b4e;
+  --orange--pink: #ef8e7f;
+  --orange--dark: #ef5735;
+  --grey--medium: #8f8f8f;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  font-family: "Calibri", sans-serif;
+  cursor: auto;
+  box-sizing: border-box;
+  backdrop-filter: blur(124px);
+  background-color: rgba(0,0,0,.65);
+  border-radius: 8px;
+  margin: 0px;
+  padding: 32px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg);
+  transform-style: preserve-3d;
+}
+
+/*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
 :root {
@@ -14,17 +109,19 @@
 }
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   color: #444444;
+  font-size: 16px;
+  padding: 20px;
 }
 
 a {
-  color: #4154f1;
+  color: #ffffff;
   text-decoration: none;
 }
 
 a:hover {
-  color: #717ff5;
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -34,7 +131,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
 }
 
 /*--------------------------------------------------------------
@@ -48,7 +145,7 @@ h6 {
 
 .rainbow-text {
   display: inline-block;
-  font-size: 4vw; /* Tamaño de fuente relativo al ancho de la ventana */
+  font-size: 3vw; /* Tamaño de fuente relativo al ancho de la ventana */
   animation: rainbow 5s infinite;
 }
 
@@ -85,6 +182,7 @@ h6 {
   100% { transform: rotate(360deg); }
 }
 
+
 /*--------------------------------------------------------------
 # Sections
 --------------------------------------------------------------*/
@@ -113,7 +211,7 @@ section {
   font-size: 38px;
   line-height: 42px;
   font-weight: 700;
-  color: #012970;
+  color: #000000;
 }
 
 @media (max-width: 768px) {
@@ -141,7 +239,7 @@ section {
 }
 
 .breadcrumbs h2 {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 500;
 }
 
@@ -236,8 +334,8 @@ section {
 }
 
 .header .logo img {
-  max-height: 40px;
-  margin-right: 6px;
+  max-height: 70px;
+  margin-right: 5px;
 }
 
 .header .logo span {
@@ -245,7 +343,7 @@ section {
   font-weight: 700;
   letter-spacing: 1px;
   color: #012970;
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   margin-top: 3px;
 }
 
@@ -277,8 +375,8 @@ section {
   align-items: center;
   justify-content: space-between;
   padding: 10px 0 10px 30px;
-  font-family: "Nunito", sans-serif;
-  font-size: 16px;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
+  font-size: 20px;
   font-weight: 700;
   color: #013289;
   white-space: nowrap;
@@ -527,7 +625,7 @@ section {
 
 .hero h1 {
   margin: 0;
-  font-size: 48px;
+  font-size: 38px;
   font-weight: 700;
   color: #012970;
 }
@@ -550,7 +648,7 @@ section {
 }
 
 .hero .btn-get-started span {
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   font-weight: 600;
   font-size: 16px;
   letter-spacing: 1px;
@@ -588,7 +686,7 @@ section {
   }
 
   .hero .hero-img img {
-    width: 80%;
+    width: 50%;
   }
 }
 
@@ -610,6 +708,24 @@ section {
   }
 }
 
+@media (max-width: 991px) {
+  .hero .hero-img {
+    text-align: center;
+    margin-top: 60px;
+  }
+
+  .hero .hero-img img {
+    width: 80%; /* Cambiar el ancho de la imagen */
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero .hero-img img {
+    width: 80%; /* Reducir el ancho de la imagen en pantallas grandes */
+  }
+}
+
+
 /*--------------------------------------------------------------
 # Index Page
 --------------------------------------------------------------*/
@@ -617,14 +733,14 @@ section {
 # About
 --------------------------------------------------------------*/
 .about .content {
-  background-color: #f6f9ff;
+  background-color: #f7f7f7;
   padding: 40px;
 }
 
 .about h3 {
-  font-size: 14px;
+  font-size: 30px;
   font-weight: 700;
-  color: #4154f1;
+  color: #012970;
   text-transform: uppercase;
 }
 
@@ -635,9 +751,11 @@ section {
 }
 
 .about p {
-  margin: 15px 0 30px 0;
-  line-height: 24px;
+  margin: 20px 0 30px 0;
+  line-height: 30px;
+  font-size: 20px; /* Ajusta el tamaño de la fuente */
 }
+
 
 .about .btn-read-more {
   line-height: 0;
@@ -650,7 +768,7 @@ section {
 }
 
 .about .btn-read-more span {
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   font-weight: 600;
   font-size: 16px;
   letter-spacing: 1px;
@@ -731,9 +849,135 @@ section {
 .counts .count-box p {
   padding: 0;
   margin: 0;
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   font-size: 14px;
 }
+
+/*--------------------------------------------------------------
+# Caja Azul
+--------------------------------------------------------------*/
+
+/* Variables */
+:root {
+  --primary-color: #0056b3;
+  --secondary-color: #191919;
+  --background-color: #f2f2f3;
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Calibri", sans-serif;
+  background-color: var(--background-color);
+}
+
+/* Caja Azul styles */
+.caja-azul {
+  background-image: linear-gradient(to bottom, #191919, var(--primary-color), var(--secondary-color));
+  color: #fff;
+  padding: 30px 50px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.caja-azul__text {
+  flex: 1;
+  max-width: 35%; /* Limitar ancho del texto al 35% de la pantalla */
+  margin-right: 20px;
+}
+
+.caja-azul__text h2 {
+  font-size: 3em; /* Cambié el tamaño de la fuente */
+  margin-bottom: 10px;
+}
+
+.caja-azul__text p {
+  font-size: 1.3em; /* Cambié el tamaño de la fuente */
+  margin-bottom: 20px; /* Ajusté el espacio inferior */
+}
+
+.caja-azul__button {
+  padding: 10px 30px; /* Ajusté el relleno del botón */
+  background-color: #fff;
+  color: var(--primary-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.caja-azul__button:hover {
+  background-color: #ddd;
+}
+
+.caja-azul__image-container {
+  flex-shrink: 0;
+  margin-left: -10px; /* Ajusté el margen izquierdo para mover la imagen a la izquierda */
+  overflow: hidden;
+  position: relative;
+  perspective: 1000px; /* Agregamos perspectiva para efecto 3D */
+}
+
+.caja-azul__image {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px; /* Ajusté la altura máxima de la imagen */
+  animation: rotateAndTranslate 10s infinite alternate; /* Animación en bucle */
+  transform-style: preserve-3d; /* Preservamos el estilo 3D */
+}
+
+/* Media query para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+  .caja-azul {
+    display: block;
+    text-align: center;
+    padding: 30px; /* Ajusté el relleno */
+  }
+
+  .caja-azul__text {
+    max-width: 100%; /* Eliminar límite de ancho en pantallas pequeñas */
+    margin: 0 auto 20px;
+  }
+
+  .caja-azul__image-container {
+    margin: 0 auto;
+    margin-top: 20px;
+  }
+}
+
+/* Media query para pantallas grandes */
+@media screen and (min-width: 1200px) {
+  .caja-azul {
+    justify-content: space-between;
+  }
+
+  .caja-azul__text {
+    margin-right: 20px;
+    margin-left: 235px;
+  }
+
+  .caja-azul__image-container {
+    margin-right: 165px;
+  }
+}
+
+/* Animación de rotación y traducción */
+@keyframes rotateAndTranslate {
+  0% {
+    transform: rotateY(0deg) translateX(0px); /* Estado inicial */
+  }
+  100% {
+    transform: rotateY(20deg) translateX(20px); /* Estado final */
+  }
+}
+
 
 /*--------------------------------------------------------------
 # Features
@@ -791,7 +1035,7 @@ section {
 .features .feture-tabs .nav-link {
   background: none;
   text-transform: uppercase;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   color: #012970;
   padding: 12px 0;
@@ -827,7 +1071,7 @@ section {
   color: #012970;
   font-weight: 700;
   font-size: 32px;
-  margin-bottom: 20px;
+  margin-bottom: 60px;
   text-align: center;
 }
 
@@ -1050,7 +1294,7 @@ section {
   font-size: 36px;
   color: #444444;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
 }
 
 .pricing .price sup {
@@ -1101,7 +1345,7 @@ section {
   transition: none;
   font-size: 16px;
   font-weight: 400;
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   font-weight: 600;
   transition: 0.3s;
   border: 1px solid #4154f1;
@@ -1426,7 +1670,7 @@ width: 200px;
   box-sizing: content-box;
   padding: 30px;
   margin: 40px 30px;
-  box-shadow: 0px 0 20px rgba(1, 41, 112, 0.1);
+  box-shadow: 0px 0 20px rgba(0, 0, 0, 0.1);
   background: #fff;
   min-height: 320px;
   display: flex;
@@ -1479,11 +1723,11 @@ width: 200px;
   height: 12px;
   background-color: #fff;
   opacity: 1;
-  border: 1px solid #4154f1;
+  border: 1px solid #191919;
 }
 
 .testimonials .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #4154f1;
+  background-color: #191919;
 }
 
 .testimonials .swiper-slide {
@@ -2330,15 +2574,16 @@ width: 200px;
 # Footer
 --------------------------------------------------------------*/
 .footer {
-  background: #f6f9ff;
+  background: #191919;
   padding: 0 0 30px 0;
   font-size: 14px;
 }
 
 .footer .footer-newsletter {
   padding: 50px 0;
-  background: #f6f9ff;
-  border-top: 1px solid #e1ecff;
+  background: #191919; /* Fondo con efecto glass */
+  border-top: 1px solid rgba(25, 25, 25, 0.8);
+  backdrop-filter: blur(10px); /* Aplicar efecto de desenfoque */
 }
 
 .footer .footer-newsletter h4 {
@@ -2347,49 +2592,46 @@ width: 200px;
   padding: 0;
   line-height: 1;
   font-weight: 700;
-  color: #012970;
+  color: #ffffff;
 }
 
 .footer .footer-newsletter form {
   margin-top: 20px;
-  background: #fff;
+  background: linear-gradient(135deg, #1B2735, #191919);
   padding: 6px 10px;
   position: relative;
   border-radius: 4px;
-  border: 1px solid #e1ecff;
+  border: 1px solid #191919;
 }
 
 .footer .footer-newsletter form input[type=email] {
   border: 0;
   padding: 8px;
   width: calc(100% - 140px);
+  color: #fff;
+  background-color: transparent;
 }
 
 .footer .footer-newsletter form input[type=submit] {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
   border: 0;
-  background: none;
+  background: linear-gradient(135deg, #4154f1, #192a57);
   font-size: 16px;
-  padding: 0 30px;
-  margin: 3px;
-  background: #4154f1;
+  padding: 8px 20px;
   color: #fff;
   transition: 0.3s;
   border-radius: 4px;
 }
 
 .footer .footer-newsletter form input[type=submit]:hover {
-  background: #5969f3;
+  background: linear-gradient(135deg, #5969f3, #1b2e5c);
 }
 
+
 .footer .footer-top {
-  background: white url(../img/footer-bg.png) no-repeat right top;
+  background: #191919;
   background-size: contain;
-  border-top: 1px solid #e1ecff;
-  border-bottom: 1px solid #e1ecff;
+  border-top: 1px solid #191919;
+  border-bottom: 1px solid #191919;
   padding: 60px 0 30px 0;
 }
 
@@ -2417,8 +2659,8 @@ width: 200px;
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: #012970;
-  font-family: "Nunito", sans-serif;
+  color: #fff;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
   margin-top: 3px;
 }
 
@@ -2426,26 +2668,27 @@ width: 200px;
   font-size: 14px;
   line-height: 24px;
   margin-bottom: 0;
-  font-family: "Nunito", sans-serif;
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
+  color: #fff;
 }
 
 .footer .footer-top .social-links a {
   font-size: 20px;
   display: inline-block;
-  color: rgba(1, 41, 112, 0.5);
+  color: rgba(255, 255, 255, 0.5);
   line-height: 0;
   margin-right: 10px;
   transition: 0.3s;
 }
 
 .footer .footer-top .social-links a:hover {
-  color: #012970;
+  color: #ffffff;
 }
 
 .footer .footer-top h4 {
   font-size: 16px;
   font-weight: bold;
-  color: #012970;
+  color: #ffffff;
   text-transform: uppercase;
   position: relative;
   padding-bottom: 12px;
@@ -2479,14 +2722,14 @@ width: 200px;
 }
 
 .footer .footer-top .footer-links ul a {
-  color: #013289;
+  color: #ffffff;
   transition: 0.3s;
   display: inline-block;
   line-height: 1;
 }
 
 .footer .footer-top .footer-links ul a:hover {
-  color: #4154f1;
+  color: #ffffff;
 }
 
 .footer .footer-top .footer-contact p {
@@ -2496,12 +2739,12 @@ width: 200px;
 .footer .copyright {
   text-align: center;
   padding-top: 30px;
-  color: #012970;
+  color: #ffffff;
 }
 
 .footer .credits {
   padding-top: 10px;
   text-align: center;
   font-size: 13px;
-  color: #012970;
+  color: #ffffff;
 }
