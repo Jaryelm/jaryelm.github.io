@@ -87,8 +87,12 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-6 d-flex flex-column justify-content-center">
-          <h1 data-aos="fade-up">Revolutionizing Government Interactions</h1>
-          <h2 data-aos="fade-up" data-aos-delay="400">We use our proprietary automation and blockchain technology to secure your data while streamlining transacations between governments and consumers.</h2>
+          <h1 data-aos="fade-up">
+            <span id="animated-text"></span>
+          </h1>
+          <h2 data-aos="fade-up" data-aos-delay="400">
+            We use our proprietary automation and blockchain technology to secure your data while streamlining transactions between governments and consumers.
+          </h2>
           <div data-aos="fade-up" data-aos-delay="600">
             <div class="text-center text-lg-start">
               <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
@@ -97,7 +101,23 @@
               </a>
             </div>
           </div>
-        </div>
+        </div>        
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            var options = {
+              strings: ["Streamlining Real Estate Data", "Upgrading to Blockchain Efficiency"],
+              typeSpeed: 50,     // Velocidad de tipeo
+              backSpeed: 50,     // Velocidad al borrar
+              backDelay: 2000,   // Tiempo antes de empezar a borrar
+              startDelay: 1000,  // Tiempo antes de empezar a escribir
+              loop: true         // Loops infinitos de la animación
+            };
+        
+            var typed = new Typed("#animated-text", options);
+          });
+        </script>        
+
         <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
           <img src="img/01.png" class="img-fluid rounded-circle" alt="">
         </div>        
@@ -469,28 +489,12 @@
                   <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                 </div>
                 <p>
-                  Delnorte’s real estate platform is a very importante project to help make the world's records and properties more secure.
-                </p>
-                <div class="profile mt-auto">
-                  <img src="img/testimonials/testimonials-01.png" class="testimonial-img" alt="">
-                  <h3>Juan Bagration-Mukhrani</h3>
-                  <h4>PRINCE OF GEORGIA</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
                   Territorial and owneship problems are factors that impede the organization and development of San Bartolome. Therefore, the implementation of DelNorte technology will great help in solving those issues.
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-02.png" class="testimonial-img" alt="">
                   <h3>Ronal Ortiz</h3>
-                  <h4>MAYOR OF SAN BARTOLOME PERULAPIA, EL SALVADOR</h4>
+                  <h4>FORMER MAYOR</h4>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -684,8 +688,12 @@
   <!-- Template Main JS File -->
   <script src="js/main.js"></script>
 
-  <!-- Template Main JS File -->
+  <!-- win -->
   <script src="js/win.js"></script>
+
+  <!-- type animation -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
 
 </body>
 
