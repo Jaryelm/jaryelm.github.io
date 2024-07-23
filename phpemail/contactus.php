@@ -9,9 +9,9 @@ require __DIR__ . '/../PHPMailer/src/SMTP.php';
 $mail = new PHPMailer(true);
 $mail->CharSet = 'UTF-8';
 
-// Habilitar modo de depuración
-$mail->SMTPDebug = 2; // Cambia esto a 4 para ver todos los mensajes de depuración detallados
-$mail->Debugoutput = 'html'; // Salida de depuración en formato HTML
+// Habilitar la depuración de PHPMailer
+$mail->SMTPDebug = 3; // 3 para depuración detallada (muestra todos los mensajes SMTP)
+$mail->Debugoutput = 'html'; // Formato de depuración en HTML
 
 try {
     // Configuración del servidor SMTP
@@ -19,14 +19,14 @@ try {
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
     $mail->Username = 'contact@delnorte.io'; // Reemplaza con tu dirección de correo Gmail
-    $mail->Password = 'Con11206'; // Reemplaza con tu contraseña de correo Gmail
+    $mail->Password = 'rgzdpvytgdjgwlza'; // Reemplaza con tu contraseña de aplicación sin espacios
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
     // Destinatarios
     $mail->setFrom('contact@delnorte.io', 'Support'); // Reemplaza con tu dirección de correo Gmail
     $mail->addAddress('contact@delnorte.io'); // Correo de destino
-    $mail->addAddress('moises.castillo@medicasa.hn'); // Segundo destinatario, reemplázalo con la dirección de correo adicional
+    $mail->addAddress('moises.castillo@medicasa.hn'); // Segundo destinatario
 
     // Recogiendo datos del formulario
     $nombre = htmlspecialchars($_POST['name']);
