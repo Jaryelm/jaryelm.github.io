@@ -18,13 +18,13 @@ try {
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'jaryelm@gmail.com'; // Reemplaza con tu dirección de correo Gmail
-    $mail->Password = 'prfimoxkxttokgeo'; // Reemplaza con tu contraseña de aplicación sin espacios
+    $mail->Username = 'contact@delnorte.io'; // Reemplaza con tu dirección de correo Gmail
+    $mail->Password = 'rgzdpvytgdjgwlza'; // Reemplaza con tu contraseña de aplicación sin espacios
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
     // Destinatarios
-    $mail->setFrom('jaryelm@gmail.com', 'Support'); // Reemplaza con tu dirección de correo Gmail
+    $mail->setFrom('contact@delnorte.io', 'Support'); // Reemplaza con tu dirección de correo Gmail
     $mail->addAddress('contact@delnorte.io'); // Correo de destino
     $mail->addAddress('moises.castillo@medicasa.hn'); // Segundo destinatario
 
