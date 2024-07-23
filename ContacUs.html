@@ -193,7 +193,7 @@
       <div class="banner banner-top">
         <h1></h1>
       </div>
-
+    
       <div class="contact-section">
         <div class="background"></div>
         <div class="contact-container">
@@ -211,19 +211,19 @@
               <option value="multi_family">Suggestions for system improvement</option>
             </select>
             <textarea 
-    name="message" 
-    placeholder="Please write a brief description" 
-    required minlength="100" 
-    rows="6" 
-    style="width: 100%; color: black; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
-></textarea>
-
+              name="message" 
+              placeholder="Please write a brief description" 
+              required minlength="100" 
+              rows="6" 
+              style="width: 100%; color: black; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
+            ></textarea>
+    
             <button type="submit">Submit</button>
           </form>
         </div>
       </div>
-      
-    </main>
+    </main>    
+    
     <!-- End #main -->
 
 <!-- ======= Start Footer ======= -->
@@ -263,18 +263,18 @@
                   </div>
               </div>
               <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
-                  <div class="footer-widget">
-                      <div class="footer-widget-heading">
-                          <h3>Subscribe to the DTV newsletter</h3>
-                      </div>
-                      <div class="subscribe-form">
-                          <form action="#">
-                              <input type="text" placeholder="Email Address">
-                              <button><i class="bi bi-send"></i></button>
-                          </form>
-                      </div>
-                  </div>
-              </div>
+                <div class="footer-widget">
+                    <div class="footer-widget-heading">
+                        <h3>Subscribe to the DTV newsletter</h3>
+                    </div>
+                    <div class="subscribe-form">
+                        <form action="send_mail.php" method="post">
+                            <input type="email" name="email" placeholder="Email Address" required>
+                            <button type="submit"><i class="bi bi-send"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>            
           </div>
       </div>
   </div>
