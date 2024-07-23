@@ -67,9 +67,9 @@
         <ul>
           <li><a class="nav-link scrollto active" href="index.html">Home</a></li>
           <li class="dropdown">
-            <a href="#"><span>Network</span> <i class="bi bi-chevron-down"></i></a>
+            <a href="#"><span>Network</span></a>
             <ul>
-              <li><a href="#">Community</a></li>
+              <li><a href="community.html">Community</a></li>
               <li><a href="token.html">Token</a></li>
             </ul>
           </li>
@@ -81,356 +81,436 @@
     </div>
   </header><!-- End Header -->
 
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="hero d-flex align-items-center">
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="hero d-flex align-items-center justify-content-center">
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 d-flex flex-column justify-content-center">
-          <h1 data-aos="fade-up" style="font-size: 5em; background: linear-gradient(to right, #4154f1, #6b6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            <span id="animated-text"></span>
-          </h1>  
-          <h2 data-aos="fade-up" data-aos-delay="400">
-            We use our proprietary automation and blockchain technology to secure your data while streamlining transactions between governments and consumers.
-          </h2>
-          <div data-aos="fade-up" data-aos-delay="600">
-            <div class="text-center text-lg-start">
-              <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-                <span>Pre-Sale</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 d-flex flex-column justify-content-center align-items-center">
+        <h5 data-aos="fade-up" class="custom-animated-text">
+          <span id="custom-animated-text"></span>
+        </h5>
+        <h2 data-aos="fade-up" data-aos-delay="400">
+          We use our proprietary automation and blockchain technology to secure your data while streamlining transactions between governments and consumers.
+        </h2>
+        <!--
+        <div data-aos="fade-up" data-aos-delay="600">
+          <div class="text-center">
+            <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center">
+              <span>Pre Sale</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
           </div>
-        </div>        
-
-        <script>
-          document.addEventListener("DOMContentLoaded", function() {
-            var options = {
-              strings: ["Revolutionizing Government Interactions", "Streamlining Real Estate Data", "Upgrading to Blockchain Efficiency"],
-              typeSpeed: 85,     // Velocidad de tipeo
-              backSpeed: 10,     // Velocidad al borrar
-              backDelay: 2000,   // Tiempo antes de empezar a borrar
-              startDelay: 1000,  // Tiempo antes de empezar a escribir
-              loop: true         // Loops infinitos de la animación
-            };
-        
-            var typed = new Typed("#animated-text", options);
-          });
-        </script> 
-
-        <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
-          <img src="img/01.png" class="img-fluid rounded-circle" alt="">
-        </div>        
+        </div>
+        -->
       </div>
     </div>
 
-  </section><!-- End Hero -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+          strings: [
+            "<strong>Revolutionizing Government Interactions</strong>", 
+            "<strong>Streamlining Real Estate Data</strong>", 
+            "<strong>Upgrading to Blockchain Efficiency</strong>"
+          ],
+          typeSpeed: 100,     // Velocidad de tipeo
+          backSpeed: 10,     // Velocidad al borrar
+          backDelay: 2000,   // Tiempo antes de empezar a borrar
+          startDelay: 1000,  // Tiempo antes de empezar a escribir
+          loop: true,        // Loops infinitos de la animación
+          smartBackspace: true, // Elimina solo las cadenas que han cambiado para hacer la animación más natural
+        };
+
+        var typed = new Typed("#custom-animated-text", options);
+      });
+    </script>
+
+  </div>
+
+</section><!-- End Hero -->
+
+<style>
+  .hero {
+    width: 100%;
+    height: 100vh;
+    background: url(../img/hero-bg02.jpg) top center no-repeat;
+    background-size: cover;
+  }
+
+  .custom-animated-text {
+    font-size: 120px;
+    background: linear-gradient(to right, #ffffff, #6b6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @media (max-width: 767px) {
+    .custom-animated-text {
+      font-size: 2.5em; /* Tamaño más pequeño para pantallas pequeñas */
+    }
+  }
+
+  .container.text-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .btn-get-started {
+    font-size: 1.25rem;
+    padding: 10px 35px;
+    color: #030728;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid transparent;
+    transition: 0.2s ease;
+  }
+
+  .btn-get-started:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #fff;
+    color: #fff;
+  }
+</style>
+
 
   <main id="main">
 
 <!-- ======= About Section ======= -->
-<section id="about" class="about">
-
+<section id="abouts" class="abouts d-flex align-items-center justify-content-center">
   <div class="container" data-aos="fade-up">
-    <div class="row gx-0">
-
-      <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-        <br><br>
-        <div class="content-box"> <!-- Agregamos la clase content-box aquí -->
-          <div class="content">
-            <h2>Introduction</h2>
-            <p>In today's digital age, the need for secure, transparent, and efficient government interactions is more critical than ever. DelNorte Terra Vision (DTV) has taken on the challenge of revolutionizing the way government data is managed, shared, and monetized through the use of our blockchain and non-fungible token (NFT) technology.</p>
+    <div class="row gx-0 justify-content-center">
+      <div class="col-lg-12 d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="content-box">
+          <div class="content text-center">
+            <h1 data-aos="fade-up" class="hero-title centered-title">
+              In today's digital age, the need for secure, transparent, and efficient government interactions is more critical than ever. DelNorte Terra Vision (DTV) has taken on the challenge of revolutionizing the way government data is managed, shared, and monetized through the use of our blockchain and non-fungible token (NFT) technology.
+            </h1>
           </div>
         </div>
       </div>
-
-      <div class="col-lg-6 d-flex align-items-center justify-content-center" data-aos="zoom-out" data-aos-delay="200">
-        <div id="logo-container">
-          <img id="logo-img" src="img/logo.png" class="img-fluid logo-3d" alt="">
-        </div>
-          <style>
-/* Agrega el estilo para la caja content-box */
-.content-box {
-  background-color: #f7f7f7;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.content h2 {
-  margin-bottom: 10px;
-  color: #333;
-  font-size: 40px;
-}
-
-.content p {
-  color: #555;
-  font-size: 18px;
-}
-
-/* Estilos 3D */
-:root {
-  --perspective: 1000px;
-  --rotate-y: 30deg;
-  --scale: 1.1;
-  --animation-duration: 2s;
-}
-
-.logo-3d {
-  width: 250px;
-  transition: transform 0.5s;
-}
-
-.logo-3d:hover {
-  transform: perspective(var(--perspective)) rotateY(0deg) translateZ(0px) scale(var(--scale));
-}
-
-.logo-3d.flip {
-  transform: perspective(var(--perspective)) rotateY(180deg) translateZ(20px);
-}
-
-.logo-3d.flip:hover {
-  transform: perspective(var(--perspective)) rotateY(0deg) translateZ(0px) scale(var(--scale));
-}
-
-@keyframes flip {
-  0% {
-    transform: perspective(var(--perspective)) rotateY(0deg) translateZ(20px);
-  }
-  100% {
-    transform: perspective(var(--perspective)) rotateY(180deg) translateZ(20px);
-  }
-}
-
-@keyframes zoom {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-#logo-img {
-  animation: zoom var(--animation-duration) infinite alternate;
-}
-          </style>
-      </div>
-
     </div>
   </div>
-
 </section><!-- End About Section -->
 
+<style>
+/* Estilo de la sección About */
+.abouts {
+  width: 100%;
+  height: 100vh;
+  background: #191919; /* Fondo oscuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    <!-- ======= Values Section ======= -->
-    <section id="values" class="values">
+.content-box {
+  background-color: #191919;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 80%;
+  margin: 20px; /* Ajustar margen */
+  animation: shadowColorChange 5s infinite alternate; /* Animación de cambio de color */
+  text-align: center;
+}
 
-      <div class="container" data-aos="fade-up">
+@keyframes shadowColorChange {
+  0% {
+    box-shadow: 0 0px 200px rgba(189, 155, 252, 0.8); /* Sombras más claras */
+  }
+  100% {
+    box-shadow: 0 0px 200px rgba(17, 3, 43, 0.8); /* Sombras más blancas */
+  }
+}
 
-        <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="contents-box">
-            <div class="content" style="margin-left: 55px;"> <!-- Añadí un margen de 10px -->
-              <h2><strong>What's New With DTV</strong></h2>
-              <br>
-              <p>In Phase I: We have pilot programs in various stages of development with the governments of El Salvador, Mexico, and Honduras. Essentially, we’re implementing transactions on a municipality level.</p>
-            </div>
-          </div>
-        </div>        
+.hero-title {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
 
-        <style>
+.centered-title {
+  font-size: 2vw; /* Tamaño de fuente inicial */
+}
 
-        </style>
-        
+@media (max-width: 992px) {
+  .content-box {
+    max-width: 90%;
+  }
 
-        <br><br>
+  .centered-title {
+    font-size: 3vw;
+  }
+}
 
-        <div class="row">
+@media (max-width: 768px) {
+  .content-box {
+    max-width: 95%;
+    padding: 15px;
+  }
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="box">
-              <a href="https://www.instagram.com/p/CgxPuuouEJ0/?img_index=5" target="_blank">
-                <img src="img/clients/contratos1.png" class="img-fluid" alt="">
-              </a>              
-              <h4>Government Pilot Program</h4>
-              <p>El Salvador</p>
-            </div>
-          </div>
+  .centered-title {
+    font-size: 4vw;
+  }
+}
 
-          <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="400">
-            <div class="box">
-              <a href="https://www.facebook.com/story.php?story_fbid=pfbid0M5cyGeUw4azjxZENiwBA6BfvwJ5e2pBzr183zdPVbiggjaTuTkf7bvaodQia7wJ7l&id=106535826094917&mibextid=l066kq&_rdr" target="_blank">
-                <img src="img/clients/contratos2.png" class="img-fluid" alt="">
-              </a>
-              <h4>Government Pilot Program</h4>
-              <p>Honduras</p>
-            </div>
-          </div>
+@media (max-width: 576px) {
+  .content-box {
+    max-width: 100%;
+    padding: 10px;
+  }
 
-          <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="600">
-            <div class="box">
-              <a href="https://www.facebook.com/NDDGobiernoMunicipal/videos/591418099173129/?extid=CL-UNK-UNK-UNK-AN_GK0T-GK1C" target="_blank">
-                <img src="img/clients/contratos3.png" class="img-fluid" alt="">
-              </a>
-              <h4>Government Pilot Program</h4>
-              <p>Mexico</p>
-            </div>
-          </div>
+  .centered-title {
+    font-size: 5vw;
+  }
+}
+</style>
 
+
+
+<!-- ======= Values Section ======= -->
+<section id="values" class="values">
+  <div class="container" data-aos="fade-up">
+
+    <h1 data-aos="fade-up" class="hero-title large-title">
+      What's New With DTV
+    </h1>
+    <h2 data-aos="fade-up" class="hero-title small-title">
+      In Phase I: We have pilot programs in various stages of development with the governments of El Salvador, Mexico, and Honduras. Essentially, we’re implementing transactions on a municipality level.
+    </h2>
+
+    <br><br>
+
+    <div class="row">
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="box text-white">
+          <a href="https://www.instagram.com/p/CgxPuuouEJ0/?img_index=5" target="_blank">
+            <img src="img/clients/contratos1.png" class="img-fluid" alt="">
+          </a>
+          <h4>Government Pilot Program</h4>
+          <p>El Salvador</p>
         </div>
-
       </div>
 
-    </section><!-- End Values Section -->
-
-    <!-- ======= Features Section ======= -->
-    <section id="features" class="features">
-
-      <div class="container" data-aos="fade-up">
-
-<!-- Feature Tabs -->
-<div class="row feture-tabs" data-aos="fade-up">
-  <div class="col-lg-6 d-flex align-items-center justify-content-center">
-    <div class="contents-box">
-      <div class="content">
-        <h3>Delnorte’s platform enables the creation of digital smart certificates that are NFT’s of government real estate documents</h3>
-
-        <br>
-
-        <!-- Tabs -->
-        <ul class="nav nav-pills mb-3">
-          <li>
-            <a class="nav-link active" data-bs-toggle="pill" href="#tab1">blockchain</a>
-          </li>
-          <li>
-            <a class="nav-link" data-bs-toggle="pill" href="#tab2">The platform</a>
-          </li>
-          <li>
-            <a class="nav-link" data-bs-toggle="pill" href="#tab3">Solution Overview</a>
-          </li>
-        </ul><!-- End Tabs -->
-
-        <br>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-
-          <div class="tab-pane fade show active" id="tab1">
-            <p>Proprietary processes let us utilize physical documents and convert them to a digital format thus enabling us to tokenize and store them on the blockchain.</p>
-            <br>
-            <div class="d-flex align-items-center mb-2">
-              <i class="bi bi-check2"></i>
-              <h4>This approach ensures the authenticity, integrity, and security of government data, while also enabling real-time access and sharing between government agencies and the private sector.</h4>
-            </div>
-            <br>
-            <p>Our technology is chain agnostic, creating a secure mindset to safely deploy on the blockchain.</p>
-          </div><!-- End Tab 1 Content -->
-
-          <div class="tab-pane fade show" id="tab2">
-            <p>Our platform, along with our cutting-edge legislation and accompanying contract, empowers you to easily automate a wide range of transactions, from buying and selling real estate to transferring titles.</p>
-            <br>
-            <div class="d-flex align-items-center mb-2">
-              <i class="bi bi-check2"></i>
-              <h4>We automate business licensing, permits, tax collection, benefits distribution, applications, municipal services and much more.</h4>
-            </div>
-            <br>
-            <p>This database contains specific public information and documents that belong to either the government or the document's individual owners. While certain information itself is public, the online access and interface to this data is deployed by DelNorte. Citizens still will have the option to physically visit the public office and pull the documents themselves, but why should they in the future?</p>
-          </div><!-- End Tab 2 Content -->
-
-          <div class="tab-pane fade show" id="tab3">
-            <p>Our solution harnesses proprietary blockchain and NFT processes to digitize and tokenize government data, making it accessible, transparent, and immutable.</p>
-            <br>
-            <div class="d-flex align-items-center mb-2">
-              <i class="bi bi-check2"></i>
-              <h4>Our goal is creating an app store that allows developers specific government data to build compliant, accurate and endorsed applications that streamline interactions between the government and the private sector while enhancing citizen engagement.</h4>
-            </div>
-            <br>
-            <p>Through real-world data, we demonstrate the potential of our platform to revolutionize governance and drive business growth.</p>
-          </div><!-- End Tab 3 Content -->
-
+      <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="400">
+        <div class="box text-white">
+          <a href="https://www.facebook.com/story.php?story_fbid=pfbid0M5cyGeUw4azjxZENiwBA6BfvwJ5e2pBzr183zdPVbiggjaTuTkf7bvaodQia7wJ7l&id=106535826094917&mibextid=l066kq&_rdr" target="_blank">
+            <img src="img/clients/contratos2.png" class="img-fluid" alt="">
+          </a>
+          <h4>Government Pilot Program</h4>
+          <p>Honduras</p>
         </div>
+      </div>
 
+      <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="600">
+        <div class="box text-white">
+          <a href="https://www.facebook.com/NDDGobiernoMunicipal/videos/591418099173129/?extid=CL-UNK-UNK-UNK-AN_GK0T-GK1C" target="_blank">
+            <img src="img/clients/contratos3.png" class="img-fluid" alt="">
+          </a>
+          <h4>Government Pilot Program</h4>
+          <p>Mexico</p>
+        </div>
       </div>
     </div>
+
   </div>
+</section><!-- End Values Section -->
 
-  <div class="col-lg-6">
-    <img src="img/04.png" class="img-fluid" alt="" style="border-radius: 10%;">
-  </div>
+<!-- ======= Features Section ======= -->
+<section id="features" class="features">
 
-</div><!-- End Feature Tabs -->
+  <div class="container" data-aos="fade-up">
 
+    <!-- Feature Tabs -->
+    <div class="row feture-tabs" data-aos="fade-up">
+      <div class="col-lg-6 d-flex align-items-center justify-content-center">
+        <div class="contents-box">
+          <div class="content">
+            <h3 class="responsive-heading">
+              Delnorte’s platform enables the creation of digital smart certificates that are NFT’s of government real estate documents
+            </h3>
 
-        <!-- Feature Icons -->
-        <div class="row feature-icons" data-aos="fade-up">
-          <h3 style="margin-left: 14px;">Key Features and Benefits</h3>
+            <br>
 
-          <div class="row">
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-3">
+              <li>
+                <a class="nav-link active" data-bs-toggle="pill" href="#tab1">blockchain</a>
+              </li>
+              <li>
+                <a class="nav-link" data-bs-toggle="pill" href="#tab2">The platform</a>
+              </li>
+              <li>
+                <a class="nav-link" data-bs-toggle="pill" href="#tab3">Solution Overview</a>
+              </li>
+            </ul><!-- End Tabs -->
 
-            <div class="col-xl-4 text-center" data-aos="fade-right" data-aos-delay="100">
-              <img src="img/03.png" class="img-fluid p-4" alt="">
+            <br>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+
+              <div class="tab-pane fade show active" id="tab1">
+                <p class="responsive-text">
+                  Proprietary processes let us utilize physical documents and convert them to a digital format thus enabling us to tokenize and store them on the blockchain.
+                </p>
+                <br>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="bi bi-check2"></i>
+                  <h4 class="responsive-text">
+                    This approach ensures the authenticity, integrity, and security of government data, while also enabling real-time access and sharing between government agencies and the private sector.
+                  </h4>
+                </div>
+                <br>
+                <p class="responsive-text">
+                  Our technology is chain agnostic, creating a secure mindset to safely deploy on the blockchain.
+                </p>
+              </div><!-- End Tab 1 Content -->
+              
+              <div class="tab-pane fade show" id="tab2">
+                <p class="responsive-text">
+                  Our platform, along with our cutting-edge legislation and accompanying contract, empowers you to easily automate a wide range of transactions, from buying and selling real estate to transferring titles.
+                </p>
+                <br>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="bi bi-check2"></i>
+                  <h4 class="responsive-text">
+                    We automate business licensing, permits, tax collection, benefits distribution, applications, municipal services and much more.
+                  </h4>
+                </div>
+                <br>
+                <p class="responsive-text">
+                  This database contains specific public information and documents that belong to either the government or the document's individual owners. While certain information itself is public, the online access and interface to this data is deployed by DelNorte. Citizens still will have the option to physically visit the public office and pull the documents themselves, but why should they in the future?
+                </p>
+              </div><!-- End Tab 2 Content -->
+              
+              <div class="tab-pane fade show" id="tab3">
+                <p class="responsive-text">
+                  Our solution harnesses proprietary blockchain and NFT processes to digitize and tokenize government data, making it accessible, transparent, and immutable.
+                </p>
+                <br>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="bi bi-check2"></i>
+                  <h4 class="responsive-text">
+                    Our goal is creating an app store that allows developers specific government data to build compliant, accurate and endorsed applications that streamline interactions between the government and the private sector while enhancing citizen engagement.
+                  </h4>
+                </div>
+                <br>
+                <p class="responsive-text">
+                  Through real-world data, we demonstrate the potential of our platform to revolutionize governance and drive business growth.
+                </p>
+              </div><!-- End Tab 3 Content -->
+
             </div>
 
-            <div class="col-xl-8 d-flex content">
-              <div class="row align-self-center gy-4">
+          </div>
+        </div>
+      </div>
 
-                <div class="col-md-6 icon-box" data-aos="fade-up">
-                  <i class="ri-database-line"></i>
-                  <div>
-                    <h4>Digitization of Government Data: Our platform digitizes government data, making it easily accessible to citizens and businesses.</h4>
-                  </div>
-                </div>
+      <div class="col-lg-6 d-flex align-items-center justify-content-center" data-aos="fade-right" data-aos-delay="100">
+        <img src="img/04.png" class="img-fluid custom-shadow" alt="" style="border-radius: 10%;">
+      </div>
 
-                <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="100">
-                  <i class="ri-stack-line"></i>
-                  <div>
-                    <h4>Tokenization with NFTs: We tokenize digitized government data using NFT technology and store it on the blockchain, ensuring its authenticity, immutability, and ownership.</h4>
-                  </div>
-                </div>
+    </div><!-- End Feature Tabs -->
 
-                <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="200">
-                  <i class="ri-emotion-happy-line"></i>
-                  <div>
-                    <h4>Transparent Interactions: By recording interactions between the government and the private sector on the blockchain, we enhance transparency and accountability.</h4>
-                  </div>
-                </div>
+    <br><br><br><br>
 
-                <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="300">
-                  <i class="ri-government-line"></i>
-                  <div>
-                    <h4>App Store Utilizing Government Data: Our app store provides developers with access to government data, enabling them to create innovative applications that improve government services and citizen engagement.</h4>
-                  </div>
-                </div>
+    <!-- Feature Icons -->
+    <div class="row feature-icons" data-aos="fade-up">
+      <h3 class="responsive-heading text-center">
+        Key Features and Benefits
+      </h3>
 
-                <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="400">
-                  <i class="ri-time-zone-line"></i>
-                  <div>
-                    <h4>Real-time Verification and Transactions: Through integration with government systems, our platform facilitates real-time verification and transaction processing, enhancing efficiency and reducing bureaucracy.</h4>
-                  </div>
-                </div>
+      <div class="row">
 
+        <div class="col-xl-4 text-center" data-aos="fade-right" data-aos-delay="100">
+          <img src="img/03.png" class="img-fluid p-4 custom-shadow" alt="">
+        </div>       
+
+        <div class="col-xl-8 d-flex content">
+          <div class="row align-self-center gy-4">
+
+            <div class="col-md-6 icon-box" data-aos="fade-up">
+              <i class="ri-database-line"></i>
+              <div>
+                <h4 class="responsive-text">
+                  Digitization of Government Data: Our platform digitizes government data, making it easily accessible to citizens and businesses.
+                </h4>
+              </div>
+            </div>               
+
+            <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="100">
+              <i class="ri-stack-line"></i>
+              <div>
+                <h4 class="responsive-text">
+                  Tokenization with NFTs: We tokenize digitized government data using NFT technology and store it on the blockchain, ensuring its authenticity, immutability, and ownership.
+                </h4>
+              </div>
+            </div>
+
+            <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="200">
+              <i class="ri-emotion-happy-line"></i>
+              <div>
+                <h4 class="responsive-text">
+                  Transparent Interactions: By recording interactions between the government and the private sector on the blockchain, we enhance transparency and accountability.
+                </h4>
+              </div>
+            </div>
+
+            <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="300">
+              <i class="ri-government-line"></i>
+              <div>
+                <h4 class="responsive-text">
+                  App Store Utilizing Government Data: Our app store provides developers with access to government data, enabling them to create innovative applications that improve government services and citizen engagement.
+                </h4>
+              </div>
+            </div>
+
+            <div class="col-md-6 icon-box" data-aos="fade-up" data-aos-delay="400">
+              <i class="ri-time-zone-line"></i>
+              <div>
+                <h4 class="responsive-text">
+                  Real-time Verification and Transactions: Through integration with government systems, our platform facilitates real-time verification and transaction processing, enhancing efficiency and reducing bureaucracy.
+                </h4>
               </div>
             </div>
 
           </div>
-
-        </div><!-- End Feature Icons -->
+        </div>
 
       </div>
 
-    </section><!-- End Features Section -->
+    </div><!-- End Feature Icons -->
+
+  </div>
+
+</section><!-- End Features Section -->
+
+
+    <br><br><br><br>
 
             <!-- ======= Testimonials Section ======= -->
     <section id="testimonials" class="testimonials">
 
       <div class="container" data-aos="fade-up">
 
-        <header class="section-header">
-          <p>Testimonials</p>
-        </header>
+        <style>
+          .centered-title {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+        </style>
 
         <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="200">
           <div class="swiper-wrapper">
@@ -445,8 +525,8 @@
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-05.png" class="testimonial-img" alt="">
-                  <h3>Juan Carlos Molina</h3>
-                  <h4>Vice President of the Association of Municipalities of Honduras (AMHON)</h4>
+                  <p>Juan Carlos Molina</p>
+                  <p>Vice President of the Association of Municipalities of Honduras (AMHON)</p>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -461,8 +541,8 @@
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-01.png" class="testimonial-img" alt="">
-                  <h3>Juan Bagration-Mukhrani</h3>
-                  <h4>PRINCE OF GEORGIA</h4>
+                  <p>Juan Bagration-Mukhrani</p>
+                  <p>Prince of Georgia</p>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -477,8 +557,8 @@
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-06.png" class="testimonial-img" alt="">
-                  <h3>Francis Suarez</h3>
-                  <h4>MAYOR OF MIAMI</h4>
+                  <p>Francis Suarez</p>
+                  <p>MAYOR OF MIAMI</p>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -493,8 +573,8 @@
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-02.png" class="testimonial-img" alt="">
-                  <h3>Ronal Ortiz</h3>
-                  <h4>FORMER MAYOR OF SAN BARTOLOME PERULAPIA, EL SALVADOR</h4>
+                  <p>Ronal Ortiz</p>
+                  <p>FORMER MAYOR OF SAN BARTOLOME PERULAPIA, EL SALVADOR</p>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -509,8 +589,8 @@
                 </p>
                 <div class="profile mt-auto">
                   <img src="img/testimonials/testimonials-04.png" class="testimonial-img" alt="">
-                  <h3>Laurent Lamothe</h3>
-                  <h4>FORMER PRIME MINISTER OF HAITI</h4>
+                  <p>Laurent Lamothe</p>
+                  <p>FORMER PRIME MINISTER OF HAITI</p>
                 </div>
               </div>
             </div><!-- End testimonial item -->
@@ -522,6 +602,8 @@
       </div>
 
     </section><!-- End Testimonials Section -->
+
+    <br><br><br><br>
 
     <style>
       body {
@@ -590,96 +672,183 @@
 <div class="caja-azul">
   <div class="caja-azul__text">
     <h2>DTV TOKEN</h2> 
-    <p>We are thrilled to announce the launch of Delnorte Tokens, the key to unlocking a realm of opportunities within the Delnorte ecosystem. Designed to be the primary medium of exchange, Delnorte Tokens empower users to seamlessly access and engage with tokenized government data and documents.</p> 
-    <button class="caja-azul__button">Learn more</button> </div> 
-    <div class="caja-azul__image-container"> <img class="caja-azul__image" src="img/dtvcajaazul.png" alt="Imagen de ejemplo"> 
+    <p>We are thrilled to announce the launch of Delnorte Tokens, the key to unlocking a realm of opportunities within the Delnorte ecosystem. Designed to be the primary medium of exchange, Delnorte Tokens empower users to seamlessly access and engage with tokenized government data and documents.</p>
+    <div data-aos="fade-up" data-aos-delay="600">
+      <div class="text-center text-lg-start">
+        <a href="token.html" class="caja-azul__button scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+          <span>Learn more</span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div> 
+  <div class="caja-azul__image-container">
+    <img class="caja-azul__image" src="img/dtvcajaazul.png" alt="Imagen de ejemplo">
   </div> 
 </div>
+
+<style>
+  .caja-azul .caja-azul__button {
+  margin-top: 30px;
+  line-height: 0;
+  padding: 15px 40px;
+  border-radius: 10px;
+  transition: 0.5s;
+  color: #ffffff; /* Cambiado a texto negro */
+  border: 1px solid #deb7f5; /* Añadido borde del mismo color que el fondo inicial */
+  box-shadow: 0px 10px 100px rgba(255, 255, 255, 0.4);
+}
+
+.caja-azul .caja-azul__button:hover {
+  background: #030303; /* Cambiado a fondo blanco al pasar el mouse */
+  color: #fff; /* Cambiado a texto negro al pasar el mouse */
+  border-color: #ffffff; /* Añadido borde del mismo color que el fondo inicial al pasar el mouse */
+}
+
+.caja-azul .caja-azul__button span {
+  font-family: "Calibri", sans-serif; /* Cambia la fuente a Calibri */
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.caja-azul .caja-azul__button i {
+  margin-left: 5px;
+  font-size: 18px;
+  transition: 0.3s;
+}
+
+.caja-azul .caja-azul__button:hover i {
+  transform: translateX(5px);
+}
+
+</style>
 
 
 <!-- ======= end cajaazul ======= -->
 
   </main><!-- End #main -->
 
-  <!-- ======= Footer ======= -->
-<footer id="footer" class="footer">
+<!-- ======= Start Footer ======= -->
 
-    <div class="footer-newsletter">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-6">
-            <br><br><br>
-            <h4 style="text-align: left;">Subscribe to the DTV newsletter</h4>
-            <form action="" method="post">
-              <input type="email" name="email" placeholder="Type your email address">
-              <input type="submit" value="Subscribe">
-            </form>
+<footer class="footer-section">
+  <div class="container">
+      <div class="footer-content pt-5 pb-5">
+          <div class="row">
+              <div class="col-xl-4 col-lg-4 mb-50">
+                  <div class="footer-widget">
+                    <div class="footer-logo">
+                      <a href="index.html"><img src="img/logo.png" class="img-fluid" alt="logo"><img src="img/dtvcajaazul.png" class="img-fluid" alt="logo"></a>
+                    </div>
+                    <div class="footer-social-icon">
+                      <span>Follow Us</span>
+                      <a href="#"><i class="bi bi-instagram"></i></a>
+                      <a href="#"><i class="bi bi-x"></i></a>
+                      <a href="#"><i class="bi bi-linkedin"></i></a>
+                  </div>
+                      <p><a href="#">&copy; 2024 All Right Reserved DTV</a></p>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Links</h3>
+                      </div>
+                      <ul>
+                          <li><a href="community.html">Community</a></li>  
+                          <li><a href="about.html">About</a></li>
+                          <li><a href="token.html">Token</a></li>
+                          <li><a href="ContacUs.html">Contact Us</a></li>
+                          <li><a href="events.html">Events</a></li>
+                          <li><a href="docs/Privacy Policy.pdf">Privacy Policy</a></li>
+                          <li><a href="docs/Terms of Service.pdf">Disclaimer</a></li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Subscribe to the DTV newsletter</h3>
+                      </div>
+                      <div class="subscribe-form">
+                          <form action="#">
+                              <input type="text" placeholder="Email Address">
+                              <button><i class="bi bi-send"></i></button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </div>
       </div>
-    </div>
-    
+  </div>
 
+  <div class="copyright-area">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 text-center">
+          <div class="copyright-text">
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+</footer>
+
+  <!-- ======= Start Footer ======= 
+
+  <footer id="footer" class="footer footer-gradient">
     <div class="footer-top">
       <div class="container">
-        <div class="row gy-4">
-          <div class="col-lg-5 col-md-12 footer-info">
+        <div class="row align-items-center">
+          <div class="col-lg-6 col-md-12 footer-info d-flex align-items-center justify-content-start">
             <a href="index.html" class="logo d-flex align-items-center">
-              <img src="img/logo.png" alt="">
-              <span><img src="img/dtvcajaazul.png"></span>
+              <img src="img/logo.png" alt="Logo">
+              <span><img src="img/dtvcajaazul.png" alt="Logo"></span>
             </a>
-            <p>DTV (Delnorte Terra Vision)</p>
-            <div class="social-links mt-3">
+            <div class="d-lg-block d-none ml-4">
+              <p>Delnorte Terra Vision</p>
+            </div>
+            <div class="social-links mt-3 mt-lg-0 ml-lg-4">
               <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
               <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
               <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
               <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
             </div>
           </div>
-
-          <!-- Modificados los divs de los links -->
-          <div class="col-lg-1 col-6 footer-links text-center" style="margin-left: -10px;"> <!-- Añadido el estilo margin-left -->
-            <h4>Network</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
+          <div class="col-lg-6 col-md-12 footer-newsletter d-flex align-items-center justify-content-end mt-4 mt-lg-0">
+            <div class="text-center text-lg-right">
+              <h4>Subscribe to the DTV newsletter</h4>
+              <form action="" method="post" class="d-flex">
+                <input type="email" name="email" placeholder="Type your email address" class="w-100 max-w-lg">
+                <input type="submit" value="Subscribe">
+              </form>
+            </div>
           </div>
-
-          <div class="col-lg-1 col-6 footer-links text-center" style="margin-left: -10px;"> <!-- Añadido el estilo margin-left -->
-            <h4>Community</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
+          <div class="col-lg-12">
+            <div class="row justify-content-center mt-4 footer-links-container">
+              <div class="col-lg-2 col-md-4 col-sm-6 text-center mb-3 mb-lg-0">
+                <p class="large-font"><a href="#">Community</a></p>
+              </div>
+              <div class="col-lg-2 col-md-4 col-sm-6 text-center mb-3 mb-lg-0">
+                <p class="large-font"><a href="#">Token</a></p>
+              </div>
+              <div class="col-lg-2 col-md-4 col-sm-6 text-center">
+                <p class="large-font"><a href="#">Contact Us</a></p>
+              </div>
+            </div>
           </div>
-          
-          <div class="col-lg-1 col-6 footer-links text-center" style="margin-left: -10px;"> <!-- Añadido el estilo margin-left -->
-            <h4>Token</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
-          </div>  
-
-          <div class="col-lg-1 col-6 footer-links text-center" style="margin-left: -10px;"> <!-- Añadido el estilo margin-left -->
-            <h4>Contact Us</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
-          </div>  
-
         </div>
       </div>
     </div>
-
-    <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>DTV</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
+  
+    <div class="container-credits">
+      <div class="credits text-center">
         Designed by <a href="#">DTV</a>
       </div>
     </div>
-  </footer><!-- End Footer -->
-
+  </footer>--><!-- End Footer -->
+  
 
   <!-- End Footer -->
 

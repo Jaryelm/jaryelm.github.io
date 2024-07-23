@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>DTV</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Favicons -->
+    <link href="img/logo.png" rel="icon" />
+    <link href="img/logo.png" rel="apple-touch-icon" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Vendor CSS Files -->
+    <link href="vendor/aos/aos.css" rel="stylesheet" />
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
+    <link href="vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="css/style3.css" rel="stylesheet">
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+
+  
+
+  <body>
+    <header id="header" class="header fixed-top">
+      <div
+        class="container-fluid container-xl d-flex align-items-center justify-content-between"
+      >
+      <a href="index.html" class="logo d-flex align-items-center" id="logo">
+        <img src="img/02-1.png" alt="" id="white-logo">
+        <img src="img/02.png" alt="" id="color-logo">
+        <span><img src="img/dtvcajaazul.png"></span>
+      </a>
+
+        <style>
+          #color-logo {
+            display: none;
+          }
+        </style>
+
+        <script>
+          window.addEventListener("scroll", function () {
+            var logoColor = document.getElementById("color-logo");
+            var logoWhite = document.getElementById("white-logo");
+
+            if (window.scrollY > 0) {
+              logoColor.style.display = "inline-block";
+              logoWhite.style.display = "none";
+            } else {
+              logoColor.style.display = "none";
+              logoWhite.style.display = "inline-block";
+            }
+          });
+        </script>
+
+        <nav id="navbar" class="navbar">
+          <ul>
+            <li>
+              <a class="nav-link scrollto active" href="index.html">Home</a>
+            </li>
+            <li class="dropdown">
+              <a href="#"
+                >Network</a>
+              <ul>
+                <li><a href="community.html">Community</a></li>
+                <li><a href="token.html">Token</a></li>
+              </ul>
+            </li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav>
+        <!-- .navbar -->
+      </div>
+    </header><!-- End Header -->
+  
+
+    <main id="main">
+
+    <body>
+      <div class="banner">
+          <video autoplay muted loop>
+              <source src="clips/video.mp4" type="video/mp4">
+              <!-- Asegúrate de proporcionar un formato de video adecuado para la compatibilidad -->
+              Tu navegador no soporta el elemento de video.
+          </video>
+
+          <style>
+            .content {
+  text-align: center; /* Centra el contenido del div */
+}
+
+.event-title {
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 4.5vw;
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  text-align: center;
+  display: inline-flex;
+  align-items: center; /* Alinea el logo y el texto verticalmente */
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+}
+
+.event-title::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 500%;
+  height: 1200%;
+  background: linear-gradient(45deg, rgba(51, 21, 21, 0.6), rgba(8, 77, 8, 0.6), rgba(5, 5, 66, 0.6), rgba(59, 59, 6, 0.6), rgba(75, 7, 75, 0.6), rgba(5, 66, 66, 0.6));
+  background-size: 500% 500%;
+  filter: blur(20px);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: animateBg 10s infinite;
+}
+
+@keyframes animateBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+.event-logo {
+  margin-right: 10px; /* Ajusta el espacio entre el logo y el texto */
+  width: 200px; /* Ajusta el ancho del logo */
+  height: 190px; /* Ajusta el alto del logo */
+}
+          </style>
+          
+      </div>
+      <!-- El resto de tu contenido aquí -->
+    </body>
+    
+    <style>
+              /* Estilos generales para el banner */
+              .banner {
+                position: relative;
+                width: 100%;
+                height: 500px; /* Ajusta la altura según tus necesidades */
+                overflow: hidden;
+            }
+            .banner video {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                z-index: 1;
+            }
+            .banner .content {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #fff;
+                font-size: 2rem;
+                font-weight: bold;
+                z-index: 1;
+            }
+            /* Estilos adicionales para el tema gamer */
+            body {
+                margin: 0;
+                font-family: 'Arial', sans-serif;
+            }
+            .banner {
+                background-color: #111; /* Color de fondo oscuro */
+            }
+            .banner video {
+                filter: brightness(50%); /* Ajusta el brillo del video */
+            }
+    </style>
+
+<br>
+
+<style>
+  .event-title {
+      font-family: 'Calibri', sans-serif; /* Aplica Calibri */
+      font-size: 7rem; /* Ajusta el tamaño si es necesario */
+  }
+</style>
+
+<br><br><br><br>
+
+<div class="main-container">
+  <div class="containercaja">
+    <div class="left-column">
+      <div class="event" onclick="showEventDetails(this, 'evento1')">
+        <div class="event-icon">10 Oct</div>
+        <div class="event-description">Shaping The Future</div>
+      </div>
+      <!-- Repite los eventos aquí -->
+
+    </div>
+    <div class="right-column">
+      <div id="evento1" class="event-details">
+        <img src="img/events/002.jpg" alt="Evento 1">
+        <style>
+          .right-align-text {
+            margin-left: 0; /* Valor por defecto para pantallas pequeñas */
+          }
+        
+          @media (min-width: 576px) {
+            .right-align-text {
+              margin-left: 20px;
+            }
+          }
+        
+          @media (min-width: 768px) {
+            .right-align-text {
+              margin-left: 100px;
+            }
+          }
+        
+          @media (min-width: 992px) {
+            .right-align-text {
+              margin-left: 200px;
+            }
+          }
+        
+          @media (min-width: 1200px) {
+            .right-align-text {
+              margin-left: 427px; /* Valor original para pantallas grandes */
+            }
+          }
+        </style>
+        
+        <p class="right-align-text"><strong>901 S Federal Hwy</strong></p>
+        <p class="right-align-text"><strong>Time: 5pm to 11pm</strong></p>
+        
+        
+        <p>Sponsored by Delnorte (DTV), we are excited to invite you to our upcoming blockchain event, where we will delve into the crucial topic of migrating real estate assets to non-fungible tokens NFTs. This event will highlight the significance of raising awareness about this innovative approach, which enables real-world assets to be securely recorded on the blockchain. By leveraging NFTs, we can enhance transparency and fortify protection against fraudulent activities in the real estate industry.</p>
+        <p>​We are bringing prominent leaders together to discuss the most pressing issues on how they are dealing with new methods of ownership through tokenization, legislation and investment opportunities.</p>
+        <p>​Selected Featured Speakers from Saudi Arabia and USA main players in Tech investments.</p>
+        <p><strong>Learn More: </strong><a href="https://lu.ma/g8axfyun" target="_blank">Register for event</a></p>
+      </div>
+      <div id="evento2" class="event-details">
+        <h3>Evento 2</h3>
+        <img src="https://via.placeholder.com/300x200" alt="Evento 2">
+        <p>Detalles del Evento 2</p>
+        <a href="https://example.com/pago-evento2" target="_blank">Comprar boleto</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showEventDetails(eventElement, eventId) {
+    // Ocultar todos los detalles del evento
+    const details = document.querySelectorAll('.event-details');
+    details.forEach(detail => detail.classList.remove('active'));
+    
+    // Quitar la clase de seleccionado de todos los eventos
+    const events = document.querySelectorAll('.event');
+    events.forEach(event => event.classList.remove('selected'));
+    
+    // Añadir la clase de seleccionado al evento actual
+    eventElement.classList.add('selected');
+    
+    // Mostrar el detalle del evento seleccionado
+    const eventDetail = document.getElementById(eventId);
+    if (eventDetail) {
+      eventDetail.classList.add('active');
+    }
+  }
+</script>
+
+<style>
+/* Estilos generales para el contenedor principal */
+.containercaja {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+.left-column, .right-column {
+  padding: 20px;
+  box-sizing: border-box;
+}
+/* Estilos para la columna izquierda */
+.left-column {
+  flex: 1 1 25%;
+  background-color: #191919;
+  color: #fff;
+  max-height: 700px;
+  overflow-y: auto;
+}
+.event {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #191919;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.event:hover {
+  background-color: #444;
+}
+.event.selected {
+  box-shadow: 0 0 100px 20px #deb7f5;
+}
+.event-icon {
+  width: 100px;
+  height: 50px;
+  background-color: #313131;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+}
+.event-description {
+  flex-grow: 1;
+}
+/* Personalización de la barra de desplazamiento */
+.left-column::-webkit-scrollbar {
+  width: 8px;
+}
+.left-column::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+.left-column::-webkit-scrollbar-track {
+  background-color: #333;
+}
+/* Estilos para la columna derecha */
+.right-column {
+  flex: 1 1 70%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  background-color: #333;
+  color: #fff;
+  max-height: 700px;
+  overflow-y: auto;
+}
+.event-details {
+  flex: 1 1 calc(33.33% - 20px);
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #191919;
+  padding: 10px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  max-height: 1200px;
+}
+.event-details.active {
+  display: flex;
+}
+.event-details h3 {
+  margin-top: 0;
+}
+.event-details img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  max-height: 200px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.event-details a {
+  display: block;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  padding: 10px;
+  background-color: #242424;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+.event-details a:hover {
+  background-color: #3a3a3a;
+}
+.center-text {
+  text-align: center;
+}
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Personalización de la barra de desplazamiento para la columna derecha */
+.right-column::-webkit-scrollbar {
+  width: 8px;
+}
+.right-column::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+.right-column::-webkit-scrollbar-track {
+  background-color: #333;
+}
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .left-column, .right-column {
+    flex: 1 1 100%;
+  }
+  .event-details {
+    flex: 1 1 100%;
+  }
+}
+@media (min-width: 769px) {
+  .event-details img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .event-details .center-text {
+    text-align: center;
+  }
+}
+</style>
+
+<br><br><br><br><br>
+
+    </main>
+    <!-- End #main -->
+
+<!-- ======= Start Footer ======= -->
+
+<footer class="footer-section">
+  <div class="container">
+      <div class="footer-content pt-5 pb-5">
+          <div class="row">
+              <div class="col-xl-4 col-lg-4 mb-50">
+                  <div class="footer-widget">
+                    <div class="footer-logo">
+                      <a href="index.html"><img src="img/logo.png" class="img-fluid" alt="logo"><img src="img/dtvcajaazul.png" class="img-fluid" alt="logo"></a>
+                    </div>
+                    <div class="footer-social-icon">
+                      <span>Follow Us</span>
+                      <a href="#"><i class="bi bi-instagram"></i></a>
+                      <a href="#"><i class="bi bi-x"></i></a>
+                      <a href="#"><i class="bi bi-linkedin"></i></a>
+                  </div>
+                      <p><a href="#">&copy; 2024 All Right Reserved DTV</a></p>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Links</h3>
+                      </div>
+                      <ul>
+                        <li><a href="community.html">Community</a></li>  
+                        <li><a href="events.html">Events</a></li>  
+                        <li><a href="token.html">Token</a></li>
+                        <li><a href="ContacUs.html">Contact Us</a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Subscribe to the DTV newsletter</h3>
+                      </div>
+                      <div class="subscribe-form">
+                          <form action="#">
+                              <input type="text" placeholder="Email Address">
+                              <button><i class="bi bi-send"></i></button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+</footer>
+
+
+  <!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script src="vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="vendor/aos/aos.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/glightbox/js/glightbox.min.js"></script>
+<script src="vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="vendor/swiper/swiper-bundle.min.js"></script>
+<script src="vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="js/main.js"></script>
+
+<!-- win -->
+<script src="js/win.js"></script>
+
+<!-- type animation -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+
+</body>
+
+</html>

@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>DTV</title>
   <meta content="" name="description">
@@ -13,8 +14,9 @@
   <link href="img/logo.png" rel="icon">
   <link href="img/logo.png" rel="apple-touch-icon">
 
+      <!-- Google Fonts -->
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="vendor/aos/aos.css" rel="stylesheet">
@@ -25,7 +27,7 @@
   <link href="vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="css/style.css" rel="stylesheet">
+  <link href="css/style2.css" rel="stylesheet">
 
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -38,7 +40,7 @@
       <a href="index.html" class="logo d-flex align-items-center" id="logo">
         <img src="img/02-1.png" alt="" id="white-logo">
         <img src="img/02.png" alt="" id="color-logo">
-        <span>DTV</span>
+        <span><img src="img/dtvcajaazul.png"></span>
       </a>
       
       <style>
@@ -64,11 +66,11 @@
       
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="index.html">Home</a></li>
+          <li><a href="index.html">Home</a></li>
           <li class="dropdown">
-            <a href="#"><span>Network</span> <i class="bi bi-chevron-down"></i></a>
+            <a class="nav-link scrollto active" href="#"><span>Network</span></a>
             <ul>
-              <li><a href="ecosystem.html">Ecosystem</a></li>
+              <li><a href="community.html">Community</a></li>
               <li><a href="token.html">Token</a></li>
             </ul>
           </li>
@@ -80,1204 +82,570 @@
     </div>
   </header><!-- End Header -->
 
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="hero d-flex align-items-center">
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="hero d-flex align-items-center">
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 d-flex flex-column justify-content-center">
-          <h1 data-aos="fade-up">#</h1>
-          <h2 data-aos="fade-up" data-aos-delay="400">#</h2>
-          <div data-aos="fade-up" data-aos-delay="600">
-            <div class="text-center text-lg-start">
-              <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-                <span>Pre-Sale</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
-          <img src="img/token.jpg" class="img-fluid rounded-circle" alt="">
-        </div>        
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 d-flex flex-column justify-content-center text-center">
+<!-- Título principal que se mantiene igual en todas las pantallas -->
+<h1 data-aos="fade-up" class="hero-title hero-title-main" style="font-size: 5vw; font-family: 'Montserrat', sans-serif; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; margin-bottom: 0; margin-top: 0;">
+  Delnorte Terra Vision
+</h1>
+
+<!-- Segundo título con imagen que cambia de tamaño en pantallas pequeñas -->
+<h1 data-aos="fade-up" class="hero-title hero-title-secondary" style="font-size: 6vw; font-family: 'Montserrat', sans-serif; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; margin-bottom: 0; margin-top: 0;">
+  Explore our token 
+  <img src="img/logo.png" alt="logo" class="animated-image" style="height: 1em; vertical-align: middle; margin-bottom: 0.1em;">
+  <img src="img/dtvcajaazul.png" alt="logo" class="animated-image2" style="height: 1.8em; vertical-align: middle; margin-bottom: 0.1em;">
+</h1>
+
+<style>
+.animated-image {
+  animation: rotate-animation 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes rotate-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title-main {
+    font-size: 8vw; /* Ajusta el tamaño de la fuente para pantallas pequeñas */
+  }
+
+  .hero-title-secondary {
+    font-size: 7vw; /* Ajusta el tamaño de la fuente para pantallas pequeñas */
+  }
+
+  .animated-image {
+    height: 1.5em; /* Ajusta el tamaño de la imagen para pantallas pequeñas */
+  }
+
+  .animated-image2 {
+    height: 2.2em; /* Ajusta el tamaño de la imagen para pantallas pequeñas */
+  }
+}
+</style>
+
+
+        <!-- Párrafo de descripción -->
+        <p data-aos="fade-up" data-aos-delay="600" style="font-size: 2em; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; margin-bottom: 10px;">
+          The mission is to create wealth and security for people through innovative technological solutions that address global challenges.
+        </p>
+
+        <!-- Botón Pre-Sale centrado 
+        <div data-aos="fade-up" data-aos-delay="600" class="text-center">
+          <a href="#" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+            <span>Pre-Sale</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>-->
+        
       </div>
     </div>
+  </div>
 
-  </section><!-- End Hero -->
+</section><!-- End Hero -->
+
+<style>
+.hero {
+  width: 100%;
+  min-height: 100vh;
+  background: url(../assets/img/hero-bg-blancoynegro.png) top center no-repeat;
+  background-size: cover;
+  padding-top: 150px;
+  padding-bottom: 80px;
+}
+
+/* Estilo de texto con degradado */
+.gradient-text {
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Media query para ajustar tamaño de fuente en pantallas pequeñas */
+@media (max-width: 768px) {
+  .hero-title:nth-of-type(2) {
+    font-size: 10vw; /* Tamaño de fuente más grande para el segundo título en pantallas pequeñas */
+  }
+}
+</style>
 
   <main id="main">
 
+<!-- ======= Section ======= -->
 
+<!-- ======= Section ======= -->
 
 <!-- ======= Pricing Section ======= -->
 <section id="pricing" class="pricing">
-
   <div class="container" data-aos="fade-up">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 d-flex flex-column justify-content-center text-center">
+          <!-- Título principal que se mantiene igual en todas las pantallas -->
+          <div class="container" data-aos="fade-up">
+            <div class="section-title" style="text-align: center;">
+              <h2 class="animated-gradient-text">THE VISION</h2>
+            </div>
+            <style>
+              @keyframes gradientAnimation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+              }
 
-    <header class="section-header">
-      <h3>Token Distribution</h3>
-      <p>Total Supply: The total supply of Delnorte Tokens at network launch will be 1 Billion.  The max final supply of Delnorte tokens will not exceed 1 Billion.</p>
-    </header>
+              .animated-gradient-text {
+                font-size: 80px;
+                font-weight: 600;
+                font-family: Montserrat, sans-serif;
+                background: linear-gradient(to right, #575757, #ffffff);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                background-size: 200% 100%;
+                animation: gradientAnimation 5s linear infinite;
+              }
 
-    <div class="row gy-4" data-aos="fade-left">
+              .content-wrapper {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 10px;
+              }
 
-<!-- Caja 1 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
-  <div class="box">
-    <h3 style="color: #000000;">★ Founder Round: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>Sold to early investors and strategic partners to raise initial capital for development. 90% of the tokens are locked, meaning they cannot be accessed. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
+              .left-content {
+                max-width: 600px;
+                flex: 1;
+                margin-bottom: 20px;
+              }
 
-<!-- Caja 2 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="200">
-  <div class="box">
-    <h3 style="color: #1c8663;">★ Team: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
+              .right-content {
+                max-width: 600px;
+                flex: 1;
+                margin-top: 255px;
+                text-align: right;
+              }
 
-<!-- Caja 3 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="300">
-  <div class="box">
-    <h3 style="color: #ff0000;">★ Private Pre-Sale One: 6%</h3>
-    <div class="price">(60 Million Tokens)</div>
-    <ul>
-      <li>Offered through public pre-sale. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 1.5 years / 548 days.</li>
-    </ul>
-  </div>
-</div>
+              @media (max-width: 992px) {
+                .right-content {
+                  margin-top: 10px;
+                  text-align: center;
+                }
+              }
 
-<!-- Caja 4 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="400">
-  <div class="box">
-    <h3 style="color: #ff0071;">★ Private Pre-Sale Two: 4%</h3>
-    <div class="price">(40 Million Tokens)</div>
-    <ul>
-      <li>Offered through public pre-sale. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 1.5 years / 548 days.</li>
-    </ul>
-  </div>
-</div>
+              @media (max-width: 430px) {
+                .content-wrapper {
+                  flex-direction: column;
+                  align-items: center;
+                }
 
-<!-- Caja 5 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="500">
-  <div class="box">
-    <h3 style="color: #2ecc71;">★ Public Sale: 20%</h3>
-    <div class="price">(200 Million Tokens)</div>
-    <ul>
-      <li>Offered through public token sale. On launch day 3% (30 Million Tokens) will be available, after the launch day 1% will be released every 30 days until all 26% (260 Million Tokens) are unlocked.</li>
-    </ul>
-  </div>
-</div>
+                .left-content, .right-content {
+                  max-width: 100%;
+                  text-align: center;
+                }
 
-<!-- Caja 6 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="600">
-  <div class="box">
-    <h3 style="color: #3498db;">★ Liquidity: 10%</h3>
-    <div class="price">(100 Million Tokens)</div>
-    <ul>
-      <li>Locked at launch and provided to exchanges for the 1st year / 365 days.</li>
-    </ul>
-  </div>
-</div>
+                .right-content {
+                  margin-top: 10px;
+                }
+              }
+            </style>
 
-<!-- Caja 7 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="700">
-  <div class="box">
-    <h3 style="color: #9b59b6;">★ Advisors: 2.5%</h3>
-    <div class="price">(25 Million Tokens)</div>
-    <ul>
-      <li>Vested over 2 years with a 3-month cliff to incentivize long-term commitment and a daily unlock for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
+            <!-- Contenedor para ambos párrafos y la imagen -->
+            <div class="content-wrapper">
+              <!-- Párrafo de descripción alineado a la izquierda con la imagen debajo -->
+              <div class="left-content">
+                <p data-aos="fade-up" data-aos-delay="600" style="font-size: 1.8em; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; margin-bottom: 10px; text-align: left; word-wrap: break-word;">
+                  The company's goal is to create and provide customers with a set of convenient and highly effective tools for solving various problems.
+                </p>
+                <img src="img/security.png" alt="Descripción de la imagen" style="width: 100%; max-width: 700px; margin-top: 10px;">
+              </div>
 
-<!-- Caja 8 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="800">
-  <div class="box">
-    <h3 style="color: #e74c3c;">★ Ecosystem Fund: 15%</h3>
-    <div class="price">(150 Million Tokens)</div>
-    <ul>
-      <li>Allocated for ecosystem development, marketing, grants to developers, and future initiatives. 100% locked at TGE. Daily unlock over 3 years with a 6-month cliff post TGE.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 9 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="900">
-  <div class="box">
-    <h3 style="color: #f1c40f;">★ Treasury: 17.5%</h3>
-    <div class="price">(175 Million Tokens)</div>
-    <ul>
-      <li>10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 3 years / 1095 days.</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Caja 10 -->
-<div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="1000">
-  <div class="box">
-    <h3 style="color: #af6723;">★ Government Reserve and</h3>
-    <h3 style="color: #af6723;">Business Development: 5%</h3>
-    <div class="price">(50 Million Tokens)</div>
-    <ul>
-      <li>Allocated to the governments for potential future use cases within the platform and to incentivize government participation and business development. 10% of the tokens unlocked at TGE (Token Generation Event). After TGE tokens shall be unlocked every day for 2 years / 730 days.</li>
-    </ul>
-  </div>
-</div>
-
-
+              <!-- Contenedor para el párrafo alineado a la derecha -->
+              <div class="right-content">
+                <p class="description-right" data-aos="fade-up" data-aos-delay="600" style="font-size: 1.8em; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; word-wrap: break-word;">
+                  DTV offers a comprehensive solution for security management, recording, and storage of property rights for both movable and immovable real assets. Our multifunction platform provides government-verified digital documents and enables public and private entities to generate and manage secure registries of digital IDs (NFTs). By utilizing distributed storage and security features, DTV minimizes power and network congestion commonly associated with blockchain technology.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
-
 </section><!-- End Pricing Section -->
 
-<!-- graficos in -->
 
-<style>
-  .launch-info {
-    display: grid;
-    place-items: center;
-    height: 100vh;
-    margin: 0;
-  }
 
-  .boxs {
-    width: 80%;
-    max-width: 1400px;
-    height: 80%;
-    max-height: 1200px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #fff;
-    border-radius: 50px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 20px;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flipping Boxes Section</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+      
+        body {
+          background-color: #0d0d0d;
+          color: white;
+          font-family: 'Montserrat', sans-serif;
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+      
+        .flipping-section {
+          position: relative;
+          width: 100%;
+          height: 110vh; /* Ajusta la altura según sea necesario */
+          overflow: hidden;
+          margin-bottom: 10px; /* Espacio para el footer o la siguiente sección */
+          margin-top: 80px; /* Espacio adicional en la parte superior */
+        }
+      
+        .flipping-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: repeat(3, 300px);
+          gap: 20px; /* Aumenta la separación entre las cajas */
+          max-width: 1225px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 1;
+        }
+      
+        .box {
+          width: 100%;
+          height: 300px;
+          perspective: 1000px;
+        }
+      
+        .inner-box {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          text-align: center;
+          transition: transform 0.6s;
+          transform-style: preserve-3d;
+        }
+      
+        .box.flipped .inner-box {
+          transform: rotateY(180deg);
+        }
+      
+        .front {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          display: flex;
+          flex-direction: column; /* Alinea el texto en columna */
+          justify-content: center;
+          align-items: center;
+          border-radius: 20px;
+          color: white;
+          font-size: 1.5em; /* Ajusta el tamaño del texto */
+          padding: 20px;
+          box-sizing: border-box;
+          background: rgba(25, 25, 25, 0.7); /* Transparente */
+          box-shadow: 0 4px 50px rgba(53, 0, 0, 0.5), 0 0 50px rgba(2, 81, 83, 0.3); /* Sombra oscura y efecto neón */
+        }
+      
+        .front span {
+          display: block;
+          margin: 5px 0; /* Espaciado entre las líneas de texto */
+        }
+      
+        .back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 20px;
+          color: white;
+          font-size: 1em; /* Ajusta el tamaño del texto */
+          padding: 10px;
+          box-sizing: border-box;
+          background: #191919; /* Transparente */
+          box-shadow: 0 4px 100px rgba(38, 30, 39, 0.5), 0 0 100px rgba(2, 41, 53, 0.3); /* Sombra oscura y efecto neón */
+          transform: rotateY(180deg);
+        }
 
-  .graph-container {
-    width: 50%;
-    position: relative;
-    height: auto;
-  }
+        .backs {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 20px;
+          color: white;
+          font-size: 1em; /* Ajusta el tamaño del texto */
+          padding: 10px;
+          box-sizing: border-box;
+          background: #191919; /* Transparente */
+          box-shadow: 0 4px 100px rgba(35, 2, 39, 0.5), 0 0 100px rgba(2, 41, 53, 0.3); /* Sombra oscura y efecto neón */
+          transform: rotateY(180deg);
+        }
 
-  svg {
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .text-container {
-    width: 45%;
-  }
-
-  .text-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .text-item {
-    font-size: 22px;
-    margin-bottom: 10px;
-  }
-
-  .segment-label {
-    display: none;
-  }
-</style>
-
-<script>
-  const data = [
-    { name: '★ Founder Round', value: 10 },
-    { name: '★ Team', value: 10 },
-    { name: '★ Private Pre-Sale One', value: 6 },
-    { name: '★ Private Pre-Sale Two', value: 4 },
-    { name: '★ Public Sale', value: 20 },
-    { name: '★ Liquidity', value: 10 },
-    { name: '★ Advisors', value: 2.5 },
-    { name: '★ Ecosystem Fund', value: 15 },
-    { name: '★ Treasury', value: 17.5 },
-    { name: '★ Government Reserve and Business Development', value: 5 }
-  ];
-
-  const total = data.reduce((acc, item) => acc + item.value, 0);
-
-  const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
-
-  const width = 600;
-  const height = 600;
-  const radius = Math.min(width, height) / 2.5;
-
-  const svg = d3.select('#graph')
-    .attr('width', width)
-    .attr('height', height)
-    .append('g')
-    .attr('transform', `translate(${width / 2}, ${height / 2})`);
-
-  const pie = d3.pie()
-    .sort(null)
-    .value(d => d.value);
-
-  const arc = d3.arc()
-    .innerRadius(0)
-    .outerRadius(radius);
-
-  const arcs = svg.selectAll('.arc')
-    .data(pie(data))
-    .enter().append('g')
-    .attr('class', 'arc')
-    .on('mouseover', handleMouseOver)
-    .on('mouseout', handleMouseOut);
-
-  arcs.append('path')
-    .attr('d', arc)
-    .attr('fill', d => colorScale(d.data.name));
-
-  arcs.append('text')
-    .attr('class', 'segment-label')
-    .attr('transform', (d, i) => {
-      const [x, y] = arc.centroid(d);
-      const radius = 1.2 * Math.sqrt(x * x + y * y);
-      const angle = (d.startAngle + d.endAngle) / 2;
-      const newX = Math.sin(angle) * (radius + 10);
-      const newY = -Math.cos(angle) * (radius + 10);
-      return `translate(${newX}, ${newY})`;
-    })
-    .text(d => `${d.data.name}: ${d.data.value}%`)
-    .each(function(d) {
-      const listItem = document.createElement('li');
-      listItem.textContent = `${d.data.name}: ${d.data.value}%`;
-      listItem.classList.add('text-item');
-      document.querySelector('.text-list').appendChild(listItem);
-    });
-
-  function handleMouseOver(event, d) {
-    d3.select(this).select('.segment-label')
-      .attr('font-weight', 'bold')
-      .attr('font-size', '14px');
-
-    d3.select(this).select('path')
-      .transition()
-      .duration(200)
-      .attr('d', d => {
-        const distance = 10;
-        const angle = (d.startAngle + d.endAngle) / 2;
-        const x = Math.sin(angle) * distance;
-        const y = -Math.cos(angle) * distance;
-        return d3.arc()
-          .innerRadius(0)
-          .outerRadius(radius + 10)
-          .startAngle(d.startAngle)
-          .endAngle(d.endAngle)(d);
-      });
-
-    d3.select('#tooltip')
-      .html(`${d.data.name}: ${d.data.value}%`)
-      .style('left', `${event.pageX}px`)
-      .style('top', `${event.pageY}px`);
-  }
-
-  function handleMouseOut(event, d) {
-    d3.select(this).select('.segment-label')
-      .attr('font-weight', 'normal')
-      .attr('font-size', '12px');
-
-    d3.select(this).select('path')
-      .transition()
-      .duration(200)
-      .attr('d', arc);
-
-    d3.select('#tooltip').html('');
-  }
-</script>
-
-<!-- graficos out -->
-
-    <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <p>No mint function: The total supply of The Token is fixed at 1 Billion total</p>
-          <p>Token Burn Mechanics: No burn mechanic at the moment</p>
-          <br>
-          <h1>Utility within the Ecosystem</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Platform-Access.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Platform Access</h4>
-                <span>The Token will be the primary utility token within the Delnorte platform. Users will need The Token to:</span>
-                <p>○	Access and interact with government data and documents (including viewing Smart Certificates).
-                  ○	Pay transaction fees for data access and services on the platform at a discounted rate.
-                  ○	Participate in governance voting (see Governance Mechanisms).
-                  ○	Collect rewards both staking and randomized bonuses
-                  ○	Receive transaction and other discounts.                  
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Developer-Incentives.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Developer Incentives</h4>
-                <span>Developers building apps for the Delnorte app store can earn Token rewards through various mechanisms:</span>
-                <p>○	Grants from the Ecosystem Fund for innovative app development.
-                  ○	Revenue sharing models within their apps using The Token for in-app purchases or subscriptions.
-                  ○	The Token can be used to crowd-fund and crowd-lend tokenized assets on Delnorte platform or on 3rd party platforms that operate on top of Delnorte infrastructure.
-                  </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Governance Mechanisms</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Token-Holders-Governance.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Token Holders Governance</h4>
-                <span>The Token holders will have the right to vote on proposals impacting the Delnorte platform, including</span>
-                <p>○	Distribution of funds from the Ecosystem Fund and grant allocation to projects.
-                  ○	Future platform development priorities.
-                  ○	Bonus giveaways, staking and other rewards.
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Voting-Power.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Voting Power</h4>
-                <span>Voting power will be proportional to the amount of The Token held. Vote for new projects to be built and offered on the platform</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Staking and Rewards</h1>
-          <p>Staking</p>
-          <br>
-          <spa>In this innovative decentralized finance (DeFi) mechanism, crypto staking is integrated with NFTs representing real assets recognized by the government, leading to a transformative approach to asset-backed investments. Owners of these NFTs gain the unique ability to participate in crowdfunding projects through Delnorte's legal framework and Delnorte’s or third-party platforms, leveraging their ownership of real-world assets to fuel digital innovation. Furthermore, The Token owners can opt to stake their tokens to provide liquidity for these tokenized projects, thereby earning a dividend yield from verified businesses and assets. This symbiotic relationship between NFTs and staked tokens not only facilitates the democratization of investment opportunities but also incentivizes participation in the growth of the ecosystem both physical and digital. Additionally, owners of NFTs can further maximize their returns by staking the NFT itself, unlocking the liquidity locked behind it through staking—a concept analogous to a reverse mortgage in traditional finance. By intertwining crypto staking with NFTs representing tangible assets, this groundbreaking approach has the potential to reshape the landscape of decentralized finance, offering new avenues for asset-backed investments and fostering greater inclusivity and transparency in the financial ecosystem.</spa>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Staking Options</h4>
-                <span>The Token holders will be able to stake their tokens to earn rewards in the form of additional Tokens. Different staking options can be offered with varying lockup periods and reward rates.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4> Rewards Source</h4>
-                <span>A portion of transaction fees collected on the platform will be allocated to staking rewards, incentivizing users to hold The Token and contribute to platform security.</span>
-                <p>○	Tiered Rewards: </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Base Chance</h4>
-                <span>Every Token holder has a base chance of winning a loot box each month.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Increased Odds</h4>
-                <span>For each 1,000 Tokens held in your wallet, your win chance increases by 0.005%.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Bonus Draws</h4>
-                <span>Participate in community activities, engagement with the apps on the Delnorte app store will increase your chance for randomized draws.</span>
-                <p>●	The longer the token is held/staked the better the rewards get as well!</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Options.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Bonus Draws</h4>
-                <span>Participate in community activities, engagement with the apps on the Delnorte app store will increase your chance for randomized draws.</span>
-                <p></p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <style>
-          .member {
-            position: relative;
-            perspective: 2000px; /* Aumenta la perspectiva para un efecto más pronunciado */
+        /* Media queries para pantallas pequeñas */
+        @media (max-width: 768px) {
+          .flipping-container {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
           }
-        
-          .member-img {
-            transition: transform 1s; /* Ajusta la duración de la transición para que la rotación completa dure 1 segundo */
-            transform-style: preserve-3d;
+      
+          .box {
+            height: 250px; /* Ajusta la altura para pantallas pequeñas */
           }
-        
-          .member:hover .member-img {
-            transform: rotateY(360deg); /* Hace que la imagen dé una vuelta completa (360 grados) */
+
+          .front, .back, .backs {
+            font-size: 0.9em; /* Ajusta el tamaño del texto */
           }
-        
-          .member-img img {
-            width: 100%; /* Ajusta el ancho de la imagen al 100% del contenedor */
-            height: auto; /* Altura automática para mantener la proporción */
-            display: block; /* Asegura que la imagen sea un elemento de bloque */
-            margin: 0 auto; /* Centra la imagen horizontalmente */
+        }
+      
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .flipping-container {
+            grid-template-columns: repeat(2, 1fr);
           }
-        </style>
+      
+          .box {
+            height: 300px; /* Ajusta la altura para pantallas medianas */
+          }
+
+          .front, .back, .backs {
+            font-size: 1em; /* Ajusta el tamaño del texto */
+          }
+        }
+      
+        /* Efecto de partículas */
+        #particles-js {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="flipping-section">
+        <div class="flipping-container">
+            <div class="box" style="grid-column: 1; grid-row: 1;">
+                <div class="inner-box">
+                    <div class="front">
+                        <span>Utility Driven</span>
+                        <span>Demand</span>
+                    </div>
+                    <div class="back">The core utility of the Token for accessing government data and platform services creates ongoing demand for the token</div>
+                </div>
+            </div>
+            <div class="box" style="grid-column: 3; grid-row: 3;">
+                <div class="inner-box">
+                    <div class="front">Staking Rewards</div>
+                    <div class="backs">Staking offers a passive income stream for the Token holders, incentivizing long-term holding</div>
+                </div>
+            </div>
+            <div class="box" style="grid-column: 3; grid-row: 4;">
+                <div class="inner-box">
+                    <div class="front">Governance Rights</div>
+                    <div class="backs">By providing token holders with a voice in the decision making process, we're fostering a strong sense of ownership and community within our platform. This collaborative approach ensures that the interests and feedback of our community are taken into consideration leading to a more inclusive and sustainable ecosystem.</div>
+                </div>
+            </div>
+            <div class="box" style="grid-column: 1; grid-row: 2;">
+                <div class="inner-box">
+                    <div class="front">Limited Supply</div>
+                    <div class="back">The fixed total supply of the Token creates scarcity and potential for value appreciation over time</div>
+                </div>
+            </div>
+            <div class="box" style="grid-column: 2; grid-row: 3;">
+                <div class="inner-box">
+                  <div class="front">
+                    <span>NFT Crowdfunding</span>
+                    <span>& Crowd Lending</span>
+                </div>
+                    <div class="backs">The Token can be used for investing in tokenized real assets and projects, creating additional use cases and demand</div>
+                </div>
+            </div>
+            <div class="box" style="grid-column: 2; grid-row: 2;">
+                <div class="inner-box">
+                    <div class="front">Mass Adoption and Business Opportunity Expansion</div>
+                    <div class="back">As the app store grows in popularity and users due to ever increasing number and variety of apps and use cases, the DTV token will grow in price and adoption</div>
+                </div>
+            </div>
+        </div>
         
-        
-
-
-        </style>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Transparency and Fairness</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Randomized-Algorithm.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Randomized Algorithm</h4>
-                <span>A secure and auditable algorithm determines loot box winners, ensuring complete fairness and transparency. Ensured to be randomized with crypto randomizer</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Investments-and-Grants-Transparency.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Investments and Grants Transparency</h4>
-                <span>Details about company activities will be visible on chain in real time.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Liquidity Provisions</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Profit-Sharing.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>5% Profit Sharing</h4>
-                <span>5% of Delnorte's gross profit will be used to continuously buy DGC and add it to liquidity pools on both centralized and decentralized exchanges. This process will be managed by The Token Foundation (a non-profit organization). Every quarter 5% of the gross reported profit will be directly injected evenly between participating exchanges in form of cash deposits and tokens to match from the locked 1 Billion allocated for this purpose. This ensures market liquidity, provides additional tokens to the market without changing the price and facilitates easier Token trading. Once the 1 Billion Token pool runs dry, the process of 5% gross profit injection into the liquidity will continue, except that new liquidity will flow directly into the market without having matching new tokens, thus increasing overall token value.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Liquidity-provision-Business.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Liquidity provision Business</h4>
-                <span>1 Billion will be released based on actual quarterly business, that means if we earn $1 million dollars in this quarter, we will add 5% or $50,000 into the liquidity.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Public-Pre-Sale-Lockup.png" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Public Pre-Sale Lockup</h4>
-                <span>75% of the The Token from the public pre-sale will be locked for a 1 year, with a 25% unlock every 90 days or 2,160 hours. This is done to prevent immediate sell-off and promote long-term token value. This will not affect any tokens purchased on the open market or exchange post official token release date.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <br>
-          <h1>Incentivizing Long-Term Participation and Growth</h1>
-        </header>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Utility-drivenDemand.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Utility-driven Demand</h4>
-                <span>The core utility of The Token for accessing government data and platform services creates ongoing demand for the token.</span>
-                <p>
-                  </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Staking-Rewards.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Staking Rewards</h4>
-                <span>Staking offers a passive income stream for The Token holders, incentivizing long-term holding.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Governance-Rights.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Governance Rights</h4>
-                <span>The Token holders have a say in the platform's future, fostering a sense of ownership and community.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/Limited-Supply.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Limited Supply</h4>
-                <span>The fixed total supply of The Token creates scarcity and potential for value appreciation over time.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-            <div class="member">
-              <div class="member-img">
-                <img src="img/svg/NFT-Crowd-funding-and-Crowd-lending.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                  <a href=""><i class="bi bi-coin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>NFT Crowd-funding and Crowd-lending</h4>
-                <span>The Token can be used for investing in tokenized real assets and projects, creating additional use cases and demand.</span>
-                <p>.</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section><!-- End Team Section -->
-
-                                <!-- ======= About Section ======= -->
-                                <section id="about" class="about">
-
-                                  <div class="container" data-aos="fade-up">
-                                    <div class="row gx-0">
-                            
-                                      <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
-                                        <div class="content">
-                                          <h2>Private Pre-sale bonuses 10% (100 Million Tokens)</h2>
-                                        </div>
-                                      </div>
-                            
-                                      <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
-                                        <img src="img/06.png" class="img-fluid" alt="" style="border-radius: 10%;">
-                                      </div>
-                            
-                                    </div>
-                                  </div>
-                            
-                                </section><!-- End About Section -->
-
-
-        <!-- ======= Recent Blog Posts Section ======= -->
-        <section id="recent-blog-posts" class="recent-blog-posts">
-
-          <div class="container" data-aos="fade-up">
-    
-            <div class="row">
-    
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/07.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Raising split: for the first $600,000 in presale raise we are offering bonuses to early investors. Total presale raise round 1 and 2 will be $600,000 at which point the pre-sale round will be closed. After the pre-sale at a specified time The Token will go live on several exchanges. At presale the company will be valued at $10,000,000 and the 1 Billion tokens will be issued at that same value. That means $1 will equal 100 coins at presale.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-    
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/08.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Private Pre-sale One $300,000: will be offered at a 2X discount. That means each dollar will buy 300 coins. That is a total of 60 Million coins.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-    
-              <div class="col-lg-4">
-                <div class="post-box">
-                  <div class="post-img"><img src="img/07.png" class="img-fluid" alt=""></div>
-                  <h3 class="post-title">Private Pre-sale Two $300,000: will be offered at a 1.33X discount. That means each dollar will buy 1.33 coins. That is a total of 40 Million coins.</h3>
-                  <a href="#" class="readmore stretched-link mt-auto"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-    
-            </div>
-    
-          </div>
-    
-        </section><!-- End Recent Blog Posts Section -->
-
-<div class="container">
-  <div class="section">
-    <div class="card">
-      <h3>The token distribution</h3>
-      <p>The token distribution model is designed to fairly distribute tokens among stakeholders while incentivizing early investors, team commitment, and ecosystem development.</p>
+        <div id="particles-js"></div>
     </div>
-    <div class="card">
-      <h3>The fixed supply </h3>
-      <p>The fixed supply and focus on utility within the platform aim to create scarcity and long-term value for The Token.</p>
-    </div>
-    <div class="card">
-      <h3>Staking rewards</h3>
-      <p>Staking rewards and governance rights incentivize users to hold The Token and participate in the ecosystem's growth.</p>
-    </div>
-    <div class="card">
-      <h3>Profit sharing</h3>
-      <p>Profit sharing for liquidity pools ensures market stability and easier trading.</p>
-    </div>
-    <div class="card">
-      <h3>The focus</h3>
-      <p>The focus on real-world use cases like NFT crowd-funding and DeFi applications expands the utility of The Token and attracts a wider user base.</p>
-    </div>
-    <div class="card">
-      <h3>2-Year Roadmap</h3>
-      <p>for Delnorte Terra Vision (DTV) 
-        Goal: Attract 1 million users and establish Delnorte and The Token as the premiere platform to mediate transactions between public and private sector.
-      </p>
-    </div>
-    <!-- Agregar más tarjetas aquí -->
-  </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+          "particles": {
+            "number": {
+              "value": 50,
+              "density": {
+                "enable": true,
+                "value_area": 800
+              }
+            },
+            "color": {
+              "value": "#FFFFFF" // Solo blanco
+            },
+            "shape": {
+              "type": "star",
+              "stroke": {
+                "width": 0,
+                "color": "#000000"
+              }
+            },
+            "opacity": {
+              "value": 0.5,
+              "random": false,
+              "anim": {
+                "enable": true,
+                "speed": 0.01, // Reducido para hacer que las partículas sean aún más lentas
+                "opacity_min": 0.1,
+                "sync": false
+              }
+            },
+            "size": {
+              "value": 2,
+              "random": true,
+              "anim": {
+                "enable": true,
+                "speed": 1, // Reducido para hacer que las partículas sean aún más lentas
+                "size_min": 0.1,
+                "sync": false
+              }
+            },
+            "move": {
+              "enable": true,
+              "speed": 0.5, // Reducido para hacer que las partículas sean aún más lentas
+              "direction": "none",
+              "random": false,
+              "straight": false,
+              "out_mode": "out",
+              "bounce": false,
+              "attract": {
+                "enable": false,
+                "rotateX": 600,
+                "rotateY": 1200
+              }
+            },
+            "line_linked": {
+              "enable": false
+            }
+          },
+          "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+              "onhover": {
+                "enable": true,
+                "mode": "repulse"
+              },
+              "onclick": {
+                "enable": true,
+                "mode": "push"
+              },
+              "resize": true
+            }
+          }
+        });
+
+        document.querySelectorAll('.box').forEach((box) => {
+          box.addEventListener('click', () => {
+            box.classList.toggle('flipped');
+
+            // Set a timeout to flip the box back after 5 seconds
+            setTimeout(() => {
+              box.classList.remove('flipped');
+            }, 5000);
+          });
+        });
+    </script>
+</body>
+</html>
 
 
 
-<style>
-
-/* Estilos para el encabezado de sección */
-.sections-head {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.sections-head h1 {
-  color: #000;
-  font-size: 28px;
-}
-
-/* Estilos para la imagen */
-.sections-head img {
-  max-width: 65%; /* Reducir el ancho máximo de la imagen al 80% del contenedor */
-  height: auto; /* La altura se ajusta automáticamente para mantener la proporción */
-  margin-top: 20px; /* Espacio superior para separar la imagen del título */
-}
-
-</style>
-
-
-
-<style>
-
-/* Estilos para las tarjetas */
-.card {
-  width: 100%; /* Make cards occupy full horizontal space */
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card h3 {
-  color: #000000;
-}
-
-/* Responsive styling */
-@media screen and (min-width: 768px) {
-  .card {
-    width: calc(50% - 20px); /* Two cards per row on larger screens */
-  }
-}
-
-@media screen and (min-width: 992px) {
-  .card {
-    width: calc(33.33% - 20px); /* Three cards per row on extra-large screens */
-  }
-}
-
-/* Estilos para la sección */
-.section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-</style>
-
-    <!-- ======= Portfolio Section ======= -->
-    <section id="portfolio" class="portfolio">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <p>Industries that we aim to impact and improve via Delnorte</p>
-        </header>
-
-        <div class="row" data-aos="fade-up" data-aos-delay="100">
-          <div class="col-lg-12 d-flex justify-content-center">
-            <ul id="portfolio-flters">
-              <li data-filter="*" class="filter-active">all industries</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="row gy-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/realstate.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Applications that provide real-time access to government data on property information, such as ownership, title history, and zoning regulations. These will streamline and automate the home buying and selling process, reducing the time and cost associated with manual verification and title searches. In the USA market according to the National Association of Realtors, the real estate industry has seen a 15% increase in home sales due to the use of these applications.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/realstate.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Real State"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-wrap">
-              <img src="img/svg/transportation.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Transportation: Applications that provide real-time access to government data on traffic conditions, road closures, and public transportation schedules. This has improved transportation efficiency, reducing congestion and travel time. According to the US Department of Transportation, the use of these applications has resulted in a 10% reduction in traffic congestion and a 15% increase in public transportation usage.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/transportation.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Transportation"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/healthcare.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Healthcare: Applications that provide real-time access to government data on healthcare providers, services, and regulations. This has improved healthcare outcomes, reducing the time and cost associated with manual verification and compliance checks. According to the Centers for Medicare and Medicaid Services, the use of these applications has resulted in a 10% increase in healthcare accessibility and a 15% reduction in healthcare costs.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/healthcare.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Healthcare"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-            <div class="portfolio-wrap">
-              <img src="img/svg/finance.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Finance: Applications that provide real-time access to government data on financial regulations, tax codes, and business licenses. This has improved financial transparency, reducing the time and cost associated with manual verification and compliance checks. According to the Internal Revenue Service, the use of these applications has resulted in a 10% increase in financial transparency and a 15% reduction in financial fraud.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/finance.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Finance"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-wrap">
-              <img src="img/svg/energy.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Energy: Applications that provide real-time access to government data on energy usage, pricing, and regulations. This has improved energy efficiency, reducing energy costs and carbon emissions. According to the US Department of Energy, the use of these applications has resulted in a 10% reduction in energy costs and a 15% reduction in carbon emissions.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/energy.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Energy"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-wrap">
-              <img src="img/svg/marketsandtrading.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
-                <p>Markets and Trading: Tokenized real property like farms and factories will create new value and tax revenue by connecting their verified data to carbon credit markets. By tracking and verifying carbon emissions to sell, buy and offset credits associated with these assets, tokenization can increase transparency and liquidity in the carbon credit and other markets. Government validated fractional investments can be displayed and traded on new market places creating new and derivative value.</p>
-                <div class="portfolio-links">
-                  <a href="img/svg/marketsandtrading.png" data-gallery="portfolioGallery" class="portfokio-lightbox" title="Markets and Trading"><i class="bi bi-plus"></i></a>
-                  <a href="#" title="More Details"><i class="bi bi-link"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section><!-- End Portfolio Section -->
-
-
-
-    <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
-
-      <div class="container" data-aos="fade-up">
-
-        <header class="section-header">
-          <h1>The growth statistics and real-world examples demonstrate the significant potential of the Delnorte business model and token value. The app store has the potential to transform various industries and promote innovation and economic growth. As more developers and users adopt the app store, the potential for business growth is significant, with estimates projecting a minimum 500% increase in revenue over the next five years.</h1>
-        </header>
-
-      </div>
-
-    </section><!-- End Team Section -->
-
-
+<!-- ======= end cajaazul ======= -->
 
   </main><!-- End #main -->
 
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
+<!-- ======= Start Footer ======= -->
 
-    <div class="footer-newsletter">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-12 text-center">
-            <h4>Our Newsletter</h4>
-            <p>Subscribe for notifications</p>
+<footer class="footer-section">
+  <div class="container">
+      <div class="footer-content pt-5 pb-5">
+          <div class="row">
+              <div class="col-xl-4 col-lg-4 mb-50">
+                  <div class="footer-widget">
+                    <div class="footer-logo">
+                      <a href="index.html"><img src="img/logo.png" class="img-fluid" alt="logo"><img src="img/dtvcajaazul.png" class="img-fluid" alt="logo"></a>
+                    </div>
+                    <div class="footer-social-icon">
+                      <span>Follow Us</span>
+                      <a href="#"><i class="bi bi-instagram"></i></a>
+                      <a href="#"><i class="bi bi-x"></i></a>
+                      <a href="#"><i class="bi bi-linkedin"></i></a>
+                  </div>
+                      <p><a href="#">&copy; 2024 All Right Reserved DTV</a></p>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Links</h3>
+                      </div>
+                      <ul>
+                        <li><a href="community.html">Community</a></li>  
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="token.html">Token</a></li>
+                        <li><a href="ContacUs.html">Contact Us</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="docs/Privacy Policy.pdf">Privacy Policy</a></li>
+                        <li><a href="docs/Terms of Service.pdf">Disclaimer</a></li>
+                    </ul>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Subscribe to the DTV newsletter</h3>
+                      </div>
+                      <div class="subscribe-form">
+                          <form action="#">
+                              <input type="text" placeholder="Email Address">
+                              <button><i class="bi bi-send"></i></button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
           </div>
-          <div class="col-lg-6">
-            <form action="" method="post">
-              <input type="email" name="email"><input type="submit" value="Subscribe">
-            </form>
-          </div>
-        </div>
       </div>
-    </div>
+  </div>
+  
+</footer>
 
-    <div class="footer-top">
-      <div class="container">
-        <div class="row gy-4">
-          <div class="col-lg-5 col-md-12 footer-info">
-            <a href="index.html" class="logo d-flex align-items-center">
-              <img src="img/logo.png" alt="">
-              <span>DTV</span>
-            </a>
-            <p>DTV (Delnorte Terra Vision)</p>
-            <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
 
-          <div class="col-lg-2 col-6 footer-links">
-            <h4>Platform</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-2 col-6 footer-links">
-            <h4>About</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">example</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-            <h4>Contact Us</h4>
-            <p>
-              example <br>
-              example<br>
-              United States <br><br>
-              <strong>Phone:</strong> +00000000000000<br>
-              <strong>Email:</strong> info@example.com<br>
-            </p>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>DTV</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
-        Designed by <a href="#">DTV</a>
-      </div>
-    </div>
-  </footer><!-- End Footer -->
+  <!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -1293,9 +661,24 @@
   <!-- Template Main JS File -->
   <script src="js/main.js"></script>
 
-  <!-- Template Main JS File -->
+  <!-- win -->
   <script src="js/win.js"></script>
+
+  <!-- type animation -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
 
 </body>
 
 </html>
+
+
+  <!--
+<div class="tn-atom">
+  <img
+    class="tn-atom__img t-img"
+    data-original="https://static.tildacdn.com/tild3861-3630-4931-a664-373534666332/DAO_KONDR_VC.svg"
+    alt=""
+    imgfield="tn_img_1651996255399"
+  />
+</div>-->

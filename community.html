@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>DTV</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Favicons -->
+    <link href="img/logo.png" rel="icon" />
+    <link href="img/logo.png" rel="apple-touch-icon" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Vendor CSS Files -->
+    <link href="vendor/aos/aos.css" rel="stylesheet" />
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
+    <link href="vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="css/style3.css" rel="stylesheet">
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+
+  <body>
+    <header id="header" class="header fixed-top">
+      <div
+        class="container-fluid container-xl d-flex align-items-center justify-content-between"
+      >
+      <a href="index.html" class="logo d-flex align-items-center" id="logo">
+        <img src="img/02-1.png" alt="" id="white-logo">
+        <img src="img/02.png" alt="" id="color-logo">
+        <span><img src="img/dtvcajaazul.png"></span>
+      </a>
+
+        <style>
+          #color-logo {
+            display: none;
+          }
+        </style>
+
+        <script>
+          window.addEventListener("scroll", function () {
+            var logoColor = document.getElementById("color-logo");
+            var logoWhite = document.getElementById("white-logo");
+
+            if (window.scrollY > 0) {
+              logoColor.style.display = "inline-block";
+              logoWhite.style.display = "none";
+            } else {
+              logoColor.style.display = "none";
+              logoWhite.style.display = "inline-block";
+            }
+          });
+        </script>
+
+        <nav id="navbar" class="navbar">
+          <ul>
+            <li>
+              <a href="index.html">Home</a>
+            </li>
+            <li class="dropdown">
+              <a class="nav-link scrollto active" href="#"
+                >Network</a>
+              <ul>
+                <li><a href="community.html">Community</a></li>
+                <li><a href="token.html">Token</a></li>
+              </ul>
+            </li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav>
+        <!-- .navbar -->
+      </div>
+    </header>
+    <!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="hero d-flex align-items-center">
+    <div class="container">
+      <div class="hero-content" data-aos="fade-up"data-aos-delay="200">
+      
+        <h1 data-aos="fade-up" class="hero-title" style="font-size: 6vw; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; margin-bottom: 0; margin-top: 0;">
+          Follow Us and Join Our Community
+        </h1>
+
+        <br><br>
+        <div class="hero-content" data-aos="fade-up"data-aos-delay="500">
+                <!-- Párrafo de descripción -->
+          <p data-aos="fade-up" data-aos-delay="600" style="font-size: 2em; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; margin-bottom: 10px;">
+            At DTV, we are thrilled to announce that we are expanding our efforts to bring more information and opportunities to everyone. Our team has been working tirelessly to create new programs, resources, and partnerships that will benefit our community.
+          </p>
+      </div>
+    </div>
+  </section>
+  <!-- End Hero -->
+
+    <style>
+    /* Estilos generales para la sección hero */
+    #hero {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100vh; /* Altura total del viewport */
+      background-color: #f8f9fa; /* Color de fondo */
+      padding: 20px;
+    }
+
+    /* Estilos específicos para el contenido dentro de la sección hero */
+    .hero-content {
+      max-width: 1000px; /* Ancho máximo del contenido */
+      margin: 0 auto; /* Centrado horizontal */
+      font-family: 'Calibri', sans-serif; /* Fuente Calibri */
+    }
+
+    .hero-title {
+      font-size: 7rem; /* Tamaño grande para el título */
+      font-weight: bold;
+      margin-bottom: 20px; /* Espaciado inferior */
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(9, 11, 133, 0.8)); /* Degradado entre blanco y gris suave */
+      -webkit-background-clip: text; /* Clip de fondo para WebKit (Safari, Chrome, etc.) */
+      background-clip: text; /* Clip de fondo para otros navegadores */
+      color: transparent; /* Hace el color del texto transparente */
+    }
+
+    .hero-subtitle {
+      font-size: 1.8rem; /* Tamaño más pequeño para el subtítulo */
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(180, 180, 180, 0.8)); /* Degradado entre blanco y gris suave */
+      -webkit-background-clip: text; /* Clip de fondo para WebKit (Safari, Chrome, etc.) */
+      background-clip: text; /* Clip de fondo para otros navegadores */
+      color: transparent; /* Hace el color del texto transparente */
+    }
+    </style>
+
+    <style>
+      .hero {
+        width: 100%;
+        height: 100vh;
+        background: url(../img/hero-bg-azulynegroo.png) top center no-repeat;
+        background-size: cover;
+      }
+    </style>
+
+    <main id="main">
+      
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
+  <div class="container" data-aos="fade-up">
+    <div class="about-content text-center"> <!-- Añado la clase text-center para centrar el contenido -->
+      <h1 data-aos="fade-up" class="hero-title" style="font-size: 5vw; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; margin-bottom: 0; margin-top: 0;">
+        keep up to date
+      </h1>
+      <div class="row justify-content-center">
+        <div class="col-lg-2 col-md-4 col-6">
+          <a href="https://www.youtube.com/@Delnorte_DTV" class="square-icon" target="_blank">
+            <img src="img/iconos/youtube.png" alt="YouTube" class="neon-icon">
+          </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <a href="#" class="square-icon" target="_blank">
+            <img src="img/iconos/telegram.png" alt="Telegram" class="neon-icon">
+          </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <a href="#" class="square-icon" target="_blank">
+            <img src="img/iconos/linkedin.png" alt="LinkedIn" class="neon-icon">
+          </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <a href="https://x.com/dtv_token?s=11" class="square-icon" target="_blank">
+            <img src="img/iconos/x.png" alt="Twitter" class="neon-icon">
+          </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <a href="#" class="square-icon" target="_blank">
+            <img src="img/iconos/blog.png" alt="News Letter" class="neon-icon">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End About Section -->
+
+<style>
+  /* Contenedor principal */
+.custom-containers {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; /* Altura del 50% del viewport */
+  position: relative;
+  z-index: 1;
+}
+
+/* Caja con efectos neon */
+.custom-neon-boxs {
+  background-color: transparent;
+  color: #fff;
+  padding: 50px;
+  border-radius: 10px;
+  border: 1px solid #0b193f;
+  border-bottom-width: 5px; /* Ancho específico para el borde inferior */
+  text-align: center;
+  width: 100%;
+  max-width: 1300px;
+  margin: 20px auto; /* Margen vertical de 20px y centrado horizontalmente */
+  margin-bottom: 0px; /* Espacio adicional en la parte inferior de la caja */
+  margin-top: 0px; /* Agrega un margen superior de 100px */
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-neon-boxs {
+  /* ... */
+  box-shadow: 0 0 300px #0b193f; /* Sombra de color neón inicial */
+  animation: neon-shadow 30s infinite; /* Animación que cambia la sombra */
+}
+
+@keyframes neon-shadow {
+  0% {
+    box-shadow: 0 0 300px #0b193f; /* Color inicial */
+  }
+  33% {
+    box-shadow: 0 0 300px #313131; /* Color intermedio 1 */
+  }
+  66% {
+    box-shadow: 0 0 300px #312807; /* Color intermedio 2 */
+  }
+  100% {
+    box-shadow: 0 0 300px #0b193f; /* Color final */
+  }
+}
+
+/* Títulos en azul */
+.custom-blue-titles {
+  color: #2549aa;
+  font-size: 2vw; /* Tamaño de fuente ajustado */
+  font-weight: bold; /* Texto en negrita */
+  margin-bottom: 20px; /* Espacio inferior */
+}
+
+/* Títulos hero */
+.custom-hero-titles {
+  font-size: 1.5vw; /* Tamaño de texto en base a la anchura de la pantalla */
+  color: #fff;
+  margin-bottom: 0;
+  margin-top: 0;
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .custom-hero-titles {
+    font-size: 4vw; /* Reducir el tamaño de fuente para pantallas más pequeñas */
+  }
+}
+
+/* Efecto neon para los iconos */
+.neon-icon {
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-icon:hover {
+  box-shadow: 0 0 200px #bd9bfc; /* Sombra de color neón al pasar el mouse */
+}
+
+/* Centrar contenido en la sección about */
+.about-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* Asegura que el texto esté centrado */
+}
+
+</style>
+
+  <style>
+.square-icon {
+  transition: transform 0.3s ease-in-out;
+}
+
+.square-icon:hover {
+  transform: rotate(10deg);
+}
+  </style>
+
+  <style>
+    /* Estilos generales para la sección de iconos */
+    #about {
+      background: linear-gradient(180deg, #121621, #000); /* Degradado entre negro dark azul y negro totalmente */
+      padding: 30px 0; /* Espaciado interior */
+      text-align: center; /* Alineación del contenido al centro */
+    }
+
+    .about-content {
+  /* existing styles */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+    .about-content h3 {
+      font-size: 5.5rem; /* Tamaño del título */
+      margin-bottom: 20px; /* Espaciado inferior */
+      background: linear-gradient(90deg, #818181, #252525); /* Degradado blanco a gris para el texto */
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent; /* Ocultar el color del texto original */
+    }
+
+    .about-content p {
+      font-size: 1.2rem; /* Tamaño del texto */
+      line-height: 1.6; /* Altura de línea */
+      color: #ffffff; /* Color del texto */
+    }
+
+    /* Estilos para los iconos cuadrados */
+    .square-icon {
+      width: 200px; /* Tamaño del cuadrado */
+      height: 200px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px; /* Espaciado entre los iconos */
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .square-icon:hover {
+      transform: scale(1.1); /* Escala al hacer hover */
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Sombra al hacer hover */
+    }
+
+    .square-icon img {
+      max-width: 50%; /* Ajuste para asegurar que la imagen se ajuste dentro del cuadrado */
+      height: auto;
+    }
+
+    /* Ajustes responsivos */
+    @media (max-width: 992px) {
+      .square-icon {
+        width: 150px; /* Reducir tamaño de los cuadrados en pantallas más pequeñas */
+        height: 150px;
+        margin: 20px; /* Reducir el espaciado entre los iconos */
+      }
+
+      .about-content h3 {
+        font-size: 2rem; /* Reducir tamaño del título en pantallas más pequeñas */
+      }
+
+      .about-content p {
+        font-size: 1rem; /* Reducir tamaño del texto en pantallas más pequeñas */
+      }
+    }
+
+    @media (max-width: 576px) {
+      .square-icon {
+        width: 120px; /* Reducir tamaño de los cuadrados en pantallas móviles */
+        height: 120px;
+        margin: 15px; /* Reducir el espaciado entre los iconos en pantallas móviles */
+      }
+
+      .about-content h3 {
+        font-size: 1.8rem; /* Reducir tamaño del título en pantallas móviles */
+      }
+
+      .about-content p {
+        font-size: 0.9rem; /* Reducir tamaño del texto en pantallas móviles */
+      }
+    }
+  </style>
+
+
+<style>
+/* Contenedor principal */
+.custom-containers {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; /* Altura del 50% del viewport */
+  position: relative;
+  z-index: 2;
+}
+
+/* Títulos en azul */
+.custom-blue-titles {
+  color: #2549aa;
+  font-size: 2vw; /* Tamaño de fuente ajustado */
+  font-weight: bold; /* Texto en negrita */
+  margin-bottom: 20px; /* Espacio inferior */
+}
+
+/* Títulos hero */
+.custom-hero-titles {
+  font-size: 1.5vw; /* Tamaño de texto en base a la anchura de la pantalla */
+  color: #fff;
+  margin-bottom: 0;
+  margin-top: 0;
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .custom-hero-titles {
+    font-size: 4vw; /* Reducir el tamaño de fuente para pantallas más pequeñas */
+  }
+}
+  
+  /* Caja tipo TV HD */
+  .custom-neon-box {
+    background-color: #121621;
+    color: #fff;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra suave */
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .custom-neon-box h1 {
+    font-size: 3vw; /* Tamaño de fuente relativo */
+    font-weight: bold;
+    text-transform: uppercase; /* Mayúsculas */
+    margin-bottom: 20px; /* Espaciado inferior */
+  }
+  
+  /* Carousel */
+  .custom-carousel-new {
+    background-color: #000;
+    padding: 0; /* Eliminar relleno */
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra suave */
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    overflow: hidden;
+    position: relative; /* Add this to make the carousel section relative */
+    z-index: -1; /* Add this to make the carousel content appear on top of the particles */
+  }
+  
+  .custom-carousel-new .carousel-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px; /* Borde redondeado para las imágenes */
+  }
+
+  /* Detras de los elementos */
+  
+  #particles-js {
+  position: relative; /* Add this to make the particles container relative */
+  height: 60vh; /* Set the height to 100vh to cover the entire carousel section */
+  width: 100%; /* Set the width to 100% to cover the entire carousel section */
+}
+
+#particles-js canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Make the particles canvas appear behind the carousel content */
+}
+  </style>
+
+<div id="particles-js"><!-- Partículas aquí -->
+
+  <div class="custom-containers">
+    <div class="custom-neon-boxs">
+      <h2 class="animated-gradient-text">Our communities is our foundation for awareness</h2>
+      
+        <style>
+
+        @keyframes gradientAnimation {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        .animated-gradient-text {
+          font-size: 60px;
+          font-weight: 600;
+          font-family: Montserrat, sans-serif;
+          background: linear-gradient(to right, #575757, #ffffff);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          background-size: 200% 100%;
+          animation: gradientAnimation 5s linear infinite;
+        }
+
+        </style>
+
+      <p data-aos="fade-up" data-aos-delay="600" style="font-size: 1.7em; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 10px; margin-bottom: 10px;">
+        Stay in the loop with the latest news and progress at our company by signing up for our newsletter. Gain access to exclusive insights, behind-the-scenes stories, and special promotions delivered directly to your email. Don't miss out on our efforts to build awareness in Latin America and our engagement at a municipal level to promote the use of blockchain technology for tangible assets.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- particulas -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": {
+        "value": 50,
+        "density": {
+          "enable": true,
+          "value_area": 800
+        }
+      },
+      "color": {
+        "value": "#FFFFFF" // Solo blanco
+      },
+      "shape": {
+        "type": "star",
+        "stroke": {
+          "width": 0,
+          "color": "#000000"
+        }
+      },
+      "opacity": {
+        "value": 0.5,
+        "random": false,
+        "anim": {
+          "enable": true,
+          "speed": 0.01, // Reducido de 0.1 a 0.01 para que sean aún más lentas
+          "opacity_min": 0.1,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": 2,
+        "random": true,
+        "anim": {
+          "enable": true,
+          "speed": 1, // Reducido de 5 a 1 para que sean aún más lentas
+          "size_min": 0.1,
+          "sync": false
+        }
+      },
+      "move": {
+        "enable": true,
+        "speed": 0.5, // Reducido de 1 a 0.5 para que sean aún más lentas
+        "direction": "none",
+        "random": false,
+        "straight": false,
+        "out_mode": "out",
+        "bounce": false,
+        "attract": {
+          "enable": false,
+          "rotateX": 600,
+          "rotateY": 1200
+        }
+      },
+      "line_linked": {
+        "enable": false
+      }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": {
+          "enable": true,
+          "mode": "repulse"
+        },
+        "onclick": {
+          "enable": true,
+          "mode": "push"
+        },
+        "resize": true
+      }
+    }
+  });
+  </script>
+
+<div class="container">
+  <h1 data-aos="fade-up" class="hero-title move-right" style="font-size: 5vw; background: linear-gradient(to right, grey, white, grey); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; margin-bottom: 0; margin-top: 0; text-align: center;">
+    Press Room
+</h1>
+
+  <br><br>
+  
+  <style>
+    .move-right {
+  margin-left: 50px; /* Ajusta este valor según sea necesario */
+    }
+  </style>
+
+
+  <!-- Carousel Galería -->
+  <div class="custom-carousel-new carousel slide mt-4" data-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="img/events/01.JPG" class="d-block w-100" alt="Foto 1">
+      </div>
+      <div class="carousel-item">
+        <img src="img/events/02.jpg" class="d-block w-100" alt="Foto 2">
+      </div>
+      <div class="carousel-item">
+        <img src="img/events/03.jpg" class="d-block w-100" alt="Foto 3">
+      </div>
+      <div class="carousel-item">
+        <img src="img/events/5.jpg" class="d-block w-100" alt="Foto 4">
+      </div>
+      <div class="carousel-item">
+        <img src="img/events/6.jpg" class="d-block w-100" alt="Foto 5">
+      </div>
+      <div class="carousel-item">
+        <img src="img/events/7.jpg" class="d-block w-100" alt="Foto 6">
+      </div>
+    </div>
+  </div>
+
+  <br><br>
+  
+<style>
+
+/* Efecto de sombra neón para el carrusel */
+.custom-carousel-new {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 300px #41325c; /* Sombra de color neón */
+  margin: 20px auto; /* Centrado horizontal y margen vertical */
+}
+
+/* Títulos en azul */
+.custom-blue-titles {
+  color: #2549aa;
+  font-size: 2vw; /* Tamaño de fuente ajustado */
+  font-weight: bold; /* Texto en negrita */
+  margin-bottom: 20px; /* Espacio inferior */
+}
+
+/* Títulos hero */
+.custom-hero-titles {
+  font-size: 1.5vw; /* Tamaño de texto en base a la anchura de la pantalla */
+  color: #fff;
+  margin-bottom: 0;
+  margin-top: 0;
+  background: linear-gradient(to right, grey, white, grey);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .custom-hero-titles {
+    font-size: 4vw; /* Reducir el tamaño de fuente para pantallas más pequeñas */
+  }
+}
+
+/* Efecto neon para los iconos */
+.neon-icon {
+  transition: box-shadow 0.3s ease;
+}
+
+/* Centrar contenido en la sección about */
+.about-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* Asegura que el texto esté centrado */
+}
+</style>
+    
+  <!-- Events Slider -->
+
+  <div class="container swiper">
+    <div class=" slider-wrapper">
+      <div class="card-list swiper-wrapper">
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/startup-594090_640.webp" alt="User Image" class="user-image">
+          <h2 class="user-name">Innovación Verde: las startups de Latinoamérica que están moldeando el futuro sostenible del continente</h2>
+          <p class="user-profession">By: Forbes Centro America</p>
+          <div class="read-container">
+            <a href="https://forbescentroamerica.com/2024/03/28/innovacion-verde-las-startups-de-latinoamerica-que-estan-moldeando-el-futuro-sostenible-del-continente" class="message-button-link" target="_blank">
+              <button class="message-button">Read</button>
+          </a>
+          </div>
+          <div class="balls-container">
+            <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+            <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+            <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+            <!-- Agrega más pelotas según sea necesario -->
+          </div>
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/segunda.png" alt="User Image" class="user-image">
+          <h2 class="user-name">The companies that represented Team USA 🇺🇸 on the 2023 Global Fundraising Stage hosted by World Business Angels Investment Forum.</h2>
+          <p class="user-profession">By: WBAF</p>
+          <div class="read-container">
+          <a href="https://www.linkedin.com/posts/ingrid-vasiliu-feltes-mdmba_please-join-me-in-congratulating-the-companies-activity-7135632006100447232-jOfK/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>              
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/02.webp" alt="User Image" class="user-image">
+          <h2 class="user-name">Increasing Efficiency and Combating Corruption: The Power of Blockchain-Based Bureaucracy</h2>
+          <p class="user-profession">By: Medium</p>
+          <div class="read-container">
+          <a href="https://medium.com/partisia-blockchain/increasing-efficiency-and-combating-corruption-the-power-of-blockchain-based-bureaucracy-cc5f4d6f5b84" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/04.webp" alt="User Image" class="user-image">
+          <h2 class="user-name">Coldwell Banker Costa Rica to move to the blockchain with DelNorte technology</h2>
+          <p class="user-profession">By: Medium</p>
+          <div class="read-container">
+          <a href="https://medium.com/@DTVtechteam/coldwell-banker-costa-rica-to-move-to-the-blockchain-with-delnorte-technology-e5406a2dcda6" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                  
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/05.webp" alt="User Image" class="user-image">
+          <h2 class="user-name">Housing project “Home Refugio” to be tokenized in Honduras</h2>
+          <p class="user-profession">By: Medium</p>
+          <div class="read-container">
+          <a href="https://medium.com/@DTVtechteam/housing-project-home-refugio-to-be-tokenized-in-honduras-baa46f65b7fa" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a></div>
+        <div class="balls-container">
+          <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+          <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+          <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+          <!-- Agrega más pelotas según sea necesario -->
+        </div>                 
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/06.png" alt="User Image" class="user-image">
+          <h2 class="user-name">International real estate giant Novotel to tokenize new hotel and residential project in Georgia</h2>
+          <p class="user-profession">By: Crypto News</p>
+          <div class="read-container">
+          <a href="https://cryptonews.net/news/blockchain/20709905/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                  
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/07.jpeg" alt="User Image" class="user-image">
+          <h2 class="user-name">La tecnológica DelNorte donará plataforma blockchain a Olanchito</h2>
+          <p class="user-profession">By: El Pulso</p>
+          <div class="read-container">
+          <a href="https://www.elpulso.hn/2022/10/27/la-tecnologica-delnorte-donara-plataforma-blockchain-a-olanchito/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                 
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/08.jfif" alt="User Image" class="user-image">
+          <h2 class="user-name">When your city goes on the blockchain</h2>
+          <p class="user-profession">By: Político</p>
+          <div class="read-container">
+          <a href="https://www.politico.com/newsletters/digital-future-daily/2022/04/14/when-your-city-goes-on-the-blockchain-00025358" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/09.jfif" alt="User Image" class="user-image">
+          <h2 class="user-name">Empresa de tecnología blockchain abre en El Salvador</h2>
+          <p class="user-profession">By: Diario El Salvador</p>
+          <div class="read-container">
+          <a href="https://diarioelsalvador.com/empresa-de-tecnologia-blockchain-abre-en-el-salvador/201472/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                 
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/10.jpeg" alt="User Image" class="user-image">
+          <h2 class="user-name">Anton Glotser, CEO de DTV: “La inversión en El Salvador se decidió por el gran paso tecnológico que ha dado, traerá beneficios a la gente</h2>
+          <p class="user-profession">By: El Periodista</p>
+          <div class="read-container">
+          <a href="https://www.elperiodista.com.sv/2022/03/09/anton-glotser-ceo-fundador-de-dtv-la-inversion-en-el-salvador-se-decidio-por-el-gran-paso-tecnologico-que-ha-dado-traera-grandes-beneficios-a-la-gente/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                 
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/innovation.jfif" alt="User Image" class="user-image">
+          <h2 class="user-name">El Salvador se convierte en el centro del lanzamiento de una nueva plataforma</h2>
+          <p class="user-profession">By: The Insight</p>
+          <div class="read-container">
+          <a href="https://theinsight.mx/el-salvador-se-convierte-en-el-centro-del-lanzamiento-de-una-nueva-plataforma/" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>                
+        </div>
+        <div class="card-item swiper-slide">
+          <img src="img/carouselevents/ultima.jpeg" alt="User Image" class="user-image">
+          <h2 class="user-name">La tecnológica DelNorte TerraVision (DTV) lanzará su plataforma en El Salvado</h2>
+          <p class="user-profession">By: Tu Nota</p>
+          <div class="read-container">
+          <a href="https://www.tunota.com/tecnologia/articulo/la-tecnologica-dtv-lanzara-su-plataforma-en-el-salvador" class="message-button-link" target="_blank">
+            <button class="message-button">Read</button>
+        </a>
+      </div>
+      <div class="balls-container">
+        <div class="ball" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="ball" style="top: 40%; left: 80%; animation-delay: 2s;"></div>
+        <div class="ball" style="top: 70%; left: 30%; animation-delay: 4s;"></div>
+        <!-- Agrega más pelotas según sea necesario -->
+      </div>       
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-slide-button swiper-button-prev"></div>
+      <div class="swiper-slide-button swiper-button-next"></div>
+    </div>
+  </div>
+
+  <!-- Linking SwiperJS script -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Linking custom script -->
+  <script src="script.js"></script>
+
+  <style>
+/* Importing Google Font - Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+.slider-wrapper {
+    overflow: hidden;
+    max-width: 1200px;
+    margin: 0 70px 55px;
+}
+
+.card-list {
+    position: relative;
+}
+
+.card-list .card-item .read-container {
+  position: absolute;
+  bottom: 25px;
+  left: 130px;
+}
+
+.card-list .card-item .read-container .message-button {
+  /* ... otros estilos ... */
+  width: 100px; /* Establecer ancho fijo para el botón Read */
+}
+
+.card-list .card-item {
+    position: relative;
+    height: 550px; /* Reduce la altura aquí */
+    color: #fff;
+    user-select: none;
+    padding: 20px; /* Reduce el padding aquí */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    background: transparent;
+    border: 1px solid #363636;
+    overflow: hidden; /* Para que las pelotas no se desborden */
+    box-shadow: 0px 0px 2px #bd9bfc; /* Aplicar el shadow específico */
+}
+
+.card-list .card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+.ball-container {
+    width: 100%;
+    height: 1200px;
+    overflow: hidden;
+}
+
+.ball {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    background: rgba(55, 17, 145, 0.5);
+    animation: moveBalls 30s ease-in-out infinite;
+    filter: blur(25px);
+}
+
+.ball {
+  pointer-events: none;
+}
+
+.message-button-link, .user-image {
+  pointer-events: auto;
+  z-index: 1;
+  position: relative;
+}
+
+@keyframes moveBalls {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(200px, -200px);
+    }
+    50% {
+        transform: translate(-200px, 200px);
+    }
+    75% {
+        transform: translate(200px, 200px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes changeColors {
+    0%, 100% {
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+.card-list .card-item .user-image {
+  max-width: 400px; /* Establecer ancho máximo para la imagen */
+  max-height: 180px; /* Establecer alto máximo para la imagen */
+    width: 100%;
+    height: auto;
+    border-radius: 20px; /* Mantiene la imagen cuadrada */
+    margin-bottom: 10px; /* Reduce el margen inferior */
+    border: none; /* Remover el borde */
+    padding: 0; /* Remover el padding */
+    object-fit: cover; /* Asegurar que la imagen cubra el área */
+    box-shadow: 0 0px 15px rgba(57, 3, 100, 0.3), 0 6px 20px rgba(174, 0, 255, 0.3); /* Agregar el box-shadow blanco */
+}
+
+.card-list .card-item .user-name {
+    font-size: 1.2rem; /* Ajustar el tamaño de la fuente si es necesario */
+    margin-bottom: 10px; /* Reduce el margen inferior */
+}
+
+.card-list .card-item .user-profession {
+    font-size: 1rem; /* Reduce el tamaño de la fuente */
+    color: #e3e3e3;
+    font-weight: 500;
+    margin: 10px 0 20px; /* Ajusta los márgenes */
+}
+
+.card-list .card-item .message-button {
+    display: block; /* Asegúrate de que sea un bloque */
+    margin: 0 auto; /* Centra horizontalmente */
+    font-size: 1.2rem; 
+    padding: 8px 25px; 
+    color: #ffffff;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #252525;
+    border: 1px solid transparent;
+    transition: 0.2s ease;
+}
+
+.card-list .card-item .message-button:hover {
+    background: rgb(255, 255, 255);
+    border: 1px solid #000000;
+    color: #000000;
+}
+
+.slider-wrapper .swiper-pagination-bullet {
+    background: #fff;
+    height: 13px;
+    width: 13px;
+    opacity: 0.5;
+}
+
+.slider-wrapper .swiper-pagination-bullet-active {
+    opacity: 1;
+}
+
+.slider-wrapper .swiper-slide-button {
+    color: #fff;
+    margin-top: -55px;
+    transition: 0.2s ease;
+}
+
+.slider-wrapper .swiper-slide-button:hover {
+    color: #bd9bfc;
+}
+
+@media (max-width: 768px) {
+    .slider-wrapper {
+        margin: 0 10px 40px;
+    }
+
+    .slider-wrapper .swiper-slide-button {
+        display: none;
+    }
+}
+  </style>
+
+<script>
+  const swiper = new Swiper('.slider-wrapper', {
+  loop: false,
+  grabCursor: true,
+  spaceBetween: 30,
+
+  // Pagination bullets
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true,
+    dynamicBullets: true
+  },
+
+  // Navigation arrows
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+
+  // Responsive breakpoints
+  breakpoints: {
+    0: {
+      slidesPerView: 1
+    },
+    768: {
+      slidesPerView: 2
+    },
+    1024: {
+      slidesPerView: 3
+    }
+  }
+});
+</script>
+
+
+  <!-- Bootstrap y jQuery (necesario para el funcionamiento del carousel) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    </main>
+    <!-- End #main -->
+
+<!-- ======= Start Footer ======= -->
+
+<br><br><br><br><br><br><br><br>
+
+<footer class="footer-section">
+  <div class="container">
+      <div class="footer-content pt-5 pb-5">
+          <div class="row">
+              <div class="col-xl-4 col-lg-4 mb-50">
+                  <div class="footer-widget">
+                    <div class="footer-logo">
+                      <a href="index.html"><img src="img/logo.png" class="img-fluid" alt="logo"><img src="img/dtvcajaazul.png" class="img-fluid" alt="logo"></a>
+                    </div>
+                      <div class="footer-social-icon">
+                          <span>Follow Us</span>
+                          <a href="#"><i class="bi bi-instagram"></i></a>
+                          <a href="#"><i class="bi bi-x"></i></a>
+                          <a href="#"><i class="bi bi-linkedin"></i></a>
+                      </div>
+                      <p><a href="#">&copy; 2024 All Right Reserved DTV</a></p>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Links</h3>
+                      </div>
+                      <ul>
+                        <li><a href="community.html">Community</a></li>  
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="token.html">Token</a></li>
+                        <li><a href="ContacUs.html">Contact Us</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="docs/Privacy Policy.pdf">Privacy Policy</a></li>
+                        <li><a href="docs/Terms of Service.pdf">Disclaimer</a></li>
+                    </ul>
+                  </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
+                  <div class="footer-widget">
+                      <div class="footer-widget-heading">
+                          <h3>Subscribe to the DTV newsletter</h3>
+                      </div>
+                      <div class="subscribe-form">
+                          <form action="#">
+                              <input type="text" placeholder="Email Address">
+                              <button><i class="bi bi-send"></i></button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+</footer>
+
+<style>
+  .large-font {
+    font-size: 1.3em; /* Adjust the font size as needed */
+  }
+
+  @media (max-width: 768px) {
+    .footer-links-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      margin: 10px 0;
+    }
+
+    .large-font {
+      font-size: 1.1em; /* Adjust the font size for smaller screens if needed */
+    }
+  }
+</style>
+
+  <!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="vendor/aos/aos.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="js/main.js"></script>
+
+  <!-- win -->
+  <script src="js/win.js"></script>
+
+  <!-- type animation -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+
+</body>
+
+</html>
+
+
+  <!--
+<div class="tn-atom">
+  <img
+    class="tn-atom__img t-img"
+    data-original="https://static.tildacdn.com/tild3861-3630-4931-a664-373534666332/DAO_KONDR_VC.svg"
+    alt=""
+    imgfield="tn_img_1651996255399"
+  />
+</div>-->
