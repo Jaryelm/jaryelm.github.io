@@ -9,6 +9,10 @@ require __DIR__ . '/../PHPMailer/src/SMTP.php';
 $mail = new PHPMailer(true);
 $mail->CharSet = 'UTF-8';
 
+// Habilitar modo de depuración
+$mail->SMTPDebug = 2; // Cambia esto a 4 para ver todos los mensajes de depuración detallados
+$mail->Debugoutput = 'html'; // Salida de depuración en formato HTML
+
 try {
     // Configuración del servidor SMTP
     $mail->isSMTP();
