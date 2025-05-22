@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicons -->
+  <link href="assets/img/logo/logopuntosyalass.png" rel="icon">
+  <link href="assets/img/logo/logopuntosyalass.png" rel="apple-touch-icon">
+
+  <title>Bot IA Conversacional</title>
+  <link href="assets/css/main.css" rel="stylesheet">
+</head>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(45deg, #035c67, #06adbf, #fdd575);
+      background-size: 400% 400%;
+      animation: gradientBackground 15s ease infinite;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: #06adbf;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #333;
+      font-size: 1.2em;
+      line-height: 1.6;
+    }
+
+    .bot-note {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    /* Animación de fondo */
+    @keyframes gradientBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Efectos adicionales */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://source.unsplash.com/1600x900/?tech,neon') no-repeat center center/cover;
+      opacity: 0.1;
+      pointer-events: none;
+      filter: blur(10px);
+      z-index: -1;
+    }
+
+    .container h1,
+    .container p,
+    .container .bot-note {
+      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .container button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      color: #fff;
+      background-color: #06adbf;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .container button:hover {
+      background-color: #048c9d;
+    }
+  </style>
+
+<body>
+  <div class="container">
+    <h1>🤖 Bienvenido al Asistente Virtual MEDICASA</h1>
+    <p>Haz clic en el ícono del chat en la esquina inferior derecha para comenzar una conversación.</p>
+    <p>Bot incorpora IA conversacional y enfocado en atención al cliente</p>
+    <div class="bot-note">Desarrollado por: Dirección de Tecnología y Desarrollo</div>
+    <div class="bot-note">soporteti@medicasa.hn</div>
+  </div>
+
+</body>
+
+  <!-- Scripts del bot -->
+  <script src="https://cdn.botpress.cloud/webchat/v2.4/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2024/11/15/16/20241115163604-TFQZAJ6J.js"></script>
+
+</html>
