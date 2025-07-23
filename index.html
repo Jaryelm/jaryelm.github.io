@@ -1,119 +1,412 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicons -->
-  <link href="assets/img/logo/logopuntosyalass.png" rel="icon">
-  <link href="assets/img/logo/logopuntosyalass.png" rel="apple-touch-icon">
-
-  <title>Bot IA Conversacional</title>
-  <link href="assets/css/main.css" rel="stylesheet">
-</head>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operaciones IT-HN - Presentación</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
     body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: linear-gradient(45deg, #035c67, #06adbf, #fdd575);
-      background-size: 400% 400%;
-      animation: gradientBackground 15s ease infinite;
-      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #e2e8f0;
     }
-
-    .container {
-      text-align: center;
-      padding: 40px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      width: 90%;
-      max-width: 500px;
+    .title-font {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1.2px;
     }
-
-    h1 {
-      color: #06adbf;
-      font-size: 2.5em;
-      margin-bottom: 20px;
+    .card-hover {
+      transition: all 0.3s ease;
     }
-
-    p {
-      color: #333;
-      font-size: 1.2em;
-      line-height: 1.6;
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     }
-
-    .bot-note {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: #666;
+    .timeline-item {
+      border-left: 3px solid #3b82f6;
+      padding-left: 1rem;
+      margin-bottom: 2rem;
+      position: relative;
     }
-
-    /* Animación de fondo */
-    @keyframes gradientBackground {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Efectos adicionales */
-    .container::before {
+    .timeline-item::before {
       content: '';
       position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #3b82f6;
+      left: -5px;
       top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://source.unsplash.com/1600x900/?tech,neon') no-repeat center center/cover;
-      opacity: 0.1;
-      pointer-events: none;
-      filter: blur(10px);
-      z-index: -1;
-    }
-
-    .container h1,
-    .container p,
-    .container .bot-note {
-      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .container button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1em;
-      color: #fff;
-      background-color: #06adbf;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .container button:hover {
-      background-color: #048c9d;
     }
   </style>
+</head>
+<body class="min-h-screen">
+  <div x-data="{ tab: 'overview' }" class="container mx-auto px-6 py-12">
+    <!-- Header -->
+    <header class="text-center mb-16">
+      <h1 class="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 title-font mb-4">
+        Operaciones IT-HN
+      </h1>
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        Plataforma Nacional de Gestión Tecnológica para Honduras – Digitalización, Eficiencia y Mejora Continua en TI
+      </p>
+      <div class="mt-6 h-1 w-32 bg-gradient-to-r from-blue-500 to-teal-400 mx-auto rounded"></div>
+    </header>
 
-<body>
-  <div class="container">
-    <h1>🤖 Bienvenido al Asistente Virtual MEDICASA</h1>
-    <p>Haz clic en el ícono del chat en la esquina inferior derecha para comenzar una conversación.</p>
-    <p>Bot incorpora IA conversacional y enfocado en atención al cliente</p>
-    <div class="bot-note">Desarrollado por: Dirección de Tecnología y Desarrollo</div>
-    <div class="bot-note">soporteti@medicasa.hn</div>
+    <!-- Navigation Tabs -->
+    <nav class="flex flex-wrap justify-center gap-2 mb-12 border-b border-gray-700 pb-4">
+      <button 
+        @click="tab = 'overview'" 
+        :class="{ 'bg-blue-600 text-white': tab === 'overview', 'text-gray-400 hover:text-white': tab !== 'overview' }"
+        class="px-6 py-3 rounded-lg font-medium transition">
+        Visión General
+      </button>
+      <button 
+        @click="tab = 'features'" 
+        :class="{ 'bg-blue-600 text-white': tab === 'features', 'text-gray-400 hover:text-white': tab !== 'features' }"
+        class="px-6 py-3 rounded-lg font-medium transition">
+        Funcionalidades
+      </button>
+      <button 
+        @click="tab = 'timeline'" 
+        :class="{ 'bg-blue-600 text-white': tab === 'timeline', 'text-gray-400 hover:text-white': tab !== 'timeline' }"
+        class="px-6 py-3 rounded-lg font-medium transition">
+        Cronograma (7 Meses)
+      </button>
+      <button 
+        @click="tab = 'advantages'" 
+        :class="{ 'bg-blue-600 text-white': tab === 'advantages', 'text-gray-400 hover:text-white': tab !== 'advantages' }"
+        class="px-6 py-3 rounded-lg font-medium transition">
+        Ventajas
+      </button>
+    </nav>
+
+    <!-- Tab Content -->
+    <main class="space-y-20">
+
+      <!-- Overview Tab -->
+      <div x-show="tab === 'overview'" x-cloak class="animate-fade-in">
+        <section class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6">Transformando la Gestión IT en Honduras</h2>
+          <p class="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            <strong>Operaciones IT-HN</strong> es una plataforma integral desarrollada para digitalizar, optimizar y visualizar 
+            en tiempo real todas las operaciones tecnológicas del país. Desde el seguimiento de activos hasta la gestión de 
+            tareas, pasando por inventarios, visitas técnicas y rendición de cuentas, todo centralizado en una solución 
+            segura, escalable y 100% local.
+          </p>
+        </section>
+
+        <div class="grid md:grid-cols-3 gap-8 mt-12">
+          <div class="bg-gray-800 p-8 rounded-2xl shadow-xl card-hover">
+            <div class="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Digitalización Total</h3>
+            <p class="text-gray-400">Eliminación del papeleo, formularios digitales, seguimiento en tiempo real y acceso desde cualquier dispositivo.</p>
+          </div>
+
+          <div class="bg-gray-800 p-8 rounded-2xl shadow-xl card-hover">
+            <div class="w-14 h-14 bg-teal-600 rounded-lg flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v0H8v0z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Seguridad y Acceso</h3>
+            <p class="text-gray-400">Doble autenticación, certificado SSL, dominio público seguro y roles de acceso por usuario (Técnico, Auditor, Finanzas, etc).</p>
+          </div>
+
+          <div class="bg-gray-800 p-8 rounded-2xl shadow-xl card-hover">
+            <div class="w-14 h-14 bg-indigo-600 rounded-lg flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Infraestructura Moderna</h3>
+            <p class="text-gray-400">Docker Compose, Linux LTS, bases de datos SQL y MongoDB, APIs integradas, sin dependencia de proveedores externos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Tab -->
+      <div x-show="tab === 'features'" x-cloak class="animate-fade-in">
+        <h2 class="text-4xl font-bold text-center mb-12">Funcionalidades Clave</h2>
+        <div class="space-y-12">
+
+          <!-- Feature 1 -->
+          <div class="bg-gray-800 rounded-2xl p-8 shadow-xl">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold mb-3">Mapa Interactivo con Visitas en Tiempo Real</h3>
+                <p class="text-gray-300 mb-4">Integración con API de KoboToolbox para enviar datos GPS sin internet. Visualización de visitas técnicas en mapa satelital con detalles: fecha, técnico, motivo, ticket asociado, duración y estado.</p>
+                <ul class="text-gray-400 space-y-2 list-disc list-inside">
+                  <li>Visualización de puntos de visita en 24 horas</li>
+                  <li>Asociación de tickets y fallas reportadas</li>
+                  <li>Historial completo de visitas por restaurante</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="bg-gray-800 rounded-2xl p-8 shadow-xl">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold mb-3">Registro de Horas Extras por Colaborador</h3>
+                <p class="text-gray-300 mb-4">Sistema automatizado para registrar, validar y reportar horas extras trabajadas por cada técnico. Integrado con calendario y aprobación por supervisor.</p>
+                <ul class="text-gray-400 space-y-2 list-disc list-inside">
+                  <li>Dashboard de horas por semana/mes</li>
+                  <li>Exportación a Excel, PDF y CSV</li>
+                  <li>Notificaciones de límites y alertas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="bg-gray-800 rounded-2xl p-8 shadow-xl">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold mb-3">Inventario Inteligente (Bodegas & Restaurantes)</h3>
+                <p class="text-gray-300 mb-4">Gestión completa de activos con códigos QR, historial de movimientos, formularios pre-llenados por número de tag, y visualización gráfica por restaurante.</p>
+                <ul class="text-gray-400 space-y-2 list-disc list-inside">
+                  <li>Generación automática de QR por equipo</li>
+                  <li>Historial de instalación: origen, destino, motivo (reparación, actualización, etc.)</li>
+                  <li>Diseño visual interactivo del restaurante con activos instalados</li>
+                  <li>Mantenimiento preventivo y seguimiento de equipos dañados</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="bg-gray-800 rounded-2xl p-8 shadow-xl">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 bg-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold mb-3">Rendición de Cuentas y Gestión de Tareas</h3>
+                <p class="text-gray-300 mb-4">Calendario integrado con DataTables para seguimiento semanal de tareas: asignadas, en progreso, completadas, con tiempos de resolución y observaciones.</p>
+                <ul class="text-gray-400 space-y-2 list-disc list-inside">
+                  <li>Planificación semanal de actividades</li>
+                  <li>Seguimiento en tiempo real con estado y tiempos</li>
+                  <li>Integración con notificaciones y recordatorios</li>
+                  <li>Reportes automáticos por técnico, restaurante o semana</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Tab -->
+      <div x-show="tab === 'timeline'" x-cloak class="animate-fade-in">
+        <h2 class="text-4xl font-bold text-center mb-12">Cronograma de Desarrollo (7 Meses)</h2>
+        <p class="text-center text-gray-400 text-lg mb-12 max-w-3xl mx-auto">
+          Desarrollo ágil en etapas bien definidas para garantizar entrega oportuna, calidad y escalabilidad.
+        </p>
+
+        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-gray-600">
+                  <th class="py-4 px-6 text-blue-400 font-semibold text-lg">Mes</th>
+                  <th class="py-4 px-6 text-blue-400 font-semibold text-lg">Etapa</th>
+                  <th class="py-4 px-6 text-blue-400 font-semibold text-lg">Objetivos Clave</th>
+                  <th class="py-4 px-6 text-blue-400 font-semibold text-lg">Entregables</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-300">
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 1</td>
+                  <td class="py-4 px-6">Fundamentos</td>
+                  <td class="py-4 px-6">Diseño arquitectura, infraestructura Docker, bases de datos, autenticación</td>
+                  <td class="py-4 px-6">Servidor listo, usuarios, roles, SSL, dominio</td>
+                </tr>
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 2</td>
+                  <td class="py-4 px-6">Inventario Bodega</td>
+                  <td class="py-4 px-6">Formularios pre-llenados, generación QR, historial movimientos</td>
+                  <td class="py-4 px-6">Módulo de inventario en bodega con QR y trazabilidad</td>
+                </tr>
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 3</td>
+                  <td class="py-4 px-6">Mapa Interactivo</td>
+                  <td class="py-4 px-6">Integración KoboToolbox, GPS, puntos de visita, detalles</td>
+                  <td class="py-4 px-6">Mapa funcional con visitas en tiempo real</td>
+                </tr>
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 4</td>
+                  <td class="py-4 px-6">Inventario Restaurante</td>
+                  <td class="py-4 px-6">Diseño visual por restaurante, activos, mantenimiento, altas/bajas</td>
+                  <td class="py-4 px-6">Visualización gráfica por restaurante con activos</td>
+                </tr>
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 5</td>
+                  <td class="py-4 px-6">Tareas & Rendición</td>
+                  <td class="py-4 px-6">Calendario, DataTables, seguimiento, horas extras</td>
+                  <td class="py-4 px-6">Sistema de tareas semanales con seguimiento</td>
+                </tr>
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 6</td>
+                  <td class="py-4 px-6">Integración Total</td>
+                  <td class="py-4 px-6">Conexión módulos, pruebas, corrección errores, UX final</td>
+                  <td class="py-4 px-6">Plataforma integrada y funcional</td>
+                </tr>
+                <tr class="hover:bg-gray-700 transition">
+                  <td class="py-4 px-6 font-bold text-white">Mes 7</td>
+                  <td class="py-4 px-6 text-green-400 font-bold">Lanzamiento</td>
+                  <td class="py-4 px-6">Capacitación, documentación, monitoreo, soporte</td>
+                  <td class="py-4 px-6 text-green-400 font-bold">Operaciones IT-HN en Producción</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Timeline Visual -->
+          <div class="mt-12 relative">
+            <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-500"></div>
+            <div class="space-y-8 ml-16">
+              <div class="timeline-item">
+                <h4 class="text-xl font-bold text-blue-400">Inicio del Proyecto</h4>
+                <p class="text-gray-400">Configuración del entorno, equipos, repositorios y planificación ágil</p>
+              </div>
+              <div class="timeline-item">
+                <h4 class="text-xl font-bold text-blue-400">Desarrollo Backend</h4>
+                <p class="text-gray-400">APIs, bases de datos, seguridad, autenticación y roles</p>
+              </div>
+              <div class="timeline-item">
+                <h4 class="text-xl font-bold text-blue-400">Desarrollo Frontend</h4>
+                <p class="text-gray-400">Interfaces, mapas, formularios, dashboards y UX</p>
+              </div>
+              <div class="timeline-item">
+                <h4 class="text-xl font-bold text-blue-400">Pruebas y Validación</h4>
+                <p class="text-gray-400">Pruebas de usuarios, corrección de errores, optimización</p>
+              </div>
+              <div class="timeline-item">
+                <h4 class="text-xl font-bold text-green-400">Lanzamiento Nacional</h4>
+                <p class="text-gray-400">Operaciones IT-HN disponible para todo Honduras</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advantages Tab -->
+      <div x-show="tab === 'advantages'" x-cloak class="animate-fade-in">
+        <h2 class="text-4xl font-bold text-center mb-12">Ventajas Competitivas</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div class="bg-gradient-to-br from-blue-900 to-blue-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Sin Licencias Externas</h3>
+            <p class="text-blue-100">Plataforma 100% desarrollada internamente. Sin dependencia de proveedores ni costos recurrentes de licencias.</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-teal-900 to-teal-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Acceso 24/7 Seguro</h3>
+            <p class="text-teal-100">Dominio con SSL, sin necesidad de VPN. Acceso rápido, seguro y directo desde cualquier dispositivo.</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-indigo-900 to-indigo-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Doble Factor de Autenticación</h3>
+            <p class="text-indigo-100">Seguridad reforzada mediante códigos enviados por correo según rol del usuario.</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-emerald-900 to-emerald-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Exportación de Informes</h3>
+            <p class="text-emerald-100">Todos los datos se pueden exportar en: PDF, Excel, CSV, copiar o imprimir. Diseño corporativo personalizado.</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-purple-900 to-purple-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Mejora Continua</h3>
+            <p class="text-purple-100">Plataforma evolutiva, actualizada constantemente con nuevas funcionalidades y mejoras.</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-rose-900 to-rose-700 p-8 rounded-2xl shadow-xl">
+            <h3 class="text-2xl font-bold mb-4 text-white">Piloto Nacional</h3>
+            <p class="text-rose-100">Honduras será el primer país en implementar este modelo de gestión IT digitalizada y eficiente.</p>
+          </div>
+
+        </div>
+
+        <div class="mt-16 bg-gray-800 rounded-2xl p-10 shadow-2xl border border-gray-700">
+          <h3 class="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-400 to-teal-300 text-transparent bg-clip-text">
+            Impacto en el Negocio
+          </h3>
+          <div class="grid md:grid-cols-2 gap-8 text-gray-300">
+            <div>
+              <h4 class="text-xl font-semibold mb-3 text-blue-400">Para Técnicos</h4>
+              <ul class="space-y-2 list-disc list-inside">
+                <li>Menos papeleo, más eficiencia</li>
+                <li>Tiempo ahorrado en reportes y documentación</li>
+                <li>Acceso rápido a información crítica</li>
+                <li>Mayor satisfacción laboral</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-xl font-semibold mb-3 text-teal-400">Para la Organización</h4>
+              <ul class="space-y-2 list-disc list-inside">
+                <li>Transparencia total en operaciones</li>
+                <li>Reducción de errores y pérdidas</li>
+                <li>Mejor toma de decisiones con datos en tiempo real</li>
+                <li>Escalabilidad para otros países</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center mt-24 pt-12 border-t border-gray-700">
+      <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-teal-300 text-transparent bg-clip-text mb-4">
+        Operaciones IT-HN
+      </h2>
+      <p class="text-gray-400 mb-2">Plataforma Nacional de Gestión Tecnológica</p>
+      <p class="text-gray-500 text-sm">© 2024 Todos los derechos reservados. Honduras, Centroamérica.</p>
+      <div class="mt-6 flex justify-center space-x-6 text-gray-500">
+        <span>JS • PHP • CSS</span>
+        <span>|</span>
+        <span>SQL • MongoDB</span>
+        <span>|</span>
+        <span>Docker • Linux LTS</span>
+      </div>
+    </footer>
   </div>
 
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('presentation', () => ({
+        tab: 'overview'
+      }));
+    });
+  </script>
 </body>
-
-  <!-- Scripts del bot -->
-  <script src="https://cdn.botpress.cloud/webchat/v2.4/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2024/11/15/16/20241115163604-TFQZAJ6J.js"></script>
-
 </html>
+```
