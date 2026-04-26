@@ -218,8 +218,9 @@
   /* ======= Gantt ======= */
   .gantt-wrap{
     background:var(--surface);border-radius:var(--radius);border:1px solid var(--line);
-    box-shadow:var(--shadow);padding:28px 28px 24px;margin-top:24px;overflow-x:auto;
+    box-shadow:var(--shadow);padding:28px 28px 24px;margin-top:24px;
   }
+  .gantt-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .gantt-hint{
     display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;
     margin-bottom:14px;
@@ -235,6 +236,8 @@
   .g-head .col.label{
     grid-column:1;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;
     padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);background:#fafdfd;
+    position:sticky;left:0;z-index:4;
+    box-shadow:6px 0 10px -8px rgba(0,0,0,.18);
   }
   .g-month{
     border-bottom:2px solid var(--line);
@@ -256,6 +259,8 @@
     padding:16px 14px;font-weight:600;color:var(--ink);font-size:13.5px;
     display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);
     line-height:1.25;
+    position:sticky;left:0;z-index:3;
+    box-shadow:6px 0 10px -8px rgba(0,0,0,.18);
   }
   .g-row .row-label i{
     width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
@@ -749,6 +754,7 @@
     <p>Cada barra representa una función con su duración real estimada. Las funciones <b>de RH se identifican en naranja</b>, las <b>de Enfermería en turquesa</b> y el <b>cierre integral en verde</b>. El eje horizontal está dividido en 26 semanas (4 por mes en promedio).</p>
 
     <div class="gantt-wrap">
+      <div class="gantt-scroll">
       <div class="gantt">
         <!-- Header -->
         <div class="g-head">
@@ -858,6 +864,7 @@
           <div class="row-track"><div class="bar cierre short" style="left:96.154%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">30 Oct</span></div></div>
         </div>
 
+      </div>
       </div>
 
       <div class="legend">
