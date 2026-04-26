@@ -52,7 +52,8 @@
     --radius:14px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;overflow-x:hidden}
+  img{max-width:100%}
   body{
     font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     background:var(--bg);
@@ -420,11 +421,6 @@
     display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
     background:#e0e7ef;color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
   }
-  @media (max-width:980px){
-    .callout{flex-direction:column}
-    .callout .options{grid-template-columns:1fr}
-  }
-
   /* ======= Footer ======= */
   footer{
     background:var(--ink);color:#cfeef2;padding:40px 0;text-align:center;font-size:13px;
@@ -447,14 +443,124 @@
   }
 
   /* ======= Responsive ======= */
-  @media (max-width:980px){
+  /* ======= Responsive ======= */
+
+  /* Tablet grande / laptop pequeña */
+  @media (max-width:1100px){
+    .wrap{padding:0 22px}
     .kpi{grid-template-columns:repeat(2,1fr);margin-top:-30px}
-    .grid-2{grid-template-columns:1fr}
-    .modules{grid-template-columns:1fr}
-    .obj-list{grid-template-columns:1fr}
-    section{padding:56px 0}
-    .hero{padding:70px 0 80px}
+    h2{font-size:26px}
   }
+
+  /* Tablet vertical */
+  @media (max-width:900px){
+    section{padding:54px 0}
+    .hero{padding:64px 0 72px}
+    .grid-2{grid-template-columns:1fr;gap:22px}
+    .modules{grid-template-columns:1fr;gap:18px}
+    .obj-list{grid-template-columns:1fr}
+    .info-card{padding:22px}
+    .module-card{padding:20px}
+    .meetings{padding:28px 22px}
+    h2 small{font-size:12px}
+    .meet-list{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .func-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    /* Callout */
+    .callout{flex-direction:column;padding:22px}
+    .callout .options{grid-template-columns:1fr;gap:12px}
+    /* Tabla detalle: scroll horizontal nativo */
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table.detalle{min-width:680px}
+    table.detalle thead th,table.detalle tbody td{padding:12px 14px}
+    /* Gantt: padding y label más compactos */
+    .gantt-wrap{padding:20px 16px 18px}
+    .gantt{min-width:1280px}
+  }
+
+  /* Móvil grande */
+  @media (max-width:680px){
+    .wrap{padding:0 18px}
+    section{padding:46px 0}
+    .hero{padding:54px 0 66px}
+    h1,h2,h3,h4{margin-bottom:10px}
+    h2{font-size:22px;line-height:1.25}
+    h2 small{font-size:11px;letter-spacing:1.6px;margin-bottom:6px}
+    .badge{font-size:11px;letter-spacing:1.5px;padding:5px 12px}
+    .hero p.lead{font-size:15px;margin-bottom:22px}
+    .hero-meta{gap:10px}
+    .meta-pill{font-size:12px;padding:8px 12px;gap:8px}
+    .meta-pill i{font-size:16px}
+    .brand-row{gap:10px;margin-bottom:18px}
+    .brand-row .brand-logo{width:48px;height:48px;border-radius:11px}
+    .brand-row .brand-text b{font-size:18px}
+    .brand-row .brand-text span{font-size:10px;letter-spacing:2px}
+    /* KPI 1 columna */
+    .kpi{grid-template-columns:1fr;gap:14px;margin-top:-20px}
+    .kpi-card{padding:18px}
+    .kpi-icon{width:42px;height:42px;font-size:22px}
+    .kpi-card .num{font-size:22px}
+    /* Cards y formularios */
+    .info-card{padding:18px;border-radius:12px}
+    .module-card{padding:16px}
+    .func-card{padding:18px}
+    .feat-line{font-size:13px;padding:7px 0;flex-wrap:wrap;gap:8px}
+    .feat-line .name{flex:1 1 100%}
+    .feat-line .tag{font-size:10px;padding:2px 7px}
+    /* Modules header */
+    .module-icon{width:42px;height:42px;font-size:22px}
+    .module-head h3{font-size:16px}
+    /* Funciones */
+    .func-grid{grid-template-columns:1fr;gap:14px}
+    .func-card h4{font-size:15px}
+    .func-card .desc{font-size:12.5px}
+    .func-card .what{font-size:12px;padding:9px 11px}
+    /* Reuniones */
+    .meetings{padding:24px 18px;border-radius:12px}
+    .meetings h3{font-size:18px}
+    .meet-list{grid-template-columns:1fr;gap:10px}
+    .meet-pill{padding:12px}
+    .meet-pill b{font-size:13px}
+    .meet-pill span{font-size:11.5px}
+    .meet-modes{gap:8px}
+    .mode-pill{font-size:12px;padding:6px 12px}
+    /* Callout */
+    .callout{padding:18px;border-left-width:5px;gap:14px}
+    .callout .ico{width:46px;height:46px;font-size:24px}
+    .callout h3{font-size:16px}
+    .callout p{font-size:13.5px}
+    .callout .opt{padding:12px 14px}
+    .callout .opt b{font-size:13px}
+    .callout .opt span{font-size:12px}
+    /* Tabla más compacta */
+    table.detalle thead th{font-size:11px;padding:10px 12px}
+    table.detalle tbody td{font-size:13px;padding:11px 12px}
+    table.detalle .num-cell{width:36px}
+    /* Hint del Gantt */
+    .gantt-hint{font-size:11.5px}
+    /* Footer */
+    footer{padding:30px 0;font-size:12px}
+    footer .footer-brand img{width:36px;height:36px}
+    footer .footer-brand .brand{font-size:16px}
+  }
+
+  /* Móvil pequeño */
+  @media (max-width:420px){
+    .wrap{padding:0 14px}
+    h2{font-size:20px}
+    .hero h1{letter-spacing:-.5px}
+    .hero p.lead{font-size:14px}
+    .meta-pill{font-size:11.5px}
+    .obj-item{padding:12px;gap:10px}
+    .obj-item i{font-size:20px}
+    .obj-item b{font-size:13px}
+    .obj-item span{font-size:12px}
+    .info-card ul{padding-left:18px;font-size:13px}
+    .meetings h3{font-size:17px}
+    .meetings p{font-size:13px}
+    .badge i{font-size:13px}
+  }
+
+  /* Existing callout fallback removed; consolidated above */
   @media print{
     body{background:#fff}
     section{padding:30px 0;page-break-inside:avoid}
