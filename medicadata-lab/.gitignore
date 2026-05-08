@@ -1,0 +1,6 @@
+.qodo
+
+# Secretos locales — no versionar
+credenciales.txt
+.env
+.env.*
