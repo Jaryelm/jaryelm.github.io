@@ -30,10 +30,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
         
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
         
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
 //            file_put_contents('set_user_binary_log', $self->data_recv.PHP_EOL.'========================='.PHP_EOL, FILE_APPEND);
 
             $u = unpack('H2h1/H2h2/H2h3/H2h4/H2h5/H2h6', substr( $self->data_recv, 0, 8 ) );
@@ -59,10 +59,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
         
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
         
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
 //            file_put_contents('read_user_binary_log', $self->data_recv.'========', FILE_APPEND);
 
             $u = unpack('H2h1/H2h2/H2h3/H2h4/H2h5/H2h6', substr( $self->data_recv, 0, 8 ) );
@@ -71,14 +71,14 @@
                 $bytes = getSizeUser($self);
                 
                 while ( $bytes > 0 ) {
-                    @socket_recvfrom($self->zkclient, $data_recv, 1032, 0, $self->ip, $self->port);
+                    $self->recvUdp($data_recv, 1032);
 //                    file_put_contents('read_user_binary_log', $data_recv.'========', FILE_APPEND);
                     array_push( $self->userdata, $data_recv);
                     $bytes -= 1024;
                 }
                 
                 $self->session_id =  hexdec( $u['h6'].$u['h5'] );
-                @socket_recvfrom($self->zkclient, $data_recv, 1024, 0, $self->ip, $self->port);
+                $self->recvUdp($data_recv, 1024);
 //                file_put_contents('read_user_binary_log', $data_recv.'========', FILE_APPEND);
 
             }
@@ -148,10 +148,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
 //        file_put_contents('request_finger', $self->data_recv.'========', FILE_APPEND);
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
         
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
 //            file_put_contents('read_finger', $self->data_recv.'========', FILE_APPEND);
             
             return '';
@@ -173,10 +173,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
         
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
         
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
             
             $u = unpack('H2h1/H2h2/H2h3/H2h4/H2h5/H2h6', substr( $self->data_recv, 0, 8 ) );
             
@@ -200,10 +200,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
         
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
         
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
             
             $u = unpack('H2h1/H2h2/H2h3/H2h4/H2h5/H2h6', substr( $self->data_recv, 0, 8 ) );
             
@@ -227,10 +227,10 @@
 
         $buf = $self->createHeader($command, $chksum, $session_id, $reply_id, $command_string);
 
-        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->ip, $self->port);
+        socket_sendto($self->zkclient, $buf, strlen($buf), 0, $self->device_ip, $self->device_port);
 
         try {
-            @socket_recvfrom($self->zkclient, $self->data_recv, 1024, 0, $self->ip, $self->port);
+            $self->recvUdp($self->data_recv, 1024);
 
             $u = unpack('H2h1/H2h2/H2h3/H2h4/H2h5/H2h6', substr( $self->data_recv, 0, 8 ) );
 

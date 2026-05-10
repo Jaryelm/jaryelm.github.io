@@ -1,6 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-$__orthanc_lab = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
 // incuir el archivo de sesion login
 ?>
 <!DOCTYPE html>
@@ -380,7 +379,7 @@ function viewSeries(seriesId) {
     }
     
     // URL directa - abre en nueva ventana como la descarga
-    const viewerUrl = <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+    const viewerUrl = `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
     
     // Abrir en nueva ventana
     window.open(viewerUrl, '_blank');
@@ -411,7 +410,7 @@ function downloadStudy(studyId) {
     }
     
     // URL directa con credenciales en la URL
-    const downloadUrl = <?php echo json_encode($__orthanc_lab['study_archive_prefix']); ?> + studyId + '/archive';
+    const downloadUrl = `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/${studyId}/archive`;
     
     // Abrir en nueva ventana
     window.open(downloadUrl, '_blank');

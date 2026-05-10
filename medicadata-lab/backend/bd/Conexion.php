@@ -1,17 +1,32 @@
 <?php
 /**
- * Conexión PDO MySQL — MEDIDATA (paquete laboratorio NEXAR / Joan Dev)
+ * Conexión PDO MySQL — MEDIDATA
  *
- * Solo configuración local XAMPP. Sin credenciales ni host de producción.
- * Ajusta usuario/contraseña si tu MySQL local no usa root sin clave.
+ * Local (XAMPP) y producción en este archivo. Mismos datos que credenciales.txt (producción).
  */
 
-$dbCfg = [
+// --- LOCAL (XAMPP) ---
+$dbLocal = [
     'host' => 'localhost',
     'user' => 'root',
     'pass' => '',
     'name' => 'medic9ue_medi_data',
 ];
+
+// --- PRODUCCIÓN (credenciales.txt líneas 8-11) ---
+$dbProduccion = [
+    'host' => '162.241.123.41',
+    'user' => 'medic9ue_moisesc',
+    'pass' => 'Mrecords%7',
+    'name' => 'medic9ue_medi_data',
+];
+
+$httpHost = isset($_SERVER['HTTP_HOST']) ? strtolower((string) $_SERVER['HTTP_HOST']) : '';
+$esEntornoLocal = ($httpHost === '')
+    || $httpHost === 'localhost'
+    || strpos($httpHost, '127.0.0.1') === 0;
+
+$dbCfg = $esEntornoLocal ? $dbLocal : $dbProduccion;
 
 if (!defined('dbhost')) {
     define('dbhost', $dbCfg['host']);
@@ -26,6 +41,7 @@ if (!defined('dbname')) {
     define('dbname', $dbCfg['name']);
 }
 
+// Una sola PDO por petición aunque este archivo se ejecute más de una vez (p. ej. require sin _once tras session_check).
 if (isset($connect) && $connect instanceof PDO) {
     return;
 }

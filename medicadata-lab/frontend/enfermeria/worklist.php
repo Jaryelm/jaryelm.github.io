@@ -1,7 +1,6 @@
 <?php
 include_once '../../backend/registros/session_check.php';
 require_once('../../backend/bd/Conexion.php');
-$__orthanc_lab = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -533,7 +532,7 @@ $__orthanc_lab = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config
 
     function openDicomViewer(seriesId) {
         document.getElementById('orthancViewer').src = 
-            <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+            `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
         document.getElementById('viewerModal').style.display = 'block';
     }
 

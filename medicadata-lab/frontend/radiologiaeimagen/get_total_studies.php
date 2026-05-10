@@ -1,10 +1,12 @@
 <?php
 header('Content-Type: application/json');
 
-$__o = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
-$orthanc_url = rtrim($__o['curl_base'], '/') . '/studies';
-$username = $__o['curl_user'];
-$password = $__o['curl_pass'];
+// URL base de la API de Orthanc
+$orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies';
+
+// Configurar las credenciales de Orthanc
+$username = 'dev'; // Usuario registrado en Orthanc
+$password = 'Mrecords7'; // Contraseña del usuario
 
 // Iniciar cURL para obtener los estudios
 $ch = curl_init($orthanc_url);

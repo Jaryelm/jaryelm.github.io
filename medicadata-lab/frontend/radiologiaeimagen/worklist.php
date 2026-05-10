@@ -3,7 +3,6 @@
 date_default_timezone_set('America/Tegucigalpa');
 
 include_once '../../backend/registros/session_check.php';
-$__orthanc_lab = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
 session_start();
 $rol_usuario = $_SESSION['rol'] ?? '';
 ?>
@@ -1224,7 +1223,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         iframe.style.display = 'block';
         
         // Construir URL directa (funcionaba antes)
-        const viewerUrl = <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+        const viewerUrl = `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
         console.log('URL del visor:', viewerUrl);
         
         // Configurar el iframe
@@ -1242,7 +1241,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         iframe.onerror = function() {
             console.error('Error cargando el iframe');
             // Fallback a URL directa si el proxy falla
-            const directUrl = <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+            const directUrl = `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
             console.log('Intentando URL directa:', directUrl);
             iframe.src = directUrl;
         };
@@ -1264,7 +1263,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     function openDicomViewerNewWindow(seriesId) {
         console.log('Abriendo visor DICOM en nueva ventana para series:', seriesId);
         
-        const viewerUrl = <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+        const viewerUrl = `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
         console.log('URL del visor (nueva ventana):', viewerUrl);
         
         // Abrir en nueva ventana

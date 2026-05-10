@@ -1,10 +1,9 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
+// Conexión a la base de datos
+$servername = "162.241.123.41";
+$username = "medic9ue_moisesc";
+$password = "Mrecords%7";
 $dbname = "medic9ue_postulaciones";
-
-$uploadsRoot = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'uploads_postulaciones';
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -32,7 +31,7 @@ if ($result->num_rows > 0) {
     // Verificar si el campo cv contiene el nombre del archivo
     if (!empty($cvPath)) {
         // Generar la ruta completa del archivo basado en el nombre obtenido
-        $filePath = $uploadsRoot . DIRECTORY_SEPARATOR . basename($cvPath);
+        $filePath = "/home4/medic9ue/uploads/" . basename($cvPath);
 
         // Verificar si el archivo existe
         if (file_exists($filePath)) {

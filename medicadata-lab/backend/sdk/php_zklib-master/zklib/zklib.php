@@ -2,6 +2,9 @@
     class ZKLib {
         public $ip;
         public $port;
+        /** Destino fijo para envíos UDP (no mutar con socket_recvfrom). */
+        public $device_ip;
+        public $device_port;
         public $zkclient;
         
         public $data_recv = '';
@@ -9,32 +12,53 @@
         public $userdata = array();
         public $attendancedata = array();
         
-        public function __construct($ip, $port) {
+        public function __construct($ip, $port, $recvTimeoutSec = 60) {
             $this->ip = $ip;
             $this->port = $port;
-            
+            $this->device_ip = (string) $ip;
+            $this->device_port = (int) $port;
+
+            $sec = (int) $recvTimeoutSec;
+            if ($sec < 1) {
+                $sec = 1;
+            }
+            if ($sec > 120) {
+                $sec = 120;
+            }
+
             $this->zkclient = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
             // $this->zkclient = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             
             // socket_bind($this->zkclient, $ip, $port);
 
-            $timeout = array('sec'=>60,'usec'=>500000);
+            $timeout = array('sec' => $sec, 'usec' => 0);
             socket_set_option($this->zkclient,SOL_SOCKET,SO_RCVTIMEO,$timeout);
             
-            include_once("zkconst.php");
-            include_once("zkconnect.php");
-            include_once("zkversion.php");
-            include_once("zkos.php");
-            include_once("zkplatform.php");
-            include_once("zkworkcode.php");
-            include_once("zkssr.php");
-            include_once("zkpin.php");
-            include_once("zkface.php");
-            include_once("zkserialnumber.php");
-            include_once("zkdevice.php");
-            include_once("zkuser.php");
-            include_once("zkattendance.php");
-            include_once("zktime.php");
+            $d = __DIR__;
+            include_once $d . '/zkconst.php';
+            include_once $d . '/zkconnect.php';
+            include_once $d . '/zkversion.php';
+            include_once $d . '/zkos.php';
+            include_once $d . '/zkplatform.php';
+            include_once $d . '/zkworkcode.php';
+            include_once $d . '/zkssr.php';
+            include_once $d . '/zkpin.php';
+            include_once $d . '/zkface.php';
+            include_once $d . '/zkserialnumber.php';
+            include_once $d . '/zkdevice.php';
+            include_once $d . '/zkuser.php';
+            include_once $d . '/zkattendance.php';
+            include_once $d . '/zktime.php';
+        }
+
+        /**
+         * Recibe UDP sin usar ip/puerto del dispositivo como parámetros ref de recvfrom
+         * (PHP sobrescribe esas variables con el origen del datagrama).
+         */
+        public function recvUdp(&$buffer, $length = 1024) {
+            $from = '';
+            $fromPort = 0;
+            return @socket_recvfrom($this->zkclient, $buffer, $length, 0, $from, $fromPort);
         }
         
         
@@ -85,14 +109,12 @@
             $buf = unpack('C'.(8+strlen($command_string)).'c', $buf);
             
             $u = unpack('S', $this->createChkSum($buf));
-            
-            if ( is_array( $u ) ) {
-                foreach ($command as $key => $value) {
-                    $u = $u[$key];
-                    break;
-                }
+            // unpack('S', ...) devuelve array; nunca iterar $command (es int).
+            if (is_array($u)) {
+                $chksum = (int) reset($u);
+            } else {
+                $chksum = 0;
             }
-            $chksum = $u;
             
             $reply_id += 1;
             

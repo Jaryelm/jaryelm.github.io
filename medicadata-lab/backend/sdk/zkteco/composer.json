@@ -1,0 +1,11 @@
+{
+    "name": "medicasa/zkteco-local",
+    "description": "Dependencia local para pruebas ZKTeco (jmrashed/zkteco)",
+    "require": {
+        "php": ">=8.0",
+        "jmrashed/zkteco": "^1.2 <2.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

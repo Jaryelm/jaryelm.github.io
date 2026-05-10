@@ -1,11 +1,7 @@
 <?php
 /**
- * Partida contable automática al registrar compra en almacén (solo CONTADO).
- * Coincide con la lógica enviada por Finanzas: inventarios + ISV al debe,
- * Proveedores Comerciales al haber. Código en Diario General: COMPRA_PROVEEDOR.
- *
- * Compras a CRÉDITO no generan esta partida aquí (evita duplicar con el flujo
- * de pago / asientos que ya entran por tesorería).
+ * Partida contable automática al registrar compra en almacén (todos los términos de pago).
+ * Inventarios + ISV al debe; Proveedores Comerciales al haber. Código: COMPRA_PROVEEDOR.
  */
 
 require_once __DIR__ . '/funciones_diario_general.php';
@@ -17,18 +13,18 @@ function medidata_cuenta_haber_registro_compra(): string
 }
 
 /**
- * Genera la partida y actualiza compras.numero_partida_contable (solo cred_cont CONTADO).
- * Si la compra es crédito u otro término, devuelve null y no altera la compra.
- * Idempotente si ya existe numero_partida_contable.
+ * Genera la partida y actualiza compras.numero_partida_contable.
+ * Aplica a cualquier cred_cont (Crédito, Contado, Prima, Consignación, etc.).
+ * Idempotente si ya existe numero_partida_contable o ya hay líneas en diario con referencia COMP-{id}.
  *
- * @return string|null número de partida o null si no aplica
+ * @return string número de partida
  */
 function medidata_generar_partida_desde_compra(
     PDO $connect,
     int $idCompra,
     string $usuarioNombre,
     string $unidadServicio = 'Hospital Medicasa'
-): ?string {
+): string {
     $st = $connect->prepare('SELECT * FROM compras WHERE id_compra = ? LIMIT 1');
     $st->execute([$idCompra]);
     $compra = $st->fetch(PDO::FETCH_ASSOC);
@@ -36,13 +32,26 @@ function medidata_generar_partida_desde_compra(
         throw new Exception('Compra no encontrada (id ' . $idCompra . ').');
     }
 
-    if (!empty($compra['numero_partida_contable'])) {
+    $ref = 'COMP-' . $idCompra;
+
+    if (!empty($compra['numero_partida_contable'] ?? '')) {
         return (string) $compra['numero_partida_contable'];
     }
 
-    $cred = strtoupper(trim((string) ($compra['cred_cont'] ?? '')));
-    if ($cred !== 'CONTADO') {
-        return null;
+    $qEx = $connect->prepare(
+        'SELECT numero_partida FROM diario_general_transacciones
+         WHERE referencia = ? AND tipo_transaccion = \'COMPRA_PROVEEDOR\'
+         ORDER BY id ASC LIMIT 1'
+    );
+    $qEx->execute([$ref]);
+    $rowEx = $qEx->fetch(PDO::FETCH_ASSOC);
+    if ($rowEx && !empty($rowEx['numero_partida'])) {
+        $np = (string) $rowEx['numero_partida'];
+        $up = $connect->prepare(
+            'UPDATE compras SET numero_partida_contable = ? WHERE id_compra = ? AND (numero_partida_contable IS NULL OR numero_partida_contable = \'\') LIMIT 1'
+        );
+        $up->execute([$np, $idCompra]);
+        return $np;
     }
 
     $st2 = $connect->prepare(
@@ -74,7 +83,6 @@ function medidata_generar_partida_desde_compra(
         $byCuenta = ['110400102' => $subTotalHeader];
     }
 
-    $ref = 'COMP-' . $idCompra;
     $fact = trim((string) ($compra['dato_fac'] ?? ''));
     $prov = trim((string) ($compra['prov_datos'] ?? ''));
     $descBase = 'Compra proveedores OC ' . $idCompra

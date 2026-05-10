@@ -87,7 +87,7 @@
             <ul class="new-side-dropdown">
                 <li><a href="../recursos/reclutamiento.php">RECLUTAMIENTO</a></li>
                 <li><a href="#">PROCESO DE ENTREVISTAS</a></li>
-                <li><a href="#">RELOJ BIOMÉTRICO</a></li>
+                <li><a href="../recursos/relojbio.php">RELOJ BIOMÉTRICO</a></li>
             </ul>
         </li>
         <li>
