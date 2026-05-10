@@ -1,0 +1,3 @@
+[submodule "medicadata-lab/backend/sdk/zkteco"]
+	path = medicadata-lab/backend/sdk/zkteco
+	url = https://github.com/jmrashed/zkteco.git
