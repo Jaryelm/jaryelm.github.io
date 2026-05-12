@@ -4,3 +4,6 @@
 credenciales.txt
 .env
 .env.*
+
+# Memory IA
+GEMINI.md
