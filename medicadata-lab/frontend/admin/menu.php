@@ -87,7 +87,7 @@
             <ul class="new-side-dropdown">
                 <li><a href="../recursos/reclutamiento.php">RECLUTAMIENTO</a></li>
                 <li><a href="#">PROCESO DE ENTREVISTAS</a></li>
-                <li><a href="#">RELOJ BIOMÉTRICO</a></li>
+                <li><a href="../recursos/relojbio.php">RELOJ BIOMÉTRICO</a></li>
             </ul>
         </li>
         <li>
@@ -157,7 +157,7 @@
         <li>
                 <a href="#"><i class='bx bx-accessibility icon'></i>ENFERMERÍA<i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
-                    <li><a href="#">PRE-CLINICA</a></li>
+                    <li><a href="../enfermeria/pre_clinica.php">PRE-CLINICA</a></li>
                     <li><a href="../admision/preadmision.php">ADMISIÓN</a></li>
                     <li><a href="../pacientes/historial.php">EXPEDIENTE CLINICO</a></li>
                     <li><a href="../pacientes/otros_anexos_paciente.php">OTROS ANEXOS</a></li>
