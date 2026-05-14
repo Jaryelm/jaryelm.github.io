@@ -4,14 +4,10 @@
         <ul class="side-menu">
             <li><a href="../enfermeria/escritorio.php" class="active"><i class='bx bxs-dashboard icon' ></i> Panel</a></li>
             <li class="divider" data-text="panel">Panel</li>
-
-
-
-
         <li>
                 <a href="#"><i class='bx bx-accessibility icon'></i>ENFERMERÍA<i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
-                    <li><a href="#">PRE-CLINICA</a></li>
+                    <li><a href="../enfermeria/pre_clinica.php">PRE-CLINICA</a></li>
                     <li><a href="../enfermeria/preadmision.php">ADMISIÓN</a></li>
                     <li><a href="../enfermeria/historial_user.php">EXPEDIENTE CLINICO</a></li>
                     <li><a href="../enfermeria/otros_anexos_paciente.php">OTROS ANEXOS</a></li>

@@ -10,9 +10,10 @@ header('Content-Type: application/json');
 try {
     // Validar los datos recibidos
     if (
-        empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['procesado_por']) ||
-        empty($_POST['fc']) || empty($_POST['ta']) || empty($_POST['temp']) ||
-        empty($_POST['spo']) || empty($_POST['peso']) || empty($_POST['talla']) ||
+        empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['processed_by']) ||
+        empty($_POST['blood_pressure']) || empty($_POST['map_pressure']) || empty($_POST['temperature']) ||
+        empty($_POST['heart_rate']) || empty($_POST['respiratory_rate']) || empty($_POST['oxygen_saturation']) ||
+        empty($_POST['weight']) || empty($_POST['stature']) || empty($_POST['glucose']) ||
         empty($_POST['idpa'])
     ) {
         throw new Exception("Todos los campos son obligatorios.");
@@ -21,29 +22,44 @@ try {
     // Recibir los datos
     $fecha = $_POST['fecha'];
     $hora = $_POST['hora'];
-    $procesadoPor = $_POST['procesado_por'];
-    $fc = $_POST['fc'];
-    $ta = $_POST['ta'];
-    $temp = $_POST['temp'];
-    $spo = $_POST['spo'];
-    $peso = $_POST['peso'];
-    $talla = $_POST['talla'];
+    $processedBy = $_POST['processed_by'];
+    $reviewsBy = $_POST['reviews_by'] ?? '';
+    $weight = $_POST['weight'];
+    $stature = $_POST['stature'];
+    $bloodPressure = $_POST['blood_pressure'];
+    $mapPressure = $_POST['map_pressure'];
+    $temperature = $_POST['temperature'];
+    $heartRate = $_POST['heart_rate'];
+    $respiratoryRate = $_POST['respiratory_rate'];
+    $oxygenSaturation = $_POST['oxygen_saturation'];
+    $glucose = $_POST['glucose'];
     $idpa = $_POST['idpa'];
 
     // Insertar en la tabla
-    $sql = "INSERT INTO signos_vitales (fecha, hora, procesado_por, fc, ta, temp, spo, peso_kg, talla, idpa)
-            VALUES (:fecha, :hora, :procesadoPor, :fc, :ta, :temp, :spo, :peso, :talla, :idpa)";
+    $sql = "INSERT INTO signos_vitales (
+                fecha, hora, processed_by, reviews_by, weight, stature, 
+                blood_pressure, map_pressure, temperature, heart_rate, 
+                respiratory_rate, oxygen_saturation, glucose, idpa
+            ) VALUES (
+                :fecha, :hora, :processedBy, :reviewsBy, :weight, :stature, 
+                :bloodPressure, :mapPressure, :temperature, :heartRate, 
+                :respiratoryRate, :oxygenSaturation, :glucose, :idpa
+            )";
     $stmt = $connect->prepare($sql);
     $stmt->execute([
         ':fecha' => $fecha,
         ':hora' => $hora,
-        ':procesadoPor' => $procesadoPor,
-        ':fc' => $fc,
-        ':ta' => $ta,
-        ':temp' => $temp,
-        ':spo' => $spo,
-        ':peso' => $peso,
-        ':talla' => $talla,
+        ':processedBy' => $processedBy,
+        ':reviewsBy' => $reviewsBy,
+        ':weight' => $weight,
+        ':stature' => $stature,
+        ':bloodPressure' => $bloodPressure,
+        ':mapPressure' => $mapPressure,
+        ':temperature' => $temperature,
+        ':heartRate' => $heartRate,
+        ':respiratoryRate' => $respiratoryRate,
+        ':oxygenSaturation' => $oxygenSaturation,
+        ':glucose' => $glucose,
         ':idpa' => $idpa
     ]);
 
