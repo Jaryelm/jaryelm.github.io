@@ -422,8 +422,8 @@ if($sentencia){
             <tbody id="signosVitalesBody">
                 <!-- Aquí se llenarán los datos dinámicamente -->
                 <tr>
-                    <td><input type="date" id="fecha"></td>
-                    <td><input type="time" id="hora"></td>
+                    <td><input type="date" id="fecha" value="<?php echo date('Y-m-d'); ?>" readonly></td>
+                    <td><input type="time" id="hora" value="<?php echo date('H:i'); ?>" readonly></td>
                     <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
                     <td><input type="text" id="reviewsBy"></td>
                     <td><input type="text" id="weight"></td>
@@ -2098,9 +2098,6 @@ function descargarAltaExigidaPDF() {
 
     <script>
 function registrarSignosVitales() {
-    // Obtener valores de los campos
-    const fecha = document.getElementById("fecha").value;
-    const hora = document.getElementById("hora").value;
     const processedBy = document.getElementById("processedBy").value;
     const reviewsBy = document.getElementById("reviewsBy").value;
     const weight = document.getElementById("weight").value;
@@ -2114,19 +2111,15 @@ function registrarSignosVitales() {
     const glucose = document.getElementById("glucose").value;
     const idpa = <?php echo $_GET['id']; ?>;
 
-    // Validar que no haya campos vacíos (excepto reviews_by que puede ser opcional)
-    if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
+    if (!processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
         swal('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
 
-    // Enviar datos al backend
     $.ajax({
         type: "POST",
         url: "add_signos_vitales.php",
         data: {
-            fecha: fecha,
-            hora: hora,
             processed_by: processedBy,
             reviews_by: reviewsBy,
             weight: weight,
@@ -2145,7 +2138,7 @@ function registrarSignosVitales() {
                 swal('Error', response.error, 'error');
             } else {
                 swal('Guardado', 'Los signos vitales se han registrado correctamente.', 'success');
-                cargarSignosVitales(); // Recargar la tabla con los datos actualizados
+                cargarSignosVitales();
             }
         },
         error: function(xhr) {
@@ -2187,11 +2180,17 @@ function cargarSignosVitales() {
                 `;
             });
 
-            // Agregar fila para nuevos datos
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const day = String(now.getDate()).padStart(2, "0");
+            const dateStr = `${year}-${month}-${day}`;
+            const timeStr = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
+
             content += `
                 <tr>
-                    <td><input type="date" id="fecha"></td>
-                    <td><input type="time" id="hora"></td>
+                    <td><input type="date" id="fecha" value="${dateStr}" readonly></td>
+                    <td><input type="time" id="hora" value="${timeStr}" readonly></td>
                     <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
                     <td><input type="text" id="reviewsBy"></td>
                     <td><input type="text" id="weight"></td>
