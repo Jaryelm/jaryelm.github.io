@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MEDIDATA · Guía de Capacitación · Módulos en producción</title>
+
+<!-- SEO -->
+<meta name="description" content="Guía de capacitación para el cliente final de MEDIDATA: explicación detallada de cada módulo del sistema que ya está operativo en producción, agrupado por área (clínica, financiera, logística, administrativa)." />
+<meta name="keywords" content="MEDIDATA, NEXAR, capacitación, módulos, hospital, software médico, Medicasa, manual de usuario" />
+<meta name="author" content="NEXAR" />
+<meta name="theme-color" content="#06adbf" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="MEDIDATA · Guía de Capacitación" />
+<meta property="og:description" content="Explicación detallada de los módulos de MEDIDATA ya operativos." />
+<meta property="og:image" content="logo_N_nexar.png" />
+<meta property="og:locale" content="es_HN" />
+
+<link rel="icon" type="image/png" href="logo_N_nexar.png" />
+<link rel="apple-touch-icon" href="logo_N_nexar.png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f6f9fb;
+    --surface:#ffffff;
+    --ink:#0f2a30;
+    --ink-soft:#39606a;
+    --muted:#7c97a0;
+    --line:#e3edf0;
+    --teal:#06adbf;
+    --teal-dark:#035c67;
+    --teal-soft:#cfeef2;
+    --orange:#f59e0b;
+    --orange-soft:#fde6c1;
+    --green:#16a34a;
+    --green-soft:#cdebd7;
+    --purple:#7c3aed;
+    --purple-soft:#e9d8fd;
+    --blue:#2563eb;
+    --blue-soft:#dbeafe;
+    --shadow:0 10px 30px rgba(3,92,103,.08);
+    --shadow-lg:0 20px 60px rgba(3,92,103,.18);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;overflow-x:hidden}
+  img{max-width:100%}
+  body{
+    font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--teal-dark);text-decoration:none}
+
+  /* ======= Layout ======= */
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+  section{padding:64px 0;position:relative}
+  section + section{border-top:1px solid var(--line)}
+  h1,h2,h3,h4{font-family:'Poppins',sans-serif;color:var(--ink);margin:0 0 12px}
+  h2{font-size:30px;font-weight:700;letter-spacing:-.5px}
+  h2 small{display:block;font-size:13px;color:var(--teal-dark);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  h3{font-size:18px;font-weight:600}
+  p{color:var(--ink-soft);margin:0 0 12px}
+
+  /* ======= Hero ======= */
+  .hero{
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(6,173,191,.35), transparent 60%),
+      radial-gradient(900px 400px at 0% 110%, rgba(3,92,103,.6), transparent 55%),
+      linear-gradient(135deg,#024a54 0%,#035c67 50%,#06adbf 100%);
+    color:#fff;padding:80px 0 96px;overflow:hidden;position:relative;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:linear-gradient(180deg, rgba(0,0,0,.6), transparent 80%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:1}
+  .back-link{
+    display:inline-flex;align-items:center;gap:8px;
+    color:#9ee9f0;font-size:13px;font-weight:600;letter-spacing:.5px;
+    text-transform:uppercase;margin-bottom:18px;
+    padding:8px 14px;border-radius:8px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+    transition:background .2s ease;
+  }
+  .back-link:hover{background:rgba(255,255,255,.16);color:#fff}
+  .back-link i{font-size:18px}
+  .brand-row{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .brand-row .brand-logo{
+    width:62px;height:62px;border-radius:14px;
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(8px);box-shadow:0 6px 18px rgba(0,0,0,.18);
+    overflow:hidden;flex-shrink:0;
+  }
+  .brand-row .brand-logo img{width:78%;height:78%;object-fit:contain;display:block}
+  .brand-row .brand-text{display:flex;flex-direction:column;line-height:1.1}
+  .brand-row .brand-text b{color:#fff;font-size:22px;font-weight:800;letter-spacing:1px}
+  .brand-row .brand-text span{color:#9ee9f0;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:600}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+    padding:6px 14px;border-radius:999px;
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;
+    backdrop-filter:blur(8px);
+  }
+  .badge i{font-size:14px;color:#9ee9f0}
+  .hero h1{
+    font-size:clamp(30px,4.5vw,48px);
+    line-height:1.1;color:#fff;
+    margin:18px 0 18px;font-weight:800;letter-spacing:-1px;
+  }
+  .hero h1 span{color:#9ee9f0}
+  .hero p.lead{color:#d6eef0;font-size:17px;max-width:820px;margin:0 0 22px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+  .meta-pill{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);
+    padding:9px 14px;border-radius:12px;
+    font-size:13px;font-weight:500;backdrop-filter:blur(8px);
+  }
+  .meta-pill b{color:#fff}
+  .meta-pill i{color:#9ee9f0;font-size:18px}
+
+  /* ======= Cómo usar la guía ======= */
+  .intro-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1px solid var(--line);padding:28px;box-shadow:var(--shadow);
+    margin-top:-50px;position:relative;z-index:2;
+  }
+  .intro-card h3{display:flex;align-items:center;gap:10px;color:var(--teal-dark);margin:0 0 10px}
+  .intro-card h3 i{font-size:24px}
+  .intro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+  .intro-item{
+    background:#fafdfd;border:1px solid var(--line);border-radius:12px;padding:16px;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .intro-item .ico{
+    width:36px;height:36px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--teal-soft);color:var(--teal-dark);font-size:20px;
+  }
+  .intro-item b{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
+  .intro-item span{color:var(--ink-soft);font-size:12.5px;line-height:1.45}
+
+  /* ======= Áreas ======= */
+  .area-block{margin-top:32px}
+  .area-head{
+    display:flex;align-items:center;gap:14px;margin-bottom:18px;
+    padding:16px 22px;border-radius:12px;
+    background:linear-gradient(135deg,#fafdfd, #f0f7f8);
+    border:1px solid var(--line);
+  }
+  .area-head .area-ico{
+    width:54px;height:54px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:28px;flex-shrink:0;
+    background:linear-gradient(135deg,#06adbf,#035c67);
+    box-shadow:0 6px 16px rgba(3,92,103,.25);
+  }
+  .area-head.financiera .area-ico{background:linear-gradient(135deg,#16a34a,#065f46);box-shadow:0 6px 16px rgba(22,163,74,.25)}
+  .area-head.logistica .area-ico{background:linear-gradient(135deg,#f59e0b,#b45309);box-shadow:0 6px 16px rgba(245,158,11,.25)}
+  .area-head.admin .area-ico{background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 6px 16px rgba(124,58,237,.25)}
+  .area-head h3{margin:0;font-size:20px;color:var(--ink)}
+  .area-head .area-sub{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+
+  /* ======= Tarjetas de módulos ======= */
+  .mod-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;
+  }
+  .mod-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1px solid var(--line);padding:22px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;
+    position:relative;overflow:hidden;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .mod-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .mod-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,#06adbf,#035c67);
+  }
+  .mod-card.financiera::before{background:linear-gradient(90deg,#16a34a,#065f46)}
+  .mod-card.logistica::before{background:linear-gradient(90deg,#f59e0b,#b45309)}
+  .mod-card.admin::before{background:linear-gradient(90deg,#7c3aed,#4c1d95)}
+
+  .mod-head{display:flex;gap:14px;align-items:center}
+  .mod-icon{
+    width:48px;height:48px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:24px;
+    background:var(--teal-soft);color:var(--teal-dark);
+  }
+  .mod-card.financiera .mod-icon{background:var(--green-soft);color:#166534}
+  .mod-card.logistica .mod-icon{background:var(--orange-soft);color:#b45309}
+  .mod-card.admin .mod-icon{background:var(--purple-soft);color:#5b21b6}
+  .mod-head h4{margin:0;font-size:17px;color:var(--ink);font-weight:700;line-height:1.25}
+  .mod-head .mod-sub{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+
+  .mod-desc{font-size:13.5px;color:var(--ink-soft);margin:0;line-height:1.55}
+
+  .mod-section{
+    background:#fafdfd;border:1px solid var(--line);border-radius:9px;
+    padding:12px 14px;
+  }
+  .mod-section b.title{
+    display:flex;align-items:center;gap:6px;color:var(--teal-dark);
+    font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;
+  }
+  .mod-card.financiera .mod-section b.title{color:#166534}
+  .mod-card.logistica .mod-section b.title{color:#b45309}
+  .mod-card.admin .mod-section b.title{color:#5b21b6}
+  .mod-section b.title i{font-size:14px}
+  .mod-section ul{margin:0;padding:0 0 0 18px;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+  .mod-section ul li{margin-bottom:3px}
+
+  .mod-users{
+    display:flex;flex-wrap:wrap;gap:6px;
+  }
+  .user-tag{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;
+    background:#eef5f6;color:var(--teal-dark);letter-spacing:.3px;
+  }
+  .user-tag i{font-size:13px}
+  .mod-card.financiera .user-tag{background:var(--green-soft);color:#166534}
+  .mod-card.logistica .user-tag{background:var(--orange-soft);color:#b45309}
+  .mod-card.admin .user-tag{background:var(--purple-soft);color:#5b21b6}
+
+  /* ======= Sesiones de capacitación (CTA inferior) ======= */
+  .training{
+    background:linear-gradient(135deg,#024a54,#035c67);
+    color:#fff;border-radius:var(--radius);padding:36px;margin-top:32px;
+    position:relative;overflow:hidden;box-shadow:var(--shadow-lg);
+  }
+  .training::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle,rgba(158,233,240,.2),transparent 70%);
+  }
+  .training h3{color:#fff;font-size:22px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .training h3 i{color:#9ee9f0}
+  .training p{color:#cfeef2;max-width:760px;margin-bottom:18px}
+  .training-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;position:relative;z-index:1}
+  .training-pill{
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;padding:14px;backdrop-filter:blur(8px);
+  }
+  .training-pill b{display:block;color:#fff;font-size:14px;margin-bottom:4px}
+  .training-pill span{color:#cfeef2;font-size:12.5px;line-height:1.45}
+
+  /* ======= Footer ======= */
+  footer{background:var(--ink);color:#cfeef2;padding:40px 0;text-align:center;font-size:13px}
+  footer b{color:#9ee9f0}
+  footer .footer-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:10px}
+  footer .footer-brand img{
+    width:42px;height:42px;border-radius:10px;
+    background:rgba(255,255,255,.06);padding:6px;
+    border:1px solid rgba(255,255,255,.10);
+    object-fit:contain;display:block;
+  }
+  footer .footer-brand .brand{font-size:18px;font-weight:700;color:#fff;letter-spacing:1.5px;display:block;line-height:1.1}
+  footer .footer-brand .brand small{display:block;font-size:10px;color:#9ee9f0;letter-spacing:3px;font-weight:500;margin-top:2px}
+
+  /* ======= Responsive ======= */
+  @media (max-width:1100px){
+    .wrap{padding:0 22px}
+    .intro-grid{grid-template-columns:1fr 1fr}
+    h2{font-size:26px}
+  }
+  @media (max-width:780px){
+    section{padding:48px 0}
+    .hero{padding:60px 0 76px}
+    .intro-card{padding:22px;margin-top:-32px}
+    .intro-grid{grid-template-columns:1fr;gap:12px}
+    .area-head{padding:14px 16px;gap:12px}
+    .area-head .area-ico{width:46px;height:46px;font-size:24px}
+    .area-head h3{font-size:17px}
+    .mod-grid{grid-template-columns:1fr;gap:14px}
+    .training{padding:24px 22px}
+    .training h3{font-size:19px}
+  }
+  @media (max-width:480px){
+    .wrap{padding:0 16px}
+    .hero{padding:48px 0 64px}
+    .brand-row .brand-logo{width:48px;height:48px;border-radius:11px}
+    .brand-row .brand-text b{font-size:18px}
+    .meta-pill{font-size:12px;padding:8px 12px}
+    .mod-card{padding:18px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <a href="index.html" class="back-link"><i class='bx bx-arrow-back'></i> Volver al plan de trabajo</a>
+    <div class="brand-row">
+      <div class="brand-logo"><img src="logo_N_nexar.png" alt="Logo NEXAR" /></div>
+      <div class="brand-text">
+        <b>NEXAR</b>
+        <span>MEDIDATA · CAPACITACIÓN</span>
+      </div>
+    </div>
+    <span class="badge"><i class='bx bx-chalkboard'></i>Guía para el cliente final</span>
+    <h1>Módulos en <span>producción</span> · Cómo trabaja cada uno</h1>
+    <p class="lead">Esta guía describe cada módulo de MEDIDATA que ya está operativo y siendo usado por Medicasa. Está organizada por área para que el equipo entienda rápido <b>qué hace cada parte del sistema, quién la usa y para qué le sirve</b>. Es la base de la formación de formadores: IT de Medicasa la usa para replicar la operación al usuario final.</p>
+    <div class="hero-meta">
+      <div class="meta-pill"><i class='bx bx-layer'></i><span><b>Áreas:</b> 4 (Clínica · Financiera · Logística · Administrativa)</span></div>
+      <div class="meta-pill"><i class='bx bx-grid-alt'></i><span><b>Módulos cubiertos:</b> 17 operativos</span></div>
+      <div class="meta-pill"><i class='bx bx-shield-quarter'></i><span><b>Estado:</b> Producción</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ INTRO · Cómo usar la guía ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="intro-card">
+      <h3><i class='bx bx-info-circle'></i>Cómo aprovechar esta guía</h3>
+      <p>Cada tarjeta describe un módulo con tres bloques fijos: <b>qué hace</b>, <b>qué incluye</b> y <b>quién lo usa</b>. La idea es que en una sola lectura el lector ubique el rol del módulo dentro del flujo del hospital y entienda con quién hablar si necesita escalar una duda.</p>
+      <div class="intro-grid">
+        <div class="intro-item">
+          <div class="ico"><i class='bx bx-search-alt'></i></div>
+          <div><b>Búsqueda rápida</b><span>Use Ctrl + F para encontrar un módulo por nombre (ej. "Caja", "Almacén", "Radiología").</span></div>
+        </div>
+        <div class="intro-item">
+          <div class="ico"><i class='bx bx-link'></i></div>
+          <div><b>Sigue el flujo</b><span>Las áreas están ordenadas como ocurren en la operación: Clínica → Financiera → Logística → Administrativa.</span></div>
+        </div>
+        <div class="intro-item">
+          <div class="ico"><i class='bx bx-support'></i></div>
+          <div><b>Soporte</b><span>Dudas técnicas: equipo NEXAR (segundo nivel). Dudas de uso: IT de Medicasa (primer nivel).</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÁREA 1 · OPERACIÓN CLÍNICA ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>01 · Operación Clínica</small>Atención del paciente, expediente y áreas críticas</h2>
+
+    <div class="area-block">
+      <div class="area-head">
+        <div class="area-ico"><i class='bx bx-plus-medical'></i></div>
+        <div>
+          <h3>Operación Clínica</h3>
+          <span class="area-sub">Todo lo que ocurre alrededor del paciente, desde el ingreso hasta el alta o el cierre del estudio.</span>
+        </div>
+      </div>
+
+      <div class="mod-grid">
+
+        <!-- Pacientes / Admisión -->
+        <div class="mod-card">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bxs-user-account'></i></div>
+            <div><h4>Pacientes y Admisión</h4><span class="mod-sub">/ frontend/pacientes · /admision</span></div>
+          </div>
+          <p class="mod-desc">Punto de entrada de toda persona al hospital. Permite registrar al paciente, abrir su expediente y dejarlo listo para que cualquier área (consulta, emergencia, hospitalización) lo trabaje.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Alta de paciente, datos personales y contacto</li>
+              <li>Documentos adjuntos del expediente</li>
+              <li>Búsqueda y consulta del historial</li>
+              <li>Asignación a médicos / áreas</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Admisión</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Servicio al cliente</span>
+          </div>
+        </div>
+
+        <!-- Médicos -->
+        <div class="mod-card">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bxs-user-voice'></i></div>
+            <div><h4>Médicos</h4><span class="mod-sub">/ frontend/medicos</span></div>
+          </div>
+          <p class="mod-desc">Espacio del médico tratante: ahí pasa consulta, escribe notas clínicas, levanta órdenes y solicitudes y firma electrónicamente lo que requiera respaldo.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Consulta médica y notas de evolución</li>
+              <li>Órdenes y solicitudes (lab, imagen, procedimientos)</li>
+              <li>Firma digital del profesional</li>
+              <li>Acceso al expediente del paciente</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Médicos</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Especialistas</span>
+          </div>
+        </div>
+
+        <!-- Enfermería -->
+        <div class="mod-card">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-pulse'></i></div>
+            <div><h4>Enfermería</h4><span class="mod-sub">/ frontend/enfermeria</span></div>
+          </div>
+          <p class="mod-desc">Operación clínica del personal de enfermería en las áreas que ya están listas. Ejecuta lo indicado por el médico y registra lo realizado al paciente en el momento.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>UCI · Cuidados Intensivos</li>
+              <li>Bloque Quirúrgico</li>
+              <li>Anexos del expediente y aplicación de órdenes</li>
+              <li>Registro de signos y procedimientos del turno</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Enfermería</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Jefes de área</span>
+          </div>
+        </div>
+
+        <!-- Radiología -->
+        <div class="mod-card">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-image-alt'></i></div>
+            <div><h4>Radiología e Imagen · MH-PACS</h4><span class="mod-sub">/ frontend/radiologiaeimagen</span></div>
+          </div>
+          <p class="mod-desc">Sistema PACS propio de MEDIDATA para gestión de estudios radiológicos. Recibe la solicitud del médico, organiza el worklist del técnico y genera la transcripción del radiólogo.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Worklist del técnico (estudios pendientes)</li>
+              <li>Visualización del estudio</li>
+              <li>Transcripción del radiólogo (texto + audio)</li>
+              <li>Documentos adjuntos del estudio</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Técnico de imagen</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Radiólogo</span>
+          </div>
+        </div>
+
+        <!-- Citas -->
+        <div class="mod-card">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-calendar-check'></i></div>
+            <div><h4>Citas</h4><span class="mod-sub">/ frontend/citas</span></div>
+          </div>
+          <p class="mod-desc">Agenda de consulta y procedimientos: programa, modifica o cancela citas y deja al paciente "esperado" para que admisión lo reciba sin fricción.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Calendario por médico / sala</li>
+              <li>Programación, edición y cancelación</li>
+              <li>Vinculación con el paciente del expediente</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Servicio al cliente</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Admisión</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÁREA 2 · OPERACIÓN FINANCIERA ============ -->
+<section style="background:linear-gradient(180deg,#fafdfd, #f6f9fb)">
+  <div class="wrap">
+    <h2><small>02 · Operación Financiera</small>Cobro al paciente, facturación y contabilidad</h2>
+
+    <div class="area-block">
+      <div class="area-head financiera">
+        <div class="area-ico"><i class='bx bx-dollar-circle'></i></div>
+        <div>
+          <h3>Operación Financiera</h3>
+          <span class="area-sub">Desde que se cobra al paciente hasta que el asiento contable queda registrado en el diario general.</span>
+        </div>
+      </div>
+
+      <div class="mod-grid">
+
+        <!-- Caja -->
+        <div class="mod-card financiera">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-money'></i></div>
+            <div><h4>Caja</h4><span class="mod-sub">/ frontend/caja</span></div>
+          </div>
+          <p class="mod-desc">Punto de cobro al paciente. Atiende ventas de servicios y productos, aplica descuentos por edad o promoción, y al final del turno cierra caja generando el cuadre y los asientos contables.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Cobro en efectivo, tarjeta, transferencia o pago mixto</li>
+              <li>Descuentos (edad 30 % / 40 %, promoción, otros)</li>
+              <li>Devoluciones de venta</li>
+              <li>Apertura, manejo de turno y cierre de caja</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Cajeras</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Supervisor de caja</span>
+          </div>
+        </div>
+
+        <!-- Facturación -->
+        <div class="mod-card financiera">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-receipt'></i></div>
+            <div><h4>Facturación</h4><span class="mod-sub">/ frontend/facturacion</span></div>
+          </div>
+          <p class="mod-desc">Genera la factura formal del cobro hecho en caja, con la numeración fiscal correspondiente. Permite consultar, reimprimir y anular facturas según las reglas internas.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Emisión de factura con número fiscal</li>
+              <li>Reimpresión y consulta histórica</li>
+              <li>Anulaciones controladas</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Facturación</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Caja</span>
+          </div>
+        </div>
+
+        <!-- Contabilidad -->
+        <div class="mod-card financiera">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-book-content'></i></div>
+            <div><h4>Contabilidad</h4><span class="mod-sub">/ frontend/contabilidad</span></div>
+          </div>
+          <p class="mod-desc">Cerebro contable del sistema. Recibe automáticamente los asientos generados en caja y compras, permite registrar partidas manuales y produce los reportes operativos del cierre.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Diario general y partidas manuales</li>
+              <li>Reporte de cuadre de caja</li>
+              <li>Reporte de detalle de pagos y facturas</li>
+              <li>Devoluciones y compras (ingresadas y detalladas)</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Contador general</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Auditoría</span>
+          </div>
+        </div>
+
+        <!-- Auxiliar contable -->
+        <div class="mod-card financiera">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-folder-plus'></i></div>
+            <div><h4>Auxiliar Contable</h4><span class="mod-sub">/ frontend/auxcontable</span></div>
+          </div>
+          <p class="mod-desc">Espacio operativo del auxiliar de contabilidad para tareas de apoyo: subir documentos, revisar partidas, validar comprobantes y dejar todo conciliado antes de la firma del contador.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Carga de documentos contables</li>
+              <li>Revisión y firma digital del auxiliar</li>
+              <li>Apoyo a la conciliación</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Auxiliar contable</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÁREA 3 · OPERACIÓN LOGÍSTICA ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>03 · Operación Logística</small>Inventario, compras, farmacia y servicios internos</h2>
+
+    <div class="area-block">
+      <div class="area-head logistica">
+        <div class="area-ico"><i class='bx bx-package'></i></div>
+        <div>
+          <h3>Operación Logística</h3>
+          <span class="area-sub">Desde que llega un insumo al hospital hasta que se entrega al área que lo necesita.</span>
+        </div>
+      </div>
+
+      <div class="mod-grid">
+
+        <!-- Almacén General -->
+        <div class="mod-card logistica">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-store-alt'></i></div>
+            <div><h4>Almacén General</h4><span class="mod-sub">/ frontend/almacen</span></div>
+          </div>
+          <p class="mod-desc">Inventario maestro del hospital. Centraliza productos, compras, requisiciones internas y reorden automático. Incluye el formulario unificado para registrar la compra y actualizar inventario en un solo paso.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Lista de inventario y categorías</li>
+              <li>Compra unificada (factura + alta de producto + stock)</li>
+              <li>Requisiciones internas y autorización</li>
+              <li>Punto de reorden y solicitudes a almacén</li>
+              <li>Catálogo de servicios</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Almacén general</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Compras</span>
+          </div>
+        </div>
+
+        <!-- Almacén Hospitalario -->
+        <div class="mod-card logistica">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-building-house'></i></div>
+            <div><h4>Almacén Hospitalario</h4><span class="mod-sub">/ frontend/almacen_hospitalario</span></div>
+          </div>
+          <p class="mod-desc">Sub-almacén dedicado a los insumos que se mueven dentro del hospital (consumo de áreas clínicas). Recibe del almacén general y abastece a enfermería, quirófano y emergencia.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Inventario hospitalario propio</li>
+              <li>Movimientos de entrada y salida por área</li>
+              <li>Trazabilidad del consumo clínico</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Almacén hospitalario</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Enfermería</span>
+          </div>
+        </div>
+
+        <!-- Medifarma Almacén -->
+        <div class="mod-card logistica">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-capsule'></i></div>
+            <div><h4>Medifarma · Almacén Farmacia</h4><span class="mod-sub">/ frontend/medifarma_almacen</span></div>
+          </div>
+          <p class="mod-desc">Almacén de la farmacia interna. Maneja medicamentos por separado del almacén general, con su propia entrada de compras y control de existencias para venta o dispensación.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Inventario de farmacia</li>
+              <li>Compras propias de Medifarma</li>
+              <li>Salida hacia caja/dispensación</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Farmacia</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Compras farmacia</span>
+          </div>
+        </div>
+
+        <!-- Cafetería -->
+        <div class="mod-card logistica">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-coffee'></i></div>
+            <div><h4>Cafetería</h4><span class="mod-sub">/ frontend/cafeteria</span></div>
+          </div>
+          <p class="mod-desc">Punto de venta y registro del servicio interno de cafetería. Funciona como una caja menor con su catálogo propio y reportes simplificados.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Catálogo y venta del servicio</li>
+              <li>Cierre de turno propio</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Cafetería</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÁREA 4 · OPERACIÓN ADMINISTRATIVA ============ -->
+<section style="background:linear-gradient(180deg,#fafdfd, #f6f9fb)">
+  <div class="wrap">
+    <h2><small>04 · Operación Administrativa</small>Personal, accesos, atención y configuración</h2>
+
+    <div class="area-block">
+      <div class="area-head admin">
+        <div class="area-ico"><i class='bx bx-cog'></i></div>
+        <div>
+          <h3>Operación Administrativa</h3>
+          <span class="area-sub">El "back office" del hospital: quién puede entrar al sistema, quién atiende al paciente y quién forma al personal.</span>
+        </div>
+      </div>
+
+      <div class="mod-grid">
+
+        <!-- Admin -->
+        <div class="mod-card admin">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-shield-quarter'></i></div>
+            <div><h4>Administración</h4><span class="mod-sub">/ frontend/admin</span></div>
+          </div>
+          <p class="mod-desc">Panel maestro del sistema. Desde aquí se manejan los catálogos generales, parámetros del hospital y vistas globales que solo la dirección y el equipo de IT necesitan.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Catálogos maestros y parámetros</li>
+              <li>Acceso a todos los módulos del sistema</li>
+              <li>Auditoría de uso</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Dirección</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>IT Medicasa</span>
+          </div>
+        </div>
+
+        <!-- Recursos Humanos -->
+        <div class="mod-card admin">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bxs-user-detail'></i></div>
+            <div><h4>Recursos Humanos</h4><span class="mod-sub">/ frontend/recursos</span></div>
+          </div>
+          <p class="mod-desc">Gestión del personal del hospital en lo que ya está operativo: reclutamiento y registro del staff médico y de enfermería. Las funciones restantes (administrativos, vacaciones, evaluaciones, dashboard) entran en el plan de Mayo a Octubre 2026.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye hoy</b>
+            <ul>
+              <li>Reclutamiento y postulaciones</li>
+              <li>Registro y listado de Médicos</li>
+              <li>Registro y listado de Enfermería</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>RR.HH.</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Dirección</span>
+          </div>
+        </div>
+
+        <!-- Usuarios -->
+        <div class="mod-card admin">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-user-pin'></i></div>
+            <div><h4>Usuarios</h4><span class="mod-sub">/ frontend/usuarios</span></div>
+          </div>
+          <p class="mod-desc">Manejo de cuentas y accesos al sistema: alta, edición, asignación de perfil (caja, médico, contador, etc.) y reseteo de contraseñas.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Alta y baja de usuarios</li>
+              <li>Asignación de perfil / rol</li>
+              <li>Reseteo de contraseña y bloqueos</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>IT Medicasa</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Administrador</span>
+          </div>
+        </div>
+
+        <!-- Servicio al cliente -->
+        <div class="mod-card admin">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-headphone'></i></div>
+            <div><h4>Servicio al Cliente</h4><span class="mod-sub">/ frontend/servicioalcliente</span></div>
+          </div>
+          <p class="mod-desc">Punto de atención al paciente fuera del flujo clínico: orientación, recepción de documentos y trámites generales. Trabaja muy de la mano con admisión y citas.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Carga de documentos del paciente</li>
+              <li>Atención y derivación interna</li>
+              <li>Firma digital del personal de atención</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Servicio al cliente</span>
+            <span class="user-tag"><i class='bx bx-id-card'></i>Recepción</span>
+          </div>
+        </div>
+
+        <!-- Profile / Funciones / Actividades / Acerca / Ajustes -->
+        <div class="mod-card admin">
+          <div class="mod-head">
+            <div class="mod-icon"><i class='bx bx-cog'></i></div>
+            <div><h4>Perfil, Ajustes y Utilidades</h4><span class="mod-sub">/ profile · /ajustes · /funciones · /actividades · /acerca</span></div>
+          </div>
+          <p class="mod-desc">Funciones transversales que viven en cada sesión: configuración personal, preferencias del usuario, registro de actividad reciente, descripción del sistema y soporte general.</p>
+          <div class="mod-section">
+            <b class="title"><i class='bx bx-list-check'></i>Qué incluye</b>
+            <ul>
+              <li>Edición del perfil del usuario y firma</li>
+              <li>Ajustes operativos del módulo activo</li>
+              <li>Bitácora de actividades del usuario</li>
+              <li>Información del sistema (acerca de)</li>
+            </ul>
+          </div>
+          <div class="mod-users">
+            <span class="user-tag"><i class='bx bx-id-card'></i>Todos los usuarios</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELO DE CAPACITACIÓN ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>05 · Cómo se va a impartir</small>Modelo de capacitación · Formación de formadores</h2>
+    <p>La capacitación se entrega al equipo de <b>IT de Medicasa</b>. Ellos son los formadores internos del hospital y replican la información a cada usuario final. NEXAR queda como segundo nivel para dudas técnicas y ajustes.</p>
+
+    <div class="training">
+      <h3><i class='bx bx-conversation'></i>Estructura de cada sesión</h3>
+      <p>Cada módulo se imparte en una sesión enfocada y corta. Se recorre el flujo real, se valida con un caso de prueba y se entrega material de respaldo para consulta posterior.</p>
+      <div class="training-list">
+        <div class="training-pill">
+          <b><i class='bx bx-walk'></i> 1. Recorrido guiado</b>
+          <span>Demostración paso a paso del módulo en ambiente real.</span>
+        </div>
+        <div class="training-pill">
+          <b><i class='bx bx-edit-alt'></i> 2. Caso práctico</b>
+          <span>El asistente ejecuta un caso real con datos de prueba.</span>
+        </div>
+        <div class="training-pill">
+          <b><i class='bx bx-help-circle'></i> 3. Q&amp;A</b>
+          <span>Preguntas y aclaraciones; se documentan dudas pendientes.</span>
+        </div>
+        <div class="training-pill">
+          <b><i class='bx bx-book-open'></i> 4. Material entregado</b>
+          <span>Manual del módulo, captura de pantalla y video corto.</span>
+        </div>
+        <div class="training-pill">
+          <b><i class='bx bx-rotate-right'></i> 5. Replicación interna</b>
+          <span>IT replica al usuario final usando esta misma guía.</span>
+        </div>
+        <div class="training-pill">
+          <b><i class='bx bx-support'></i> 6. Soporte continuo</b>
+          <span>NEXAR queda disponible para escalamiento técnico.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-brand">
+      <img src="logo_N_nexar.png" alt="Logo NEXAR" />
+      <span class="brand">MEDIDATA<small>by NEXAR</small></span>
+    </div>
+    <div>Guía de Capacitación · Módulos en producción · <b>Mayo 2026</b></div>
+    <div style="margin-top:6px;color:#9ee9f0">Documento de uso interno para formación de formadores</div>
+  </div>
+</footer>
+
+</body>
+</html>

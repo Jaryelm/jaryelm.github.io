@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MEDIDATA · Planificación Mayo – Octubre 2026 · Recursos Humanos & Enfermería</title>
+
+<!-- SEO -->
+<meta name="description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. Cronograma de 6 meses (Mayo - Octubre 2026) con 19 entregables, reuniones quincenales y capacitación a IT de Medicasa." />
+<meta name="keywords" content="MEDIDATA, NEXAR, Recursos Humanos, Enfermería, planificación, cronograma, Medicasa, hospital, software médico" />
+<meta name="author" content="NEXAR" />
+<meta name="theme-color" content="#06adbf" />
+
+<!-- Open Graph (WhatsApp, Slack, Facebook, LinkedIn) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="MEDIDATA · Planificación Mayo – Octubre 2026" />
+<meta property="og:description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. 6 meses, 19 entregables, reuniones quincenales con el cliente." />
+<meta property="og:image" content="logo_N_nexar.png" />
+<meta property="og:locale" content="es_HN" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="MEDIDATA · Planificación Mayo – Octubre 2026" />
+<meta name="twitter:description" content="Plan de 6 meses para finalizar Recursos Humanos y Enfermería de MEDIDATA." />
+<meta name="twitter:image" content="logo_N_nexar.png" />
+
+<link rel="icon" type="image/png" href="logo_N_nexar.png" />
+<link rel="apple-touch-icon" href="logo_N_nexar.png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f6f9fb;
+    --surface:#ffffff;
+    --ink:#0f2a30;
+    --ink-soft:#39606a;
+    --muted:#7c97a0;
+    --line:#e3edf0;
+    --teal:#06adbf;
+    --teal-dark:#035c67;
+    --teal-soft:#cfeef2;
+    --orange:#f59e0b;
+    --orange-soft:#fde6c1;
+    --green:#16a34a;
+    --green-soft:#cdebd7;
+    --red:#dc2626;
+    --grey:#94a3b8;
+    --shadow:0 10px 30px rgba(3,92,103,.08);
+    --shadow-lg:0 20px 60px rgba(3,92,103,.18);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;overflow-x:hidden}
+  img{max-width:100%}
+  body{
+    font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--teal-dark);text-decoration:none}
+
+  /* ======= Layout ======= */
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+  section{padding:72px 0;position:relative}
+  section + section{border-top:1px solid var(--line)}
+  h1,h2,h3,h4{font-family:'Poppins',sans-serif;color:var(--ink);margin:0 0 12px}
+  h2{font-size:30px;font-weight:700;letter-spacing:-.5px}
+  h2 small{display:block;font-size:13px;color:var(--teal-dark);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  h3{font-size:18px;font-weight:600}
+  p{color:var(--ink-soft);margin:0 0 12px}
+
+  /* ======= Hero ======= */
+  .hero{
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(6,173,191,.35), transparent 60%),
+      radial-gradient(900px 400px at 0% 110%, rgba(3,92,103,.6), transparent 55%),
+      linear-gradient(135deg,#024a54 0%,#035c67 50%,#06adbf 100%);
+    color:#fff;
+    padding:90px 0 110px;
+    overflow:hidden;
+    position:relative;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:linear-gradient(180deg, rgba(0,0,0,.6), transparent 80%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:1}
+  .brand-row{
+    display:flex;align-items:center;gap:14px;margin-bottom:22px;
+  }
+  .brand-row .brand-logo{
+    width:62px;height:62px;border-radius:14px;
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(8px);box-shadow:0 6px 18px rgba(0,0,0,.18);
+    overflow:hidden;flex-shrink:0;
+  }
+  .brand-row .brand-logo img{width:78%;height:78%;object-fit:contain;display:block}
+  .brand-row .brand-text{display:flex;flex-direction:column;line-height:1.1}
+  .brand-row .brand-text b{
+    color:#fff;font-size:22px;font-weight:800;letter-spacing:1px;
+  }
+  .brand-row .brand-text span{
+    color:#9ee9f0;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    padding:6px 14px;border-radius:999px;
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;
+    backdrop-filter:blur(8px);
+  }
+  .badge i{font-size:14px;color:#9ee9f0}
+  .hero h1{
+    font-size:clamp(34px,5vw,56px);
+    line-height:1.08;color:#fff;
+    margin:18px 0 18px;font-weight:800;letter-spacing:-1.2px;
+  }
+  .hero h1 span{color:#9ee9f0}
+  .hero p.lead{
+    color:#d6eef0;font-size:18px;max-width:780px;margin:0 0 28px;
+  }
+  .hero-meta{
+    display:flex;flex-wrap:wrap;gap:14px;margin-top:24px;
+  }
+  .meta-pill{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.2);
+    padding:10px 16px;border-radius:12px;
+    font-size:13px;font-weight:500;
+    backdrop-filter:blur(8px);
+  }
+  .meta-pill b{color:#fff}
+  .meta-pill i{color:#9ee9f0;font-size:18px}
+
+  /* ======= Hero CTA ======= */
+  .hero-cta{
+    display:inline-flex;align-items:center;gap:10px;
+    margin-top:24px;padding:14px 22px;border-radius:12px;
+    background:#fff;color:var(--teal-dark) !important;
+    font-weight:700;font-size:14px;letter-spacing:.3px;
+    text-transform:uppercase;
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.6);
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .hero-cta i{font-size:20px;color:var(--teal)}
+  .hero-cta:hover{
+    transform:translateY(-2px);
+    background:#9ee9f0;color:#024a54 !important;
+    box-shadow:0 12px 28px rgba(0,0,0,.24);
+  }
+  .hero-cta .arrow{font-size:22px;line-height:1;margin-left:2px}
+
+  /* ======= KPI ======= */
+  .kpi{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:-50px;position:relative;z-index:2;
+  }
+  .kpi-card{
+    background:var(--surface);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    display:flex;align-items:center;gap:16px;
+  }
+  .kpi-icon{
+    width:46px;height:46px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--teal-soft);color:var(--teal-dark);
+    font-size:24px;flex-shrink:0;
+  }
+  .kpi-icon.orange{background:var(--orange-soft);color:#b45309}
+  .kpi-icon.green{background:var(--green-soft);color:#166534}
+  .kpi-icon.dark{background:#dde9ec;color:var(--teal-dark)}
+  .kpi-card h4{font-size:13px;color:var(--muted);font-weight:500;margin:0 0 4px;text-transform:uppercase;letter-spacing:.5px}
+  .kpi-card .num{font-size:26px;font-weight:700;color:var(--ink);line-height:1}
+
+  /* ======= Resumen ejecutivo ======= */
+  .grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:start}
+  .info-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1px solid var(--line);padding:28px;box-shadow:var(--shadow);
+  }
+  .info-card h3{display:flex;align-items:center;gap:10px;color:var(--teal-dark)}
+  .info-card h3 i{font-size:22px}
+  .info-card ul{margin:14px 0 0;padding:0 0 0 18px;color:var(--ink-soft)}
+  .info-card ul li{margin-bottom:8px}
+  .obj-list{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  .obj-item{
+    background:#fafdfd;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .obj-item i{
+    color:var(--teal);font-size:22px;margin-top:2px;flex-shrink:0;
+  }
+  .obj-item b{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
+  .obj-item span{color:var(--muted);font-size:13px}
+
+  /* ======= Estado actual (módulos) ======= */
+  .modules{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+  .module-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1px solid var(--line);padding:24px;box-shadow:var(--shadow);
+  }
+  .module-head{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .module-icon{
+    width:48px;height:48px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#06adbf,#035c67);color:#fff;font-size:26px;
+  }
+  .module-icon.orange{background:linear-gradient(135deg,#f59e0b,#b45309)}
+  .module-head h3{margin:0;font-size:18px}
+  .module-head .sub{color:var(--muted);font-size:12px;display:block}
+  .feat-line{
+    display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px
+  }
+  .feat-line:last-child{border-bottom:0}
+  .feat-line .name{flex:1;color:var(--ink)}
+  .feat-line .tag{
+    font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase
+  }
+  .tag-ok{background:var(--green-soft);color:#166534}
+  .tag-todo{background:#fde2e2;color:#991b1b}
+  .tag-mid{background:var(--orange-soft);color:#b45309}
+
+  /* ======= Gantt ======= */
+  .gantt-wrap{
+    background:var(--surface);border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:var(--shadow);padding:28px 28px 24px;margin-top:24px;
+  }
+  .gantt-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .gantt-hint{
+    display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;
+    margin-bottom:14px;
+  }
+  .gantt-hint i{font-size:16px;color:var(--teal)}
+  .gantt{
+    min-width:1480px;
+    display:grid;
+    grid-template-columns:260px repeat(26,1fr);
+    gap:0;
+  }
+  .g-head{display:contents}
+  .g-head .col.label{
+    grid-column:1;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+    padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);background:#fafdfd;
+    position:sticky;left:0;z-index:4;
+    box-shadow:6px 0 10px -8px rgba(0,0,0,.18);
+  }
+  .g-month{
+    border-bottom:2px solid var(--line);
+    background:#fafdfd;color:var(--teal-dark);font-weight:700;font-size:12.5px;
+    padding:10px 8px;text-align:center;letter-spacing:1.2px;text-transform:uppercase;
+    border-right:1px dashed var(--line);
+  }
+  .g-month:last-child{border-right:0}
+  .g-month.may{grid-column:2 / span 4}
+  .g-month.jun{grid-column:6 / span 4}
+  .g-month.jul{grid-column:10 / span 5}
+  .g-month.ago{grid-column:15 / span 4}
+  .g-month.sep{grid-column:19 / span 4}
+  .g-month.oct{grid-column:23 / span 5}
+
+  .g-row{display:contents}
+  .g-row .row-label{
+    grid-column:1;background:#fafdfd;border-right:2px solid var(--line);
+    padding:16px 14px;font-weight:600;color:var(--ink);font-size:13.5px;
+    display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);
+    line-height:1.25;
+    position:sticky;left:0;z-index:3;
+    box-shadow:6px 0 10px -8px rgba(0,0,0,.18);
+  }
+  .g-row .row-label i{
+    width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--teal-soft);color:var(--teal-dark);font-size:20px;flex-shrink:0;
+  }
+  .g-row.rh .row-label i{background:var(--orange-soft);color:#b45309}
+  .g-row .row-track{
+    grid-column:2 / span 26;border-bottom:1px solid var(--line);
+    height:68px;position:relative;background:
+      repeating-linear-gradient(90deg, transparent, transparent calc(100%/26 - 1px), var(--line) calc(100%/26 - 1px), var(--line) calc(100%/26));
+  }
+  .g-row:hover .row-label{background:#f0f7f8}
+  .g-row:hover .row-track{background-color:#fafdfd}
+
+  .bar{
+    position:absolute;top:50%;transform:translateY(-50%);
+    height:36px;border-radius:9px;
+    color:#fff;font-size:12px;font-weight:700;letter-spacing:.3px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 6px;
+    box-shadow:0 4px 14px rgba(3,92,103,.28);
+    cursor:default;transition:transform .2s ease, box-shadow .2s ease, height .2s ease;
+    white-space:nowrap;
+  }
+  .bar::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:9px 0 0 9px;
+    background:rgba(255,255,255,.45);
+  }
+  .bar:hover{transform:translateY(-50%) scale(1.04);box-shadow:var(--shadow-lg);z-index:5;height:42px}
+  .bar.enf{background:linear-gradient(135deg,#06adbf,#035c67)}
+  .bar.rh{background:linear-gradient(135deg,#f59e0b,#b45309)}
+  .bar.cierre{background:linear-gradient(135deg,#16a34a,#065f46)}
+  .bar .dur-full{display:inline}
+  .bar .dur-short{display:none}
+  .bar.short .dur-full{display:none}
+  .bar.short .dur-short{display:inline;font-size:13px}
+  .bar .end{
+    position:absolute;right:-8px;top:50%;transform:translate(100%,-50%);
+    background:#fff;border:1px solid var(--line);border-radius:7px;padding:3px 10px;
+    color:var(--teal-dark);font-size:11px;font-weight:700;white-space:nowrap;
+    box-shadow:0 3px 8px rgba(0,0,0,.08);letter-spacing:.2px;
+  }
+  .bar.rh .end{color:#b45309;border-color:#f3d8a5}
+  .bar.cierre .end{color:#166534;border-color:#bfe3cc}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:13px;color:var(--ink-soft)}
+  .legend-dot{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:8px;vertical-align:-2px}
+  .legend .enf{background:linear-gradient(135deg,#06adbf,#035c67)}
+  .legend .rh{background:linear-gradient(135deg,#f59e0b,#b45309)}
+  .legend .cie{background:linear-gradient(135deg,#16a34a,#065f46)}
+
+  /* ======= Tabla detalle ======= */
+  .table-wrap{
+    background:var(--surface);border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:var(--shadow);overflow:hidden;margin-top:24px;
+  }
+  table.detalle{width:100%;border-collapse:collapse;font-size:14px}
+  table.detalle thead th{
+    background:#fafdfd;color:var(--teal-dark);font-weight:600;text-align:left;
+    padding:14px 16px;border-bottom:2px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.6px;
+  }
+  table.detalle tbody td{padding:14px 16px;border-bottom:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+  table.detalle tbody tr:last-child td{border-bottom:0}
+  table.detalle tbody tr:hover{background:#fafdfd}
+  table.detalle .pill{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;
+  }
+  .pill.enf{background:var(--teal-soft);color:var(--teal-dark)}
+  .pill.rh{background:var(--orange-soft);color:#b45309}
+  .pill.cie{background:var(--green-soft);color:#166534}
+  table.detalle .num-cell{font-weight:700;color:var(--ink);width:46px;text-align:center}
+  table.detalle .date-cell{white-space:nowrap;font-weight:600;color:var(--ink)}
+  table.detalle .dur-cell{white-space:nowrap;color:var(--muted);font-size:13px}
+
+  /* ======= Funciones (qué hace cada una) ======= */
+  .func-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px;margin-top:24px;
+  }
+  .func-card{
+    background:var(--surface);border-radius:var(--radius);border:1px solid var(--line);
+    padding:22px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;
+    position:relative;overflow:hidden;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .func-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .func-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,#06adbf,#035c67);
+  }
+  .func-card.rh::before{background:linear-gradient(90deg,#f59e0b,#b45309)}
+  .func-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .func-head .num{
+    font-size:13px;font-weight:700;color:var(--teal-dark);background:var(--teal-soft);
+    padding:3px 10px;border-radius:6px;
+  }
+  .func-card.rh .func-head .num{color:#b45309;background:var(--orange-soft)}
+  .func-head .date{font-size:12px;color:var(--muted);font-weight:600}
+  .func-card h4{margin:0;font-size:16px;color:var(--ink);font-weight:700;line-height:1.3}
+  .func-card .desc{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.5;flex:1}
+  .func-card .what{
+    background:#fafdfd;border-left:3px solid var(--teal);
+    padding:10px 12px;border-radius:6px;font-size:12.5px;color:var(--ink-soft);
+  }
+  .func-card.rh .what{border-left-color:var(--orange)}
+  .func-card .what b{color:var(--ink)}
+
+  /* ======= Reuniones ======= */
+  .meetings{
+    background:linear-gradient(135deg,#024a54,#035c67);
+    color:#fff;border-radius:var(--radius);padding:36px;margin-top:24px;
+    position:relative;overflow:hidden;box-shadow:var(--shadow-lg);
+  }
+  .meetings::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle,rgba(158,233,240,.2),transparent 70%);
+  }
+  .meetings h3{color:#fff;font-size:22px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .meetings h3 i{color:#9ee9f0}
+  .meetings p{color:#cfeef2;max-width:760px;margin-bottom:18px}
+  .meet-list{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;position:relative;z-index:1
+  }
+  .meet-pill{
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;padding:14px;backdrop-filter:blur(8px);
+  }
+  .meet-pill b{display:block;color:#fff;font-size:14px;margin-bottom:4px}
+  .meet-pill span{color:#cfeef2;font-size:12px}
+  .meet-modes{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+  .mode-pill{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+    font-size:13px;font-weight:500;
+  }
+  .mode-pill i{color:#9ee9f0}
+
+  /* ======= Aviso destacado (callout) ======= */
+  .callout{
+    background:linear-gradient(135deg,#fff7e6 0%, #fde6c1 100%);
+    border:1px solid #f5c98a;border-left:6px solid var(--orange);
+    border-radius:var(--radius);padding:24px 28px;margin-top:24px;
+    box-shadow:var(--shadow);display:flex;gap:20px;align-items:flex-start;
+  }
+  .callout .ico{
+    width:54px;height:54px;border-radius:14px;background:#fff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-size:30px;color:#b45309;box-shadow:0 4px 12px rgba(180,83,9,.18);
+  }
+  .callout h3{margin:0 0 8px;color:#7c3a06;font-size:18px;display:flex;align-items:center;gap:8px}
+  .callout p{color:#7c3a06;margin:0 0 14px;font-size:14.5px}
+  .callout .options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .callout .opt{
+    background:#fff;border:1px solid #f3d8a5;border-radius:10px;padding:14px 16px;
+  }
+  .callout .opt b{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:14px;margin-bottom:6px}
+  .callout .opt b i{color:var(--orange);font-size:18px}
+  .callout .opt span{font-size:13px;color:var(--ink-soft);line-height:1.5}
+  .callout .opt .badge-rec{
+    display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
+    background:var(--green-soft);color:#166534;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  }
+  .callout .opt .badge-alt{
+    display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
+    background:#e0e7ef;color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  }
+  /* ======= Footer ======= */
+  footer{
+    background:var(--ink);color:#cfeef2;padding:40px 0;text-align:center;font-size:13px;
+  }
+  footer b{color:#9ee9f0}
+  footer .footer-brand{
+    display:inline-flex;align-items:center;gap:12px;margin-bottom:10px;
+  }
+  footer .footer-brand img{
+    width:42px;height:42px;border-radius:10px;
+    background:rgba(255,255,255,.06);padding:6px;
+    border:1px solid rgba(255,255,255,.10);
+    object-fit:contain;display:block;
+  }
+  footer .footer-brand .brand{
+    font-size:18px;font-weight:700;color:#fff;letter-spacing:1.5px;display:block;line-height:1.1
+  }
+  footer .footer-brand .brand small{
+    display:block;font-size:10px;color:#9ee9f0;letter-spacing:3px;font-weight:500;margin-top:2px;
+  }
+
+  /* ======= Responsive ======= */
+  /* ======= Responsive ======= */
+
+  /* Tablet grande / laptop pequeña */
+  @media (max-width:1100px){
+    .wrap{padding:0 22px}
+    .kpi{grid-template-columns:repeat(2,1fr);margin-top:-30px}
+    h2{font-size:26px}
+  }
+
+  /* Tablet vertical */
+  @media (max-width:900px){
+    section{padding:54px 0}
+    .hero{padding:64px 0 72px}
+    .grid-2{grid-template-columns:1fr;gap:22px}
+    .modules{grid-template-columns:1fr;gap:18px}
+    .obj-list{grid-template-columns:1fr}
+    .info-card{padding:22px}
+    .module-card{padding:20px}
+    .meetings{padding:28px 22px}
+    h2 small{font-size:12px}
+    .meet-list{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .func-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    /* Callout */
+    .callout{flex-direction:column;padding:22px}
+    .callout .options{grid-template-columns:1fr;gap:12px}
+    /* Tabla detalle: scroll horizontal nativo */
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table.detalle{min-width:680px}
+    table.detalle thead th,table.detalle tbody td{padding:12px 14px}
+    /* Gantt: padding y label más compactos */
+    .gantt-wrap{padding:20px 16px 18px}
+    .gantt{min-width:1280px}
+  }
+
+  /* Móvil grande */
+  @media (max-width:680px){
+    .wrap{padding:0 18px}
+    section{padding:46px 0}
+    .hero{padding:54px 0 66px}
+    h1,h2,h3,h4{margin-bottom:10px}
+    h2{font-size:22px;line-height:1.25}
+    h2 small{font-size:11px;letter-spacing:1.6px;margin-bottom:6px}
+    .badge{font-size:11px;letter-spacing:1.5px;padding:5px 12px}
+    .hero p.lead{font-size:15px;margin-bottom:22px}
+    .hero-meta{gap:10px}
+    .meta-pill{font-size:12px;padding:8px 12px;gap:8px}
+    .meta-pill i{font-size:16px}
+    .brand-row{gap:10px;margin-bottom:18px}
+    .brand-row .brand-logo{width:48px;height:48px;border-radius:11px}
+    .brand-row .brand-text b{font-size:18px}
+    .brand-row .brand-text span{font-size:10px;letter-spacing:2px}
+    /* KPI 1 columna */
+    .kpi{grid-template-columns:1fr;gap:14px;margin-top:-20px}
+    .kpi-card{padding:18px}
+    .kpi-icon{width:42px;height:42px;font-size:22px}
+    .kpi-card .num{font-size:22px}
+    /* Cards y formularios */
+    .info-card{padding:18px;border-radius:12px}
+    .module-card{padding:16px}
+    .func-card{padding:18px}
+    .feat-line{font-size:13px;padding:7px 0;flex-wrap:wrap;gap:8px}
+    .feat-line .name{flex:1 1 100%}
+    .feat-line .tag{font-size:10px;padding:2px 7px}
+    /* Modules header */
+    .module-icon{width:42px;height:42px;font-size:22px}
+    .module-head h3{font-size:16px}
+    /* Funciones */
+    .func-grid{grid-template-columns:1fr;gap:14px}
+    .func-card h4{font-size:15px}
+    .func-card .desc{font-size:12.5px}
+    .func-card .what{font-size:12px;padding:9px 11px}
+    /* Reuniones */
+    .meetings{padding:24px 18px;border-radius:12px}
+    .meetings h3{font-size:18px}
+    .meet-list{grid-template-columns:1fr;gap:10px}
+    .meet-pill{padding:12px}
+    .meet-pill b{font-size:13px}
+    .meet-pill span{font-size:11.5px}
+    .meet-modes{gap:8px}
+    .mode-pill{font-size:12px;padding:6px 12px}
+    /* Callout */
+    .callout{padding:18px;border-left-width:5px;gap:14px}
+    .callout .ico{width:46px;height:46px;font-size:24px}
+    .callout h3{font-size:16px}
+    .callout p{font-size:13.5px}
+    .callout .opt{padding:12px 14px}
+    .callout .opt b{font-size:13px}
+    .callout .opt span{font-size:12px}
+    /* Tabla más compacta */
+    table.detalle thead th{font-size:11px;padding:10px 12px}
+    table.detalle tbody td{font-size:13px;padding:11px 12px}
+    table.detalle .num-cell{width:36px}
+    /* Hint del Gantt */
+    .gantt-hint{font-size:11.5px}
+    /* Footer */
+    footer{padding:30px 0;font-size:12px}
+    footer .footer-brand img{width:36px;height:36px}
+    footer .footer-brand .brand{font-size:16px}
+  }
+
+  /* Móvil pequeño */
+  @media (max-width:420px){
+    .wrap{padding:0 14px}
+    h2{font-size:20px}
+    .hero h1{letter-spacing:-.5px}
+    .hero p.lead{font-size:14px}
+    .meta-pill{font-size:11.5px}
+    .obj-item{padding:12px;gap:10px}
+    .obj-item i{font-size:20px}
+    .obj-item b{font-size:13px}
+    .obj-item span{font-size:12px}
+    .info-card ul{padding-left:18px;font-size:13px}
+    .meetings h3{font-size:17px}
+    .meetings p{font-size:13px}
+    .badge i{font-size:13px}
+  }
+
+  /* Existing callout fallback removed; consolidated above */
+  @media print{
+    body{background:#fff}
+    section{padding:30px 0;page-break-inside:avoid}
+    .hero{padding:40px 0}
+    .kpi{margin-top:20px}
+    .gantt-wrap{box-shadow:none;border:1px solid #ccc}
+    .meetings{background:#035c67 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .bar{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="brand-row">
+      <div class="brand-logo"><img src="logo_N_nexar.png" alt="Logo NEXAR" /></div>
+      <div class="brand-text">
+        <b>NEXAR</b>
+      </div>
+    </div>
+    <span class="badge"><i class='bx bx-pulse'></i>MEDIDATA · Plan de Trabajo Q2–Q4 2026</span>
+    <h1>Plan de Finalización <span>Recursos Humanos</span> &amp; <span>Enfermería</span></h1>
+    <p class="lead">Cronograma realista de seis meses (Mayo a Octubre 2026) para cerrar las funciones pendientes de ambos módulos, con entregas semanales, reuniones quincenales de seguimiento y validación continua con el cliente.</p>
+    <div class="hero-meta">
+      <div class="meta-pill"><i class='bx bx-calendar'></i><span><b>Inicio:</b> 04 Mayo 2026</span></div>
+      <div class="meta-pill"><i class='bx bx-flag-checkered'></i><span><b>Cierre:</b> 30 Octubre 2026</span></div>
+      <div class="meta-pill"><i class='bx bx-time-five'></i><span><b>Duración:</b> 26 semanas</span></div>
+      <div class="meta-pill"><i class='bx bx-check-double'></i><span><b>Entregables:</b> 19 funciones</span></div>
+    </div>
+    <a href="capacitacion.html" class="hero-cta">
+      <i class='bx bx-chalkboard'></i>
+      <span>Ver guía de capacitación · Módulos en producción</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</header>
+
+<!-- ============ KPI ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="kpi">
+      <div class="kpi-card">
+        <div class="kpi-icon orange"><i class='bx bxs-user-detail'></i></div>
+        <div><h4>Recursos Humanos</h4><div class="num">8 funciones</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon"><i class='bx bx-plus-medical'></i></div>
+        <div><h4>Enfermería</h4><div class="num">10 funciones</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon dark"><i class='bx bx-conversation'></i></div>
+        <div><h4>Reuniones</h4><div class="num">12 quincenales</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green"><i class='bx bx-task'></i></div>
+        <div><h4>Capacitación a IT</h4><div class="num">Formación de formadores</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESUMEN EJECUTIVO ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>01 · Resumen Ejecutivo</small>Qué cubre este plan y por qué</h2>
+    <div class="grid-2">
+      <div class="info-card">
+        <h3><i class='bx bx-info-circle'></i>Contexto</h3>
+        <p>MEDIDATA tiene hoy operativas las funciones administrativas, contables, de almacén, facturación y radiología. Los módulos de <b>Recursos Humanos</b> y <b>Enfermería</b> tienen una base funcional sólida pero conservan piezas pendientes que el cliente necesita para una operación 100% digital del personal y de las áreas de atención clínica.</p>
+        <p>Este plan ataca exclusivamente esas piezas pendientes con fechas de entrega <b>realistas</b>, basadas en complejidad: una función simple toma <b>1 semana</b>, una compleja toma <b>2 semanas</b>. No prometemos un día por función — preferimos entregar bien probado que rápido y a medias.</p>
+        <h3 style="margin-top:22px"><i class='bx bx-target-lock'></i>Objetivos</h3>
+        <div class="obj-list">
+          <div class="obj-item"><i class='bx bx-check-circle'></i><div><b>Cerrar al 100% Recursos Humanos</b><span>Personal, colaboradores, vacaciones, evaluaciones y reportes.</span></div></div>
+          <div class="obj-item"><i class='bx bx-check-circle'></i><div><b>Cerrar Áreas de Atención de Enfermería</b><span>Hospitalización, emergencia, laboratorio, maternidad y más.</span></div></div>
+          <div class="obj-item"><i class='bx bx-check-circle'></i><div><b>Validar con el cliente cada quincena</b><span>Reuniones por Meet o presenciales según conveniencia.</span></div></div>
+          <div class="obj-item"><i class='bx bx-check-circle'></i><div><b>Capacitar a IT de Medicasa</b><span>Modelo "Formación de formadores": IT recibe la formación y luego replica al usuario final.</span></div></div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3><i class='bx bx-shield-quarter'></i>Reglas del proyecto</h3>
+        <ul>
+          <li><b>Calidad sobre velocidad:</b> ninguna función pasa a producción sin pruebas funcionales.</li>
+          <li><b>Coherencia visual:</b> todo el desarrollo respeta la identidad existente de MEDICASA y su marca visual.</li>
+          <li><b>Sin sorpresas:</b> cualquier ajuste de alcance o fecha se conversa antes de tocar el cronograma.</li>
+          <li><b>Backups:</b> antes de cada despliegue importante se respalda BD y archivos.</li>
+          <li><b>Trazabilidad:</b> cada cambio queda documentado en el control de versiones del proyecto.</li>
+        </ul>
+        <h3 style="margin-top:22px"><i class='bx bx-error-circle'></i>Compromisos del cliente</h3>
+        <ul>
+          <li>Disponibilidad para reuniones quincenales (45–60 min).</li>
+          <li>Definir personal usuario para validación funcional.</li>
+          <li>Designar al equipo de <b>IT de Medicasa</b> que recibirá la capacitación final.</li>
+          <li><b>Definir hardware del reloj biométrico</b> (Opción A: nuevo reloj · Opción B: carga manual USB).</li>
+          <li>Comunicar oportunamente cambios de prioridad.</li>
+          <li>Aprobar entregables al cierre de cada quincena.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESTADO ACTUAL ============ -->
+<section style="background:linear-gradient(180deg,#fafdfd, #f6f9fb)">
+  <div class="wrap">
+    <h2><small>02 · Estado Actual</small>Qué existe hoy y qué falta por terminar</h2>
+    <p>Diagnóstico al 25 de abril 2026. Las funciones marcadas como <span class="tag tag-todo">PENDIENTE</span> son las que entran a este cronograma de 6 meses. Las marcadas como <span class="tag tag-mid">EN MEJORA</span> ya tienen base pero requieren completarse. Las <span class="tag tag-ok">LISTAS</span> ya están operando.</p>
+
+    <div class="modules">
+      <!-- RH -->
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-icon orange"><i class='bx bxs-user-detail'></i></div>
+          <div>
+            <h3>Recursos Humanos</h3>
+            <span class="sub">Personal · Colaboradores · Asistencia</span>
+          </div>
+        </div>
+        <div class="feat-line"><span class="name">Reclutamiento &amp; postulaciones</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Registrar &amp; listar Enfermería</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Registrar &amp; listar Médicos</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Reloj Biométrico <em style="color:var(--orange);font-style:normal;font-weight:600">⚠ Requiere decisión de hardware</em></span><span class="tag tag-mid">Bloqueado</span></div>
+        <div class="feat-line"><span class="name">Proceso de Entrevistas</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Registrar Administrativo</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Registrar Servicios Generales</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Vacaciones / Permisos</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Plantilla activa / Organigrama</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Evaluaciones de desempeño</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Reportes &amp; Dashboard de RH</span><span class="tag tag-todo">Pendiente</span></div>
+      </div>
+
+      <!-- ENF -->
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-icon"><i class='bx bx-plus-medical'></i></div>
+          <div>
+            <h3>Enfermería</h3>
+            <span class="sub">Atención clínica · Áreas operativas</span>
+          </div>
+        </div>
+        <div class="feat-line"><span class="name">Admisión, Expediente, Anexos, Órdenes &amp; Solicitudes</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">MH-PACS (worklist, estudios, transcripciones)</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">UCI · Cuidados Intensivos</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Bloque Quirúrgico</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Pre-Clínica (signos pre-consulta)</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Catálogo de Servicios</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Hospitalización</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Cuidados Intermedios</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Procedimientos</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Emergencia / Triage</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Laboratorio Clínico</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Maternidad</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Óptica</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Odontología</span><span class="tag tag-todo">Pendiente</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AVISO RELOJ BIOMÉTRICO ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="callout">
+      <div class="ico"><i class='bx bx-error'></i></div>
+      <div style="flex:1">
+        <h3><i class='bx bx-time-five'></i>Punto crítico · Reloj Biométrico</h3>
+        <p>El reloj biométrico físico que utiliza Medicasa actualmente está <b>obsoleto</b>: su API no es compatible con la nueva arquitectura de MEDIDATA, por lo que no podemos integrarlo de forma directa y automática. Para destrabar esta función, presentamos dos caminos posibles. La decisión la toma el cliente.</p>
+        <div class="options">
+          <div class="opt">
+            <b><i class='bx bx-wifi'></i>Opción A · Reemplazar el hardware</b>
+            <span>Adquirir un reloj biométrico moderno con API compatible (red TCP/IP o servicio en la nube). Permite que MEDIDATA reciba marcaciones en <b>tiempo real</b>, sin intervención humana, y generar reportes automáticos.</span>
+            <span class="badge-rec">Recomendada</span>
+          </div>
+          <div class="opt">
+            <b><i class='bx bx-usb'></i>Opción B · Carga manual por USB</b>
+            <span>Mantener el reloj actual y exportar las marcaciones a un archivo desde el dispositivo. Un <b>operador de RR.HH.</b> sube ese archivo a MEDIDATA <b>cada mes</b> (o con la frecuencia que el cliente defina) para visualizar la asistencia desde el sistema.</span>
+            <span class="badge-alt">Alternativa</span>
+          </div>
+        </div>
+        <p style="margin-top:14px;font-size:13px"><b>Implicación en el cronograma:</b> la Opción A puede requerir tiempo adicional dependiendo del proveedor del nuevo reloj. La Opción B se entrega dentro del plazo previsto (1 semana, viernes 9 de mayo) e incluye el módulo de carga del archivo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIAGRAMA GANTT ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>03 · Cronograma · Diagrama de Gantt</small>Línea de tiempo Mayo – Octubre 2026</h2>
+    <p>Cada barra representa una función con su duración real estimada. Las funciones <b>de RH se identifican en naranja</b>, las <b>de Enfermería en turquesa</b> y el <b>cierre integral en verde</b>. El eje horizontal está dividido en 26 semanas (4 por mes en promedio).</p>
+
+    <div class="gantt-wrap">
+      <div class="gantt-scroll">
+      <div class="gantt">
+        <!-- Header -->
+        <div class="g-head">
+          <div class="col label">Función / Entregable</div>
+          <div class="g-month may">Mayo</div>
+          <div class="g-month jun">Junio</div>
+          <div class="g-month jul">Julio</div>
+          <div class="g-month ago">Agosto</div>
+          <div class="g-month sep">Septiembre</div>
+          <div class="g-month oct">Octubre</div>
+        </div>
+
+        <!-- Filas: cada barra usa left% y width% sobre 26 semanas (3.846% por semana) -->
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-time-five'></i>Reloj Biométrico</div>
+          <div class="row-track"><div class="bar rh short" style="left:0%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">9 May</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-pulse'></i>Pre-Clínica</div>
+          <div class="row-track"><div class="bar enf short" style="left:3.846%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">16 May</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-conversation'></i>Proceso de Entrevistas</div>
+          <div class="row-track"><div class="bar rh short" style="left:7.692%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">22 May</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-clipboard'></i>Registrar Administrativo</div>
+          <div class="row-track"><div class="bar rh short" style="left:11.538%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">29 May</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-wrench'></i>Servicios Generales</div>
+          <div class="row-track"><div class="bar rh short" style="left:15.385%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">5 Jun</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-list-ul'></i>Catálogo de Servicios</div>
+          <div class="row-track"><div class="bar enf short" style="left:19.231%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">12 Jun</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-calendar-x'></i>Vacaciones / Permisos</div>
+          <div class="row-track"><div class="bar rh short" style="left:23.077%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">19 Jun</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-bed'></i>Hospitalización</div>
+          <div class="row-track"><div class="bar enf" style="left:26.923%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">3 Jul</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-plus-medical'></i>Cuidados Intermedios</div>
+          <div class="row-track"><div class="bar enf short" style="left:34.615%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">10 Jul</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-injection'></i>Procedimientos</div>
+          <div class="row-track"><div class="bar enf" style="left:38.462%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">24 Jul</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-sitemap'></i>Plantilla / Organigrama</div>
+          <div class="row-track"><div class="bar rh short" style="left:46.154%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">31 Jul</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-first-aid'></i>Emergencia / Triage</div>
+          <div class="row-track"><div class="bar enf" style="left:50.000%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">14 Ago</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-test-tube'></i>Laboratorio Clínico</div>
+          <div class="row-track"><div class="bar enf" style="left:57.692%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">28 Ago</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-medal'></i>Evaluaciones Desempeño</div>
+          <div class="row-track"><div class="bar rh short" style="left:65.385%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">4 Sep</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bxs-baby-carriage'></i>Maternidad</div>
+          <div class="row-track"><div class="bar enf" style="left:69.231%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">18 Sep</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-glasses'></i>Óptica</div>
+          <div class="row-track"><div class="bar enf short" style="left:76.923%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">25 Sep</span></div></div>
+        </div>
+
+        <div class="g-row enf">
+          <div class="row-label"><i class='bx bx-smile'></i>Odontología</div>
+          <div class="row-track"><div class="bar enf" style="left:80.769%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">9 Oct</span></div></div>
+        </div>
+
+        <div class="g-row rh">
+          <div class="row-label"><i class='bx bx-bar-chart-alt-2'></i>Reportes / Dashboard RH</div>
+          <div class="row-track"><div class="bar rh" style="left:88.462%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">23 Oct</span></div></div>
+        </div>
+
+        <div class="g-row">
+          <div class="row-label"><i class='bx bx-trophy'></i>QA · Capacitación a IT · Entrega</div>
+          <div class="row-track"><div class="bar cierre short" style="left:96.154%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">30 Oct</span></div></div>
+        </div>
+
+      </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="legend-dot rh"></span>Recursos Humanos</span>
+        <span><span class="legend-dot enf"></span>Enfermería</span>
+        <span><span class="legend-dot cie"></span>Cierre integral</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLA DETALLE ============ -->
+<section style="background:linear-gradient(180deg,#fafdfd, #f6f9fb)">
+  <div class="wrap">
+    <h2><small>04 · Detalle por Entregable</small>Tabla de fechas, módulos y duración</h2>
+    <div class="table-wrap">
+      <table class="detalle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Módulo</th>
+            <th>Función</th>
+            <th>Duración</th>
+            <th>Entrega</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num-cell">01</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Reloj Biométrico — <em style="color:var(--orange)">requiere decisión de hardware (reloj nuevo) o carga manual USB por operador RR.HH.</em></td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 9 Mayo</td></tr>
+          <tr><td class="num-cell">02</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Pre-Clínica — toma de signos previos a la consulta médica</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 16 Mayo</td></tr>
+          <tr><td class="num-cell">03</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Proceso de Entrevistas — evaluación, calificación y estados</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 22 Mayo</td></tr>
+          <tr><td class="num-cell">04</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Registrar Administrativo — formulario CRUD del personal admin.</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 29 Mayo</td></tr>
+          <tr><td class="num-cell">05</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Registrar Servicios Generales — limpieza, mantenimiento, lavandería</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 5 Junio</td></tr>
+          <tr><td class="num-cell">06</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Catálogo de Servicios — administración centralizada</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 12 Junio</td></tr>
+          <tr><td class="num-cell">07</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Vacaciones / Permisos — solicitud, aprobación, saldos</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 19 Junio</td></tr>
+          <tr><td class="num-cell">08</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Hospitalización — asignación de cama, ingreso/egreso, evoluciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 3 Julio</td></tr>
+          <tr><td class="num-cell">09</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Cuidados Intermedios — control de pacientes en transición</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 10 Julio</td></tr>
+          <tr><td class="num-cell">10</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Procedimientos — programación + reporte clínico</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 24 Julio</td></tr>
+          <tr><td class="num-cell">11</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Plantilla Activa / Organigrama visual</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 31 Julio</td></tr>
+          <tr><td class="num-cell">12</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Emergencia / Triage — clasificación y atención inmediata</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 14 Agosto</td></tr>
+          <tr><td class="num-cell">13</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Laboratorio Clínico — recepción de muestras y entrega de resultados</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 28 Agosto</td></tr>
+          <tr><td class="num-cell">14</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Evaluaciones de Desempeño — formulario + histórico</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 4 Sept.</td></tr>
+          <tr><td class="num-cell">15</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Maternidad — registro de parto y atención a recién nacido</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 18 Sept.</td></tr>
+          <tr><td class="num-cell">16</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Óptica — receta, control y entrega de lentes</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 25 Sept.</td></tr>
+          <tr><td class="num-cell">17</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Odontología — odontograma y plan de tratamiento</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 9 Oct.</td></tr>
+          <tr><td class="num-cell">18</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Reportes &amp; Dashboard — asistencia, plantilla, vacaciones, evaluaciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 23 Oct.</td></tr>
+          <tr><td class="num-cell">19</td><td><span class="pill cie"><i class='bx bx-trophy'></i>Cierre</span></td><td>QA cruzado, integración, <b>capacitación a IT de Medicasa</b> (Formación de formadores) y entrega final</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 30 Oct.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FUNCIONES (DESCRIPCIÓN) ============ -->
+<section>
+  <div class="wrap">
+    <h2><small>05 · Qué hace cada función</small>Descripción de los entregables y su utilidad</h2>
+    <p>Para cada función indicamos <b>qué problema resuelve</b> y <b>qué herramienta concreta</b> recibirá el usuario (formulario, listado, reporte, dashboard, etc.).</p>
+
+    <h3 style="margin:30px 0 0;color:var(--orange)"><i class='bx bxs-user-detail'></i> Recursos Humanos</h3>
+    <div class="func-grid">
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">01</span><span class="date">9 Mayo</span></div>
+        <h4>Reloj Biométrico <span style="color:var(--orange);font-size:13px">⚠</span></h4>
+        <p class="desc"><b>Requiere decisión de hardware.</b> El reloj actual de Medicasa está obsoleto y su API no es compatible con MEDIDATA. Dos caminos posibles:</p>
+        <div class="what" style="border-left-color:var(--green)"><b>Opción A · Hardware nuevo:</b> reloj moderno con API compatible. Marcaciones en tiempo real, reportes automáticos, sin intervención humana.</div>
+        <div class="what"><b>Opción B · Carga manual USB:</b> un operador de RR.HH. exporta los datos del reloj actual y los sube al sistema cada mes (o con la frecuencia que el cliente defina).</div>
+        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibirás (en ambas opciones):</b> tabla de marcaciones, reporte por colaborador, exportación a Excel/PDF y alertas de tardanza.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">03</span><span class="date">22 Mayo</span></div>
+        <h4>Proceso de Entrevistas</h4>
+        <p class="desc">Convertir cada postulación en una entrevista evaluable, con calificación, comentarios y estado (citado, entrevistado, contratado, descartado).</p>
+        <div class="what"><b>Qué recibirás:</b> ficha de entrevista, panel kanban de candidatos y bitácora de decisiones de RR.HH.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">04</span><span class="date">29 Mayo</span></div>
+        <h4>Registrar Administrativo</h4>
+        <p class="desc">CRUD completo del personal administrativo (gerencia, finanzas, recepción, secretarías) con expediente digital.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario multi-paso, listado con buscador y ficha individual con foto, datos de contacto y puesto.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">05</span><span class="date">5 Junio</span></div>
+        <h4>Servicios Generales</h4>
+        <p class="desc">Registro y gestión del personal de limpieza, mantenimiento, lavandería y seguridad. Mismo flujo que administrativo, pero con campos propios del puesto.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario, listado y asignación a turnos.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">07</span><span class="date">19 Junio</span></div>
+        <h4>Vacaciones &amp; Permisos</h4>
+        <p class="desc">Solicitud digital con días disponibles, aprobación por jefatura y registro automático en el calendario del colaborador.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario de solicitud, bandeja de aprobaciones, saldos por colaborador y calendario consolidado.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">11</span><span class="date">31 Julio</span></div>
+        <h4>Plantilla / Organigrama</h4>
+        <p class="desc">Vista visual de la estructura organizacional: jerarquía, áreas y plazas activas.</p>
+        <div class="what"><b>Qué recibirás:</b> organigrama interactivo, conteo de plazas por área y filtro por departamento.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">14</span><span class="date">4 Sept.</span></div>
+        <h4>Evaluaciones de Desempeño</h4>
+        <p class="desc">Formulario de evaluación periódica (trimestral o semestral) con preguntas configurables y resultado histórico.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario, histórico por colaborador y comparativo entre periodos.</div>
+      </div>
+      <div class="func-card rh">
+        <div class="func-head"><span class="num">18</span><span class="date">23 Octubre</span></div>
+        <h4>Reportes &amp; Dashboard RH</h4>
+        <p class="desc">Tablero ejecutivo que cruza asistencia (biométrico), plantilla, vacaciones y evaluaciones.</p>
+        <div class="what"><b>Qué recibirás:</b> dashboard con gráficos, indicadores clave (KPIs) y exportación de reportes consolidados.</div>
+      </div>
+    </div>
+
+    <h3 style="margin:40px 0 0;color:var(--teal-dark)"><i class='bx bx-plus-medical'></i> Enfermería</h3>
+    <div class="func-grid">
+      <div class="func-card">
+        <div class="func-head"><span class="num">02</span><span class="date">16 Mayo</span></div>
+        <h4>Pre-Clínica</h4>
+        <p class="desc">Toma rápida de signos vitales (presión, peso, talla, temperatura) antes de pasar al médico, asociada al expediente del paciente.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario corto, lista de pacientes en espera y traspaso automático al médico tratante.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">06</span><span class="date">12 Junio</span></div>
+        <h4>Catálogo de Servicios</h4>
+        <p class="desc">Administración centralizada de los servicios clínicos que ofrece el hospital, con sus tarifas y áreas asociadas.</p>
+        <div class="what"><b>Qué recibirás:</b> CRUD del catálogo, agrupación por áreas y conexión con facturación existente.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">08</span><span class="date">3 Julio</span></div>
+        <h4>Hospitalización</h4>
+        <p class="desc">Módulo central de pacientes hospitalizados: asignación de cama, ingreso, evoluciones, medicación, signos vitales y egreso.</p>
+        <div class="what"><b>Qué recibirás:</b> mapa de camas, ficha del paciente hospitalizado, registro de evoluciones y reporte de estancia.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">09</span><span class="date">10 Julio</span></div>
+        <h4>Cuidados Intermedios</h4>
+        <p class="desc">Área de transición entre UCI y hospitalización general, con monitoreo más frecuente.</p>
+        <div class="what"><b>Qué recibirás:</b> ficha clínica con frecuencia configurable, alertas y reporte de turno.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">10</span><span class="date">24 Julio</span></div>
+        <h4>Procedimientos</h4>
+        <p class="desc">Programación y reporte de procedimientos no quirúrgicos: endoscopias, biopsias, suturas, etc.</p>
+        <div class="what"><b>Qué recibirás:</b> agenda, formulario de reporte, insumos utilizados y firma digital del responsable.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">12</span><span class="date">14 Agosto</span></div>
+        <h4>Emergencia / Triage</h4>
+        <p class="desc">Clasificación rápida del paciente que llega a emergencia (rojo, amarillo, verde, azul) y atención prioritaria.</p>
+        <div class="what"><b>Qué recibirás:</b> tablero de triage, ficha rápida y derivación al área correspondiente.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">13</span><span class="date">28 Agosto</span></div>
+        <h4>Laboratorio Clínico</h4>
+        <p class="desc">Recepción de muestras, registro de procesos y entrega de resultados al expediente del paciente.</p>
+        <div class="what"><b>Qué recibirás:</b> ingreso de muestras, panel de pendientes, captura de resultados y notificación al médico.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">15</span><span class="date">18 Sept.</span></div>
+        <h4>Maternidad</h4>
+        <p class="desc">Registro del trabajo de parto, parto y atención al recién nacido, incluyendo Apgar y tamizaje.</p>
+        <div class="what"><b>Qué recibirás:</b> ficha de parto, ficha del recién nacido, signos vitales y reporte hospitalario.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">16</span><span class="date">25 Sept.</span></div>
+        <h4>Óptica</h4>
+        <p class="desc">Manejo de prescripciones oftalmológicas y entrega de lentes/lentillas al paciente.</p>
+        <div class="what"><b>Qué recibirás:</b> formulario de receta, control de pedido y entrega.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-head"><span class="num">17</span><span class="date">9 Oct.</span></div>
+        <h4>Odontología</h4>
+        <p class="desc">Odontograma interactivo, plan de tratamiento por pieza dental y avance de citas.</p>
+        <div class="what"><b>Qué recibirás:</b> odontograma visual, plan de tratamiento y bitácora de citas dentales.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REUNIONES ============ -->
+<section style="background:linear-gradient(180deg,#fafdfd, #f6f9fb)">
+  <div class="wrap">
+    <h2><small>06 · Plan de Reuniones</small>Seguimiento y validación con el cliente</h2>
+    <div class="meetings">
+      <h3><i class='bx bx-calendar-check'></i>Reuniones Quincenales de Seguimiento</h3>
+      <p>Cada dos semanas validamos lo entregado y ajustamos el siguiente entregable. Las reuniones se realizan vía <b>Google Meet</b> o <b>presenciales</b>, según convenga al cliente. Duración estimada: 45–60 minutos. En cada sesión revisamos: avance, pruebas funcionales, ajustes solicitados y siguiente entrega.</p>
+      <div class="meet-modes">
+        <div class="mode-pill"><i class='bx bx-video'></i>Google Meet</div>
+        <div class="mode-pill"><i class='bx bx-buildings'></i>Presencial</div>
+        <div class="mode-pill"><i class='bx bx-time'></i>45–60 min</div>
+        <div class="mode-pill"><i class='bx bx-user-voice'></i>Cliente + Equipo NEXAR</div>
+      </div>
+      <div class="meet-list">
+        <div class="meet-pill"><b>Reunión 1</b><span>Vie 9 Mayo · Cierre Reloj Biométrico</span></div>
+        <div class="meet-pill"><b>Reunión 2</b><span>Vie 22 Mayo · Pre-Clínica + Entrevistas</span></div>
+        <div class="meet-pill"><b>Reunión 3</b><span>Vie 5 Junio · Administrativo + Servicios Generales</span></div>
+        <div class="meet-pill"><b>Reunión 4</b><span>Vie 19 Junio · Catálogo + Vacaciones</span></div>
+        <div class="meet-pill"><b>Reunión 5</b><span>Vie 3 Julio · Hospitalización (corte 1)</span></div>
+        <div class="meet-pill"><b>Reunión 6</b><span>Vie 17 Julio · Cuidados Intermedios + Procedimientos</span></div>
+        <div class="meet-pill"><b>Reunión 7</b><span>Vie 31 Julio · Plantilla / Organigrama</span></div>
+        <div class="meet-pill"><b>Reunión 8</b><span>Vie 14 Agosto · Emergencia / Triage</span></div>
+        <div class="meet-pill"><b>Reunión 9</b><span>Vie 28 Agosto · Laboratorio Clínico</span></div>
+        <div class="meet-pill"><b>Reunión 10</b><span>Vie 11 Septiembre · Evaluaciones + avance</span></div>
+        <div class="meet-pill"><b>Reunión 11</b><span>Vie 25 Septiembre · Maternidad + Óptica</span></div>
+        <div class="meet-pill"><b>Reunión 12</b><span>Vie 9 Octubre · Odontología + revisión final</span></div>
+        <div class="meet-pill"><b>Cierre</b><span>Vie 30 Octubre · Entrega final &amp; capacitación a IT</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:30px">
+      <div class="info-card">
+        <h3><i class='bx bx-clipboard'></i>Estructura de cada reunión</h3>
+        <ul>
+          <li><b>Demostración</b> de la función entregada en ambiente real.</li>
+          <li><b>Validación funcional</b> con el usuario asignado por el cliente.</li>
+          <li><b>Lista de ajustes</b> solicitados y compromisos.</li>
+          <li><b>Confirmación</b> del siguiente entregable y su fecha.</li>
+          <li><b>Acta breve</b> enviada por correo el mismo día.</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3><i class='bx bx-error'></i>Gestión de cambios</h3>
+        <ul>
+          <li>Si surge una <b>nueva necesidad</b>, se evalúa impacto en cronograma antes de aceptar.</li>
+          <li>Cambios menores (estilo, copy, validaciones puntuales) se absorben sin mover fechas.</li>
+          <li>Cambios mayores (lógica nueva, integraciones) se acuerdan por escrito y reordenan el plan.</li>
+          <li>Se mantienen <b>backups</b> antes de cada despliegue importante.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Capacitación a IT (Formación de formadores) -->
+    <div class="info-card" style="margin-top:24px;border-left:6px solid var(--green)">
+      <h3 style="color:#166534"><i class='bx bx-chalkboard'></i>Modelo de Capacitación · Formación de formadores</h3>
+      <p>La capacitación final <b>no se imparte directamente al usuario final</b>. Se entrega al equipo de <b>IT de Medicasa</b>, quienes son los responsables de transmitir, implementar y dar soporte continuo a las áreas operativas (RR.HH., enfermería, médicos, administración, servicios generales).</p>
+      <div class="obj-list">
+        <div class="obj-item"><i class='bx bx-user-voice'></i><div><b>Audiencia</b><span>Equipo de IT designado por Medicasa.</span></div></div>
+        <div class="obj-item"><i class='bx bx-book-open'></i><div><b>Material entregado</b><span>Manuales escritos, videos cortos por módulo y guía técnica.</span></div></div>
+        <div class="obj-item"><i class='bx bx-walk'></i><div><b>Sesión final</b><span>Recorrido completo de RH y Enfermería con Q&amp;A.</span></div></div>
+        <div class="obj-item"><i class='bx bx-support'></i><div><b>Soporte posterior</b><span>IT replica al usuario final; equipo MEDIDATA queda como segundo nivel ante dudas técnicas.</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-brand">
+      <img src="logo_N_nexar.png" alt="Logo NEXAR" />
+      <span class="brand">MEDIDATA<small>by NEXAR</small></span>
+    </div>
+    <div>Plan de Trabajo · Recursos Humanos &amp; Enfermería · <b>Mayo – Octubre 2026</b></div>
+    <div style="margin-top:6px;color:#9ee9f0">Sujeto a validación con cliente MEDICASA</div>
+  </div>
+</footer>
+
+</body>
+</html>

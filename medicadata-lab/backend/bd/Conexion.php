@@ -22,16 +22,16 @@ $esEntornoLocal = ($httpHost === '')
 $dbCfg = $esEntornoLocal ? $dbLocal : $dbProduccion;
 
 if (!defined('dbhost')) {
-    define('dbhost', $dbCfg['host']);
+  define('dbhost', $dbCfg['host']);
 }
 if (!defined('dbuser')) {
-    define('dbuser', $dbCfg['user']);
+  define('dbuser', $dbCfg['user']);
 }
 if (!defined('dbpass')) {
-    define('dbpass', $dbCfg['pass']);
+  define('dbpass', $dbCfg['pass']);
 }
 if (!defined('dbname')) {
-    define('dbname', $dbCfg['name']);
+  define('dbname', $dbCfg['name']);
 }
 
 $pdoReuseKey = '__MEDIDATA_PDO_SINGLETON__';
@@ -60,9 +60,9 @@ try {
     $connect->query('set names utf8;');
     $GLOBALS[$pdoReuseKey] = $connect;
 } catch (PDOException $e) {
-    error_log('Conexion.php PDO: ' . $e->getMessage());
-    if (!headers_sent()) {
-        http_response_code(503);
-    }
-    throw $e;
+  error_log('Conexion.php PDO: ' . $e->getMessage());
+  if (!headers_sent()) {
+    http_response_code(503);
+  }
+  throw $e;
 }
