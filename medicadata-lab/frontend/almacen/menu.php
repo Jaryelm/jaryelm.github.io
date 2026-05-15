@@ -13,6 +13,7 @@
                 <ul class="side-dropdown">
                     <li><a href="../almacen/compra_unificada_user.php">COMPRA E INVENTARIO</a></li>
                     <li><a href="../almacen/mostrar_compras_user.php">COMPRAS REGISTRADAS</a></li>
+                    <li><a href="../almacen/reporte_compras_ingresadas_user.php">COMPRAS INGRESADAS</a></li>    
                     <li><a href="../almacen/mostrar_user.php">LISTA DE INVENTARIO</a></li>
                     <li><a href="../almacen/reorden_user.php">PUNTO DE REORDEN</a></li>
                     <li><a href="../almacen/lista_solicitud_reorden.php">AUTORIZACIÓN COMPRAS ALMACEN</a></li>

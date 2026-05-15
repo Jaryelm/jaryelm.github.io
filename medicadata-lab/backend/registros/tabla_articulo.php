@@ -1,14 +1,14 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/tablas_json_list_limits.php';
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         if (empty($search)) {
-            // Obtener todos los registros si no hay búsqueda
-            $sql = "SELECT * FROM registros_articulos ORDER BY fecha_registro DESC";
+            $sql = "SELECT * FROM registros_articulos ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -37,7 +37,7 @@ try {
                     OR precio_venta LIKE :search 
                     OR impuestos LIKE :search 
                     OR lote LIKE :search
-                    ORDER BY fecha_registro DESC";
+                    ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $search_param = '%' . $search . '%';
             $stmt->bindParam(':search', $search_param);

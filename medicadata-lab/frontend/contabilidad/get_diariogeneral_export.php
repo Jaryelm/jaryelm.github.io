@@ -7,6 +7,7 @@
 ob_start();
 include_once '../../backend/registros/session_check.php';
 require_once __DIR__ . '/../../backend/php/diario_tipo_etiqueta.php';
+require_once __DIR__ . '/../../backend/php/funciones_diario_general.php';
 
 try {
     // Filtros (los mismos que la búsqueda)
@@ -94,10 +95,11 @@ try {
             $debe = number_format($row['debe'], 2, '.', ',');
             $haber = number_format($row['haber'], 2, '.', ',');
             $neto = number_format($row['neto'], 2, '.', ',');
+            $cols = medidata_diario_columnas_cuenta($row['cuenta'] ?? '', $row['nombre_cuenta'] ?? '');
             $lines[] = implode("\t", [
                 $row['numero_partida'], $fechaOcur, $fechaReg, $row['referencia'] ?? '',
                 medidata_etiqueta_tipo_transaccion($row['tipo_transaccion'] ?? null),
-                $row['unidad_servicio'] ?? '', $row['cuenta'], $row['nombre_cuenta'],
+                $row['unidad_servicio'] ?? '', $cols['cuenta'], $cols['nombre_cuenta'],
                 $row['descripcion'], 'L. ' . $debe, 'L. ' . $haber, 'L. ' . $neto,
                 $row['turno'] ?? '', $row['usuario'] ?? ''
             ]);
@@ -126,6 +128,7 @@ try {
             $debe = number_format($row['debe'], 2, '.', ',');
             $haber = number_format($row['haber'], 2, '.', ',');
             $neto = number_format($row['neto'], 2, '.', ',');
+            $cols = medidata_diario_columnas_cuenta($row['cuenta'] ?? '', $row['nombre_cuenta'] ?? '');
             echo '<tr>';
             echo '<td>' . htmlspecialchars($row['numero_partida']) . '</td>';
             echo '<td>' . $fechaOcur . '</td>';
@@ -133,8 +136,8 @@ try {
             echo '<td>' . htmlspecialchars($row['referencia'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars(medidata_etiqueta_tipo_transaccion($row['tipo_transaccion'] ?? null)) . '</td>';
             echo '<td>' . htmlspecialchars($row['unidad_servicio'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['cuenta']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['nombre_cuenta']) . '</td>';
+            echo '<td>' . htmlspecialchars($cols['cuenta']) . '</td>';
+            echo '<td>' . htmlspecialchars($cols['nombre_cuenta']) . '</td>';
             echo '<td>' . htmlspecialchars($row['descripcion']) . '</td>';
             echo '<td class="text-right">L. ' . $debe . '</td>';
             echo '<td class="text-right">L. ' . $haber . '</td>';
@@ -170,6 +173,7 @@ try {
         $debe = number_format($row['debe'], 2, '.', ',');
         $haber = number_format($row['haber'], 2, '.', ',');
         $neto = number_format($row['neto'], 2, '.', ',');
+        $cols = medidata_diario_columnas_cuenta($row['cuenta'] ?? '', $row['nombre_cuenta'] ?? '');
         $rowData = [
             $row['numero_partida'],
             $fechaOcur,
@@ -177,8 +181,8 @@ try {
             $row['referencia'] ?? '',
             medidata_etiqueta_tipo_transaccion($row['tipo_transaccion'] ?? null),
             $row['unidad_servicio'] ?? '',
-            $row['cuenta'],
-            $row['nombre_cuenta'],
+            $cols['cuenta'],
+            $cols['nombre_cuenta'],
             $row['descripcion'],
             'L. ' . $debe,
             'L. ' . $haber,

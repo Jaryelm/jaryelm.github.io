@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../backend/bd/Conexion.php';
+require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
 header('Content-Type: application/json');
 
 // Verificar si el usuario está autenticado
@@ -47,6 +47,18 @@ try {
         $query .= " AND o.placed_on <= :fechaHasta";
     }
 
+    /* Límite de filas: cada línea es una fila de order_details; sin tope el JOIN puede explotar MySQL/PHP */
+    $defaultLimit = 6000;
+    $maxLimit = 12000;
+    $lineLimit = isset($_GET['limit']) ? (int) $_GET['limit'] : $defaultLimit;
+    if ($lineLimit < 1) {
+        $lineLimit = $defaultLimit;
+    }
+    if ($lineLimit > $maxLimit) {
+        $lineLimit = $maxLimit;
+    }
+    $query .= ' ORDER BY o.placed_on DESC, o.idord DESC LIMIT ' . $lineLimit;
+
     // Preparar la consulta
     $stmt = $connect->prepare($query);
 
@@ -65,9 +77,17 @@ try {
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Retornar los resultados como JSON
+    $rowCount = count($resultados);
+    $meta = ['row_limit_applied' => $lineLimit];
+    if ($rowCount >= $lineLimit) {
+        $meta['truncation_possible'] = true;
+        $meta['message'] = 'Se alcanzó el tope de filas de esta consulta. Acote el rango de fechas para ver el detalle completo o use un reporte exportable.';
+    }
+
     echo json_encode([
         'success' => true,
-        'data' => $resultados
+        'data' => $resultados,
+        'meta' => $meta,
     ]);
 } catch (Exception $e) {
     // Manejar errores

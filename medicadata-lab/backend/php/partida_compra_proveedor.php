@@ -70,7 +70,7 @@ function medidata_generar_partida_desde_compra(
 
     $byCuenta = [];
     foreach ($lineas as $ln) {
-        $cuenta = trim((string) ($ln['cat_cuenta'] ?? ''));
+        $cuenta = medidata_normalizar_codigo_cuenta_desde_cat((string) ($ln['cat_cuenta'] ?? ''));
         if ($cuenta === '') {
             $cuenta = '110400102';
         }

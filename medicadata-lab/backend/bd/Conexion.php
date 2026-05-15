@@ -1,11 +1,5 @@
 <?php
-/**
- * Conexión PDO MySQL — MEDIDATA
- *
- * Local (XAMPP) y producción en este archivo. Mismos datos que credenciales.txt (producción).
- */
 
-// --- LOCAL (XAMPP) ---
 $dbLocal = [
     'host' => 'localhost',
     'user' => 'root',
@@ -13,7 +7,6 @@ $dbLocal = [
     'name' => 'medic9ue_medi_data',
 ];
 
-// --- PRODUCCIÓN (credenciales.txt líneas 8-11) ---
 $dbProduccion = [
     'host' => '162.241.123.41',
     'user' => 'medic9ue_moisesc',
@@ -41,8 +34,14 @@ if (!defined('dbname')) {
     define('dbname', $dbCfg['name']);
 }
 
-// Una sola PDO por petición aunque este archivo se ejecute más de una vez (p. ej. require sin _once tras session_check).
+$pdoReuseKey = '__MEDIDATA_PDO_SINGLETON__';
+if (!empty($GLOBALS[$pdoReuseKey]) && $GLOBALS[$pdoReuseKey] instanceof PDO) {
+    $connect = $GLOBALS[$pdoReuseKey];
+    return;
+}
+
 if (isset($connect) && $connect instanceof PDO) {
+    $GLOBALS[$pdoReuseKey] = $connect;
     return;
 }
 
@@ -54,9 +53,12 @@ try {
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => false,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         ]
     );
     $connect->query('set names utf8;');
+    $GLOBALS[$pdoReuseKey] = $connect;
 } catch (PDOException $e) {
     error_log('Conexion.php PDO: ' . $e->getMessage());
     if (!headers_sent()) {

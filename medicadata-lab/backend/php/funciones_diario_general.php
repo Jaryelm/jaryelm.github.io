@@ -268,6 +268,85 @@ function registrarPartidaCompleta($transacciones, $fecha, $fechaRegistro = null)
 }
 
 /**
+ * Extrae solo el código numérico de catálogo cuando viene mezclado con texto
+ * (ej. detalle_compras.cat_cuenta = "ACTIVOS 110400103 INVENTARIO…").
+ * Alínea el diario con ventas/partidas manuales (columna Cuenta = solo número).
+ */
+function medidata_normalizar_codigo_cuenta_desde_cat(?string $raw): string
+{
+    $s = trim((string) $raw);
+    if ($s === '') {
+        return '';
+    }
+    if (preg_match('/^\d{6,12}$/', $s)) {
+        return $s;
+    }
+    if (preg_match('/(\d{9})/', $s, $m)) {
+        return $m[1];
+    }
+    if (preg_match('/(\d{6,8})/', $s, $m)) {
+        return $m[1];
+    }
+
+    return $s;
+}
+
+/**
+ * Carga en bloque los nombres del catálogo (una consulta por chunk) para listados paginados.
+ *
+ * @param string[] $codigosNorm Códigos de cuenta ya normalizados (6–12 dígitos)
+ * @return array<string,string>
+ */
+function medidata_prefetch_nombres_cuentas_catalogo(PDO $connect, array $codigosNorm): array
+{
+    $codigosNorm = array_values(array_unique(array_filter(array_map('strval', $codigosNorm), static function ($v) {
+        return preg_match('/^\d{6,12}$/', $v);
+    })));
+    if ($codigosNorm === []) {
+        return [];
+    }
+    $out = [];
+    foreach (array_chunk($codigosNorm, 500) as $chunk) {
+        $ph = implode(',', array_fill(0, count($chunk), '?'));
+        $st = $connect->prepare("SELECT cuenta, nombre FROM cuentas_catalogo WHERE cuenta IN ($ph)");
+        $st->execute($chunk);
+        while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
+            if (!empty($r['cuenta'])) {
+                $out[(string) $r['cuenta']] = (string) ($r['nombre'] ?? '');
+            }
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * Para listados/exportación del diario: Cuenta solo código; Nombre desde catálogo si el guardado traía texto compuesto.
+ *
+ * @param array<string,string> $nombrePorCodigoCatalogo Resultado opcional de medidata_prefetch_nombres_cuentas_catalogo()
+ *
+ * @return array{cuenta: string, nombre_cuenta: string}
+ */
+function medidata_diario_columnas_cuenta(?string $cuentaDb, ?string $nombreDb, array $nombrePorCodigoCatalogo = []): array
+{
+    $c = trim((string) ($cuentaDb ?? ''));
+    $n = (string) ($nombreDb ?? '');
+    if ($c === '') {
+        return ['cuenta' => '', 'nombre_cuenta' => $n];
+    }
+    $norm = medidata_normalizar_codigo_cuenta_desde_cat($c);
+    if (($norm !== $c || !preg_match('/^\d{6,12}$/', $c)) && preg_match('/^\d{6,12}$/', $norm)) {
+        if ($nombrePorCodigoCatalogo !== [] && isset($nombrePorCodigoCatalogo[$norm])) {
+            return ['cuenta' => $norm, 'nombre_cuenta' => $nombrePorCodigoCatalogo[$norm]];
+        }
+
+        return ['cuenta' => $norm, 'nombre_cuenta' => obtenerNombreCuenta($norm)];
+    }
+
+    return ['cuenta' => $c, 'nombre_cuenta' => $n];
+}
+
+/**
  * Obtiene el nombre de la cuenta desde el catálogo de cuentas
  * 
  * @param string $codigoCuenta Código de la cuenta

@@ -2,11 +2,12 @@
 header('Content-Type: application/json');
 
 // Incluir la conexión a la base de datos
-require_once '../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/tablas_json_list_limits.php';
 
 try {
     // Consultar todas las cuentas desde la base de datos, incluyendo el nuevo campo
-    $sql = "SELECT id, tipo_cuenta, cuenta, nombre FROM cuentas_catalogo";
+    $sql = 'SELECT id, tipo_cuenta, cuenta, nombre FROM cuentas_catalogo ORDER BY cuenta' . medidata_tablas_mysql_limit_clause();
     $stmt = $connect->prepare($sql);
     $stmt->execute();
     $cuentas = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,7 @@
 <?php
+/* Sesión opcional para firma en PDF; sin esto falta índice "id" al leer usuario */
+session_start();
+
 /* Llamar a la librería FPDF */
 require('../../backend/fpdf/fpdf.php');
 
@@ -45,8 +48,11 @@ $pdf->SetXY(65, 35);
 $pdf->Cell(0, 5, mb_convert_encoding('CAI: 1EA698-116CF4-0A87E0-63BE03-0909D7-63', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 
 /* Conexión a la base de datos */
-require '../../backend/bd/Conexion.php';
-$id = $_GET['id'];
+require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($id <= 0) {
+    exit('Solicitud inválida.');
+}
 $stmt = $connect->prepare("
 SELECT 
     o.*, 
@@ -110,11 +116,12 @@ $pdf->Cell(20, 5, mb_convert_encoding('Factura Nº:', 'ISO-8859-1', 'UTF-8'), 0,
 $pdf->Cell(0, 5, mb_convert_encoding($invoice_number, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L'); // Número en negrita y negro
 
 /* Espaciado adicional después del número de factura */
-$pdf->Ln(10);
+$pdf->Ln(14);
 
-/* Primera tabla: Información del paciente y detalles */
+$nombrePacientePdf = mb_convert_encoding(mb_strtoupper($order[0]['nomcl'], 'UTF-8'), 'ISO-8859-1', 'UTF-8');
+
+/* Cuadro: mismo contenido que antes, sin PACIENTE en la rejilla */
 $fields = [
-    'PACIENTE' => $order[0]['nomcl'],
     'DNI PACIENTE' => $dni_paciente,
     'NÚMERO DE CUENTA' => $order[0]['num_cuenta'],
     'FECHA DE INGRESO' => 'Modulo',
@@ -137,7 +144,20 @@ $pageWidth = $pdf->GetPageWidth();
 $colWidth = 97; // Ancho de cada columna
 $rowHeight = 5; // Altura base para filas
 $startX = ($pageWidth - ($colWidth * 3)) / 2; // Centrado
-$startY = 50; // Inicio de la tabla
+$bloqueAncho = $colWidth * 3;
+$anchoEtiquetaPaciente = $colWidth / 2;
+$anchoNombrePaciente = $bloqueAncho - $anchoEtiquetaPaciente;
+
+$startY = 58;
+$pdf->SetXY($startX, $startY);
+$pdf->SetFillColor(240, 240, 240);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell($anchoEtiquetaPaciente, 7, mb_convert_encoding('PACIENTE:', 'ISO-8859-1', 'UTF-8'), 0, 0, 'L', true);
+$pdf->SetXY($startX + $anchoEtiquetaPaciente, $startY);
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->MultiCell($anchoNombrePaciente, 6, $nombrePacientePdf, 0, 'L', false);
+$startY = $pdf->GetY() + 4;
+
 $pdf->SetFillColor(240, 240, 240);
 $col = 0;
 
@@ -458,15 +478,18 @@ foreach ($additionalInfo as $index => $line) {
     }
 }
 
-// Obtener la firma digital del usuario
-$userId = $_SESSION['id']; // ID del usuario autenticado
-$signatureStmt = $connect->prepare("SELECT signature FROM user_signatures WHERE user_id = :user_id LIMIT 1");
-$signatureStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-$signatureStmt->execute();
-$signatureResult = $signatureStmt->fetch(PDO::FETCH_ASSOC);
-
-// La firma se extrae como BLOB
-$signatureBlob = $signatureResult['signature'] ?? null;
+$signatureBlob = null;
+$userIdRaw = $_SESSION['id'] ?? null;
+$userIdForSig = is_numeric($userIdRaw) ? (int) $userIdRaw : 0;
+if ($userIdForSig > 0) {
+    $signatureStmt = $connect->prepare("SELECT signature FROM user_signatures WHERE user_id = :user_id LIMIT 1");
+    $signatureStmt->bindParam(':user_id', $userIdForSig, PDO::PARAM_INT);
+    $signatureStmt->execute();
+    $signatureRow = $signatureStmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($signatureRow) && isset($signatureRow['signature'])) {
+        $signatureBlob = $signatureRow['signature'];
+    }
+}
 
 // Espacio adicional antes de "FIRMA CAJERO"
 $pdf->Ln(10);

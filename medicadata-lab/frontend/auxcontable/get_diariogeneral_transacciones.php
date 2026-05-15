@@ -8,14 +8,18 @@
  * server-side con solo parte de los renglones en la página actual.
  */
 
-include_once '../../backend/bd/Conexion.php';
+require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
 require_once __DIR__ . '/../../backend/php/diario_tipo_etiqueta.php';
+require_once __DIR__ . '/../../backend/php/diario_detalle_accion.php';
+require_once __DIR__ . '/../../backend/php/funciones_diario_general.php';
 header('Content-Type: application/json');
 
 try {
     $draw = intval($_GET['draw'] ?? 1);
-    $start = intval($_GET['start'] ?? 0);
-    $length = intval($_GET['length'] ?? 10);
+    $start = max(0, intval($_GET['start'] ?? 0));
+    $lengthRaw = intval($_GET['length'] ?? 10);
+    /** DataTables envía length=-1 con "Todos"; se limita para no saturar conexiones/CPU */
+    $length = ($lengthRaw <= 0) ? 100 : min($lengthRaw, 250);
     $searchValue = $_GET['search']['value'] ?? '';
 
     $fechaDesde = $_GET['fechaDesde'] ?? null;
@@ -141,6 +145,7 @@ INNER JOIN (
         11 => 'neto',
         12 => 'turno',
         13 => 'usuario',
+        14 => 'numero_partida',
     ];
 
     $orderBy = $columns[$orderColumn] ?? 'numero_partida';
@@ -164,6 +169,32 @@ INNER JOIN (
     $stmt->execute();
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $facturasReferencias = [];
+    foreach ($resultados as $row) {
+        $tipoRow = isset($row['tipo_transaccion']) ? strtoupper(trim((string) $row['tipo_transaccion'])) : '';
+        if ($tipoRow !== 'CIERRE_VENTA' && $tipoRow !== 'REVERSION_ANULACION') {
+            continue;
+        }
+        $refRow = isset($row['referencia']) ? trim((string) $row['referencia']) : '';
+        if ($refRow !== '' && stripos($refRow, 'Cierre ') !== 0 && !ctype_digit($refRow)) {
+            $facturasReferencias[] = $refRow;
+        }
+    }
+    $ordenIdPorFactura = medidata_diario_ordenes_ids_por_invoice_numbers($connect, $facturasReferencias);
+
+    $codigosNormCatalogo = [];
+    foreach ($resultados as $row) {
+        $cRow = isset($row['cuenta']) ? trim((string) $row['cuenta']) : '';
+        if ($cRow === '') {
+            continue;
+        }
+        $normCatalogo = medidata_normalizar_codigo_cuenta_desde_cat($cRow);
+        if (($normCatalogo !== $cRow || !preg_match('/^\d{6,12}$/', $cRow)) && preg_match('/^\d{6,12}$/', $normCatalogo)) {
+            $codigosNormCatalogo[] = $normCatalogo;
+        }
+    }
+    $nombresCuentasCache = medidata_prefetch_nombres_cuentas_catalogo($connect, $codigosNormCatalogo);
+
     $data = [];
     foreach ($resultados as $row) {
         $fechaOcurrencia = date('d/m/Y', strtotime($row['fecha_ocurrencia']));
@@ -175,6 +206,10 @@ INNER JOIN (
         $ptDebe = number_format((float) $row['partida_total_debe'], 2, '.', ',');
         $ptHaber = number_format((float) $row['partida_total_haber'], 2, '.', ',');
 
+        $detMeta = medidata_diario_resolver_detalle($connect, $row['tipo_transaccion'] ?? null, $row['referencia'] ?? null, $ordenIdPorFactura);
+
+        $colsCuenta = medidata_diario_columnas_cuenta($row['cuenta'] ?? '', $row['nombre_cuenta'] ?? '', $nombresCuentasCache);
+
         $data[] = [
             'id' => $row['id'],
             'numero_partida' => $row['numero_partida'],
@@ -183,8 +218,8 @@ INNER JOIN (
             'referencia' => $row['referencia'] ?? '',
             'tipo_etiqueta' => medidata_etiqueta_tipo_transaccion($row['tipo_transaccion'] ?? null),
             'unidad_servicio' => $row['unidad_servicio'] ?? '',
-            'cuenta' => $row['cuenta'],
-            'nombre_cuenta' => $row['nombre_cuenta'],
+            'cuenta' => $colsCuenta['cuenta'],
+            'nombre_cuenta' => $colsCuenta['nombre_cuenta'],
             'descripcion' => $row['descripcion'],
             'debe' => $debe,
             'haber' => $haber,
@@ -193,6 +228,8 @@ INNER JOIN (
             'usuario' => $row['usuario'] ?? '',
             'partida_total_debe' => $ptDebe,
             'partida_total_haber' => $ptHaber,
+            'detalle_modo' => $detMeta['modo'],
+            'detalle_id' => $detMeta['id'],
         ];
     }
 

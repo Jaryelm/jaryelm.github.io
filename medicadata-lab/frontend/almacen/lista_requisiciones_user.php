@@ -28,7 +28,7 @@ include_once '../../backend/registros/session_check.php';
             <div class="form-group"></div>
         </form>
         <span class="divider"></span>
-        <?php include_once '../almacen/perfil.php'; ?>
+<?php include_once '../almacen/perfil.php'; ?>
     </nav>
 
     <main>
