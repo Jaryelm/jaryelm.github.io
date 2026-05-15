@@ -405,28 +405,36 @@ if($sentencia){
                 <tr>
                     <th scope="col">FECHA</th>
                     <th scope="col">HORA</th>
-                    <th scope="col">PROCESADO POR</th>
-                    <th scope="col">PRESIÓN ARTERIAL</th>
+                    <th scope="col">REALIZADO POR</th>
+                    <th scope="col">REVISADO POR</th>
+                    <th scope="col">PESO</th>
+                    <th scope="col">TALLA</th>
+                    <th scope="col">PA</th>
                     <th scope="col">PAM</th>
-                    <th scope="col">TEMPERATURA</th>
-                    <th scope="col">FRE CARD</th>
-                    <th scope="col">FRE RESP</th>
-                    <th scope="col">SATURACIÓN</th>
+                    <th scope="col">FC</th>
+                    <th scope="col">FR</th>
+                    <th scope="col">SAT</th>
+                    <th scope="col">TEMP</th>
+                    <th scope="col">GLUCOSA</th>
                     <th scope="col">ACCIONES</th>
                 </tr>
             </thead>
             <tbody id="signosVitalesBody">
                 <!-- Aquí se llenarán los datos dinámicamente -->
                 <tr>
-                    <td><input type="date" id="fecha"></td>
-                    <td><input type="time" id="hora"></td>
-                    <td><input type="text" id="procesadoPor" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="frecuenciac"></td>
-                    <td><input type="text" id="ta"></td>
-                    <td><input type="text" id="temp"></td>
-                    <td><input type="text" id="spo"></td>
-                    <td><input type="text" id="peso"></td>
-                    <td><input type="text" id="talla"></td>
+                    <td><input type="date" id="fecha" value="<?php echo date('Y-m-d'); ?>" readonly></td>
+                    <td><input type="time" id="hora" value="<?php echo date('H:i'); ?>" readonly></td>
+                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
+                    <td><input type="text" id="reviewsBy"></td>
+                    <td><input type="text" id="weight"></td>
+                    <td><input type="text" id="stature"></td>
+                    <td><input type="text" id="bloodPressure"></td>
+                    <td><input type="text" id="mapPressure"></td>
+                    <td><input type="text" id="heartRate"></td>
+                    <td><input type="text" id="respiratoryRate"></td>
+                    <td><input type="text" id="oxygenSaturation"></td>
+                    <td><input type="text" id="temperature"></td>
+                    <td><input type="text" id="glucose"></td>
                     <td>
                         <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
                     </td>
@@ -2090,38 +2098,39 @@ function descargarAltaExigidaPDF() {
 
     <script>
 function registrarSignosVitales() {
-    // Obtener valores de los campos
-    const fecha = document.getElementById("fecha").value;
-    const hora = document.getElementById("hora").value;
-    const procesadoPor = document.getElementById("procesadoPor").value;
-    const fc = document.getElementById("fc").value;
-    const ta = document.getElementById("ta").value;
-    const temp = document.getElementById("temp").value;
-    const spo = document.getElementById("spo").value;
-    const peso = document.getElementById("peso").value;
-    const talla = document.getElementById("talla").value;
+    const processedBy = document.getElementById("processedBy").value;
+    const reviewsBy = document.getElementById("reviewsBy").value;
+    const weight = document.getElementById("weight").value;
+    const stature = document.getElementById("stature").value;
+    const bloodPressure = document.getElementById("bloodPressure").value;
+    const mapPressure = document.getElementById("mapPressure").value;
+    const heartRate = document.getElementById("heartRate").value;
+    const respiratoryRate = document.getElementById("respiratoryRate").value;
+    const oxygenSaturation = document.getElementById("oxygenSaturation").value;
+    const temperature = document.getElementById("temperature").value;
+    const glucose = document.getElementById("glucose").value;
     const idpa = <?php echo $_GET['id']; ?>;
 
-    // Validar que no haya campos vacíos
-    if (!fecha || !hora || !procesadoPor || !fc || !ta || !temp || !spo || !peso || !talla) {
+    if (!processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
         swal('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
 
-    // Enviar datos al backend
     $.ajax({
         type: "POST",
         url: "add_signos_vitales.php",
         data: {
-            fecha: fecha,
-            hora: hora,
-            procesado_por: procesadoPor,
-            fc: fc,
-            ta: ta,
-            temp: temp,
-            spo: spo,
-            peso: peso,
-            talla: talla,
+            processed_by: processedBy,
+            reviews_by: reviewsBy,
+            weight: weight,
+            stature: stature,
+            blood_pressure: bloodPressure,
+            map_pressure: mapPressure,
+            heart_rate: heartRate,
+            respiratory_rate: respiratoryRate,
+            oxygen_saturation: oxygenSaturation,
+            temperature: temperature,
+            glucose: glucose,
             idpa: idpa
         },
         success: function(response) {
@@ -2129,7 +2138,7 @@ function registrarSignosVitales() {
                 swal('Error', response.error, 'error');
             } else {
                 swal('Guardado', 'Los signos vitales se han registrado correctamente.', 'success');
-                cargarSignosVitales(); // Recargar la tabla con los datos actualizados
+                cargarSignosVitales();
             }
         },
         error: function(xhr) {
@@ -2153,13 +2162,17 @@ function cargarSignosVitales() {
                     <tr>
                         <td>${item.fecha}</td>
                         <td>${item.hora}</td>
-                        <td>${item.procesado_por}</td>
-                        <td>${item.fc}</td>
-                        <td>${item.ta}</td>
-                        <td>${item.temp}</td>
-                        <td>${item.spo}</td>
-                        <td>${item.peso_kg}</td>
-                        <td>${item.talla}</td>
+                        <td>${item.processed_by}</td>
+                        <td>${item.reviews_by || '-'}</td>
+                        <td>${item.weight}</td>
+                        <td>${item.stature}</td>
+                        <td>${item.blood_pressure}</td>
+                        <td>${item.map_pressure}</td>
+                        <td>${item.heart_rate}</td>
+                        <td>${item.respiratory_rate}</td>
+                        <td>${item.oxygen_saturation}</td>
+                        <td>${item.temperature}</td>
+                        <td>${item.glucose}</td>
                         <td>
                             <button class="register-btn" disabled>Registrados</button>
                         </td>
@@ -2167,18 +2180,28 @@ function cargarSignosVitales() {
                 `;
             });
 
-            // Agregar fila para nuevos datos
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const day = String(now.getDate()).padStart(2, "0");
+            const dateStr = `${year}-${month}-${day}`;
+            const timeStr = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
+
             content += `
                 <tr>
-                    <td><input type="date" id="fecha"></td>
-                    <td><input type="time" id="hora"></td>
-                    <td><input type="text" id="procesadoPor" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="fc"></td>
-                    <td><input type="text" id="ta"></td>
-                    <td><input type="text" id="temp"></td>
-                    <td><input type="text" id="spo"></td>
-                    <td><input type="text" id="peso"></td>
-                    <td><input type="text" id="talla"></td>
+                    <td><input type="date" id="fecha" value="${dateStr}" readonly></td>
+                    <td><input type="time" id="hora" value="${timeStr}" readonly></td>
+                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
+                    <td><input type="text" id="reviewsBy"></td>
+                    <td><input type="text" id="weight"></td>
+                    <td><input type="text" id="stature"></td>
+                    <td><input type="text" id="bloodPressure"></td>
+                    <td><input type="text" id="mapPressure"></td>
+                    <td><input type="text" id="heartRate"></td>
+                    <td><input type="text" id="respiratoryRate"></td>
+                    <td><input type="text" id="oxygenSaturation"></td>
+                    <td><input type="text" id="temperature"></td>
+                    <td><input type="text" id="glucose"></td>
                     <td>
                         <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
                     </td>

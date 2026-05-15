@@ -83,8 +83,8 @@ $stmt->bindParam(':idpa', $idpa, PDO::PARAM_INT);
 $stmt->execute();
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Crear un nuevo PDF con tamaño Carta usando la clase extendida
-$pdf = new PDFWithFooter('P', 'mm', 'Letter');
+// Crear un nuevo PDF con tamaño Carta en orientación Horizontal (Landscape)
+$pdf = new PDFWithFooter('L', 'mm', 'Letter');
 $pdf->AddPage();
 
 // Agregar el logo
@@ -163,25 +163,27 @@ $pdf->Cell(0, 10, mb_convert_encoding('SIGNOS VITALES', 'ISO-8859-1', 'UTF-8'), 
 $pdf->Ln(5); // Espacio entre título y tabla
 
 // Tabla de signos vitales
-$headers = ['Fecha', 'Hora', 'Procesado Por', 'PA', 'PAM', 'TEMP', 'FC', 'FR', 'SATURACIÓN'];
+$headers = ['Fecha', 'Hora', 'Realizado Por', 'Revisado Por', 'Peso', 'Estatura', 'PA', 'PAM', 'FC', 'FR', 'SAT', 'Temp', 'Glucosa'];
 
-// Calcular ancho de las columnas
-$pageWidth = $pdf->GetPageWidth() - 20;
+// Calcular ancho de las columnas (Total aprox 259mm para Letter Landscape con márgenes)
 $colWidths = [
-    24, // Fecha
-    24, // Hora
-    49, // Procesado Por
-    12, // PRES ARTERIAL
-    14, // PAM
-    15, // TEMP
-    15, // SPO
-    18, // Peso
-    24, // Talla
-
+    20, // Fecha
+    18, // Hora
+    35, // Realizado Por
+    35, // Revisado Por
+    14, // Peso
+    14, // Estatura
+    22, // PA (blood_pressure)
+    14, // PAM (map_pressure)
+    13, // FC (heart_rate)
+    13, // FR (respiratory_rate)
+    13, // SAT (oxygen_saturation)
+    15, // Temp (temperature)
+    15  // Glucosa (glucose)
 ];
 
 // Encabezados de la tabla
-$pdf->SetFont('Arial', 'B', 9);
+$pdf->SetFont('Arial', 'B', 8);
 $pdf->SetFillColor(200, 200, 200);
 
 foreach ($headers as $i => $header) {
@@ -190,18 +192,22 @@ foreach ($headers as $i => $header) {
 $pdf->Ln();
 
 // Datos de la tabla
-$pdf->SetFont('Arial', '', 9);
+$pdf->SetFont('Arial', '', 8);
 
 foreach ($data as $row) {
     $pdf->Cell($colWidths[0], 6, mb_convert_encoding($row['fecha'], 'ISO-8859-1', 'UTF-8'), 1);
     $pdf->Cell($colWidths[1], 6, mb_convert_encoding($row['hora'], 'ISO-8859-1', 'UTF-8'), 1);
-    $pdf->Cell($colWidths[2], 6, mb_convert_encoding($row['procesado_por'], 'ISO-8859-1', 'UTF-8'), 1);
-    $pdf->Cell($colWidths[3], 6, $row['fc'], 1);
-    $pdf->Cell($colWidths[4], 6, $row['ta'], 1);
-    $pdf->Cell($colWidths[5], 6, $row['temp'], 1);
-    $pdf->Cell($colWidths[6], 6, $row['spo'], 1);
-    $pdf->Cell($colWidths[7], 6, $row['peso_kg'], 1);
-    $pdf->Cell($colWidths[8], 6, $row['talla'], 1);
+    $pdf->Cell($colWidths[2], 6, mb_convert_encoding($row['processed_by'], 'ISO-8859-1', 'UTF-8'), 1);
+    $pdf->Cell($colWidths[3], 6, mb_convert_encoding($row['reviews_by'] ?? '-', 'ISO-8859-1', 'UTF-8'), 1);
+    $pdf->Cell($colWidths[4], 6, $row['weight'], 1);
+    $pdf->Cell($colWidths[5], 6, $row['stature'], 1);
+    $pdf->Cell($colWidths[6], 6, $row['blood_pressure'], 1);
+    $pdf->Cell($colWidths[7], 6, $row['map_pressure'], 1);
+    $pdf->Cell($colWidths[8], 6, $row['heart_rate'], 1);
+    $pdf->Cell($colWidths[9], 6, $row['respiratory_rate'], 1);
+    $pdf->Cell($colWidths[10], 6, $row['oxygen_saturation'], 1);
+    $pdf->Cell($colWidths[11], 6, $row['temperature'], 1);
+    $pdf->Cell($colWidths[12], 6, $row['glucose'], 1);
     $pdf->Ln();
 }
 
