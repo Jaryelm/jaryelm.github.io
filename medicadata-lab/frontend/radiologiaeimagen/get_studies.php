@@ -31,10 +31,10 @@ try {
             throw new Exception("Error decodificando el caché: " . json_last_error_msg());
         }
     } else {
-        $__o = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
-        $orthanc_url = rtrim($__o['curl_base'], '/') . '/studies?expand=true';
-        $username = $__o['curl_user'];
-        $password = $__o['curl_pass'];
+        // URL base de la API de Orthanc
+        $orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies?expand=true';
+        $username = 'dev';
+        $password = 'Mrecords7';
 
         $ch = curl_init($orthanc_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -82,7 +82,7 @@ try {
                 
                 // Si no hay modalidad en el estudio y hay series, preparar para obtener de la primera serie
                 if (!$modality && !empty($study['Series'])) {
-                    $series_url = rtrim($__o['curl_base'], '/') . '/series/' . $study['Series'][0];
+                    $series_url = "https://medicloud.medicasa.hn/orthanc/series/{$study['Series'][0]}";
                     $ch = curl_init($series_url);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");

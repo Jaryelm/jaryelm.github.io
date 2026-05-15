@@ -25,7 +25,6 @@ include_once '../../backend/registros/session_check.php';
     
 <?php
 include_once '../almacen/menu.php';
-// incuir el archivo menu principal
 ?>
 
     <!-- NAVBAR -->
@@ -41,9 +40,8 @@ include_once '../almacen/menu.php';
             
            
             <span class="divider"></span>
-            <?php
+<?php
 include_once '../almacen/perfil.php';
-// incuir el archivo menu principal
 ?>
         </nav>
         <!-- NAVBAR -->

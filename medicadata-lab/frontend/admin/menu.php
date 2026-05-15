@@ -117,6 +117,7 @@
                 <ul class="side-dropdown">
                     <li><a href="../almacen/compra_unificada.php">COMPRA E INVENTARIO</a></li>
                     <li><a href="../almacen/mostrar_compras.php">COMPRAS REGISTRADAS</a></li>
+                    <li><a href="../almacen/reporte_compras_ingresadas.php">COMPRAS INGRESADAS</a></li>
                     <li><a href="../almacen/mostrar.php">LISTA DE INVENTARIO</a></li>
                     <li><a href="../almacen/categoria_new.php">CATEGORIAS</a></li>
                     <li><a href="../almacen/categoria.php">LISTA DE CATEGORIAS</a></li>

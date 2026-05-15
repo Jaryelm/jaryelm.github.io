@@ -56,9 +56,12 @@ $pdf->Cell(0, 5, mb_convert_encoding('Fecha límite de emisión: 04/08/2026', 'I
 $pdf->SetXY(65, 35);
 $pdf->Cell(0, 5, mb_convert_encoding('CAI: 3B8BA5-53CA59-8A06E0-63BE03-09091E-9A', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 
-/* Conexión a la base de datos */
-require '../../backend/bd/Conexion.php';
-$id = $_GET['id'];
+/* Conexión a la base de datos (require_once evita segunda instancia PDO en esta petición) */
+require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($id <= 0) {
+    exit('Solicitud inválida.');
+}
 $stmt = $connect->prepare("
 SELECT 
     o.*, 
@@ -114,7 +117,7 @@ if (!empty($order)) {
         $pdf->is_first_page = false;
         
         /* Espaciado adicional después del número de factura */
-        $pdf->Ln(10);
+        $pdf->Ln(14);
     }
     
     // Establecer el número de factura en el PDF después de obtenerlo de la base de datos
@@ -130,9 +133,11 @@ if ($telefonoPaciente === null) {
     $telefonoPaciente = $phoneResult['phon'] ?? 'N/A';
 }
     
-/* Primera tabla: Información del paciente y detalles */
+/* Línea completa: nombre del paciente (fuera del cuadro, ancho horizontal para nombres largos) */
+$nombrePacientePdf = mb_convert_encoding(mb_strtoupper($order[0]['nomcl'], 'UTF-8'), 'ISO-8859-1', 'UTF-8');
+
+/* Cuadro de datos: misma información que antes, sin la fila PACIENTE en la rejilla */
 $fields = [
-    'PACIENTE' => $order[0]['nomcl'],
     'DNI PACIENTE' => $dni_paciente,
     'NÚMERO DE CUENTA' => $order[0]['num_cuenta'],
     'FECHA DE INGRESO' => 'N/A',
@@ -157,40 +162,45 @@ $pageWidth = $pdf->GetPageWidth();
 $colWidth = 97; // Ancho de cada columna
 $rowHeight = 5; // Altura base para filas
 $startX = ($pageWidth - ($colWidth * 3)) / 2; // Centrado
-$startY = 50; // Inicio de la tabla
+$bloqueAncho = $colWidth * 3;
+$anchoEtiquetaPaciente = $colWidth / 2;
+$anchoNombrePaciente = $bloqueAncho - $anchoEtiquetaPaciente;
+
+$startY = 56;
+$pdf->SetXY($startX, $startY);
+$pdf->SetFillColor(240, 240, 240);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell($anchoEtiquetaPaciente, 7, mb_convert_encoding('PACIENTE:', 'ISO-8859-1', 'UTF-8'), 0, 0, 'L', true);
+$pdf->SetXY($startX + $anchoEtiquetaPaciente, $startY);
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->MultiCell($anchoNombrePaciente, 6, $nombrePacientePdf, 0, 'L', false);
+$startY = $pdf->GetY() + 4;
+
 $pdf->SetFillColor(240, 240, 240);
 $col = 0;
 
 foreach ($fields as $label => $value) {
-    $x = $startX + $col * $colWidth; // Posición X de la columna
-    $y = $startY; // Mantener posición Y
+    $x = $startX + $col * $colWidth;
+    $y = $startY;
 
-    // Configurar fuentes para etiqueta y valor
-    $pdf->SetFont('Arial', 'B', 8);
     $labelText = mb_convert_encoding(mb_strtoupper("$label:", 'UTF-8'), 'ISO-8859-1', 'UTF-8');
-    $pdf->SetXY($x, $y);
-
-    // Calcular altura necesaria para la celda del valor
     $pdf->SetFont('Arial', 'B', 8);
     $valueText = mb_convert_encoding(mb_strtoupper($value, 'UTF-8'), 'ISO-8859-1', 'UTF-8');
     $valueHeight = $pdf->GetStringWidth($valueText) > ($colWidth / 2) ? $rowHeight * ceil($pdf->GetStringWidth($valueText) / ($colWidth / 2)) : $rowHeight;
-
-    // Determinar la altura máxima entre etiqueta y valor
     $cellHeight = max($rowHeight, $valueHeight);
 
-    // Dibujar celda de etiqueta
+    $pdf->SetXY($x, $y);
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->MultiCell($colWidth / 2, $rowHeight, $labelText, 0, 'L', true);
 
-    // Dibujar celda de valor
     $pdf->SetXY($x + ($colWidth / 2), $y);
     $pdf->SetFont('Arial', 'B', 8);
     $pdf->MultiCell($colWidth / 2, $rowHeight, $valueText, 0, 'L', false);
 
     $col++;
-    if ($col == 3) { // Si se alcanzan 3 columnas, pasa a la siguiente fila
-        $startY += $cellHeight; // Incrementar posición Y por la altura más alta
-        $col = 0; // Reiniciar columna
+    if ($col == 3) {
+        $startY += $cellHeight;
+        $col = 0;
     }
 }
 
@@ -481,15 +491,18 @@ foreach ($additionalInfo as $index => $line) {
     }
 }
 
-// Obtener la firma digital del usuario (fallback a user_id de la orden si no hay sesión)
-$userId = $_SESSION['id'] ?? ($order[0]['user_id'] ?? null);
+// Firma del cajero: sesión u operador de la orden; consulta solo si hay user_id numérico válido
 $signatureBlob = null;
-if ($userId) {
+$userIdRaw = $_SESSION['id'] ?? ($order[0]['user_id'] ?? null);
+$userIdForSig = is_numeric($userIdRaw) ? (int) $userIdRaw : 0;
+if ($userIdForSig > 0) {
     $signatureStmt = $connect->prepare("SELECT signature FROM user_signatures WHERE user_id = :user_id LIMIT 1");
-    $signatureStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $signatureStmt->bindParam(':user_id', $userIdForSig, PDO::PARAM_INT);
     $signatureStmt->execute();
-    $signatureResult = $signatureStmt->fetch(PDO::FETCH_ASSOC);
-    $signatureBlob = $signatureResult['signature'] ?? null;
+    $signatureRow = $signatureStmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($signatureRow) && isset($signatureRow['signature'])) {
+        $signatureBlob = $signatureRow['signature'];
+    }
 }
 
 // Espacio adicional antes de "FIRMA CAJERO"

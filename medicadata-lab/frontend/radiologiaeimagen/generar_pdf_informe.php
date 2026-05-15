@@ -1,6 +1,5 @@
 <?php
 require_once('../../backend/bd/Conexion.php');
-$__o = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
 require_once('../../backend/fpdf/fpdf.php');
 
 // Crear carpeta temp si no existe
@@ -226,7 +225,7 @@ if (!empty($transcription['comments'])) {
 $pdf->Ln(10);
 
 // GENERAR CÓDIGO QR PARA EL ESTUDIO
-$qrUrl = rtrim($__o['study_archive_prefix'], '/') . '/' . $transcription['study_id'] . '/archive';
+$qrUrl = 'https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/' . $transcription['study_id'] . '/archive';
 $qrFile = $qrDir . 'qr_' . $transcription['id'] . '.png';
 require_once('../../backend/phpqrcode/qrlib.php');
 QRcode::png($qrUrl, $qrFile, QR_ECLEVEL_L, 10);

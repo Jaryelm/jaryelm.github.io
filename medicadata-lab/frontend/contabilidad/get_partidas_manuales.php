@@ -141,12 +141,13 @@ try {
         'data' => $data
     ]);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Error get_partidas_manuales: " . $e->getMessage());
     echo json_encode([
         'draw' => intval($_GET['draw'] ?? 1),
         'recordsTotal' => 0,
         'recordsFiltered' => 0,
-        'data' => []
+        'data' => [],
+        'error' => 'No se pudo cargar la tabla. Intente de nuevo.'
     ]);
 }

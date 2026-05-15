@@ -131,6 +131,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     <th>Neto</th>
                     <th>Turno</th>
                     <th>Usuario</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -219,7 +220,203 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     #tablaDiarioGeneral tbody tr.partida-group-header:hover {
         background-color: #e3f2fd !important;
     }
+
+    .dt-acciones {
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .btn_ver_detalles {
+        background-color: #06adbf;
+        border: none;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .btn_ver_detalles:hover {
+        background-color: #049aad;
+    }
+
+    /* Modal detalle venta: mismos criterios que frontend/almacen/venta.php (evitar class "display" = conflict DataTables) */
+    #diarioDetailsModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 12000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    #diarioDetailsModal .modal-content {
+        background-color: #fefefe;
+        border: 1px solid #888;
+        padding: 20px;
+        width: 80%;
+        max-width: 1400px;
+        max-height: 90%;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    #diarioDetailsModal .modal-content > .close-btn {
+        float: right;
+    }
+
+    #diarioDetailsModal .modal-content h2 {
+        margin: 0 0 10px 0;
+        padding-right: 36px;
+        font-size: 1.25rem;
+        color: #111;
+        font-weight: bold;
+    }
+
+    /* Sobrescribe el .table-container del listado principal solo dentro del modal */
+    #diarioDetailsModal .modal-content .table-container {
+        max-height: 60vh;
+        overflow-y: auto;
+        overflow-x: auto;
+        margin-top: 10px;
+        flex-grow: 1;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        background: transparent;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #diarioDetailsModal .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        margin-bottom: 0;
+    }
+
+    #diarioDetailsModal .responsive-table thead {
+        position: static;
+        clip: auto;
+        height: auto;
+        width: auto;
+        overflow: visible;
+        padding: 0;
+        border: 0;
+    }
+
+    #diarioDetailsModal .responsive-table thead tr,
+    #diarioDetailsModal .responsive-table tbody tr {
+        display: table-row;
+        margin: 0;
+        border: none;
+    }
+
+    /* venta.php (final): .responsive-table th, .responsive-table td */
+    #diarioDetailsModal .responsive-table th,
+    #diarioDetailsModal .responsive-table td {
+        display: table-cell;
+        padding: 10px;
+        border: 1px solid #ddd;
+        white-space: normal;
+    }
+
+    /* admin.css: .responsive-table thead th */
+    #diarioDetailsModal .responsive-table thead th {
+        background-color: #1e2c4b;
+        border: 1px solid #1e2c4b;
+        color: #fff;
+        font-weight: normal;
+        text-align: center;
+    }
+
+    #diarioDetailsModal .responsive-table thead th:first-of-type {
+        text-align: left;
+    }
+
+    /* admin.css (min-width 52em): filas pares */
+    #diarioDetailsModal .responsive-table tbody tr:nth-of-type(even) {
+        background-color: rgba(94, 93, 82, 0.1);
+    }
+
+    /* admin.css (min-width 52em): tbody td */
+    #diarioDetailsModal .responsive-table tbody td {
+        text-align: center;
+    }
+
+    #diarioDetailsModal .close-btn {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    #diarioDetailsModal .close-btn:hover,
+    #diarioDetailsModal .close-btn:focus {
+        color: #000;
+    }
+
+    #loadingDiarioDetalle {
+        display: none;
+        position: fixed;
+        z-index: 13000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+    }
+
+    #loadingDiarioDetalle .box {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #035c67;
+    }
 </style>
+
+<div id="loadingDiarioDetalle" style="display:none;"><div class="box">Cargando detalles…</div></div>
+
+<div id="diarioDetailsModal" class="modal" style="display: none !important;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="diarioCerrarModalVenta()" title="Cerrar">&times;</span>
+        <h2>Detalles de Productos y Servicios</h2>
+        <div class="table-container">
+            <table id="diarioDetailsVentaTable" class="responsive-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Impuesto</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Descuento General</th>
+                        <th scope="col">Descuento 3ra Edad</th>
+                        <th scope="col">Descuento 4ta Edad</th>
+                        <th scope="col">Promoción</th>
+                        <th scope="col">Otros Descuentos</th>
+                        <th scope="col">Descuentos Aplicados</th>
+                        <th scope="col">Total a Pagar Sin I.S.V</th>
+                    </tr>
+                </thead>
+                <tbody id="diarioDetailsVentaBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         </main>
         <!-- MAIN -->
@@ -236,6 +433,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     
     <script src="../../backend/js/script.js"></script>
 
@@ -328,7 +526,24 @@ $(function () {
                 }
             },
             { data: 'turno' },
-            { data: 'usuario' }
+            { data: 'usuario' },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                className: 'dt-acciones',
+                render: function(data, type, row) {
+                    if (type !== 'display' && type !== 'filter') {
+                        return '';
+                    }
+                    var modo = row.detalle_modo || '';
+                    var id = row.detalle_id;
+                    if (!modo || id == null || id === '') {
+                        return '—';
+                    }
+                    return '<button type="button" class="btn_ver_detalles" data-modo="' + modo + '" data-id="' + id + '">Ver detalles</button>';
+                }
+            }
         ],
         rowGroup: {
             dataSrc: 'numero_partida',
@@ -372,12 +587,12 @@ $(function () {
                     .append('<td class="text-right"><strong>L. ' + totalDebe.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
                     .append('<td class="text-right"><strong>L. ' + totalHaber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
                     .append('<td class="text-right"><strong>L. ' + diferencia.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
-                    .append('<td colspan="2" class="' + balanceClass + '"><strong>' + balanceIcon + ' ' + balanceText + '</strong></td>');
+                    .append('<td colspan="3" class="' + balanceClass + '"><strong>' + balanceIcon + ' ' + balanceText + '</strong></td>');
             }
         },
         order: [[0, 'desc'], [1, 'desc']], // Ordenar por número de partida y fecha de ocurrencia descendente
         pageLength: 10,
-        lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Todos"]],
+        lengthMenu: [[5, 10, 25, 50, 100, 200, 250], [5, 10, 25, 50, 100, 200, 250]],
         language: {
             processing: '<div class="dt-medidata-processing"><div class="dt-medidata-spinner" aria-hidden="true"></div><p>Cargando...</p></div>',
             lengthMenu: "Mostrar _MENU_ registros",
@@ -401,6 +616,175 @@ $(function () {
             $('.partida-group-header').css('font-weight', 'bold');
         }
     });
+
+    $('#tablaDiarioGeneral').on('click', '.btn_ver_detalles', function() {
+        var modo = $(this).data('modo');
+        var id = parseInt($(this).data('id'), 10);
+        if (!modo || !id) {
+            return;
+        }
+        if (modo === 'compra') {
+            diarioVerDetalleCompra(id);
+        } else if (modo === 'venta') {
+            diarioVerDetalleVenta(id);
+        }
+    });
+});
+
+function diarioShowLoadingDetalle() {
+    var el = document.getElementById('loadingDiarioDetalle');
+    if (el) {
+        el.style.display = 'flex';
+    }
+}
+
+function diarioHideLoadingDetalle() {
+    var el = document.getElementById('loadingDiarioDetalle');
+    if (el) {
+        el.style.display = 'none';
+    }
+}
+
+function diarioCerrarModalVenta() {
+    var modal = document.getElementById('diarioDetailsModal');
+    if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+    }
+}
+
+function diarioVerDetalleVenta(orderId) {
+    diarioShowLoadingDetalle();
+    fetch('../../backend/registros/obtener_detalles_checkout.php?order_id=' + encodeURIComponent(orderId))
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            diarioHideLoadingDetalle();
+            var body = document.getElementById('diarioDetailsVentaBody');
+            if (!body) {
+                return;
+            }
+            body.innerHTML = '';
+            var formatCurrency = function(value) {
+                var numValue = parseFloat(value) || 0;
+                return 'LPS. ' + numValue.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+            if (!Array.isArray(data) || data.length === 0) {
+                swal('Sin datos', 'No hay líneas de productos/servicios para esta orden.', 'info');
+                return;
+            }
+            data.forEach(function(item) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + (item.codigo || 'N/A') + '</td>' +
+                    '<td>' + (item.impuesto !== null && item.impuesto !== '' ? item.impuesto : 'N/A') + '</td>' +
+                    '<td>' + (item.nombre || 'N/A') + '</td>' +
+                    '<td>' + (item.cantidad || 0) + '</td>' +
+                    '<td>' + formatCurrency(item.total_original) + '</td>' +
+                    '<td>' + formatCurrency(item.discount_percentage) + '</td>' +
+                    '<td>' + formatCurrency(item.age_discount_30) + '</td>' +
+                    '<td>' + formatCurrency(item.age_discount_40) + '</td>' +
+                    '<td>' + formatCurrency(item.promotion_discount) + '</td>' +
+                    '<td>' + formatCurrency(item.other_discount) + '</td>' +
+                    '<td>' + formatCurrency(item.total_discount) + '</td>' +
+                    '<td>' + formatCurrency(item.total_after_discount) + '</td>';
+                body.appendChild(tr);
+            });
+            var modal = document.getElementById('diarioDetailsModal');
+            if (modal) {
+                modal.style.setProperty('display', 'flex', 'important');
+            }
+        })
+        .catch(function(err) {
+            diarioHideLoadingDetalle();
+            console.error(err);
+            swal('Error', 'No se pudieron cargar los detalles de la venta.', 'error');
+        });
+}
+
+function diarioVerDetalleCompra(idCompra) {
+    diarioShowLoadingDetalle();
+    $.ajax({
+        url: '../../backend/registros/obtener_detalle_compras.php',
+        type: 'POST',
+        data: { id_compra: idCompra },
+        success: function(data) {
+            diarioHideLoadingDetalle();
+            try {
+                var detalles = typeof data === 'string' ? JSON.parse(data) : data;
+                if (detalles && detalles.error) {
+                    swal('Error', String(detalles.error), 'error');
+                    return;
+                }
+                if (!Array.isArray(detalles)) {
+                    swal('Error', 'Respuesta inválida del servidor.', 'error');
+                    return;
+                }
+                if (detalles.length > 0) {
+                    var detallesHTML = '<div style="overflow-x:auto;max-width:1200px;">' +
+                        '<h3 style="margin-top:0;">ID compra: ' + idCompra + '</h3>' +
+                        '<table style="width:100%;border-collapse:collapse;"><thead><tr>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Cuenta</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Código Producto</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Descripción</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Cantidad</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Unidad</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Precio Unitario</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">ISV</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Subtotal</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Descuento %</th>' +
+                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Total</th>' +
+                        '</tr></thead><tbody>';
+                    detalles.forEach(function(item) {
+                        detallesHTML += '<tr>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.cat_cuenta || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.codigo_producto || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.descripcion || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.cantidad || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.unidad || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.precio_unitario || 0).toFixed(2) + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.isv || 0).toFixed(2) + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.subtotal || '') + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.descuento_porcentaje || 0).toFixed(2) + '</td>' +
+                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.total_item || '') + '</td>' +
+                            '</tr>';
+                    });
+                    detallesHTML += '</tbody></table></div>';
+                    swal({
+                        title: 'Detalles de la Compra',
+                        content: $(detallesHTML)[0],
+                        buttons: {
+                            confirm: {
+                                text: 'Cerrar',
+                                value: true,
+                                visible: true,
+                                className: 'btn_ver_detalles',
+                                closeModal: true
+                            }
+                        }
+                    });
+                    $('.swal-modal').css({
+                        width: '80%',
+                        maxWidth: '1200px',
+                        overflowX: 'auto'
+                    });
+                } else {
+                    swal('No se encontraron detalles', 'No hay detalles disponibles para esta compra.', 'info');
+                }
+            } catch (e) {
+                console.error(e);
+                swal('Error', 'Hubo un problema al cargar los detalles.', 'error');
+            }
+        },
+        error: function() {
+            diarioHideLoadingDetalle();
+            swal('Error', 'No se pudo cargar los detalles de la compra.', 'error');
+        }
+    });
+}
+
+document.addEventListener('click', function(ev) {
+    if (ev.target && ev.target.id === 'diarioDetailsModal') {
+        diarioCerrarModalVenta();
+    }
 });
 
 function aplicarFiltros() {

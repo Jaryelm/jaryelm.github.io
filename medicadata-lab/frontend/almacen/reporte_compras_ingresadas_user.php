@@ -31,14 +31,14 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
 </div>
 <script>document.addEventListener('DOMContentLoaded',function(){var o=document.getElementById('page-loading-overlay');if(o)o.style.display='none';});</script>
 
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once '../almacen/menu.php'; ?>
 
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
         <form action="#"><div class="form-group"></div></form>
         <span class="divider"></span>
-<?php include_once '../admin/perfil.php'; ?>
+<?php include_once '../almacen/perfil.php'; ?>
     </nav>
 
     <main>
@@ -48,8 +48,7 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-        <button class="button" onclick="cambiarColor(this, 'reporte_compras_detalladas.php')">Compras Detalladas</button>
-        <button class="button" onclick="cambiarColor(this, 'reporte_compras_ingresadas.php')">Compras Ingresadas</button>
+        <button class="button" onclick="cambiarColor(this, 'reporte_compras_ingresadas_user.php')">Compras Ingresadas</button>
 
         <br>
 
@@ -172,13 +171,13 @@ function aplicarFiltros() {
     var params = [];
     if (desde) params.push('desde=' + encodeURIComponent(desde));
     if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_compras_ingresadas.php';
+    var url = 'reporte_compras_ingresadas_user.php';
     if (params.length) url += '?' + params.join('&');
     window.location.href = url;
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_compras_ingresadas.php';
+    window.location.href = 'reporte_compras_ingresadas_user.php';
 }
 </script>
 </body>

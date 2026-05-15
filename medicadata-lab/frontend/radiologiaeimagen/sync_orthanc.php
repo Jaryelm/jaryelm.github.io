@@ -7,10 +7,10 @@ ini_set('max_execution_time', 300); // 5 minutos
 ini_set('memory_limit', '256M');
 
 try {
-    $__o = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
-    $orthanc_url = rtrim($__o['curl_base'], '/') . '/studies?expand=true';
-    $username = $__o['curl_user'];
-    $password = $__o['curl_pass'];
+    // URL base de la API de Orthanc
+    $orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies?expand=true';
+    $username = 'dev';
+    $password = 'Mrecords7';
 
     // Obtener la última fecha de sincronización
     $stmt = $connect->prepare("SELECT MAX(last_sync) as last_sync FROM worklist");
@@ -91,7 +91,7 @@ try {
 
         // Preparar todas las solicitudes de series en paralelo
         foreach ($study_batch as $index => $study) {
-            $series_url = rtrim($__o['curl_base'], '/') . '/studies/' . $study['ID'] . '/series?expand';
+            $series_url = "https://medicloud.medicasa.hn/orthanc/studies/{$study['ID']}/series?expand";
             $ch = curl_init($series_url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");

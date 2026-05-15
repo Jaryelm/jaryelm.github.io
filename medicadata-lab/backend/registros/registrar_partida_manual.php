@@ -133,10 +133,10 @@ try {
         @$connect->query("SELECT RELEASE_LOCK('partida_manual_registro')");
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Error registrar_partida_manual: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Error al registrar: ' . $e->getMessage()
+        'message' => 'Error al registrar la partida. Si persiste, contacte a Soporte TI.'
     ]);
 }

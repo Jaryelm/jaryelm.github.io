@@ -327,7 +327,7 @@ $('#formPartidaManual').on('submit', function(e) {
             document.getElementById('tbodyLineas').innerHTML = '';
             agregarLinea();
             agregarLinea();
-            if (typeof tablaPartidasManuales !== 'undefined' && tablaPartidasManuales) tablaPartidasManuales.ajax.reload();
+            cargarTablaPartidasManuales();
         } else {
             swal('Error', data.message || 'Error al registrar', 'error');
         }
@@ -341,66 +341,107 @@ $('#formPartidaManual').on('submit', function(e) {
 
 var tablaPartidasManuales;
 
+/** Una sola petición agrupada (simple=1) + DataTables en cliente: menos roundtrips al pool MySQL que serverSide por draw. */
+function paramsPartidasManualesCarga() {
+    return {
+        simple: '1',
+        limite: '3500',
+        fechaDesde: $('#filtroDesde').val() || '',
+        fechaHasta: $('#filtroHasta').val() || ''
+    };
+}
+
+function cargarTablaPartidasManuales() {
+    var $t = $('#tablaPartidasManuales');
+    if (!$t.length) {
+        return;
+    }
+    if ($.fn.DataTable.isDataTable($t)) {
+        $t.DataTable().destroy();
+    }
+    tablaPartidasManuales = null;
+    $t.find('tbody').empty();
+    var $wrap = $t.closest('.table-responsive');
+    $('#partidasManualCargando').remove();
+    $('#partidasManualNotaLimite').remove();
+    var $busy = $('<div id="partidasManualCargando" class="dt-medidata-processing" style="display:flex;align-items:center;gap:12px;padding:12px;"><div class="dt-medidata-spinner" aria-hidden="true"></div><p style="margin:0;">Cargando partidas…</p></div>');
+    $wrap.before($busy);
+
+    $.getJSON('../contabilidad/get_partidas_manuales.php', paramsPartidasManualesCarga())
+        .done(function(resp) {
+            $('#partidasManualCargando').remove();
+            var rows = resp && $.isArray(resp.data) ? resp.data : [];
+
+            tablaPartidasManuales = $t.DataTable({
+                data: rows,
+                processing: false,
+                serverSide: false,
+                dom: 'frtip',
+                columns: [
+                    { data: 'numero_partida' },
+                    { data: 'fecha_ocurrencia' },
+                    { data: 'referencia' },
+                    { data: 'descripcion' },
+                    {
+                        data: 'total_debe',
+                        className: 'text-right',
+                        render: function(data) {
+                            var v = parseFloat(data) || 0;
+                            return 'L. ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                        }
+                    },
+                    {
+                        data: 'total_haber',
+                        className: 'text-right',
+                        render: function(data) {
+                            var v = parseFloat(data) || 0;
+                            return 'L. ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                        }
+                    }
+                ],
+                order: [[0, 'desc']],
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    zeroRecords: "No hay partidas manuales registradas",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                    infoFiltered: "(filtrado de _MAX_ registros locales)",
+                    search: "Buscar:",
+                    paginate: { first: "Primero", previous: "Anterior", next: "Siguiente", last: "Último" }
+                },
+                scrollX: true
+            });
+
+            if (rows.length >= 3500) {
+                $('<p id="partidasManualNotaLimite" style="margin:8px 0 0;color:#666;font-size:13px;"></p>')
+                    .text('Se muestran hasta 3500 partidas agrupadas. Use filtros por fecha si no aparece alguna esperada.')
+                    .insertBefore($wrap);
+            }
+        })
+        .fail(function(jqXHR) {
+            $('#partidasManualCargando').remove();
+            var msg = 'No se pudo cargar el listado.';
+            if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                msg = jqXHR.responseJSON.error;
+            }
+            swal('Error', msg, 'error');
+        });
+}
+
 function initTablaPartidasManuales() {
-    tablaPartidasManuales = $('#tablaPartidasManuales').DataTable({
-        processing: true,
-        serverSide: true,
-        dom: 'frtip',
-        ajax: {
-            url: '../contabilidad/get_partidas_manuales.php',
-            type: 'GET',
-            data: function(d) {
-                d.fechaDesde = $('#filtroDesde').val() || '';
-                d.fechaHasta = $('#filtroHasta').val() || '';
-            }
-        },
-        columns: [
-            { data: 'numero_partida' },
-            { data: 'fecha_ocurrencia' },
-            { data: 'referencia' },
-            { data: 'descripcion' },
-            { 
-                data: 'total_debe',
-                className: 'text-right',
-                render: function(data) {
-                    var v = parseFloat(String(data).replace(/,/g, '')) || 0;
-                    return 'L. ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }
-            },
-            { 
-                data: 'total_haber',
-                className: 'text-right',
-                render: function(data) {
-                    var v = parseFloat(String(data).replace(/,/g, '')) || 0;
-                    return 'L. ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        pageLength: 10,
-        lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
-        language: {
-            processing: '<div class="dt-medidata-processing"><div class="dt-medidata-spinner" aria-hidden="true"></div><p>Cargando...</p></div>',
-            lengthMenu: "Mostrar _MENU_ registros",
-            zeroRecords: "No hay partidas manuales registradas",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros)",
-            search: "Buscar:",
-            paginate: { first: "Primero", previous: "Anterior", next: "Siguiente", last: "Último" }
-        },
-        scrollX: true
-    });
+    cargarTablaPartidasManuales();
 }
 
 function aplicarFiltrosPartidas() {
-    if (tablaPartidasManuales) tablaPartidasManuales.ajax.reload();
+    cargarTablaPartidasManuales();
 }
 
 function limpiarFiltrosPartidas() {
     document.getElementById('filtroDesde').value = '';
     document.getElementById('filtroHasta').value = '';
-    if (tablaPartidasManuales) tablaPartidasManuales.ajax.reload();
+    cargarTablaPartidasManuales();
 }
 </script>
 </body>

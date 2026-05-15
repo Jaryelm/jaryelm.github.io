@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/tablas_json_list_limits.php';
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -27,7 +28,7 @@ try {
         }
 
         // Añadir ordenamiento a la consulta
-        $sql .= " ORDER BY fecha_registro DESC";
+        $sql .= " ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
 
         $stmt = $connect->prepare($sql);
         

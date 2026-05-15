@@ -48,7 +48,6 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-        <button class="button" onclick="cambiarColor(this, 'reporte_compras_detalladas.php')">Compras Detalladas</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_compras_ingresadas.php')">Compras Ingresadas</button>
 
         <br>

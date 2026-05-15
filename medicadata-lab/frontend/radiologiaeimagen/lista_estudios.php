@@ -1,6 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-$__orthanc_lab = require __DIR__ . '/../../backend/bd/orthanc_laboratorio.config.php';
 // Obtener el rol del usuario desde la sesión
 session_start();
 $rol_usuario = $_SESSION['rol'] ?? '';
@@ -570,7 +569,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         document.getElementById('patientId').value = patientId;
         const dicomViewer = document.getElementById('orthancViewer');
         if (seriesId && seriesId !== 'null' && seriesId !== 'N/A') {
-            dicomViewer.src = <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+            dicomViewer.src = `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
             dicomViewer.style.display = '';
         } else {
             dicomViewer.src = '';
@@ -720,14 +719,14 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     // Función para descargar un estudio (igual que en tabladeestudios.php y worklist.php)
     function downloadStudy(studyId) {
-        const orthancDownloadUrl = <?php echo json_encode($__orthanc_lab['study_archive_prefix']); ?> + studyId + '/archive';
+        const orthancDownloadUrl = `https://medicloud.medicasa.hn/orthanc/studies/${studyId}/archive`;
         window.location.href = orthancDownloadUrl;
     }
 
     // Función para abrir el visor DICOM
     function openDicomViewer(seriesId) {
                 document.getElementById('orthancViewer').src =
-            <?php echo json_encode($__orthanc_lab['viewer_series_prefix']); ?> + seriesId;
+            `https://medicloud.medicasa.hn/orthanc/web-viewer/app/viewer.html?series=${seriesId}`;
         document.getElementById('viewerModal').style.display = 'block';
     }
 

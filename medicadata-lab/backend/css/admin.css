@@ -869,6 +869,14 @@ main .btn-send:hover {
   transition: background-color 0.3s ease;
 }
 
+#content main > button.button {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: none;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
 
 /* ------------------------ALERT --------------------------*/
 .alert {

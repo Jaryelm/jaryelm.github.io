@@ -32,7 +32,7 @@ include_once '../admin/menu.php';
             
            
             <span class="divider"></span>
-            <?php
+<?php
 include_once '../admin/perfil.php';
 // incuir el archivo menu principal
 ?>

@@ -1,19 +1,20 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/tablas_json_list_limits.php';
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $sql = "SELECT cuenta, nombre, tipo_cuenta FROM cuentas_catalogo";
-        
+
         if (!isset($_GET['search']) || empty(trim($_GET['search']))) {
             // Obtener todos los registros sin filtrar
-            $sql .= " ORDER BY fecha_registro DESC";
+            $sql .= " ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
         } else {
             // Manejar la búsqueda
             $search = trim($_GET['search']);
-            $sql .= " WHERE tipo_cuenta LIKE :search OR cuenta LIKE :search OR nombre LIKE :search";
+            $sql .= " WHERE tipo_cuenta LIKE :search OR cuenta LIKE :search OR nombre LIKE :search ORDER BY cuenta" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $search_param = '%' . $search . '%';
             $stmt->bindParam(':search', $search_param, PDO::PARAM_STR);

@@ -5,11 +5,55 @@ session_start();
 // Establecer zona horaria de Honduras
 date_default_timezone_set('America/Tegucigalpa');
 
+if (!function_exists('medidata_session_json_api_script')) {
+    /**
+     * Scripts que deben responder JSON (fetch / DataTables) si la BD falla,
+     * en lugar de redirigir al login con HTML.
+     */
+    function medidata_session_json_api_script(): ?string
+    {
+        $script = $_SERVER['SCRIPT_NAME'] ?? '';
+        $base = strtolower(basename((string) $script));
+        $allowed = ['registrar_partida_manual.php', 'get_partidas_manuales.php'];
+        return in_array($base, $allowed, true) ? $base : null;
+    }
+}
+
+if (!function_exists('medidata_session_emit_json_db_unavailable')) {
+    function medidata_session_emit_json_db_unavailable(?string $apiScript): bool
+    {
+        if ($apiScript === null || headers_sent()) {
+            return false;
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(503);
+        $msg = 'Base de datos temporalmente no disponible. Intente de nuevo en un momento.';
+        if ($apiScript === 'get_partidas_manuales.php') {
+            echo json_encode([
+                'draw' => intval($_GET['draw'] ?? 1),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => $msg,
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => $msg,
+            ]);
+        }
+        return true;
+    }
+}
+
 // Conexión con ruta absoluta desde este archivo (evita $connect indefinido si el CWD del servidor no es el esperado)
 try {
     require_once __DIR__ . '/../bd/Conexion.php';
 } catch (Throwable $e) {
     error_log('session_check Conexion: ' . $e->getMessage());
+    if (medidata_session_emit_json_db_unavailable(medidata_session_json_api_script())) {
+        exit();
+    }
     $_SESSION['errMsg'] = 'No se pudo conectar a la base de datos. Contacte a Soporte TI.';
     header('Location: ../../frontend/login.php');
     exit();
@@ -17,6 +61,9 @@ try {
 
 if (!isset($connect) || !($connect instanceof PDO)) {
     error_log('session_check: $connect no es PDO tras Conexion.php');
+    if (medidata_session_emit_json_db_unavailable(medidata_session_json_api_script())) {
+        exit();
+    }
     $_SESSION['errMsg'] = 'Conexión a base de datos no disponible.';
     header('Location: ../../frontend/login.php');
     exit();
@@ -61,7 +108,10 @@ try {
     $name = $_SESSION['name'] ?? 'Invitado';
 
 } catch (PDOException $e) {
-    // Manejar errores de la base de datos
+    error_log('session_check PDO: ' . $e->getMessage());
+    if (medidata_session_emit_json_db_unavailable(medidata_session_json_api_script())) {
+        exit();
+    }
     $_SESSION['errMsg'] = 'Error en la base de datos. Por favor contacte a Soporte TI.';
     header('Location: ../../frontend/login.php');
     exit();

@@ -4,12 +4,13 @@ include_once '../../backend/registros/session_check.php';
 ?>
 
 <?php
-// Laboratorio local — misma BD que en XAMPP (importar BD/medic9ue_postulaciones_esqueleto.sql si aplica)
-$servername = "localhost";
-$username = "root";
-$password = "";
+// Conexión a la base de datos
+$servername = "162.241.123.41";
+$username = "medic9ue_moisesc";
+$password = "Mrecords%7";
 $dbname = "medic9ue_postulaciones";
 
+// Crear conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión

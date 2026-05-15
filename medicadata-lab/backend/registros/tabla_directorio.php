@@ -1,12 +1,13 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/tablas_json_list_limits.php';
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         if (empty($search)) {
-            $sql = "SELECT * FROM proveedor_data ORDER BY fecha_registro DESC";
+            $sql = "SELECT * FROM proveedor_data ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
         } else {
             $sql = "SELECT * FROM proveedor_data 
                     WHERE nombre_proveedor LIKE :search 
@@ -24,7 +25,7 @@ try {
                     OR solicitud_constancia LIKE :search
                     OR constancia_vigente LIKE :search
                     OR fecha_registro LIKE :search
-                    ORDER BY fecha_registro DESC";
+                    ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
         }
 
         $stmt = $connect->prepare($sql);
