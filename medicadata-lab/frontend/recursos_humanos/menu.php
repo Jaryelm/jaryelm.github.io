@@ -11,6 +11,12 @@
                     <a href="./lista_colaboradores.php">LISTA COLABORADORES</a>
                 </li>
                 <li>
+                    <a href="#" class="new-submenu-link">SOLICITUD EMPLEOS</a>
+                    <ul class="new-side-dropdown">
+                        <li><a href="./entrevista_competencia_usr.php">ENTREVISTA COMPETENCIA</a></li>
+                    </ul>
+                </li>
+                <li>
                     <a href="#" class="new-submenu-link">PERSONAL</a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos/reclutamiento.php">RECLUTAMIENTO</a></li>

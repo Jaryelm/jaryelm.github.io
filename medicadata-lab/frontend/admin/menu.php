@@ -83,7 +83,13 @@
             <a href="#"><i class='bx bxs-user-detail icon'></i> RECURSOS HUMANOS<i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li>
-                    <a href="../recursos_humanos/lista_colaboradores.php">Lista Colaboradores</a>
+                    <a href="../recursos_humanos/lista_colaboradores.php">LISTA COLABORADORES</a>
+                </li>
+                <li>
+                    <a href="#" class="new-submenu-link">SOLICITUD EMPLEOS</a>
+                    <ul class="new-side-dropdown">
+                        <li><a href="../recursos_humanos/entrevista_competencia.php">ENTREVISTA COMPETENCIA</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="#" class="new-submenu-link">PERSONAL</a>
