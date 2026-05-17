@@ -2146,6 +2146,10 @@ function aprobarSignosVitalesRow(signoId) {
 }
 
 function registrarSignosVitales() {
+    const fechaEl = document.getElementById("fecha");
+    const horaEl = document.getElementById("hora");
+    const fecha = fechaEl ? fechaEl.value.trim() : "";
+    const hora = horaEl ? horaEl.value.trim() : "";
     const processedBy = document.getElementById("processedBy").value;
     const weight = document.getElementById("weight").value;
     const stature = document.getElementById("stature").value;
@@ -2158,7 +2162,7 @@ function registrarSignosVitales() {
     const glucose = document.getElementById("glucose").value;
     const idpa = <?php echo $_GET['id']; ?>;
 
-    if (!processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
+    if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
         swal('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
@@ -2168,6 +2172,8 @@ function registrarSignosVitales() {
         url: "add_signos_vitales.php",
         dataType: "json",
         data: {
+            fecha: fecha,
+            hora: hora,
             processed_by: processedBy,
             weight: weight,
             stature: stature,

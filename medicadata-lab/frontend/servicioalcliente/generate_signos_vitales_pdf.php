@@ -356,26 +356,12 @@ if (count($data) > 0) {
         $imgH = 14;
         $imgW = max(12, min(72, $wHalf - 2));
 
-        /** Columnas paralelas sin solapamiento; firmas después de ambos nombres */
-        $pdf->SetXY($xL, $yBlk);
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell($wHalf, 4.5, sv_sv_enc('REALIZADO POR'), 0, 1, 'L');
-        $pdf->SetXY($xL, $pdf->GetY());
-        $pdf->SetFont('Arial', '', 8);
-        $nombreRealLbl = $nombreReal !== '' ? $nombreReal : '—';
-        $pdf->Cell($wHalf, 4.5, sv_sv_enc(mb_substr($nombreRealLbl, 0, 60)), 0, 1, 'L');
-        $yAfterLeftName = $pdf->GetY();
-
-        $pdf->SetXY($xR, $yBlk);
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell($wHalf, 4.5, sv_sv_enc('REVISADO POR'), 0, 1, 'L');
-        $pdf->SetXY($xR, $pdf->GetY());
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell($wHalf, 4.5, sv_sv_enc(mb_substr($nombreRev, 0, 60)), 0, 1, 'L');
-        $yAfterRightName = $pdf->GetY();
-
-        $yImgBase = max($yAfterLeftName, $yAfterRightName) + 0.6;
-        $bottomFinal = $yImgBase;
+        /** Firma → leyenda del rol → nombre (todo centrado por columna). */
+        $yImgBase = $yBlk + 0.35;
+        $yCaption = $yImgBase + $imgH + 0.4;
+        $captionH = 4.5;
+        $nameH = 4.5;
+        $yNameRow = $yCaption + $captionH + 0.25;
 
         /** Firma centrada dentro de cada columna (coord. X es borde izq. del PNG) */
         $xImgL = $xL + (($wHalf - $imgW) / 2);
@@ -383,14 +369,25 @@ if (count($data) > 0) {
 
         if ($tmpP) {
             $pdf->Image($tmpP, $xImgL, $yImgBase, $imgW, $imgH);
-            $bottomFinal = max($bottomFinal, $yImgBase + $imgH);
         }
         if ($tmpR) {
             $pdf->Image($tmpR, $xImgR, $yImgBase, $imgW, $imgH);
-            $bottomFinal = max($bottomFinal, $yImgBase + $imgH);
         }
 
-        $pdf->SetY($bottomFinal);
+        $pdf->SetXY($xL, $yCaption);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($wHalf, $captionH, sv_sv_enc('REALIZADO POR'), 0, 0, 'C');
+        $pdf->SetXY($xR, $yCaption);
+        $pdf->Cell($wHalf, $captionH, sv_sv_enc('REVISADO POR'), 0, 0, 'C');
+
+        $nombreRealLbl = $nombreReal !== '' ? $nombreReal : '—';
+        $pdf->SetXY($xL, $yNameRow);
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRealLbl, 0, 60)), 0, 0, 'C');
+        $pdf->SetXY($xR, $yNameRow);
+        $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRev, 0, 60)), 0, 0, 'C');
+
+        $pdf->SetY($yNameRow + $nameH);
         $pdf->Ln(2);
 
         if ($tmpP) {

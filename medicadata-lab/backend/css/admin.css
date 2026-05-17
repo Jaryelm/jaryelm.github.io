@@ -1394,12 +1394,18 @@ a.registerbtn {
   display: inline-block;
   width: 60px;
   height: 34px;
+  flex-shrink: 0;
+  vertical-align: middle;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
 }
 
 .slider {
@@ -1410,6 +1416,8 @@ a.registerbtn {
   right: 0;
   bottom: 0;
   background-color: #ccc;
+  overflow: hidden;
+  border-radius: 34px;
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -1417,11 +1425,14 @@ a.registerbtn {
 .slider:before {
   position: absolute;
   content: "";
+  box-sizing: border-box;
   height: 26px;
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -3133,19 +3144,9 @@ input:checked + .slider:before {
 .status-switch input:checked + .status-slider:before {
   transform: translateX(26px);
 }
-.slider:before {
-  content: attr(data-off);
-  position: absolute;
-  top: 50%;
-  left: 5px;
-  transform: translateY(-50%);
-  color: #fff;
-  font-size: 12px;
-}
-input:checked + .slider:before {
-  content: attr(data-on);
-  left: 30px;
-}
+
+/* (Eliminadas reglas .slider:before globales duplicadas: rompían el toggle
+   Pacientes/Médicos — usan .switch + span.slider sin data-off/on.) */
 
 /* Catalog container y filtros (reportes) */
 .catalog-container {

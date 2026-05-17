@@ -36,8 +36,17 @@ try {
         throw new Exception('No se pudo obtener el nombre del usuario que registra.');
     }
 
-    $fecha = $_POST['fecha'];
-    $hora = $_POST['hora'];
+    $fecha = trim((string) $_POST['fecha']);
+    $hora = trim((string) $_POST['hora']);
+    if ($fecha === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+        $fecha = date('Y-m-d');
+    }
+    if ($hora !== '' && preg_match('/^\d{2}:\d{2}$/', $hora)) {
+        $hora .= ':00';
+    }
+    if ($hora === '' || !preg_match('/^\d{2}:\d{2}:\d{2}$/', $hora)) {
+        $hora = date('H:i:s');
+    }
     $weight = $_POST['weight'];
     $stature = $_POST['stature'];
     $bloodPressure = $_POST['blood_pressure'];

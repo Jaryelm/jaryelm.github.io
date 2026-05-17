@@ -48,49 +48,27 @@ try {
 
     $fechaPv = isset($_POST['fecha']) ? trim((string) $_POST['fecha']) : '';
     $horaPv = isset($_POST['hora']) ? trim((string) $_POST['hora']) : '';
-    $tienesFh = ($fechaPv !== '' && $horaPv !== '');
 
-    if ($tienesFh) {
-        $sql = "INSERT INTO signos_vitales (
-                    fecha, hora,
-                    processed_by, reviews_by, processed_by_user_id,
-                    reviewed_by_user_id, reviewed_at,
-                    weight, stature,
-                    blood_pressure, map_pressure, temperature, heart_rate,
-                    respiratory_rate, oxygen_saturation, glucose, idpa
-                ) VALUES (
-                    :fecha, :hora,
-                    :processedBy, '', :processedByUid,
-                    NULL, NULL,
-                    :weight, :stature,
-                    :bloodPressure, :mapPressure, :temperature, :heartRate,
-                    :respiratoryRate, :oxygenSaturation, :glucose, :idpa
-                )";
-        $stmt = $connect->prepare($sql);
-        $stmt->execute([
-            ':fecha' => $fechaPv,
-            ':hora' => $horaPv,
-            ':processedBy' => $processedBy,
-            ':processedByUid' => $userIdSession,
-            ':weight' => $weight,
-            ':stature' => $stature,
-            ':bloodPressure' => $bloodPressure,
-            ':mapPressure' => $mapPressure,
-            ':temperature' => $temperature,
-            ':heartRate' => $heartRate,
-            ':respiratoryRate' => $respiratoryRate,
-            ':oxygenSaturation' => $oxygenSaturation,
-            ':glucose' => $glucose,
-            ':idpa' => $idpa,
-        ]);
-    } else {
+    /** Siempre persistir fecha/hora: respaldo servidor (evita NULL si el cliente no las envía). */
+    if ($fechaPv === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaPv)) {
+        $fechaPv = date('Y-m-d');
+    }
+    if ($horaPv !== '' && preg_match('/^\d{2}:\d{2}$/', $horaPv)) {
+        $horaPv .= ':00';
+    }
+    if ($horaPv === '' || !preg_match('/^\d{2}:\d{2}:\d{2}$/', $horaPv)) {
+        $horaPv = date('H:i:s');
+    }
+
     $sql = "INSERT INTO signos_vitales (
+                fecha, hora,
                 processed_by, reviews_by, processed_by_user_id,
                 reviewed_by_user_id, reviewed_at,
                 weight, stature,
                 blood_pressure, map_pressure, temperature, heart_rate,
                 respiratory_rate, oxygen_saturation, glucose, idpa
             ) VALUES (
+                :fecha, :hora,
                 :processedBy, '', :processedByUid,
                 NULL, NULL,
                 :weight, :stature,
@@ -99,6 +77,8 @@ try {
             )";
     $stmt = $connect->prepare($sql);
     $stmt->execute([
+        ':fecha' => $fechaPv,
+        ':hora' => $horaPv,
         ':processedBy' => $processedBy,
         ':processedByUid' => $userIdSession,
         ':weight' => $weight,
@@ -112,7 +92,6 @@ try {
         ':glucose' => $glucose,
         ':idpa' => $idpa,
     ]);
-    }
 
     $fetchSql = "SELECT * FROM signos_vitales WHERE idpa = :idpa ORDER BY created_at DESC";
     $fetchStmt = $connect->prepare($fetchSql);
