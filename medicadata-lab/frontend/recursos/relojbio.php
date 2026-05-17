@@ -290,4 +290,3 @@ include_once '../../backend/registros/session_check.php';
 
 </html>
 
-</html>
