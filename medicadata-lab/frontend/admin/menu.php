@@ -117,7 +117,6 @@
                 <ul class="side-dropdown">
                     <li><a href="../almacen/compra_unificada.php">COMPRA E INVENTARIO</a></li>
                     <li><a href="../almacen/mostrar_compras.php">COMPRAS REGISTRADAS</a></li>
-                    <li><a href="../almacen/reporte_compras_ingresadas.php">COMPRAS INGRESADAS</a></li>
                     <li><a href="../almacen/mostrar.php">LISTA DE INVENTARIO</a></li>
                     <li><a href="../almacen/categoria_new.php">CATEGORIAS</a></li>
                     <li><a href="../almacen/categoria.php">LISTA DE CATEGORIAS</a></li>
@@ -158,7 +157,6 @@
         <li>
                 <a href="#"><i class='bx bx-accessibility icon'></i>ENFERMERÍA<i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
-                    <li><a href="../enfermeria/pre_clinica.php">PRE-CLINICA</a></li>
                     <li><a href="../admision/preadmision.php">ADMISIÓN</a></li>
                     <li><a href="../pacientes/historial.php">EXPEDIENTE CLINICO</a></li>
                     <li><a href="../pacientes/otros_anexos_paciente.php">OTROS ANEXOS</a></li>

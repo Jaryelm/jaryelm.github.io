@@ -151,22 +151,12 @@ li {
 	padding-left: 0px;
 	max-height: 0;
 	overflow-y: hidden;
-  overflow-x: hidden;
 	transition: all .15s ease;
 }
 #sidebar .side-dropdown.show {
 	max-height: 1000px;
 }
-
-#sidebar .side-dropdown a {
-  display: block;
-  padding-left: 25px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 #sidebar .side-dropdown a:hover {
-  transform: translateX(10px);
 	color: #035c67;
 }
 #sidebar .ads {
@@ -1556,10 +1546,6 @@ input:checked + .slider:before {
 .new-side-dropdown a {
   color: #333;
   text-decoration: none;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .new-submenu-link:hover {

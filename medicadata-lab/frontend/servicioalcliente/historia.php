@@ -1,5 +1,6 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+$medidataPuedeAprobarSignosVitales = (($_SESSION['rol'] ?? '') === 'Administrador');
 // incuir el archivo de sesion login
 ?>
 <!DOCTYPE html>
@@ -404,13 +405,17 @@ if($sentencia){
                 <tr>
                     <th scope="col">FECHA</th>
                     <th scope="col">HORA</th>
-                    <th scope="col">PROCESADO POR</th>
-                    <th scope="col">PRESIÓN ARTERIAL</th>
+                    <th scope="col">REALIZADO POR</th>
+                    <th scope="col">REVISADO POR</th>
+                    <th scope="col">PESO</th>
+                    <th scope="col">TALLA</th>
+                    <th scope="col">PA</th>
                     <th scope="col">PAM</th>
-                    <th scope="col">TEMPERATURA</th>
-                    <th scope="col">FRE CARD</th>
-                    <th scope="col">FRE RESP</th>
-                    <th scope="col">SATURACIÓN</th>
+                    <th scope="col">FC</th>
+                    <th scope="col">FR</th>
+                    <th scope="col">SAT</th>
+                    <th scope="col">TEMP</th>
+                    <th scope="col">GLUCOSA</th>
                     <th scope="col">ACCIONES</th>
                 </tr>
             </thead>
@@ -419,13 +424,17 @@ if($sentencia){
                 <tr>
                     <td><input type="date" id="fecha"></td>
                     <td><input type="time" id="hora"></td>
-                    <td><input type="text" id="procesadoPor" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="frecuenciac"></td>
-                    <td><input type="text" id="ta"></td>
-                    <td><input type="text" id="temp"></td>
-                    <td><input type="text" id="spo"></td>
-                    <td><input type="text" id="peso"></td>
-                    <td><input type="text" id="talla"></td>
+                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
+                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
+                    <td><input type="text" id="weight"></td>
+                    <td><input type="text" id="stature"></td>
+                    <td><input type="text" id="bloodPressure"></td>
+                    <td><input type="text" id="mapPressure"></td>
+                    <td><input type="text" id="heartRate"></td>
+                    <td><input type="text" id="respiratoryRate"></td>
+                    <td><input type="text" id="oxygenSaturation"></td>
+                    <td><input type="text" id="temperature"></td>
+                    <td><input type="text" id="glucose"></td>
                     <td>
                         <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
                     </td>
@@ -441,6 +450,12 @@ if($sentencia){
     const url = `generate_signos_vitales_pdf.php?idpa=${idpa}`;
     window.open(url, '_blank'); // Abrir el PDF en una nueva pestaña
 }
+
+    function descargarPDFSignoVital(signoId) {
+        const idpa = <?php echo (int)($_GET['id'] ?? 0); ?>;
+        if (!signoId) return;
+        window.open(`generate_signos_vitales_pdf.php?idpa=${idpa}&signo_id=${signoId}`, '_blank');
+    }
 </script>
 <!-- Estilo para el boton "Registrar" -->
 <Style>
@@ -1801,21 +1816,65 @@ $(document).ready(function() {
     
 
     <script>
+const medidataPuedeAprobarSv = <?php echo !empty($medidataPuedeAprobarSignosVitales) ? 'true' : 'false'; ?>;
+const medidataApproveSvUrl = '../pacientes/approve_signos_vitales.php';
+
+function svEstaAprobadoHistoria(item) {
+    const txt = item.reviews_by != null ? String(item.reviews_by).trim() : '';
+    if (txt !== '' && txt !== '-') return true;
+    if (item.reviewed_at != null && String(item.reviewed_at).trim() !== '') return true;
+    const rid = item.reviewed_by_user_id != null ? parseInt(item.reviewed_by_user_id, 10) : 0;
+    return !isNaN(rid) && rid > 0;
+}
+
+function aprobarSignosVitalesRow(signoId) {
+    var idpac = <?php echo (int)($_GET['id'] ?? 0); ?>;
+    swal({
+        title: '¿Aprobar registro?',
+        text: 'Se registrarán su nombre y firma digital del perfil en "Revisado por".',
+        icon: 'info',
+        buttons: true,
+        dangerMode: false
+    }).then(function(ok) {
+        if (!ok) return;
+        $.ajax({
+            type: 'POST',
+            url: medidataApproveSvUrl,
+            dataType: 'json',
+            data: { signo_id: signoId, idpa: idpac },
+            success: function(resp) {
+                if (resp && resp.error) {
+                    swal('Error', resp.error, 'error');
+                    return;
+                }
+                swal('Listo', (resp && resp.message) ? resp.message : 'Aprobación guardada.', 'success');
+                cargarSignosVitales();
+            },
+            error: function(xhr) {
+                swal('Error', xhr.responseText || 'No se pudo aprobar.', 'error');
+            }
+        });
+    });
+}
+
 function registrarSignosVitales() {
     // Obtener valores de los campos
     const fecha = document.getElementById("fecha").value;
     const hora = document.getElementById("hora").value;
-    const procesadoPor = document.getElementById("procesadoPor").value;
-    const fc = document.getElementById("fc").value;
-    const ta = document.getElementById("ta").value;
-    const temp = document.getElementById("temp").value;
-    const spo = document.getElementById("spo").value;
-    const peso = document.getElementById("peso").value;
-    const talla = document.getElementById("talla").value;
+    const processedBy = document.getElementById("processedBy").value;
+    const weight = document.getElementById("weight").value;
+    const stature = document.getElementById("stature").value;
+    const bloodPressure = document.getElementById("bloodPressure").value;
+    const mapPressure = document.getElementById("mapPressure").value;
+    const heartRate = document.getElementById("heartRate").value;
+    const respiratoryRate = document.getElementById("respiratoryRate").value;
+    const oxygenSaturation = document.getElementById("oxygenSaturation").value;
+    const temperature = document.getElementById("temperature").value;
+    const glucose = document.getElementById("glucose").value;
     const idpa = <?php echo $_GET['id']; ?>;
 
-    // Validar que no haya campos vacíos
-    if (!fecha || !hora || !procesadoPor || !fc || !ta || !temp || !spo || !peso || !talla) {
+    // Validar que no haya campos vacíos (excepto reviews_by que puede ser opcional)
+    if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
         swal('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
@@ -1824,16 +1883,20 @@ function registrarSignosVitales() {
     $.ajax({
         type: "POST",
         url: "add_signos_vitales.php",
+        dataType: "json",
         data: {
             fecha: fecha,
             hora: hora,
-            procesado_por: procesadoPor,
-            fc: fc,
-            ta: ta,
-            temp: temp,
-            spo: spo,
-            peso: peso,
-            talla: talla,
+            processed_by: processedBy,
+            weight: weight,
+            stature: stature,
+            blood_pressure: bloodPressure,
+            map_pressure: mapPressure,
+            heart_rate: heartRate,
+            respiratory_rate: respiratoryRate,
+            oxygen_saturation: oxygenSaturation,
+            temperature: temperature,
+            glucose: glucose,
             idpa: idpa
         },
         success: function(response) {
@@ -1861,20 +1924,52 @@ function cargarSignosVitales() {
         success: function(result) {
             let content = '';
             result.forEach(item => {
+                const pdfSvBtn =
+                    '<button type="button" class="register-btn" title="PDF de este registro" onclick="descargarPDFSignoVital(' +
+                    item.id +
+                    ')">PDF</button>';
+                const accFlexOpen = '<div style="display:flex;flex-direction:column;gap:10px;">';
+                const accFlexClose = '</div>';
+                let accBtns = '';
+                if (!svEstaAprobadoHistoria(item)) {
+                    if (medidataPuedeAprobarSv) {
+                        accBtns =
+                            accFlexOpen +
+                            pdfSvBtn +
+                            '<button type="button" class="register-btn" onclick="aprobarSignosVitalesRow(' +
+                            item.id +
+                            ')">Aprobar</button>' +
+                            accFlexClose;
+                    } else {
+                        accBtns =
+                            accFlexOpen +
+                            pdfSvBtn +
+                            '<button type="button" class="register-btn" disabled>Pendiente aprobación</button>' +
+                            accFlexClose;
+                    }
+                } else {
+                    accBtns =
+                        accFlexOpen +
+                        pdfSvBtn +
+                        '<button type="button" class="register-btn" disabled>Registrados</button>' +
+                        accFlexClose;
+                }
                 content += `
                     <tr>
                         <td>${item.fecha}</td>
                         <td>${item.hora}</td>
-                        <td>${item.procesado_por}</td>
-                        <td>${item.fc}</td>
-                        <td>${item.ta}</td>
-                        <td>${item.temp}</td>
-                        <td>${item.spo}</td>
-                        <td>${item.peso_kg}</td>
-                        <td>${item.talla}</td>
-                        <td>
-                            <button class="register-btn" disabled>Registrar</button>
-                        </td>
+                        <td>${item.processed_by}</td>
+                        <td>${item.reviews_by || '-'}</td>
+                        <td>${item.weight}</td>
+                        <td>${item.stature}</td>
+                        <td>${item.blood_pressure}</td>
+                        <td>${item.map_pressure}</td>
+                        <td>${item.heart_rate}</td>
+                        <td>${item.respiratory_rate}</td>
+                        <td>${item.oxygen_saturation}</td>
+                        <td>${item.temperature}</td>
+                        <td>${item.glucose}</td>
+                        <td>${accBtns}</td>
                     </tr>
                 `;
             });
@@ -1884,13 +1979,17 @@ function cargarSignosVitales() {
                 <tr>
                     <td><input type="date" id="fecha"></td>
                     <td><input type="time" id="hora"></td>
-                    <td><input type="text" id="procesadoPor" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="fc"></td>
-                    <td><input type="text" id="ta"></td>
-                    <td><input type="text" id="temp"></td>
-                    <td><input type="text" id="spo"></td>
-                    <td><input type="text" id="peso"></td>
-                    <td><input type="text" id="talla"></td>
+                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
+                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
+                    <td><input type="text" id="weight"></td>
+                    <td><input type="text" id="stature"></td>
+                    <td><input type="text" id="bloodPressure"></td>
+                    <td><input type="text" id="mapPressure"></td>
+                    <td><input type="text" id="heartRate"></td>
+                    <td><input type="text" id="respiratoryRate"></td>
+                    <td><input type="text" id="oxygenSaturation"></td>
+                    <td><input type="text" id="temperature"></td>
+                    <td><input type="text" id="glucose"></td>
                     <td>
                         <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
                     </td>

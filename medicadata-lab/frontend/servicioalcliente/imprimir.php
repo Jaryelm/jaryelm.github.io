@@ -270,28 +270,36 @@ addSection(
   "SELECT 
       fecha AS Fecha, 
       hora AS Hora, 
-      procesado_por AS 'Procesado Por', 
-      fc AS 'Presión Arterial', 
-      ta AS 'PAM', 
-      temp AS 'Temp', 
-      spo AS 'Frec Card', 
-      peso_kg AS 'Frec Resp', 
-      talla AS 'Saturación'
+      processed_by AS 'Procesado Por', 
+      reviews_by AS 'Revisado Por',
+      blood_pressure AS 'PA', 
+      map_pressure AS 'PAM', 
+      temperature AS 'TEMP', 
+      heart_rate AS 'FC', 
+      respiratory_rate AS 'FR', 
+      oxygen_saturation AS 'SAT',
+      weight AS 'PESO',
+      stature AS 'TALLA',
+      glucose AS 'GLUCOSA'
    FROM signos_vitales 
    WHERE idpa = :idpa 
    ORDER BY fecha DESC, hora DESC",
   [
       'Fecha' => 'Fecha', 
       'Hora' => 'Hora', 
-      'Procesado Por' => 'Procesado Por', 
-      'Presión Arterial' => 'PA', 
+      'Procesado Por' => 'Realizado', 
+      'Revisado Por' => 'Revisado',
+      'PA' => 'PA', 
       'PAM' => 'PAM', 
-      'Temp' => 'TEMP', 
-      'Frec Card' => 'FC', 
-      'Frec Resp' => 'FR', 
-      'Saturación' => 'SAT'
+      'TEMP' => 'TEMP', 
+      'FC' => 'FC', 
+      'FR' => 'FR', 
+      'SAT' => 'SAT',
+      'PESO' => 'PESO',
+      'TALLA' => 'TALLA',
+      'GLUCOSA' => 'GLU'
   ],
-  [0.12, 0.12, 0.18, 0.1, 0.08, 0.08, 0.1, 0.1, 0.12] // Anchos relativos de las columnas
+  [0.08, 0.08, 0.12, 0.12, 0.08, 0.06, 0.06, 0.06, 0.06, 0.06, 0.07, 0.07, 0.08] // Anchos relativos (total 1.0)
 );
 
 $pdf->AddPage();
