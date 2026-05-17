@@ -1841,56 +1841,94 @@ input:checked + .slider:before {
 }
 
 /*
- * DataTables + scrollX: la cabecera visible es un clon sin id — sin estas reglas
- * pierde el color de marca (#06adbf) que sí aplica #directorio-table / #compras_table.
- * Cuerpo alineado con Compras Registradas (filas alternas).
+ * Estilo General para DataTables (Standard & scrollX)
+ * Asegura el color de marca (#06adbf) y filas alternas en todo el sistema.
  */
-#directorio-table_wrapper .dataTables_scrollHead table.dataTable thead th,
-#directorio-table_wrapper .dataTables_scrollHead table.dataTable thead td,
-#compras_table_wrapper .dataTables_scrollHead table.dataTable thead th,
-#compras_table_wrapper .dataTables_scrollHead table.dataTable thead td {
-  background-color: #06adbf !important;
-  color: #fff !important;
-  padding: 10px !important;
-  border-bottom: 2px solid #035c67 !important;
-  font-weight: bold;
+.dataTables_wrapper,
+.dataTables_scroll,
+.dataTables_scrollHead,
+.dataTables_scrollHeadInner,
+.dataTables_scrollHeadInner table,
+.dataTables_scrollBody,
+.dataTables_scrollBody table,
+table.dataTable {
+  width: 100% !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
 }
 
-/* Lista inventario: cabecera continua como Compras (sin líneas verticales entre columnas) */
-#directorio-table_wrapper .dataTables_scrollHead table.dataTable thead th,
-#directorio-table_wrapper .dataTables_scrollHead table.dataTable thead td {
+.dataTables_wrapper .dataTables_scrollHead table.dataTable thead th,
+.dataTables_wrapper .dataTables_scrollHead table.dataTable thead td,
+table.dataTable thead th {
+  background-color: #06adbf !important;
+  color: #fff !important;
+  padding: 12px 15px !important;
+  border-bottom: 2px solid #035c67 !important;
+  font-weight: bold;
+  text-align: left !important;
+  box-sizing: border-box;
+}
+
+/* Ocultar la fila "fantasma" de alineación que genera DataTables para el scroll */
+/* Esta fila a veces hereda el color del header y parece una línea vacía azul */
+table.dataTable thead tr[style*="height:0"],
+table.dataTable thead tr[style*="height: 0"],
+.dataTables_scrollBody table thead tr {
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+table.dataTable thead tr[style*="height:0"] th,
+table.dataTable thead tr[style*="height: 0"] th,
+.dataTables_scrollBody table thead tr th {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  height: 0 !important;
+  line-height: 0 !important;
+}
+
+/* Eliminar márgenes automáticos que centran y reducen el ancho */
+.dataTables_scrollHeadInner {
+  padding-right: 0px !important;
+}
+
+/* Lista inventario y tablas generales: cabecera sin líneas verticales innecesarias */
+.dataTables_wrapper .dataTables_scrollHead table.dataTable thead th,
+.dataTables_wrapper .dataTables_scrollHead table.dataTable thead td {
   border-left: none !important;
   border-right: none !important;
   border-top: none !important;
 }
 
-#directorio-table_wrapper .dataTables_scrollHead table.dataTable,
-#directorio-table_wrapper .dataTables_scrollBody #directorio-table.dataTable {
+.dataTables_wrapper .dataTables_scrollHead table.dataTable,
+.dataTables_wrapper .dataTables_scrollBody table.dataTable {
   border: none !important;
   border-radius: 0 !important;
 }
 
-#directorio-table_wrapper .dataTables_scrollBody table.dataTable tbody td,
-#directorio-table_wrapper .dataTables_scrollBody table.dataTable tbody th {
+.dataTables_wrapper .dataTables_scrollBody table.dataTable tbody td,
+.dataTables_wrapper .dataTables_scrollBody table.dataTable tbody th {
   border-left: none !important;
   border-right: none !important;
 }
 
-#directorio-table_wrapper .dataTables_scrollBody tbody tr:nth-child(even) > td,
-#compras_table_wrapper .dataTables_scrollBody tbody tr:nth-child(even) > td {
+/* Filas alternas y celdas consistentes */
+.dataTables_wrapper .dataTables_scrollBody tbody tr:nth-child(even) > td,
+table.dataTable tbody tr:nth-child(even) {
   background-color: #e6f7f8 !important;
 }
 
-#directorio-table_wrapper .dataTables_scrollBody tbody tr:nth-child(odd) > td,
-#compras_table_wrapper .dataTables_scrollBody tbody tr:nth-child(odd) > td {
+.dataTables_wrapper .dataTables_scrollBody tbody tr:nth-child(odd) > td,
+table.dataTable tbody tr:nth-child(odd) {
   background-color: #ffffff !important;
 }
 
-#directorio-table_wrapper .dataTables_scrollBody tbody td,
-#compras_table_wrapper .dataTables_scrollBody tbody td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #e0e0e0;
-  vertical-align: middle;
+.dataTables_wrapper .dataTables_scrollBody tbody td,
+table.dataTable tbody td {
+  padding: 8px 10px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  vertical-align: middle !important;
 }
 
 #directorio-table_wrapper .dataTables_scrollBody td img.foto-thumb {

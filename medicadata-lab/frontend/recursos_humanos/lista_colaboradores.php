@@ -24,32 +24,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             margin-top: 20px;
         }
 
-        #colaboradores_table {
-            width: 100% !important;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: var(--light);
-            text-align: left;
-        }
-
-        #colaboradores_table thead th {
-            background-color: var(--blue);
-            color: var(--light);
-            padding: 12px 10px;
-            border-bottom: 2px solid var(--dark-blue);
-            font-weight: 600;
-        }
-
-        #colaboradores_table tbody td {
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--grey);
-            color: var(--dark);
-        }
-
-        #colaboradores_table tbody tr:hover {
-            background-color: var(--grey) !important;
-        }
-
         .table-title h1 {
             font-size: 24px;
             font-weight: 600;
@@ -57,7 +31,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             margin-bottom: 5px;
         }
 
-        /* Estilo para los botones de DataTables */
+        /* Estilo para los botones de DataTables (Mantenidos según preferencia) */
         .dt-buttons .dt-button {
             background-color: var(--blue) !important;
             color: white !important;
