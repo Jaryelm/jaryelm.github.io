@@ -196,7 +196,14 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
                 <div class="dashboard">
                     <?php
                     // Conteos rápidos
-                    $totalColaboradores = $connect->query("SELECT COUNT(*) FROM doctor")->fetchColumn();
+                    $totalColaboradores = $connect->query("WITH colaboradores AS (
+                        SELECT COUNT(*) AS 'Colaborador' FROM medic9ue_medi_data.doctor
+                        UNION ALL
+                        SELECT COUNT(*) FROm medic9ue_medi_data.nurse
+                        UNION ALL
+                        SELECT COUNT(*) FROm medic9ue_medi_data.users
+                        )
+                        SELECT SUM(Colaborador) FROM colaboradores;")->fetchColumn();
                     $totalPacientes = $connect->query("SELECT COUNT(*) FROM patients")->fetchColumn();
                     ?>
                     <div class="card">
