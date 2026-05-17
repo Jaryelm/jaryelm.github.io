@@ -165,20 +165,62 @@
         </li>
 
         <li>
-            <a href="#"><i class='bx bx-accessibility icon'></i>ENFERMERÍA<i class='bx bx-chevron-right icon-right'></i></a>
-            <ul class="side-dropdown">
-                <li><a href="../admision/preadmision.php">ADMISIÓN</a></li>
-                <li><a href="../pacientes/historial.php">EXPEDIENTE CLINICO</a></li>
-                <li><a href="../pacientes/otros_anexos_paciente.php">OTROS ANEXOS</a></li>
-                <li><a href="../enfermeria/estudios.php">ORDEN ESTUDIOS RADIOLOGÍA E IMAGEN</a></li>
-                <li><a href="../enfermeria/examenes_lab_externo.php">ESTUDIOS RADIOLOGÍA E IMAGEN EXTERNO</a></li>
-                <li><a href="../enfermeria/examenes_lab.php">ORDEN EXAMENES DE LABORATORIO</a></li>
-                <li><a href="../enfermeria/estudios_externos.php">EXAMENES LABORATORIALES EXTERNO</a></li>
-                <!-- <li><a href="../enfermeria/soliditud_medicamentos_insumo.php">SOLICITUD DE MEDICAMENTOS E INSUMOS</a></li> -->
-                <li><a href="../enfermeria/solicitud_interconsulta.php">SOLICITUD DE INTERCONSULTAS</a></li>
-                <li><a href="../enfermeria/solicitud_intrahospitalario.php">SOLICITUD DE EQUIPO INTRAHOSPITARALIO</a></li>
+                <a href="#"><i class='bx bxs-box icon'></i>INVENTARIO<i class='bx bx-chevron-right icon-right' ></i></a>
+                <ul class="side-dropdown">
+                    <li><a href="../almacen/compra_unificada.php">COMPRA E INVENTARIO</a></li>
+                    <li><a href="../almacen/mostrar_compras.php">COMPRAS REGISTRADAS</a></li>
+                    <li><a href="../almacen/mostrar.php">LISTA DE INVENTARIO</a></li>
+                    <li><a href="../almacen/categoria_new.php">CATEGORIAS</a></li>
+                    <li><a href="../almacen/categoria.php">LISTA DE CATEGORIAS</a></li>
+                    <li><a href="../almacen/nuevo_servicio.php">REGISTRAR SERVICIOS</a></li>
+                    <li><a href="../almacen/lista_servicios.php">LISTA DE SERVICIOS</a></li>
+                    <li><a href="../almacen/reorden.php">PUNTO DE REORDEN</a></li>
+                    <li><a href="../almacen/lista_solicitud_reorden_admin.php">AUTORIZACIÓN COMPRAS ALMACEN</a></li>
+                    <li><a href="../almacen/lista_requisiciones.php">REQUISICIONES</a></li>
 
-            </ul>
+                </ul>
+        </li>
+
+            <li>
+                <a href="#"><i class='bx bxs-bulb icon'></i>CRM MARKETING<i class='bx bx-chevron-right icon-right' ></i></a>
+                <ul class="side-dropdown">
+                    <li><a href="#">CUMPLEAÑOS</a></li>
+
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class='bx bxs-truck icon'></i>PROVEEDORES<i class='bx bx-chevron-right icon-right' ></i></a>
+                <ul class="side-dropdown">
+                    <li><a href="../contabilidad/formulario_directorio.php">REGISTRO DE PROVEEDORES</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class='bx bxs-calendar-check icon'></i>CITAS MEDICAS<i class='bx bx-chevron-right icon-right' ></i></a>
+                <ul class="side-dropdown">
+                    <li><a href="../pacientes/nuevo.php" >REGISTRO DE PACIENTES</a></li>
+                    <li><a href="../pacientes/documentos.php">AGREGAR DOCUMENTOS</a></li>
+                    <li><a href="../citas/nueva.php">PROGRAMACIÓN</a></li>
+                    <li><a href="../citas/calendario.php">CALENDARIO DE CITAS</a></li>
+                </ul>
+            </li>
+
+        <li>
+                <a href="#"><i class='bx bx-accessibility icon'></i>ENFERMERÍA<i class='bx bx-chevron-right icon-right' ></i></a>
+                <ul class="side-dropdown">
+                    <li><a href="../admision/preadmision.php">ADMISIÓN</a></li>
+                    <li><a href="../pacientes/historial.php">EXPEDIENTE CLINICO</a></li>
+                    <li><a href="../pacientes/otros_anexos_paciente.php">OTROS ANEXOS</a></li>
+                    <li><a href="../enfermeria/estudios.php">ORDEN ESTUDIOS RADIOLOGÍA E IMAGEN</a></li>
+                    <li><a href="../enfermeria/examenes_lab_externo.php">ESTUDIOS RADIOLOGÍA E IMAGEN EXTERNO</a></li>
+                    <li><a href="../enfermeria/examenes_lab.php">ORDEN EXAMENES DE LABORATORIO</a></li>
+                    <li><a href="../enfermeria/estudios_externos.php">EXAMENES LABORATORIALES EXTERNO</a></li>
+                    <!-- <li><a href="../enfermeria/soliditud_medicamentos_insumo.php">SOLICITUD DE MEDICAMENTOS E INSUMOS</a></li> -->
+                    <li><a href="../enfermeria/solicitud_interconsulta.php">SOLICITUD DE INTERCONSULTAS</a></li>
+                    <li><a href="../enfermeria/solicitud_intrahospitalario.php">SOLICITUD DE EQUIPO INTRAHOSPITARALIO</a></li>
+                    
+                </ul>
         </li>
 
         <li>

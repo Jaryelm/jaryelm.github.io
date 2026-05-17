@@ -1,12 +1,23 @@
 <?php
+session_start();
 require_once('../../backend/bd/Conexion.php');
 
 date_default_timezone_set('America/Tegucigalpa');
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 try {
+    if (!isset($_SESSION['id'])) {
+        echo json_encode(['error' => 'Sesión no válida. Reinicie sesión e intente de nuevo.']);
+        exit;
+    }
+
+    $userIdSession = (int) $_SESSION['id'];
+    if ($userIdSession < 1) {
+        echo json_encode(['error' => 'Sesión no válida.']);
+        exit;
+    }
+
     if (
-        empty($_POST['processed_by']) ||
         empty($_POST['blood_pressure']) || empty($_POST['map_pressure']) || empty($_POST['temperature']) ||
         empty($_POST['heart_rate']) || empty($_POST['respiratory_rate']) || empty($_POST['oxygen_saturation']) ||
         empty($_POST['weight']) || empty($_POST['stature']) || empty($_POST['glucose']) ||
@@ -15,8 +26,15 @@ try {
         throw new Exception("Todos los campos son obligatorios.");
     }
 
-    $processedBy = $_POST['processed_by'];
-    $reviewsBy = $_POST['reviews_by'] ?? '';
+    $stmtName = $connect->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+    $stmtName->execute([$userIdSession]);
+    $nombreDb = trim((string) $stmtName->fetchColumn());
+
+    $processedBy = $nombreDb !== '' ? $nombreDb : trim((string) ($_POST['processed_by'] ?? ''));
+    if ($processedBy === '') {
+        throw new Exception('No se pudo obtener el nombre del usuario que registra.');
+    }
+
     $weight = $_POST['weight'];
     $stature = $_POST['stature'];
     $bloodPressure = $_POST['blood_pressure'];
@@ -28,19 +46,41 @@ try {
     $glucose = $_POST['glucose'];
     $idpa = $_POST['idpa'];
 
+    $fechaPv = isset($_POST['fecha']) ? trim((string) $_POST['fecha']) : '';
+    $horaPv = isset($_POST['hora']) ? trim((string) $_POST['hora']) : '';
+
+    /** Siempre persistir fecha/hora: respaldo servidor (evita NULL si el cliente no las envía). */
+    if ($fechaPv === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaPv)) {
+        $fechaPv = date('Y-m-d');
+    }
+    if ($horaPv !== '' && preg_match('/^\d{2}:\d{2}$/', $horaPv)) {
+        $horaPv .= ':00';
+    }
+    if ($horaPv === '' || !preg_match('/^\d{2}:\d{2}:\d{2}$/', $horaPv)) {
+        $horaPv = date('H:i:s');
+    }
+
     $sql = "INSERT INTO signos_vitales (
-                processed_by, reviews_by, weight, stature, 
-                blood_pressure, map_pressure, temperature, heart_rate, 
+                fecha, hora,
+                processed_by, reviews_by, processed_by_user_id,
+                reviewed_by_user_id, reviewed_at,
+                weight, stature,
+                blood_pressure, map_pressure, temperature, heart_rate,
                 respiratory_rate, oxygen_saturation, glucose, idpa
             ) VALUES (
-                :processedBy, :reviewsBy, :weight, :stature, 
-                :bloodPressure, :mapPressure, :temperature, :heartRate, 
+                :fecha, :hora,
+                :processedBy, '', :processedByUid,
+                NULL, NULL,
+                :weight, :stature,
+                :bloodPressure, :mapPressure, :temperature, :heartRate,
                 :respiratoryRate, :oxygenSaturation, :glucose, :idpa
             )";
     $stmt = $connect->prepare($sql);
     $stmt->execute([
+        ':fecha' => $fechaPv,
+        ':hora' => $horaPv,
         ':processedBy' => $processedBy,
-        ':reviewsBy' => $reviewsBy,
+        ':processedByUid' => $userIdSession,
         ':weight' => $weight,
         ':stature' => $stature,
         ':bloodPressure' => $bloodPressure,
@@ -50,7 +90,7 @@ try {
         ':respiratoryRate' => $respiratoryRate,
         ':oxygenSaturation' => $oxygenSaturation,
         ':glucose' => $glucose,
-        ':idpa' => $idpa
+        ':idpa' => $idpa,
     ]);
 
     $fetchSql = "SELECT * FROM signos_vitales WHERE idpa = :idpa ORDER BY created_at DESC";
@@ -60,14 +100,13 @@ try {
     $records = $fetchStmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        "success" => "Signos vitales guardados correctamente.",
-        "data" => $records
+        'success' => 'Signos vitales guardados correctamente.',
+        'data' => $records,
     ]);
 } catch (PDOException $e) {
-    error_log("Error de base de datos: " . $e->getMessage());
-    echo json_encode(["error" => "Error al guardar en la base de datos."]);
+    error_log('add_signos_vitales PDO: ' . $e->getMessage());
+    echo json_encode(['error' => 'Error al guardar en la base de datos (¿aplicó la migración de firmas?).']);
 } catch (Exception $e) {
-    error_log("Error general: " . $e->getMessage());
-    echo json_encode(["error" => $e->getMessage()]);
+    error_log('add_signos_vitales: ' . $e->getMessage());
+    echo json_encode(['error' => $e->getMessage()]);
 }
-?>

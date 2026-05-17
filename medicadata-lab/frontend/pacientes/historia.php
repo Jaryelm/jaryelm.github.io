@@ -1,5 +1,6 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+$medidataPuedeAprobarSignosVitales = (($_SESSION['rol'] ?? '') === 'Administrador');
 // incuir el archivo de sesion login
 ?>
 <!DOCTYPE html>
@@ -425,7 +426,7 @@ if($sentencia){
                     <td><input type="date" id="fecha" value="<?php echo date('Y-m-d'); ?>" readonly></td>
                     <td><input type="time" id="hora" value="<?php echo date('H:i'); ?>" readonly></td>
                     <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="reviewsBy"></td>
+                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
                     <td><input type="text" id="weight"></td>
                     <td><input type="text" id="stature"></td>
                     <td><input type="text" id="bloodPressure"></td>
@@ -450,6 +451,12 @@ if($sentencia){
     const url = `generate_signos_vitales_pdf.php?idpa=${idpa}`;
     window.open(url, '_blank'); // Abrir el PDF en una nueva pestaña
 }
+
+    function descargarPDFSignoVital(signoId) {
+        const idpa = <?php echo (int)($_GET['id'] ?? 0); ?>;
+        if (!signoId) return;
+        window.open(`generate_signos_vitales_pdf.php?idpa=${idpa}&signo_id=${signoId}`, '_blank');
+    }
 </script>
 <!-- Estilo para el boton "Registrar" -->
 <Style>
@@ -2097,9 +2104,53 @@ function descargarAltaExigidaPDF() {
     
 
     <script>
+const medidataPuedeAprobarSv = <?php echo !empty($medidataPuedeAprobarSignosVitales) ? 'true' : 'false'; ?>;
+const medidataApproveSvUrl = 'approve_signos_vitales.php';
+
+function svEstaAprobadoHistoria(item) {
+    const txt = item.reviews_by != null ? String(item.reviews_by).trim() : '';
+    if (txt !== '' && txt !== '-') return true;
+    if (item.reviewed_at != null && String(item.reviewed_at).trim() !== '') return true;
+    const rid = item.reviewed_by_user_id != null ? parseInt(item.reviewed_by_user_id, 10) : 0;
+    return !isNaN(rid) && rid > 0;
+}
+
+function aprobarSignosVitalesRow(signoId) {
+    var idpac = <?php echo (int)($_GET['id'] ?? 0); ?>;
+    swal({
+        title: '¿Aprobar registro?',
+        text: 'Se registrarán su nombre y firma digital del perfil en "Revisado por".',
+        icon: 'info',
+        buttons: true,
+        dangerMode: false
+    }).then(function(ok) {
+        if (!ok) return;
+        $.ajax({
+            type: 'POST',
+            url: medidataApproveSvUrl,
+            dataType: 'json',
+            data: { signo_id: signoId, idpa: idpac },
+            success: function(resp) {
+                if (resp && resp.error) {
+                    swal('Error', resp.error, 'error');
+                    return;
+                }
+                swal('Listo', (resp && resp.message) ? resp.message : 'Aprobación guardada.', 'success');
+                cargarSignosVitales();
+            },
+            error: function(xhr) {
+                swal('Error', xhr.responseText || 'No se pudo aprobar.', 'error');
+            }
+        });
+    });
+}
+
 function registrarSignosVitales() {
+    const fechaEl = document.getElementById("fecha");
+    const horaEl = document.getElementById("hora");
+    const fecha = fechaEl ? fechaEl.value.trim() : "";
+    const hora = horaEl ? horaEl.value.trim() : "";
     const processedBy = document.getElementById("processedBy").value;
-    const reviewsBy = document.getElementById("reviewsBy").value;
     const weight = document.getElementById("weight").value;
     const stature = document.getElementById("stature").value;
     const bloodPressure = document.getElementById("bloodPressure").value;
@@ -2111,7 +2162,7 @@ function registrarSignosVitales() {
     const glucose = document.getElementById("glucose").value;
     const idpa = <?php echo $_GET['id']; ?>;
 
-    if (!processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
+    if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
         swal('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
@@ -2119,9 +2170,11 @@ function registrarSignosVitales() {
     $.ajax({
         type: "POST",
         url: "add_signos_vitales.php",
+        dataType: "json",
         data: {
+            fecha: fecha,
+            hora: hora,
             processed_by: processedBy,
-            reviews_by: reviewsBy,
             weight: weight,
             stature: stature,
             blood_pressure: bloodPressure,
@@ -2158,6 +2211,36 @@ function cargarSignosVitales() {
         success: function(result) {
             let content = '';
             result.forEach(item => {
+                const pdfSvBtn =
+                    '<button type="button" class="register-btn" title="PDF de este registro" onclick="descargarPDFSignoVital(' +
+                    item.id +
+                    ')">PDF</button>';
+                const accFlexOpen = '<div style="display:flex;flex-direction:column;gap:10px;">';
+                const accFlexClose = '</div>';
+                let accBtns = '';
+                if (!svEstaAprobadoHistoria(item)) {
+                    if (medidataPuedeAprobarSv) {
+                        accBtns =
+                            accFlexOpen +
+                            pdfSvBtn +
+                            '<button type="button" class="register-btn" onclick="aprobarSignosVitalesRow(' +
+                            item.id +
+                            ')">Aprobar</button>' +
+                            accFlexClose;
+                    } else {
+                        accBtns =
+                            accFlexOpen +
+                            pdfSvBtn +
+                            '<button type="button" class="register-btn" disabled>Pendiente aprobación</button>' +
+                            accFlexClose;
+                    }
+                } else {
+                    accBtns =
+                        accFlexOpen +
+                        pdfSvBtn +
+                        '<button type="button" class="register-btn" disabled>Registrados</button>' +
+                        accFlexClose;
+                }
                 content += `
                     <tr>
                         <td>${item.fecha}</td>
@@ -2173,9 +2256,7 @@ function cargarSignosVitales() {
                         <td>${item.oxygen_saturation}</td>
                         <td>${item.temperature}</td>
                         <td>${item.glucose}</td>
-                        <td>
-                            <button class="register-btn" disabled>Registrados</button>
-                        </td>
+                        <td>${accBtns}</td>
                     </tr>
                 `;
             });
@@ -2192,7 +2273,7 @@ function cargarSignosVitales() {
                     <td><input type="date" id="fecha" value="${dateStr}" readonly></td>
                     <td><input type="time" id="hora" value="${timeStr}" readonly></td>
                     <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
-                    <td><input type="text" id="reviewsBy"></td>
+                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
                     <td><input type="text" id="weight"></td>
                     <td><input type="text" id="stature"></td>
                     <td><input type="text" id="bloodPressure"></td>
