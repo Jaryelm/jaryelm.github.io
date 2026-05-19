@@ -56,11 +56,11 @@ try {
 
     if ($tipo_paciente === 'paciente') {
         $sql = "INSERT INTO signos_vitales (
-                    fecha, hora, processed_by, reviews_by, processed_by_user_id,
+                    fecha, hora, processed_by, reviews_by,
                     weight, stature, blood_pressure, map_pressure, temperature, 
                     heart_rate, respiratory_rate, oxygen_saturation, glucose, idpa
                 ) VALUES (
-                    :fecha, :hora, :processedBy, '', :processedByUid,
+                    :fecha, :hora, :processedBy, '',
                     :weight, :stature, :bloodPressure, :mapPressure, :temperature, 
                     :heartRate, :respiratoryRate, :oxygenSaturation, :glucose, :idpa
                 )";
@@ -82,21 +82,6 @@ try {
         ];
     }
 
-    $common_params = [
-        ':fecha' => $fechaPv,
-        ':hora' => $horaPv,
-        ':processedBy' => $processedBy,
-        ':weight' => $weight,
-        ':stature' => $stature,
-        ':bloodPressure' => $bloodPressure,
-        ':mapPressure' => $mapPressure,
-        ':temperature' => $temperature,
-        ':heartRate' => $heartRate,
-        ':respiratoryRate' => $respiratoryRate,
-        ':oxygen_saturation' => $oxygenSaturation, // Note: fixing param name if needed, usually :oxygenSaturation
-        ':glucose' => $glucose
-    ];
-
     // Rectify param names
     $stmt_params = array_merge($params, [
         ':fecha' => $fechaPv,
@@ -113,10 +98,6 @@ try {
         ':glucose' => $glucose
     ]);
     
-    if ($tipo_paciente === 'paciente') {
-        $stmt_params[':processedByUid'] = $userIdSession;
-    }
-
     $stmt = $connect->prepare($sql);
     $stmt->execute($stmt_params);
 

@@ -105,11 +105,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
         }
         .modal-content-custom {
             background-color: #fefefe;
-            margin: 5% auto;
+            margin: 2% auto;
             padding: 25px;
             border-radius: 12px;
-            width: 90%;
-            max-width: 1200px;
+            width: 95%;
+            max-width: 1400px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .modal-header {
@@ -127,10 +127,39 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             color: #aaa;
         }
         .close-modal:hover { color: black; }
+
+        /* Asegurar que las tablas no se desborden */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         
         @media (max-width: 768px) {
             #vitals-form-grid {
                 grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Layout lateral para registro y tabla */
+        .vitals-flex-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .vitals-form-section {
+            flex: 0 0 40%;
+            min-width: 450px;
+        }
+        .vitals-table-section {
+            flex: 1;
+            min-width: 500px;
+        }
+        @media (max-width: 1200px) {
+            .vitals-form-section, .vitals-table-section {
+                flex: 0 0 100%;
+                min-width: 100%;
             }
         }
     </style>
@@ -197,80 +226,105 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             </div>
 
             <!-- Formulario de Signos Vitales y Tabla Condensada -->
-            <div id="vitals_display_area" style="display: none;">
-                <div class="pre-clinica-container">
-                    <h3>Registrar Nuevos Signos Vitales</h3>
-                    <hr><br>
-                    <!-- Formulario con máximo 2 columnas -->
-                    <form id="vitals-form">
-                        <div id="vitals-form-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                            <div class="form-group">
-                                <label for="weight">Peso (kg)</label>
-                                <input type="text" id="weight" class="form-control" placeholder="Ej: 70.5" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="stature">Talla (cm)</label>
-                                <input type="text" id="stature" class="form-control" placeholder="Ej: 175" required>
-                            </div>
-                            
-                            <!-- PA Dividida para formato automático con "/" -->
-                            <div class="form-group">
-                                <label>Presión Arterial (PA)</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="number" id="bp_sys" class="form-control" placeholder="Sistólica (Ej: 120)" required style="width: 45%;">
-                                    <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
-                                    <input type="number" id="bp_dia" class="form-control" placeholder="Diastólica (Ej: 80)" required style="width: 45%;">
+            <div id="vitals_display_area">
+                <div class="vitals-flex-container">
+                    <!-- Columna Formulario (40%) -->
+                    <div class="vitals-form-section">
+                        <div class="pre-clinica-container">
+                            <h3>Registrar Nuevos Signos Vitales</h3>
+                            <hr><br>
+                            <form id="vitals-form">
+                                <div id="vitals-form-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                    <div class="form-group">
+                                        <label for="weight_kg">Peso (KG)</label>
+                                        <input type="number" step="0.01" id="weight_kg" class="form-control" placeholder="Ej: 70.5" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="stature_cm">Talla (CM)</label>
+                                        <input type="number" step="0.01" id="stature_cm" class="form-control" placeholder="Ej: 175" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Presión Arterial (mmHg)</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="number" id="bp_sys" class="form-control" placeholder="120" required style="width: 45%;">
+                                            <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                            <input type="number" id="bp_dia" class="form-control" placeholder="80" required style="width: 45%;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Frec. Cardíaca (lpm)</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="number" id="hr_1" class="form-control" placeholder="60" required style="width: 45%;">
+                                            <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                            <input type="number" id="hr_2" class="form-control" placeholder="100" required style="width: 45%;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Frec. Respiratoria (rpm)</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="number" id="rr_1" class="form-control" placeholder="14" required style="width: 45%;">
+                                            <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                            <input type="number" id="rr_2" class="form-control" placeholder="16" required style="width: 45%;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Saturación (SatO2)</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="number" id="sat_1" class="form-control" placeholder="96" required style="width: 45%;">
+                                            <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                            <input type="number" id="sat_2" class="form-control" placeholder="80" required style="width: 45%;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="temp_c">Temperatura (°C)</label>
+                                        <input type="number" step="0.1" id="temp_c" class="form-control" placeholder="Ej: 36.5" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="map_pressure">P.A. Media (PAM)</label>
+                                        <input type="text" id="map_pressure" class="form-control" value="N/A" required>
+                                    </div>
+                                    
+                                    <div class="form-group" style="grid-column: span 2;">
+                                        <label for="glucose_mg">Glucosa (mg/dL)</label>
+                                        <input type="number" step="0.01" id="glucose_mg" class="form-control" placeholder="Ej: 110" required>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="map_pressure">P.A. Media (PAM)</label>
-                                <input type="text" id="map_pressure" class="form-control" value="N/A" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="heart_rate">Frec. Cardíaca (FC)</label>
-                                <input type="text" id="heart_rate" class="form-control" placeholder="Ej: 80" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="respiratory_rate">Frec. Respiratoria (FR)</label>
-                                <input type="text" id="respiratory_rate" class="form-control" placeholder="Ej: 18" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="oxygen_saturation">Saturación (SAT %)</label>
-                                <input type="text" id="oxygen_saturation" class="form-control" placeholder="Ej: 98" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="temperature">Temperatura (°C)</label>
-                                <input type="text" id="temperature" class="form-control" placeholder="Ej: 36.5" required>
-                            </div>
-                            <div class="form-group" style="grid-column: span 2;">
-                                <label for="glucose">Glucosa (mg/dL)</label>
-                                <input type="text" id="glucose" class="form-control" placeholder="Ej: 110" required>
+                                <br>
+                                <button type="submit" id="btn_save_vitals" class="search-btn" style="width: 100%; justify-content: center; background-color: #28a745; margin-top: 10px;" disabled>
+                                    <i class='bx bx-save'></i> Guardar Signos Vitales
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Columna Tabla (60%) -->
+                    <div class="vitals-table-section">
+                        <div class="pre-clinica-container">
+                            <h3>Últimos Registros (Resumen)</h3>
+                            <hr><br>
+                            <div class="table-responsive">
+                                <table class="dataTable display table-condensed" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha y Hora</th>
+                                            <th>Realizado Por</th>
+                                            <th>Revisado Por</th>
+                                            <th>FC / FR</th>
+                                            <th>PA / SAT</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summary-body">
+                                        <tr><td colspan="6" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <br>
-                        <button type="submit" class="search-btn" style="width: 100%; justify-content: center; background-color: #28a745; margin-top: 10px;">
-                            <i class='bx bx-save'></i> Guardar Signos Vitales
-                        </button>
-                    </form>
-
-                    <div style="margin-top: 50px;">
-                        <h3>Últimos Registros (Resumen)</h3>
-                        <hr><br>
-                        <table class="dataTable display table-condensed" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>Fecha y Hora</th>
-                                    <th>Realizado Por</th>
-                                    <th>Revisado Por</th>
-                                    <th>FC / FR</th>
-                                    <th>PA / SAT</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summary-body">
-                                <tr><td colspan="5" style="text-align:center;">Cargando...</td></tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -293,15 +347,16 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                             <th>Hora</th>
                             <th>Realizado Por</th>
                             <th>Revisado Por</th>
-                            <th>Peso</th>
-                            <th>Talla</th>
-                            <th>PA</th>
+                            <th>Peso (kg/lb)</th>
+                            <th>Talla (cm/in)</th>
+                            <th>PA (mmHg)</th>
                             <th>PAM</th>
-                            <th>FC</th>
-                            <th>FR</th>
-                            <th>SAT</th>
-                            <th>TEMP</th>
-                            <th>GLUCOSA</th>
+                            <th>FC (lpm)</th>
+                            <th>FR (rpm)</th>
+                            <th>SAT (SatO2)</th>
+                            <th>TEMP (°C/°F)</th>
+                            <th>GLUCOSA (mg/dL / mmol/L)</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -337,6 +392,55 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
         $(document).ready(function() {
             let dataTableDetalles = null;
 
+            // Conversiones automáticas
+            // Peso KG <-> LB
+            $('#weight_kg').on('input', function() {
+                let kg = $(this).val();
+                if (kg) $('#weight_lb').val((kg * 2.20462).toFixed(2));
+                else $('#weight_lb').val('');
+            });
+            $('#weight_lb').on('input', function() {
+                let lb = $(this).val();
+                if (lb) $('#weight_kg').val((lb / 2.20462).toFixed(2));
+                else $('#weight_kg').val('');
+            });
+
+            // Talla CM <-> IN
+            $('#stature_cm').on('input', function() {
+                let cm = $(this).val();
+                if (cm) $('#stature_in').val((cm / 2.54).toFixed(2));
+                else $('#stature_in').val('');
+            });
+            $('#stature_in').on('input', function() {
+                let inch = $(this).val();
+                if (inch) $('#stature_cm').val((inch * 2.54).toFixed(2));
+                else $('#stature_cm').val('');
+            });
+
+            // Temperatura °C <-> °F
+            $('#temp_c').on('input', function() {
+                let c = $(this).val();
+                if (c) $('#temp_f').val(((c * 9/5) + 32).toFixed(1));
+                else $('#temp_f').val('');
+            });
+            $('#temp_f').on('input', function() {
+                let f = $(this).val();
+                if (f) $('#temp_c').val(((f - 32) * 5/9).toFixed(1));
+                else $('#temp_c').val('');
+            });
+
+            // Glucosa mg/dL <-> mmol/L
+            $('#glucose_mg').on('input', function() {
+                let mg = $(this).val();
+                if (mg) $('#glucose_mmol').val((mg / 18).toFixed(2));
+                else $('#glucose_mmol').val('');
+            });
+            $('#glucose_mmol').on('input', function() {
+                let mmol = $(this).val();
+                if (mmol) $('#glucose_mg').val((mmol * 18).toFixed(2));
+                else $('#glucose_mg').val('');
+            });
+
             // Inicializar Select2 con un pequeño delay para permitir que los scripts de carga inyecten los datos
             setTimeout(() => {
                 $('#patients, #outpatients').select2({
@@ -356,8 +460,16 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     $('#wrapper_patients').hide();
                     $('#wrapper_outpatients').show();
                 }
-                $('#vitals_display_area').hide();
                 $('#btn_ver_detalles').hide();
+                $('#btn_save_vitals').prop('disabled', true);
+                $('#summary-body').html('<tr><td colspan="5" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>');
+            });
+
+            // Resetear estado al cambiar de paciente en el select
+            $('#patients, #outpatients').on('change', function() {
+                $('#btn_ver_detalles').hide();
+                $('#btn_save_vitals').prop('disabled', true);
+                $('#summary-body').html('<tr><td colspan="5" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>');
             });
 
             // Consultar datos
@@ -370,8 +482,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     return;
                 }
 
-                // Mostrar el área de vitales y el botón de detalles
-                $('#vitals_display_area').fadeIn();
+                // Habilitar el botón de salvar y el de ver detalles
+                $('#btn_save_vitals').prop('disabled', false);
                 $('#btn_ver_detalles').fadeIn();
                 cargarVitals(tipo, id);
             });
@@ -382,16 +494,25 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     if (data && data.length > 0) {
                         data.slice(0, 5).forEach(item => {
                             const aprobado = item.reviews_by ? '<span class="badge" style="background:#28a745; color:white; padding:4px 8px; border-radius:10px;">' + item.reviews_by + '</span>' : '<span class="badge" style="background:#ffc107; color:#333; padding:4px 8px; border-radius:10px;">Pendiente</span>';
+                            const btnAprobar = !item.reviews_by ? `<button class="search-btn btn-aprobar" data-id="${item.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745;"><i class='bx bx-check-shield'></i> Aprobar</button>` : '-';
+                            
+                            // Conversiones dinámicas para el resumen
+                            const weight_kg = parseFloat(item.weight) || 0;
+                            const display_weight = weight_kg ? `${weight_kg}/${(weight_kg * 2.20462).toFixed(2)}` : item.weight;
+                            
+                            const pa_sat = `${item.blood_pressure} / ${item.oxygen_saturation}%`;
+
                             rows += `<tr>
                                 <td>${item.fecha} - ${item.hora}</td>
                                 <td>${item.processed_by}</td>
                                 <td>${aprobado}</td>
                                 <td>${item.heart_rate} bpm / ${item.respiratory_rate} rpm</td>
-                                <td>${item.blood_pressure} / ${item.oxygen_saturation}%</td>
+                                <td>${pa_sat}</td>
+                                <td>${btnAprobar}</td>
                             </tr>`;
                         });
                     } else {
-                        rows = '<tr><td colspan="5" style="text-align:center;">No hay registros previos para este paciente</td></tr>';
+                        rows = '<tr><td colspan="6" style="text-align:center;">No hay registros previos para este paciente</td></tr>';
                     }
                     $('#summary-body').html(rows);
                 });
@@ -418,16 +539,51 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         { data: 'fecha' },
                         { data: 'hora' },
                         { data: 'processed_by' },
-                        { data: 'reviews_by', defaultContent: '-' },
-                        { data: 'weight' },
-                        { data: 'stature' },
+                        { 
+                            data: 'reviews_by', 
+                            render: function(data) {
+                                return data ? `<span class="badge" style="background:#28a745; color:white; padding:4px 8px; border-radius:10px;">${data}</span>` : '<span class="badge" style="background:#ffc107; color:#333; padding:4px 8px; border-radius:10px;">Pendiente</span>';
+                            }
+                        },
+                        { 
+                            data: 'weight',
+                            render: function(data) {
+                                let val = parseFloat(data);
+                                return val ? `${val}/${(val * 2.20462).toFixed(2)}` : data;
+                            }
+                        },
+                        { 
+                            data: 'stature',
+                            render: function(data) {
+                                let val = parseFloat(data);
+                                return val ? `${val}/${(val / 2.54).toFixed(2)}` : data;
+                            }
+                        },
                         { data: 'blood_pressure' },
                         { data: 'map_pressure' },
                         { data: 'heart_rate' },
                         { data: 'respiratory_rate' },
                         { data: 'oxygen_saturation' },
-                        { data: 'temperature' },
-                        { data: 'glucose' }
+                        { 
+                            data: 'temperature',
+                            render: function(data) {
+                                let val = parseFloat(data);
+                                return val ? `${val}/${((val * 9/5) + 32).toFixed(1)}` : data;
+                            }
+                        },
+                        { 
+                            data: 'glucose',
+                            render: function(data) {
+                                let val = parseFloat(data);
+                                return val ? `${val}/${(val / 18).toFixed(2)}` : data;
+                            }
+                        },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                return !row.reviews_by ? `<button class="search-btn btn-aprobar" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745;"><i class='bx bx-check-shield'></i> Aprobar</button>` : '-';
+                            }
+                        }
                     ],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
@@ -436,6 +592,33 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     buttons: [
                         'copy', 'csv', 'excel', 'pdf', 'print'
                     ]
+                });
+            });
+
+            // Acción de Aprobar (Delegación de eventos)
+            $(document).on('click', '.btn-aprobar', function() {
+                const idRegistro = $(this).data('id');
+                const tipo = $('input[name="tipo_paciente"]:checked').val();
+                const idPaciente = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+
+                swal({
+                    title: "¿Confirmar Aprobación?",
+                    text: "Se registrará su nombre como revisor de estos signos vitales.",
+                    icon: "info",
+                    buttons: ["Cancelar", "Aprobar"],
+                }).then((willApprove) => {
+                    if (willApprove) {
+                        // Aquí se llamará al backend para actualizar reviews_by
+                        $.post('approve_vitals.php', { id: idRegistro, tipo: tipo }, function(resp) {
+                            if (resp.success) {
+                                swal("Éxito", resp.success, "success");
+                                cargarVitals(tipo, idPaciente);
+                                if (dataTableDetalles) dataTableDetalles.ajax.reload();
+                            } else {
+                                swal("Error", resp.error || "No se pudo aprobar", "error");
+                            }
+                        }, 'json');
+                    }
                 });
             });
 
@@ -450,23 +633,30 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                 const tipo = $('input[name="tipo_paciente"]:checked').val();
                 const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
 
-                // Construir Presión Arterial uniendo Sistólica y Diastólica
-                const bp_sys = $('#bp_sys').val();
-                const bp_dia = $('#bp_dia').val();
-                const blood_pressure = bp_sys + '/' + bp_dia;
+                // Construir valores compuestos solo para los que la BD espera como string "X/Y"
+                // Para los numéricos (Peso, Talla, Temp, Glucosa) enviamos solo la unidad base (KG, CM, °C, mg/dL)
+                const weight = $('#weight_kg').val();
+                const stature = $('#stature_cm').val();
+                const temperature = $('#temp_c').val();
+                const glucose = $('#glucose_mg').val();
+                
+                const blood_pressure = $('#bp_sys').val() + '/' + $('#bp_dia').val();
+                const heart_rate = $('#hr_1').val() + '/' + $('#hr_2').val();
+                const respiratory_rate = $('#rr_1').val() + '/' + $('#rr_2').val();
+                const oxygen_saturation = $('#sat_1').val() + '/' + $('#sat_2').val();
 
                 const formData = {
                     tipo_paciente: tipo,
                     id_paciente: id,
-                    weight: $('#weight').val(),
-                    stature: $('#stature').val(),
+                    weight: weight,
+                    stature: stature,
                     blood_pressure: blood_pressure,
                     map_pressure: $('#map_pressure').val(),
-                    heart_rate: $('#heart_rate').val(),
-                    respiratory_rate: $('#respiratory_rate').val(),
-                    oxygen_saturation: $('#oxygen_saturation').val(),
-                    temperature: $('#temperature').val(),
-                    glucose: $('#glucose').val()
+                    heart_rate: heart_rate,
+                    respiratory_rate: respiratory_rate,
+                    oxygen_saturation: oxygen_saturation,
+                    temperature: temperature,
+                    glucose: glucose
                 };
 
                 $.post('save_vitals.php', formData, function(resp) {
