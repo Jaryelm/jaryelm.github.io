@@ -1,5 +1,5 @@
 <?php
-include_once '../../backend/registros/session_check.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 ?>
 
 <!DOCTYPE html>
@@ -96,14 +96,14 @@ include_once '../../backend/registros/session_check.php';
 </head>
 
 <body>
-    <?php include_once '../admin/menu.php'; ?>
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/frontend/admin/menu.php'; ?>
 
     <section id="content">
         <nav>
             <i class='bx bx-menu toggle-sidebar'></i>
             <form action="#"><div class="form-group"></div></form>
             <span class="divider"></span>
-            <?php include_once '../admin/perfil.php'; ?>
+            <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/frontend/admin/perfil.php'; ?>
         </nav>
 
         <main>

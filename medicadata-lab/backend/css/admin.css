@@ -46,10 +46,12 @@ li {
 	top: 0;
 	left: 0;
 	height: 100%;
+	overflow-x: hidden !important;
 	overflow-y: auto;
 	scrollbar-width: none;
 	transition: all .3s ease;
 	z-index: 200;
+	contain: paint;
 }
 #sidebar.hide {
 	max-width: 60px;
@@ -67,7 +69,7 @@ li {
 	height: 64px;
 	font-weight: 700;
 	color: var(--blue);
-	position: sticky;
+	position: relative;
 	top: 0;
 	left: 0;
 	z-index: 100;
@@ -120,9 +122,25 @@ li {
 	border-radius: 10px;
 	margin: 4px 0;
 	white-space: nowrap;
+	overflow: hidden;
+	width: 100%;
+	box-sizing: border-box;
 }
-#sidebar .side-menu > li > a:hover {
+#sidebar .side-menu a span {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	transition: all .3s ease;
+}
+#sidebar .side-menu a .icon,
+#sidebar .side-menu a .icon-right {
+	flex-shrink: 0;
+}
+#sidebar .side-menu a:hover {
 	background: var(--grey);
+	padding-left: 10px;
+	padding-right: 6px;
 }
 #sidebar .side-menu > li > a.active .icon-right {
 	transform: rotateZ(90deg);
@@ -148,9 +166,9 @@ li {
 	text-align: center;
 }
 #sidebar .side-dropdown {
-	padding-left: 0px;
+	padding-left: 32px;
 	max-height: 0;
-	overflow-y: hidden;
+	overflow: hidden;
 	transition: all .15s ease;
 }
 #sidebar .side-dropdown.show {
@@ -1545,7 +1563,7 @@ input:checked + .slider:before {
 
 /* Estilos para el SubMenu */
 .new-side-dropdown {
-  padding-left: 20px;
+  padding-left: 32px;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;

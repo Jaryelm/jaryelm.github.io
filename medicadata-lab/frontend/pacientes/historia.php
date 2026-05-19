@@ -408,38 +408,20 @@ if($sentencia){
                     <th scope="col">HORA</th>
                     <th scope="col">REALIZADO POR</th>
                     <th scope="col">REVISADO POR</th>
-                    <th scope="col">PESO</th>
-                    <th scope="col">TALLA</th>
-                    <th scope="col">PA</th>
+                    <th scope="col">PESO (kg/lb)</th>
+                    <th scope="col">TALLA (cm/in)</th>
+                    <th scope="col">PA (mmHg)</th>
                     <th scope="col">PAM</th>
-                    <th scope="col">FC</th>
-                    <th scope="col">FR</th>
-                    <th scope="col">SAT</th>
-                    <th scope="col">TEMP</th>
-                    <th scope="col">GLUCOSA</th>
+                    <th scope="col">FC (lpm)</th>
+                    <th scope="col">FR (rpm)</th>
+                    <th scope="col">SAT (SatO2)</th>
+                    <th scope="col">TEMP (°C/°F)</th>
+                    <th scope="col">GLUCOSA (mg/dL / mmol/L)</th>
                     <th scope="col">ACCIONES</th>
                 </tr>
             </thead>
             <tbody id="signosVitalesBody">
                 <!-- Aquí se llenarán los datos dinámicamente -->
-                <tr>
-                    <td><input type="date" id="fecha" value="<?php echo date('Y-m-d'); ?>" readonly></td>
-                    <td><input type="time" id="hora" value="<?php echo date('H:i'); ?>" readonly></td>
-                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
-                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
-                    <td><input type="text" id="weight"></td>
-                    <td><input type="text" id="stature"></td>
-                    <td><input type="text" id="bloodPressure"></td>
-                    <td><input type="text" id="mapPressure"></td>
-                    <td><input type="text" id="heartRate"></td>
-                    <td><input type="text" id="respiratoryRate"></td>
-                    <td><input type="text" id="oxygenSaturation"></td>
-                    <td><input type="text" id="temperature"></td>
-                    <td><input type="text" id="glucose"></td>
-                    <td>
-                        <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -2145,61 +2127,6 @@ function aprobarSignosVitalesRow(signoId) {
     });
 }
 
-function registrarSignosVitales() {
-    const fechaEl = document.getElementById("fecha");
-    const horaEl = document.getElementById("hora");
-    const fecha = fechaEl ? fechaEl.value.trim() : "";
-    const hora = horaEl ? horaEl.value.trim() : "";
-    const processedBy = document.getElementById("processedBy").value;
-    const weight = document.getElementById("weight").value;
-    const stature = document.getElementById("stature").value;
-    const bloodPressure = document.getElementById("bloodPressure").value;
-    const mapPressure = document.getElementById("mapPressure").value;
-    const heartRate = document.getElementById("heartRate").value;
-    const respiratoryRate = document.getElementById("respiratoryRate").value;
-    const oxygenSaturation = document.getElementById("oxygenSaturation").value;
-    const temperature = document.getElementById("temperature").value;
-    const glucose = document.getElementById("glucose").value;
-    const idpa = <?php echo $_GET['id']; ?>;
-
-    if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
-        swal('Error', 'Todos los campos son obligatorios.', 'error');
-        return;
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "add_signos_vitales.php",
-        dataType: "json",
-        data: {
-            fecha: fecha,
-            hora: hora,
-            processed_by: processedBy,
-            weight: weight,
-            stature: stature,
-            blood_pressure: bloodPressure,
-            map_pressure: mapPressure,
-            heart_rate: heartRate,
-            respiratory_rate: respiratoryRate,
-            oxygen_saturation: oxygenSaturation,
-            temperature: temperature,
-            glucose: glucose,
-            idpa: idpa
-        },
-        success: function(response) {
-            if (response.error) {
-                swal('Error', response.error, 'error');
-            } else {
-                swal('Guardado', 'Los signos vitales se han registrado correctamente.', 'success');
-                cargarSignosVitales();
-            }
-        },
-        error: function(xhr) {
-            swal('Error', 'Ocurrió un problema: ' + xhr.responseText, 'error');
-        }
-    });
-}
-
 function cargarSignosVitales() {
     const idpa = <?php echo $_GET['id']; ?>;
 
@@ -2247,47 +2174,19 @@ function cargarSignosVitales() {
                         <td>${item.hora}</td>
                         <td>${item.processed_by}</td>
                         <td>${item.reviews_by || '-'}</td>
-                        <td>${item.weight}</td>
-                        <td>${item.stature}</td>
+                        <td>${item.weight ? parseFloat(item.weight) + '/' + (parseFloat(item.weight) * 2.20462).toFixed(2) : ''}</td>
+                        <td>${item.stature ? parseFloat(item.stature) + '/' + (parseFloat(item.stature) / 2.54).toFixed(2) : ''}</td>
                         <td>${item.blood_pressure}</td>
                         <td>${item.map_pressure}</td>
                         <td>${item.heart_rate}</td>
                         <td>${item.respiratory_rate}</td>
                         <td>${item.oxygen_saturation}</td>
-                        <td>${item.temperature}</td>
-                        <td>${item.glucose}</td>
+                        <td>${item.temperature ? parseFloat(item.temperature) + '/' + ((parseFloat(item.temperature) * 9/5) + 32).toFixed(1) : ''}</td>
+                        <td>${item.glucose ? parseFloat(item.glucose) + '/' + (parseFloat(item.glucose) / 18).toFixed(2) : ''}</td>
                         <td>${accBtns}</td>
                     </tr>
                 `;
             });
-
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, "0");
-            const day = String(now.getDate()).padStart(2, "0");
-            const dateStr = `${year}-${month}-${day}`;
-            const timeStr = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
-
-            content += `
-                <tr>
-                    <td><input type="date" id="fecha" value="${dateStr}" readonly></td>
-                    <td><input type="time" id="hora" value="${timeStr}" readonly></td>
-                    <td><input type="text" id="processedBy" value="<?php echo $name; ?>" readonly></td>
-                    <td><span title="Quién revisa lo define administración con Aprobar.">—</span></td>
-                    <td><input type="text" id="weight"></td>
-                    <td><input type="text" id="stature"></td>
-                    <td><input type="text" id="bloodPressure"></td>
-                    <td><input type="text" id="mapPressure"></td>
-                    <td><input type="text" id="heartRate"></td>
-                    <td><input type="text" id="respiratoryRate"></td>
-                    <td><input type="text" id="oxygenSaturation"></td>
-                    <td><input type="text" id="temperature"></td>
-                    <td><input type="text" id="glucose"></td>
-                    <td>
-                        <button class="register-btn" onclick="registrarSignosVitales()">Registrar</button>
-                    </td>
-                </tr>
-            `;
 
             $("#signosVitalesBody").html(content);
         },

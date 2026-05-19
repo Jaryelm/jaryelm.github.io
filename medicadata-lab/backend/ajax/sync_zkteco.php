@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../bd/Conexion.php';
-require_once __DIR__ . '/../sdk/zkteco/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/backend/bd/Conexion.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/backend/sdk/zkteco/vendor/autoload.php';
 
 use Jmrashed\Zkteco\Lib\ZKTeco;
 
@@ -33,19 +33,23 @@ class ZkTecoController {
                 $attendance = $this->_zk->getAttendance();
 
                 if (!empty($attendance)) {
+                    /* TODO: Base de datos no integrada por completo aún.
                     $stmt = $this->_dboConnect->prepare("INSERT IGNORE INTO attendance_log_employee 
                         (employeeCode, typeDailing, dTime, created_by) 
                         VALUES (:code, :type, :time, :user)");
+                    */
 
                     foreach ($attendance as $log) {
                         $tipo = $this->mapType($log['type']);
 
+                        /*
                         $stmt->execute([
                             ':code' => (string)$log['id'],
                             ':type' => $tipo,
                             ':time' => $log['timestamp'],
                             ':user' => 'SYSTEM_SYNC'
                         ]);
+                        */
 
                         $log['mapped_type'] = $tipo;
                         $attendanceData[] = $log;
