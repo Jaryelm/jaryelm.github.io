@@ -305,10 +305,15 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     <!-- Columna Tabla (60%) -->
                     <div class="vitals-table-section">
                         <div class="pre-clinica-container">
-                            <h3>Últimos Registros (Resumen)</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                <h3>Últimos Registros (Resumen)</h3>
+                                <button type="button" class="search-btn" id="btn_descargar_pdf_resumen" style="background-color: #e74c3c; display: none;">
+                                    <i class='bx bxs-file-pdf'></i> Descargar Hoja de Signos Vitales
+                                </button>
+                            </div>
                             <hr><br>
                             <div class="table-responsive">
-                                <table class="dataTable display table-condensed" style="width:100%">
+                                <table id="table_resumen" class="dataTable display table-condensed" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>Fecha y Hora</th>
@@ -337,7 +342,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
         <div class="modal-content-custom">
             <div class="modal-header">
                 <h2>Historial Detallado de Signos Vitales</h2>
-                <span class="close-modal">&times;</span>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="search-btn" id="btn_descargar_pdf_detalle" style="background-color: #e74c3c; padding: 8px 15px;">
+                        <i class='bx bxs-file-pdf'></i> Descargar PDF General
+                    </button>
+                    <span class="close-modal">&times;</span>
+                </div>
             </div>
             <div class="table-responsive">
                 <table id="table_detalles" class="dataTable display" style="width:100%">
@@ -391,6 +401,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <script>
         $(document).ready(function() {
             let dataTableDetalles = null;
+            let dataTableResumen = null;
 
             // Conversiones automáticas
             // Peso KG <-> LB
@@ -461,15 +472,21 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     $('#wrapper_outpatients').show();
                 }
                 $('#btn_ver_detalles').hide();
+                $('#btn_descargar_pdf_resumen').hide();
                 $('#btn_save_vitals').prop('disabled', true);
-                $('#summary-body').html('<tr><td colspan="5" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>');
+                if (dataTableResumen) {
+                    dataTableResumen.clear().draw();
+                }
             });
 
             // Resetear estado al cambiar de paciente en el select
             $('#patients, #outpatients').on('change', function() {
                 $('#btn_ver_detalles').hide();
+                $('#btn_descargar_pdf_resumen').hide();
                 $('#btn_save_vitals').prop('disabled', true);
-                $('#summary-body').html('<tr><td colspan="5" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>');
+                if (dataTableResumen) {
+                    dataTableResumen.clear().draw();
+                }
             });
 
             // Consultar datos
@@ -485,36 +502,65 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                 // Habilitar el botón de salvar y el de ver detalles
                 $('#btn_save_vitals').prop('disabled', false);
                 $('#btn_ver_detalles').fadeIn();
+                $('#btn_descargar_pdf_resumen').fadeIn();
                 cargarVitals(tipo, id);
             });
 
             function cargarVitals(tipo, id) {
-                $.get('fetch_vitals.php', { id, tipo }, function(data) {
-                    let rows = '';
-                    if (data && data.length > 0) {
-                        data.slice(0, 5).forEach(item => {
-                            const aprobado = item.reviews_by ? '<span class="badge" style="background:#28a745; color:white; padding:4px 8px; border-radius:10px;">' + item.reviews_by + '</span>' : '<span class="badge" style="background:#ffc107; color:#333; padding:4px 8px; border-radius:10px;">Pendiente</span>';
-                            const btnAprobar = !item.reviews_by ? `<button class="search-btn btn-aprobar" data-id="${item.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745;"><i class='bx bx-check-shield'></i> Aprobar</button>` : '-';
-                            
-                            // Conversiones dinámicas para el resumen
-                            const weight_kg = parseFloat(item.weight) || 0;
-                            const display_weight = weight_kg ? `${weight_kg}/${(weight_kg * 2.20462).toFixed(2)}` : item.weight;
-                            
-                            const pa_sat = `${item.blood_pressure} / ${item.oxygen_saturation}%`;
+                if (dataTableResumen) {
+                    dataTableResumen.destroy();
+                }
 
-                            rows += `<tr>
-                                <td>${item.fecha} - ${item.hora}</td>
-                                <td>${item.processed_by}</td>
-                                <td>${aprobado}</td>
-                                <td>${item.heart_rate} bpm / ${item.respiratory_rate} rpm</td>
-                                <td>${pa_sat}</td>
-                                <td>${btnAprobar}</td>
-                            </tr>`;
-                        });
-                    } else {
-                        rows = '<tr><td colspan="6" style="text-align:center;">No hay registros previos para este paciente</td></tr>';
-                    }
-                    $('#summary-body').html(rows);
+                dataTableResumen = $('#table_resumen').DataTable({
+                    ajax: {
+                        url: 'fetch_vitals.php',
+                        data: { id, tipo },
+                        dataSrc: ''
+                    },
+                    columns: [
+                        { 
+                            data: null,
+                            render: function(data) {
+                                return `${data.fecha} - ${data.hora}`;
+                            }
+                        },
+                        { data: 'processed_by' },
+                        { 
+                            data: 'reviews_by', 
+                            render: function(data) {
+                                return data ? `<span class="badge" style="background:#28a745; color:white; padding:4px 8px; border-radius:10px;">${data}</span>` : '<span class="badge" style="background:#ffc107; color:#333; padding:4px 8px; border-radius:10px;">Pendiente</span>';
+                            }
+                        },
+                        { 
+                            data: null,
+                            render: function(data) {
+                                return `${data.heart_rate} bpm / ${data.respiratory_rate} rpm`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            render: function(data) {
+                                return `${data.blood_pressure} / ${data.oxygen_saturation}%`;
+                            }
+                        },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                let btns = '';
+                                if (!row.reviews_by) {
+                                    btns += `<button class="search-btn btn-aprobar" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745; display:inline-flex; margin-right: 5px;"><i class='bx bx-check-shield'></i> Aprobar</button>`;
+                                }
+                                btns += `<button class="search-btn btn-pdf-individual" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #e74c3c; display:inline-flex;"><i class='bx bxs-file-pdf'></i> PDF</button>`;
+                                return btns;
+                            }
+                        }
+                    ],
+                    pageLength: 5,
+                    lengthMenu: [5, 10, 25, 50],
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+                    },
+                    dom: 'tp' 
                 });
             }
 
@@ -581,7 +627,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         {
                             data: null,
                             render: function(data, type, row) {
-                                return !row.reviews_by ? `<button class="search-btn btn-aprobar" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745;"><i class='bx bx-check-shield'></i> Aprobar</button>` : '-';
+                                let btns = '';
+                                if (!row.reviews_by) {
+                                    btns += `<button class="search-btn btn-aprobar" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #28a745; display:inline-flex; margin-right: 5px;"><i class='bx bx-check-shield'></i> Aprobar</button>`;
+                                }
+                                btns += `<button class="search-btn btn-pdf-individual" data-id="${row.id}" style="padding: 5px 10px; font-size: 0.8rem; background-color: #e74c3c; display:inline-flex;"><i class='bx bxs-file-pdf'></i> PDF</button>`;
+                                return btns;
                             }
                         }
                     ],
@@ -593,6 +644,39 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         'copy', 'csv', 'excel', 'pdf', 'print'
                     ]
                 });
+            });
+
+            // Lógica de Descarga PDF General
+            function descargarPDFSignosVitales() {
+                const tipo = $('input[name="tipo_paciente"]:checked').val();
+                const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+
+                if (!id || id === '0') {
+                    swal('Aviso', 'Seleccione un paciente primero.', 'warning');
+                    return;
+                }
+                if (tipo !== 'paciente') {
+                    swal('Aviso', 'La generación de PDF con membrete actualmente solo está soportada para pacientes hospitalarios.', 'info');
+                    return;
+                }
+                const url = `../pacientes/generate_signos_vitales_pdf.php?idpa=${id}`;
+                window.open(url, '_blank');
+            }
+
+            $('#btn_descargar_pdf_resumen, #btn_descargar_pdf_detalle').click(descargarPDFSignosVitales);
+
+            // Lógica de Descarga PDF Individual
+            $(document).on('click', '.btn-pdf-individual', function() {
+                const signoId = $(this).data('id');
+                const tipo = $('input[name="tipo_paciente"]:checked').val();
+                const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+
+                if (tipo !== 'paciente') {
+                    swal('Aviso', 'La generación de PDF con membrete actualmente solo está soportada para pacientes hospitalarios.', 'info');
+                    return;
+                }
+                const url = `../pacientes/generate_signos_vitales_pdf.php?idpa=${id}&signo_id=${signoId}`;
+                window.open(url, '_blank');
             });
 
             // Acción de Aprobar (Delegación de eventos)
