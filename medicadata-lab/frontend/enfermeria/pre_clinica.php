@@ -14,8 +14,26 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="../../backend/vendor/datatables/dataTables.bs4.css" />
     <link href="../../backend/vendor/datatables/buttons.bs.css" rel="stylesheet" />
+    
+    <!-- Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    
+    <!-- Estilos personalizados globales de DataTables -->
+    <link rel="stylesheet" type="text/css" href="../../backend/css/custom-datatable.css">
 
     <style>
+        /* Estilos para que Select2 se vea igual a los inputs del sistema */
+        .select2-container--default .select2-selection--single {
+            height: 40px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+        }
+        
         .pre-clinica-container {
             background: white;
             padding: 30px;
@@ -71,23 +89,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             border: 1px solid #ddd;
             border-radius: 6px;
             box-sizing: border-box;
-        }
-
-        /* Estilo para la tabla condensada */
-        .table-condensed {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        .table-condensed th {
-            background-color: #f8f9fa;
-            text-align: left;
-            padding: 10px;
-            border-bottom: 2px solid #dee2e6;
-        }
-        .table-condensed td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
         }
 
         /* Modal Styles */
@@ -256,7 +257,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     <div style="margin-top: 50px;">
                         <h3>Últimos Registros (Resumen)</h3>
                         <hr><br>
-                        <table class="table-condensed">
+                        <table class="dataTable display table-condensed" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Fecha y Hora</th>
@@ -285,7 +286,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                 <span class="close-modal">&times;</span>
             </div>
             <div class="table-responsive">
-                <table id="table_detalles" class="table table-bordered table-striped" style="width:100%">
+                <table id="table_detalles" class="dataTable display" style="width:100%">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -325,6 +326,9 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <script src="../../backend/vendor/datatables/html5.min.js"></script>
     <script src="../../backend/vendor/datatables/buttons.print.min.js"></script>
     
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    
     <!-- Componentes de Carga -->
     <script src="../../backend/js/enfermeria/patients/cat_patients.js"></script>
     <script src="../../backend/js/enfermeria/patients/cat_outpatients.js"></script>
@@ -332,6 +336,15 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <script>
         $(document).ready(function() {
             let dataTableDetalles = null;
+
+            // Inicializar Select2 con un pequeño delay para permitir que los scripts de carga inyecten los datos
+            setTimeout(() => {
+                $('#patients, #outpatients').select2({
+                    placeholder: "Seleccione un paciente",
+                    allowClear: true,
+                    width: '100%'
+                });
+            }, 500);
 
             // Cambio de tipo de paciente
             $('input[name="tipo_paciente"]').change(function() {
