@@ -44,5 +44,13 @@ CREATE TABLE IF NOT EXISTS `signos_vitales_outpatients` (
     `updated_at` TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Agregar constraints de FK para ambas tablas
 ALTER TABLE `signos_vitales`
-    MODIFY COLUMN 'map_pressure' VARCHAR(15) DEFAULT 'N/A';
+    ADD CONSTRAINT `fk_signos_vitales_patients`
+    FOREIGN KEY (`idpa`) REFERENCES `patients`(`idpa`)
+    ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `signos_vitales_outpatients`
+    ADD CONSTRAINT `fk_signos_vitales_outpatients`
+    FOREIGN KEY (`id_outpatient`) REFERENCES `patients_ambulatorios`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE;
