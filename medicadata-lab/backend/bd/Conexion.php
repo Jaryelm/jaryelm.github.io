@@ -1,37 +1,16 @@
 <?php
 
-$dbLocal = [
-    'host' => 'localhost',
-    'user' => 'root',
-    'pass' => 'hpk7pdwM4',
-    'name' => 'medic9ue_medi_data',
-];
-
-$dbProduccion = [
-    'host' => '162.241.123.41',
-    'user' => 'medic9ue_moisesc',
-    'pass' => 'Mrecords%7',
-    'name' => 'medic9ue_medi_data',
-];
-
-$httpHost = isset($_SERVER['HTTP_HOST']) ? strtolower((string) $_SERVER['HTTP_HOST']) : '';
-$esEntornoLocal = ($httpHost === '')
-    || $httpHost === 'localhost'
-    || strpos($httpHost, '127.0.0.1') === 0;
-
-$dbCfg = $esEntornoLocal ? $dbLocal : $dbProduccion;
-
 if (!defined('dbhost')) {
-  define('dbhost', $dbCfg['host']);
+  define('dbhost', 'localhost');
 }
 if (!defined('dbuser')) {
-  define('dbuser', $dbCfg['user']);
+  define('dbuser', 'root');
 }
 if (!defined('dbpass')) {
-  define('dbpass', $dbCfg['pass']);
+  define('dbpass', 'hpk7pdwM4');
 }
 if (!defined('dbname')) {
-  define('dbname', $dbCfg['name']);
+  define('dbname', 'medic9ue_medi_data');
 }
 
 $pdoReuseKey = '__MEDIDATA_PDO_SINGLETON__';
