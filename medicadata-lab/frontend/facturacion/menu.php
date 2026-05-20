@@ -1,4 +1,4 @@
-<!-- SIDEBAR --> 
+﻿<!-- SIDEBAR --> 
 <section id="sidebar">
     <a href="../facturacion/escritorio.php" class="brand"><i class='bx bxs-home home'></i>MEDIDATA</a>
         <ul class="side-menu">
@@ -25,7 +25,7 @@
                 </ul>
             </li>
 
-            <li><a href="../facturacion/acerca.php"><i class='bx bxs-info-circle icon' ></i>ACERCA DE MEDIDATA</a></li>
+            <li><a href="../facturacion/acerca.php"><i class='bx bxs-info-circle icon' ></i>ACERCA DE MEDICASA</a></li>
            
         </ul>
        

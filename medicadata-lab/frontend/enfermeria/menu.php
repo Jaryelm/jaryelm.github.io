@@ -1,4 +1,4 @@
-<!-- SIDEBAR -->
+﻿<!-- SIDEBAR -->
 <section id="sidebar">
     <a href="../enfermeria/escritorio.php" class="brand"><i class='bx bxs-home home'></i><span>MEDIDATA</span></a>
     <ul class="side-menu">
@@ -44,7 +44,7 @@
             </ul>
         </li>
 
-        <li><a href="../enfermeria/mostrar.php"><i class='bx bxs-info-circle icon'></i><span>ACERCA DE MEDIDATA</span></a></li>
+        <li><a href="../enfermeria/mostrar.php"><i class='bx bxs-info-circle icon'></i><span>ACERCA DE MEDICASA</span></a></li>
     </ul>
 </section>
 <!-- SIDEBAR -->

@@ -1,5 +1,5 @@
-<div class="profile" style="display: flex; align-items: center;">
-    <span style="margin-right: 8px; font-weight: bold; font-size: 1.1em; color: #06adbf;">Hospital MEDICASA</span>
+<div class="profile">
+    <span>Hospital MEDICASA</span>
     <img src="../../backend/img/icon.png" alt="">
     <ul class="profile-link">
         <li>
