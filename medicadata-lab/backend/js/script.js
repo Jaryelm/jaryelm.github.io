@@ -2,6 +2,29 @@
 const allDropdown = document.querySelectorAll('#sidebar .side-dropdown');
 const sidebar = document.getElementById('sidebar');
 
+/** Preferencia menú colapsado (solo íconos): persiste entre páginas y sesiones */
+const SIDEBAR_COLLAPSED_KEY = 'medidata_sidebar_collapsed';
+
+function readSidebarCollapsedPref() {
+	try {
+		return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+	} catch (e) {
+		return false;
+	}
+}
+
+function writeSidebarCollapsedPref(collapsed) {
+	try {
+		if (collapsed) {
+			localStorage.setItem(SIDEBAR_COLLAPSED_KEY, '1');
+		} else {
+			localStorage.setItem(SIDEBAR_COLLAPSED_KEY, '0');
+		}
+	} catch (e) {
+		/* modo privado u otro bloqueo */
+	}
+}
+
 // Verificar que sidebar exista antes de usar
 if (sidebar) {
 allDropdown.forEach(item=> {
@@ -35,47 +58,61 @@ allDropdown.forEach(item=> {
 const toggleSidebar = document.querySelector('nav .toggle-sidebar');
 const allSideDivider = document.querySelectorAll('#sidebar .divider');
 
-// Verificar que sidebar y toggleSidebar existan antes de usarlos
-if (sidebar && toggleSidebar) {
-if(sidebar.classList.contains('hide')) {
-	allSideDivider.forEach(item=> {
-		item.textContent = '-'
-	})
-	allDropdown.forEach(item=> {
+function closeDropdownsForCollapsedSidebar() {
+	allDropdown.forEach(item => {
 		const a = item.parentElement.querySelector('a:first-child');
-			if (a) {
-		a.classList.remove('active');
-			}
+		if (a) {
+			a.classList.remove('active');
+		}
 		item.classList.remove('show');
-	})
-} else {
-	allSideDivider.forEach(item=> {
-		item.textContent = item.dataset.text;
-	})
+	});
 }
 
+function applySidebarCollapsedState(collapsed) {
+	if (!sidebar) {
+		return;
+	}
+	if (collapsed) {
+		sidebar.classList.add('hide');
+		allSideDivider.forEach(item => {
+			item.textContent = '-';
+		});
+		closeDropdownsForCollapsedSidebar();
+	} else {
+		sidebar.classList.remove('hide');
+		allSideDivider.forEach(item => {
+			item.textContent = item.dataset.text;
+		});
+	}
+}
+
+// Restaurar preferencia al cargar la vista (misma experiencia en todo el sistema)
+if (sidebar) {
+	if (readSidebarCollapsedPref()) {
+		applySidebarCollapsedState(true);
+	} else {
+		applySidebarCollapsedState(false);
+	}
+}
+
+// Verificar que sidebar y toggleSidebar existan antes de usarlos
+if (sidebar && toggleSidebar) {
 	toggleSidebar.addEventListener('click', function (e) {
 		e.preventDefault();
-	sidebar.classList.toggle('hide');
-
-	if(sidebar.classList.contains('hide')) {
-		allSideDivider.forEach(item=> {
-			item.textContent = '-'
-		})
-
-		allDropdown.forEach(item=> {
-			const a = item.parentElement.querySelector('a:first-child');
-				if (a) {
-			a.classList.remove('active');
-				}
-			item.classList.remove('show');
-		})
-	} else {
-		allSideDivider.forEach(item=> {
-			item.textContent = item.dataset.text;
-		})
-	}
-})
+		sidebar.classList.toggle('hide');
+		const collapsed = sidebar.classList.contains('hide');
+		writeSidebarCollapsedPref(collapsed);
+		if (collapsed) {
+			allSideDivider.forEach(item => {
+				item.textContent = '-';
+			});
+			closeDropdownsForCollapsedSidebar();
+		} else {
+			allSideDivider.forEach(item => {
+				item.textContent = item.dataset.text;
+			});
+		}
+	});
 }
 
 
@@ -239,3 +276,110 @@ if (chartElement) {
     var chart = new ApexCharts(chartElement, options);
     chart.render();
 }
+
+/**
+ * === Novedades para el cliente (tipo “actualización” de apps móvil) ===
+ *
+ * Cuando haya mejoras visibles del menú, cabecera o navegación:
+ * 1. Cambia MEDIDATA_UI_RELEASE_ID (un valor nuevo cada entrega).
+ * 2. Ajusta MEDIDATA_UI_RELEASE_LEAD y MEDIDATA_UI_RELEASE_ITEMS abajo.
+ * 3. La vista debe cargar admin.css + este script; solo se muestra si existe #sidebar.
+ *
+ * Igual que iOS/Android: el usuario ve el aviso una vez por versión; al pulsar «Entendido»
+ * queda registrado en localStorage y no se repite hasta la próxima versión.
+ */
+(function medidataUiReleaseNotes() {
+	const MEDIDATA_UI_RELEASE_ID = 'menu-ui-2026-05-18';
+	const STORAGE_KEY = 'medidata_ui_release_seen_id';
+
+	function alreadySeenThisRelease() {
+		try {
+			return localStorage.getItem(STORAGE_KEY) === MEDIDATA_UI_RELEASE_ID;
+		} catch (e) {
+			return true;
+		}
+	}
+
+	function markReleaseSeen() {
+		try {
+			localStorage.setItem(STORAGE_KEY, MEDIDATA_UI_RELEASE_ID);
+		} catch (e) {
+			/* sin espacio / modo privado */
+		}
+	}
+
+	function dismissOverlay(overlayEl) {
+		markReleaseSeen();
+		if (overlayEl && overlayEl.parentNode) {
+			overlayEl.parentNode.removeChild(overlayEl);
+		}
+	}
+
+	if (!document.getElementById('sidebar')) {
+		return;
+	}
+	if (alreadySeenThisRelease()) {
+		return;
+	}
+
+	const MEDIDATA_UI_RELEASE_LEAD =
+		'Estos cambios hacen más cómodo moverse entre módulos y mantener pantallas ordenadas. Tu flujo habitual no cambia.';
+
+	const MEDIDATA_UI_RELEASE_ITEMS = [
+		{ title: 'Barra superior', text: 'Mejor alineación del menú y del perfil Hospital MEDICASA, sin huecos molestos.' },
+		{ title: 'Menú contraído', text: 'Al reducir el panel lateral los íconos siguen visibles; ya no «desaparecen» por error.' },
+		{ title: 'Tu preferencia guardada', text: 'Si dejas el menú colapsado o expandido, se mantiene al abrir otras vistas del sistema.' },
+	];
+
+	window.setTimeout(function () {
+		if (!document.getElementById('sidebar')) {
+			return;
+		}
+		const overlay = document.createElement('div');
+		overlay.className = 'medidata-release-overlay';
+		overlay.setAttribute('role', 'dialog');
+		overlay.setAttribute('aria-modal', 'true');
+		overlay.setAttribute('aria-labelledby', 'medidataReleaseTitle');
+
+		const panel = document.createElement('div');
+		panel.className = 'medidata-release-panel';
+
+		const ulHtml = MEDIDATA_UI_RELEASE_ITEMS.map(function (row) {
+			return '<li><strong>' + row.title + ':</strong> ' + row.text + '</li>';
+		}).join('');
+
+		panel.innerHTML =
+			'<span class="medidata-release-badge">Actualización MEDIDATA</span>' +
+			'<h2 id="medidataReleaseTitle">Mejoras en menú y cabecera</h2>' +
+			'<p class="medidata-release-lead">' + MEDIDATA_UI_RELEASE_LEAD + '</p>' +
+			'<ul>' +
+			ulHtml +
+			'</ul>' +
+			'<div class="medidata-release-actions">' +
+			'<button type="button" class="medidata-release-btn">Entendido</button>' +
+			'</div>';
+
+		overlay.appendChild(panel);
+		document.body.appendChild(overlay);
+
+		function closeIt() {
+			dismissOverlay(overlay);
+			document.removeEventListener('keydown', onEscape);
+		}
+
+		function onEscape(e) {
+			if (e.key === 'Escape') {
+				closeIt();
+			}
+		}
+		document.addEventListener('keydown', onEscape);
+
+		panel.querySelector('.medidata-release-btn').addEventListener('click', closeIt);
+
+		overlay.addEventListener('click', function (e) {
+			if (e.target === overlay) {
+				closeIt();
+			}
+		});
+	}, 520);
+})();
