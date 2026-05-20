@@ -29,8 +29,7 @@ if (curl_errno($ch)) {
 // Obtener el código de estado HTTP
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// Cerrar cURL
-curl_close($ch);
+unset($ch);
 
 // Verificar el código de estado HTTP
 if ($http_status != 200) {

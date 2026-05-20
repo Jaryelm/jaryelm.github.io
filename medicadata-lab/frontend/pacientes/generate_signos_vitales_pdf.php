@@ -71,6 +71,27 @@ function sv_sv_maybe_transparent_png(string $path): string
     return $path;
 }
 
+/**
+ * Obtiene user_id para cargar firma en user_signatures si el INSERT antiguo dejó *_user_id en NULL pero sí existe el nombre en users.name.
+ *
+ * @return int 0 si no se encuentra
+ */
+function sv_sv_resolve_user_id(PDO $connect, ?int $storedUid, ?string $nombreVisible): int
+{
+    $u = (int) $storedUid;
+    if ($u > 0) {
+        return $u;
+    }
+    $n = trim((string) $nombreVisible);
+    if ($n === '' || $n === '—' || $n === '-') {
+        return 0;
+    }
+    $stmt = $connect->prepare('SELECT id FROM users WHERE TRIM(name) = ? LIMIT 1');
+    $stmt->execute([$n]);
+    $id = $stmt->fetchColumn();
+    return $id !== false ? (int) $id : 0;
+}
+
 class PDFWithFooter extends FPDF
 {
     public function __construct($orientation = 'P', $unit = 'mm', $size = 'Letter')
@@ -282,120 +303,144 @@ foreach ($data as $row) {
     $pdf->Ln();
 }
 
-/* Firmas digitales: ubicadas junto al pie (encima del área segura del footer) */
-if (count($data) > 0) {
+/* Firmas digitales: ubicadas junto al pie (encima del área segura del footer). 
+   Solo se muestran si es un reporte INDIVIDUAL (count($data) === 1) para evitar que el reporte general sea demasiado extenso. */
+if (count($data) === 1) {
     $footerBandMm = 38;
     $padAboveFooterMm = 4;
     $ySafeBottom = $pdf->GetPageHeight() - $footerBandMm - $padAboveFooterMm;
 
-    $nSig = count($data);
-    $hPerSig = 38;
-    $interBlockMm = 2;
-    $totalSigNeeded = $nSig * $hPerSig + max(0, $nSig - 1) * $interBlockMm;
+    $row = $data[0];
+    /** Alto bloque firma (etiqueta + imagen/línea + nombre) para salto de página */
+    $estimatedBlockMm = 34;
+    
+    // Si no cabe en la página actual, agregar una nueva
+    if ($pdf->GetY() + $estimatedBlockMm > $ySafeBottom) {
+        $pdf->AddPage();
+        $ySafeBottom = $pdf->GetPageHeight() - $footerBandMm - $padAboveFooterMm;
+    }
 
-    /* Altura disponible típica “zona antes del footer” (desde margen superior de contenido nuevo) */
-    $topReserveMm = 28;
-    $maxSignStackInFooterZone = $ySafeBottom - $topReserveMm;
-
-    /* Si el bloque no cabría jamás anclado, seguimos con flujo normal bajo la tabla */
-    if ($totalSigNeeded <= $maxSignStackInFooterZone) {
-        $yBelowTable = $pdf->GetY() + 5;
-        $idealStartY = $ySafeBottom - $totalSigNeeded;
-
-        if ($idealStartY >= $yBelowTable) {
-            $pdf->SetY($idealStartY);
-        } else {
-            $pdf->AddPage();
-            $ySafeBottom = $pdf->GetPageHeight() - $footerBandMm - $padAboveFooterMm;
-            $yFreshTop = max($pdf->GetY() + 2, $topReserveMm);
-            $ideal2 = $ySafeBottom - $totalSigNeeded;
-            $pdf->SetY(max($yFreshTop, $ideal2));
-        }
+    // Intentar anclar al fondo de la página
+    $idealY = $ySafeBottom - $estimatedBlockMm;
+    if ($idealY > $pdf->GetY()) {
+        $pdf->SetY($idealY);
     } else {
         $pdf->Ln(5);
     }
 
-    foreach ($data as $row) {
-        $estimatedBlockMm = 32;
-        $ySafeMax = $pdf->GetPageHeight() - $footerBandMm - 2;
-        if ($pdf->GetY() + $estimatedBlockMm > $ySafeMax) {
-            $pdf->AddPage();
+    $nombreReal = trim((string) ($row['processed_by'] ?? ''));
+    $nombreRevRaw = trim((string) ($row['reviews_by'] ?? ''));
+    $hayRevision = ($nombreRevRaw !== '' && $nombreRevRaw !== '-');
+
+    $uidP = sv_sv_resolve_user_id(
+        $connect,
+        isset($row['processed_by_user_id']) ? (int) $row['processed_by_user_id'] : 0,
+        $nombreReal
+    );
+    $blobP = $uidP > 0 ? sv_sv_signature_blob($connect, $uidP) : null;
+    $tmpP = $blobP ? sv_sv_sig_temp_png($blobP) : null;
+    if ($tmpP) {
+        $tmpP = sv_sv_maybe_transparent_png($tmpP);
+    }
+
+    $uidRstored = isset($row['reviewed_by_user_id']) ? (int) $row['reviewed_by_user_id'] : 0;
+    $nombreRev = $hayRevision ? (($nombreRevRaw !== '' && $nombreRevRaw !== '-') ? $nombreRevRaw : '—') : '—';
+
+    $uidR = ($hayRevision && $uidRstored > 0)
+        ? $uidRstored
+        : (($hayRevision) ? sv_sv_resolve_user_id($connect, 0, $nombreRevRaw) : 0);
+
+    $blobR = ($uidR > 0 && $hayRevision) ? sv_sv_signature_blob($connect, $uidR) : null;
+    $tmpR = $blobR ? sv_sv_sig_temp_png($blobR) : null;
+    if ($tmpR) {
+        $tmpR = sv_sv_maybe_transparent_png($tmpR);
+    }
+
+    $lm = $pdf->SvLeftMargin();
+    $uw = $pdf->SvUsableWidth();
+    $gutter = 3;
+    $wHalf = ($uw - $gutter) / 2;
+    $xL = $lm;
+    $xR = $lm + $wHalf + $gutter;
+
+    $pdf->Ln(1);
+    $yBlk = $pdf->GetY();
+    $imgH = 14;
+    $imgW = max(12, min(72, $wHalf - 2));
+    /**
+     * Orden institucional (por columna, de arriba hacia abajo):
+     * 1) dibujo de firma PNG (o cuadro de aviso),
+     * 2) texto REALIZADO POR / REVISADO POR,
+     * 3) nombre de la persona.
+     */
+    $captionH = 5;
+    $nameH = 4.8;
+    $yImgBase = $yBlk + 0.3;
+    $yCaption = $yImgBase + $imgH + 0.6;
+    $yNameRow = $yCaption + $captionH + 0.5;
+
+    $xImgL = $xL + (($wHalf - $imgW) / 2);
+    $xImgR = $xR + (($wHalf - $imgW) / 2);
+
+    /* --- Paso 1: zonas de firma (izquierda y derecha) --- */
+    foreach ([[$tmpP, $xImgL, $yImgBase], [$tmpR, $xImgR, $yImgBase]] as $idx => $trip) {
+        [$tmpSig, $xImg, $yI] = $trip;
+        if ($idx === 1 && !$hayRevision) {
+            /** Columna revisión sin revisar: mismo hueco pero mensaje corto */
+            $pdf->SetDrawColor(200, 202, 208);
+            $pdf->Rect($xImg, $yI, $imgW, $imgH);
+            $pdf->SetFont('Arial', 'I', 7);
+            $pdf->SetTextColor(120, 120, 118);
+            $pdf->SetXY($xImg, $yI + ($imgH / 2) - 2.5);
+            $pdf->Cell($imgW, 4, sv_sv_enc('Sin revisión'), 0, 0, 'C');
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->SetDrawColor(0, 0, 0);
+            $pdf->SetTextColor(0, 0, 0);
+            continue;
         }
-
-        $uidP = isset($row['processed_by_user_id']) ? (int) $row['processed_by_user_id'] : 0;
-        $blobP = $uidP > 0 ? sv_sv_signature_blob($connect, $uidP) : null;
-        $tmpP = $blobP ? sv_sv_sig_temp_png($blobP) : null;
-        if ($tmpP) {
-            $tmpP = sv_sv_maybe_transparent_png($tmpP);
+        if ($tmpSig && is_string($tmpSig)) {
+            try {
+                $pdf->Image($tmpSig, $xImg, $yI, $imgW, $imgH);
+            } catch (\Throwable $e) {
+                $tmpSig = null;
+            }
         }
-
-        $uidR = isset($row['reviewed_by_user_id']) ? (int) $row['reviewed_by_user_id'] : 0;
-        $nombreRevRaw = trim((string) ($row['reviews_by'] ?? ''));
-        $hayRevision = ($uidR > 0 || ($nombreRevRaw !== '' && $nombreRevRaw !== '-'));
-
-        $blobR = ($uidR > 0 && $hayRevision) ? sv_sv_signature_blob($connect, $uidR) : null;
-        $tmpR = $blobR ? sv_sv_sig_temp_png($blobR) : null;
-        if ($tmpR) {
-            $tmpR = sv_sv_maybe_transparent_png($tmpR);
+        if (!$tmpSig) {
+            $pdf->SetDrawColor(190, 192, 198);
+            $pdf->Rect($xImg, $yI, $imgW, $imgH);
+            $pdf->SetFont('Arial', 'I', 6.8);
+            $pdf->SetTextColor(115, 115, 113);
+            $pdf->SetXY($xImg, $yI + ($imgH / 2) - 2);
+            $msg = (($idx === 0 ? $uidP : $uidR) > 0)
+                ? 'Firma PNG no válida'
+                : 'Sin firma en perfil MEDIDATA';
+            $pdf->MultiCell($imgW, 3, sv_sv_enc($msg), 0, 'C', false);
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->SetDrawColor(0, 0, 0);
+            $pdf->SetTextColor(0, 0, 0);
         }
+    }
 
-        $nombreReal = trim((string) ($row['processed_by'] ?? ''));
-        $nombreRev = $hayRevision
-            ? (($nombreRevRaw !== '' && $nombreRevRaw !== '-') ? $nombreRevRaw : '—')
-            : '—';
+    /* --- Paso 2: títulos de rol --- */
+    $pdf->SetXY($xL, $yCaption);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell($wHalf, $captionH, sv_sv_enc('REALIZADO POR'), 0, 0, 'C');
+    $pdf->SetXY($xR, $yCaption);
+    $pdf->Cell($wHalf, $captionH, sv_sv_enc('REVISADO POR'), 0, 0, 'C');
 
-        $lm = $pdf->SvLeftMargin();
-        $uw = $pdf->SvUsableWidth();
-        $gutter = 3;
-        $wHalf = ($uw - $gutter) / 2;
-        $xL = $lm;
-        $xR = $lm + $wHalf + $gutter;
+    /* --- Paso 3: nombres --- */
+    $nombreRealLbl = $nombreReal !== '' ? $nombreReal : '—';
+    $pdf->SetXY($xL, $yNameRow);
+    $pdf->SetFont('Arial', '', 8);
+    $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRealLbl, 0, 60)), 0, 0, 'C');
+    $pdf->SetXY($xR, $yNameRow);
+    $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRev, 0, 60)), 0, 0, 'C');
 
-        $pdf->Ln(1);
-        $yBlk = $pdf->GetY();
-        $imgH = 14;
-        $imgW = max(12, min(72, $wHalf - 2));
-
-        /** Firma → leyenda del rol → nombre (todo centrado por columna). */
-        $yImgBase = $yBlk + 0.35;
-        $yCaption = $yImgBase + $imgH + 0.4;
-        $captionH = 4.5;
-        $nameH = 4.5;
-        $yNameRow = $yCaption + $captionH + 0.25;
-
-        /** Firma centrada dentro de cada columna (coord. X es borde izq. del PNG) */
-        $xImgL = $xL + (($wHalf - $imgW) / 2);
-        $xImgR = $xR + (($wHalf - $imgW) / 2);
-
-        if ($tmpP) {
-            $pdf->Image($tmpP, $xImgL, $yImgBase, $imgW, $imgH);
-        }
-        if ($tmpR) {
-            $pdf->Image($tmpR, $xImgR, $yImgBase, $imgW, $imgH);
-        }
-
-        $pdf->SetXY($xL, $yCaption);
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell($wHalf, $captionH, sv_sv_enc('REALIZADO POR'), 0, 0, 'C');
-        $pdf->SetXY($xR, $yCaption);
-        $pdf->Cell($wHalf, $captionH, sv_sv_enc('REVISADO POR'), 0, 0, 'C');
-
-        $nombreRealLbl = $nombreReal !== '' ? $nombreReal : '—';
-        $pdf->SetXY($xL, $yNameRow);
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRealLbl, 0, 60)), 0, 0, 'C');
-        $pdf->SetXY($xR, $yNameRow);
-        $pdf->Cell($wHalf, $nameH, sv_sv_enc(mb_substr($nombreRev, 0, 60)), 0, 0, 'C');
-
-        $pdf->SetY($yNameRow + $nameH);
-        $pdf->Ln(2);
-
-        if ($tmpP) {
-            @unlink($tmpP);
-        }
-        if ($tmpR) {
-            @unlink($tmpR);
-        }
+    if ($tmpP) {
+        @unlink($tmpP);
+    }
+    if ($tmpR) {
+        @unlink($tmpR);
     }
 }
 

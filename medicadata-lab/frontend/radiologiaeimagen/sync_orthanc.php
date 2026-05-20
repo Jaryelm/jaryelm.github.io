@@ -33,7 +33,7 @@ try {
     }
 
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    unset($ch);
 
     if ($http_status != 200) {
         throw new Exception("Error al obtener estudios de Orthanc. Código HTTP: " . $http_status);
