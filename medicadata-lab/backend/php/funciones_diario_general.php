@@ -246,10 +246,10 @@ function registrarPartidaCompleta($transacciones, $fecha, $fechaRegistro = null)
             
             registrarTransaccionContable($datos);
         }
-        
-        // Log de confirmación de balance
-        error_log("Partida $numeroPartida registrada correctamente - DEBE: " . number_format($totalDebe, 2) . " | HABER: " . number_format($totalHaber, 2) . " | Diferencia: " . number_format($diferencia, 2));
-        
+
+        // No usar error_log() para operaciones correctas: va al error_log del servidor
+        // y confunde con fallos reales. Los desbalances ya se registran arriba y en catch.
+
         // Confirmar transacción solo si la iniciamos nosotros
         if ($transaccionIniciada) {
             $connect->commit();
