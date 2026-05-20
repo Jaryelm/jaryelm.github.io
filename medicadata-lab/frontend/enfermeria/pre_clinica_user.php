@@ -90,7 +90,7 @@ include_once '../../backend/registros/session_check.php';
 
                     <div class="preclinica-actions">
                         <button type="button" id="btn_fetch_vitals" class="button preclinica-main-btn">
-                            Consultar signos vitales
+                            Consultar
                         </button>
                     </div>
                     </form>
@@ -364,7 +364,8 @@ include_once '../../backend/registros/session_check.php';
                     language: {
                         url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
                     },
-                    dom: '<"sv-dt-toolbar-row"Bf>irtip',
+                    /* rtip: info solo abajo (irtip duplicaba "Mostrando registros…") */
+                    dom: '<"sv-dt-toolbar-row"Bf>rtip',
                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                     ordering: false,
                     scrollX: true,
