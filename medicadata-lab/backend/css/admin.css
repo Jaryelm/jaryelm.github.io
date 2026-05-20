@@ -22,11 +22,15 @@
 
 html {
 	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
 }
 
 body {
 	background: var(--grey);
 	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
 }
 
 a {
@@ -64,6 +68,7 @@ li {
 	font-size: 24px;
 	display: flex;
 	align-items: center;
+	line-height: 1;
 	height: 64px;
 	font-weight: 700;
 	color: var(--blue);
@@ -206,9 +211,21 @@ li {
 	width: calc(100% - 320px);
 	left: 320px;
 	transition: all .3s ease;
+	/* Reserva altura del nav fijo; el main no queda tapado */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	gap: 0;
+	min-height: 100vh;
+	margin: 0;
+	padding: 64px 0 0 0;
 }
 #sidebar.hide + #content {
 	width: calc(100% - 60px);
+	left: 60px;
+}
+#sidebar.hide + #content > nav {
 	left: 60px;
 }
 /* NAVBAR */
@@ -324,9 +341,88 @@ nav .profile .profile-link a {
 nav .profile .profile-link a:hover {
 	background: var(--grey);
 }
+/* Barra superior fija: misma fila visual que el .brand del sidebar (top:0), sin hueco extra arriba */
+#content > nav {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 320px;
+	z-index: 150;
+	transition: left 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	flex-wrap: nowrap;
+	grid-gap: 28px;
+	box-sizing: border-box;
+	height: 64px;
+	min-height: 64px;
+	max-height: 64px;
+	margin: 0;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 0;
+	padding-bottom: 0;
+	background: var(--light);
+}
+/* Ajuste sólo la .form-group del buscador: no poner margin:0 en el <form>, eso borraba margin-right:auto y mandaba todo al medio */
+#content > nav > form .form-group {
+	margin: 0;
+	padding: 0;
+	min-height: 0;
+	border: none;
+}
+#content > nav > .toggle-sidebar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	line-height: 1;
+}
+/* El formulario de búsqueda en flex: sin width:100% forzando raras alturas en barra sticky */
+/* El buscador: margin-right:auto desplaza divisor + branding + perfil a la derecha (comportamiento original del layout) */
+#content > nav > form {
+	display: flex;
+	align-items: center;
+	flex: 0 1 auto;
+	min-width: 0;
+	max-width: 400px;
+	width: auto;
+	margin-right: auto;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding: 0;
+}
+#content > nav > span.divider,
+#content > nav > .divider {
+	align-self: center;
+	flex-shrink: 0;
+}
+#content nav .profile {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	cursor: pointer;
+	flex: 0 0 auto;
+	line-height: 1;
+	align-self: center;
+}
+#content nav .profile > span:first-child {
+	font-weight: 700;
+	font-size: 1.1em;
+	color: var(--blue);
+	line-height: 1.25;
+}
 /* NAVBAR */
 
 /* MAIN */
+#content > main {
+	flex: 1 1 auto;
+	min-width: 0;
+}
 main {
 	width: 100%;
 	padding: 24px 20px 20px 20px;
@@ -1235,8 +1331,12 @@ main .btn-send:hover {
 @media screen and (max-width: 768px) {
 	#content {
 		position: relative;
+		left: 60px;
 		width: calc(100% - 60px);
 		transition: all .3s ease;
+	}
+	#content > nav {
+		left: 60px;
 	}
 	nav .nav-link,
 	nav .divider {
@@ -1728,12 +1828,13 @@ a.registerbtn {
 #cookiePopup a {
   color: #6859fe;
 }
-.hide {
+/* Banner cookies: NO usar la clase .hide suelta; chocaba con #sidebar.hide (mismo class="hide" → visibility:hidden en todo el menú) */
+#cookiePopup.hide {
   visibility: hidden;
   bottom: 0;
   right: 2em;
 }
-.shows {
+#cookiePopup.shows {
   visibility: visible;
   bottom: 2em;
   right: 2em;
@@ -1742,11 +1843,11 @@ a.registerbtn {
   #cookiePopup {
     width: 100%;
   }
-  .hide {
+  #cookiePopup.hide {
     bottom: 2em;
     right: 0;
   }
-  .shows {
+  #cookiePopup.shows {
     right: 0;
     bottom: 0;
   }
