@@ -1084,6 +1084,31 @@ main .data.preclinica-stack .preclinica-select-slot.is-loading::after {
 	box-sizing: border-box;
 	justify-content: center;
 }
+/*
+ * Expediente clínico → Signos vitales (tabla HTML, sin DataTables):
+ * mismos tamaños/hover centrado que columnas ACCIONES de Pre-Clínica (.dataTable tbody td …).
+ */
+.sv-dt-expediente-wrap.sv-expediente-signos-vitals-acciones table.responsive-table tbody td .sv-actions-cell-inner .register-btn {
+	padding: 8px 12px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	min-width: 7.75rem;
+	width: min(100%, 9.875rem);
+	max-width: 100%;
+	box-sizing: border-box;
+	justify-content: center;
+	text-align: center;
+}
+.sv-dt-expediente-wrap.sv-expediente-signos-vitals-acciones table.responsive-table tbody .sv-actions-cell-inner .register-btn:not(:disabled):not(.register-btn--outline):not(.register-btn--danger) {
+	transition: background-color 0.3s ease, transform 0.2s ease !important;
+}
+.sv-dt-expediente-wrap.sv-expediente-signos-vitals-acciones table.responsive-table tbody .sv-actions-cell-inner .register-btn:not(:disabled):not(.register-btn--outline):not(.register-btn--danger):hover {
+	background-color: #06adbf !important;
+	transform: scale(1.05);
+}
+.sv-dt-expediente-wrap.sv-expediente-signos-vitals-acciones table.responsive-table tbody .sv-actions-cell-inner .register-btn:not(:disabled):not(.register-btn--outline):not(.register-btn--danger):active {
+	transform: scale(1);
+}
 
 .register-btn {
 	background-color: #035c67;
@@ -1098,6 +1123,12 @@ main .data.preclinica-stack .preclinica-select-slot.is-loading::after {
 	align-items: center;
 	gap: 8px;
 }
+/* ACCIONES — PDF en tabla Pre-Clínica (DataTables) */
+.sv-actions-cell-inner > .register-btn.btn-pdf-individual {
+	justify-content: center;
+	text-align: center;
+}
+
 .register-btn:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;

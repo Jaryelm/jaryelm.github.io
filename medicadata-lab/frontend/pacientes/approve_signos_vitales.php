@@ -20,6 +20,8 @@ if (($_SESSION['rol'] ?? '') !== 'Administrador') {
 $signoId = intval($_POST['signo_id'] ?? 0);
 $idpa = intval($_POST['idpa'] ?? 0);
 $approverId = (int) $_SESSION['id'];
+$tipoSv = isset($_POST['tipo']) ? trim((string) $_POST['tipo']) : 'paciente';
+$esAmbulatorio = ($tipoSv === 'ambulatorio');
 
 if ($signoId < 1 || $idpa < 1 || $approverId < 1) {
     echo json_encode(['error' => 'Datos inválidos.']);
@@ -27,9 +29,15 @@ if ($signoId < 1 || $idpa < 1 || $approverId < 1) {
 }
 
 try {
-    $stmtRow = $connect->prepare(
-        'SELECT id, reviews_by, reviewed_by_user_id, reviewed_at FROM signos_vitales WHERE id = ? AND idpa = ? LIMIT 1'
-    );
+    if ($esAmbulatorio) {
+        $stmtRow = $connect->prepare(
+            'SELECT id, reviews_by, reviewed_by_user_id, reviewed_at FROM signos_vitales_outpatients WHERE id = ? AND id_outpatient = ? LIMIT 1'
+        );
+    } else {
+        $stmtRow = $connect->prepare(
+            'SELECT id, reviews_by, reviewed_by_user_id, reviewed_at FROM signos_vitales WHERE id = ? AND idpa = ? LIMIT 1'
+        );
+    }
     $stmtRow->execute([$signoId, $idpa]);
     $row = $stmtRow->fetch(PDO::FETCH_ASSOC);
 
@@ -64,10 +72,17 @@ try {
         exit;
     }
 
-    $upd = $connect->prepare(
-        'UPDATE signos_vitales SET reviews_by = :reviews_by, reviewed_by_user_id = :rid,
-         reviewed_at = NOW() WHERE id = :sid AND idpa = :idpa AND reviewed_at IS NULL'
-    );
+    if ($esAmbulatorio) {
+        $upd = $connect->prepare(
+            'UPDATE signos_vitales_outpatients SET reviews_by = :reviews_by, reviewed_by_user_id = :rid,
+             reviewed_at = NOW() WHERE id = :sid AND id_outpatient = :idpa AND reviewed_at IS NULL'
+        );
+    } else {
+        $upd = $connect->prepare(
+            'UPDATE signos_vitales SET reviews_by = :reviews_by, reviewed_by_user_id = :rid,
+             reviewed_at = NOW() WHERE id = :sid AND idpa = :idpa AND reviewed_at IS NULL'
+        );
+    }
     $upd->execute([
         ':reviews_by' => trim((string) $reviewerName),
         ':rid' => $approverId,

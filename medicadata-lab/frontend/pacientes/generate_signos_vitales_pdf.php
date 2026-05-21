@@ -119,13 +119,59 @@ class PDFWithFooter extends FPDF
     }
 }
 
-if (!isset($_GET['idpa']) || empty($_GET['idpa'])) {
+if (!isset($_GET['idpa']) || trim((string) $_GET['idpa']) === '') {
     die('Error: ID del paciente no proporcionado.');
 }
 
-$idpa = intval($_GET['idpa']);
+$idpa = (int) $_GET['idpa'];
+if ($idpa < 1) {
+    die('Error: ID del paciente no válido.');
+}
 
-$stmtPatient = $connect->prepare("
+$esAmbulatorio = isset($_GET['tipo'])
+    && strtolower(trim((string) $_GET['tipo'])) === 'ambulatorio';
+
+if ($esAmbulatorio) {
+    $stmtPatient = $connect->prepare('
+        SELECT
+            nompa,
+            apepa,
+            numhs AS dni,
+            cump AS fecha_nacimiento
+        FROM patients_ambulatorios
+        WHERE id = :id LIMIT 1
+    ');
+    $stmtPatient->execute([':id' => $idpa]);
+    $rowAmb = $stmtPatient->fetch(PDO::FETCH_ASSOC);
+    if (!$rowAmb) {
+        die('Error: Paciente ambulatorio no encontrado.');
+    }
+    $nombre = trim(trim((string) ($rowAmb['nompa'] ?? '')) . ' ' . trim((string) ($rowAmb['apepa'] ?? '')));
+    if ($nombre === '') {
+        $nombre = 'No registrado';
+    }
+    $edadAnosStr = '';
+    $fnRaw = isset($rowAmb['fecha_nacimiento']) ? (string) $rowAmb['fecha_nacimiento'] : '';
+    if ($fnRaw !== '' && preg_match('/^\d{4}-\d{2}-\d{2}/', $fnRaw)) {
+        $stAge = $connect->prepare('SELECT TIMESTAMPDIFF(YEAR, :cump, CURDATE())');
+        $stAge->execute([':cump' => substr($fnRaw, 0, 10)]);
+        $edanos = $stAge->fetchColumn();
+        $edadAnosStr = ($edanos !== false && $edanos !== null) ? (string) $edanos : '';
+    }
+    $patient = [
+        'full_name' => $nombre,
+        'dni' => $rowAmb['dni'] ?? 'No registrado',
+        'fecha_nacimiento' => $fnRaw !== '' ? substr($fnRaw, 0, 10) : 'No registrado',
+        'edad' => $edadAnosStr !== '' ? $edadAnosStr : '-',
+        'servicio' => 'Pre-clínica / Consulta externa',
+        'habitacion_no' => 'N/A',
+        'medico_tratante' => 'No registrado',
+        'especialidad' => 'No registrado',
+        'fecha_hora_ingreso' => 'No registrado',
+        'fecha_hora_egreso' => 'No registrado',
+    ];
+} else {
+    $stmtPatient = $connect->prepare("
     SELECT 
         CONCAT(patients.nompa, ' ', patients.apepa) AS full_name,
         patients.numhs AS dni,
@@ -147,15 +193,15 @@ $stmtPatient = $connect->prepare("
         consult.fere DESC 
     LIMIT 1
 ");
-$stmtPatient->bindParam(':idpa', $idpa, PDO::PARAM_INT);
-$stmtPatient->execute();
-$patient = $stmtPatient->fetch(PDO::FETCH_ASSOC);
+    $stmtPatient->bindParam(':idpa', $idpa, PDO::PARAM_INT);
+    $stmtPatient->execute();
+    $patient = $stmtPatient->fetch(PDO::FETCH_ASSOC);
 
-if (!$patient) {
-    die('Error: Paciente no encontrado.');
-}
+    if (!$patient) {
+        die('Error: Paciente no encontrado.');
+    }
 
-$stmtConsult = $connect->prepare("
+    $stmtConsult = $connect->prepare("
     SELECT 
         medico_tratante,
         especialidad,
@@ -165,29 +211,50 @@ $stmtConsult = $connect->prepare("
     ORDER BY fere DESC
     LIMIT 1
 ");
-$stmtConsult->bindParam(':idpa', $idpa, PDO::PARAM_INT);
-$stmtConsult->execute();
-$consultData = $stmtConsult->fetch(PDO::FETCH_ASSOC);
+    $stmtConsult->bindParam(':idpa', $idpa, PDO::PARAM_INT);
+    $stmtConsult->execute();
+    $consultData = $stmtConsult->fetch(PDO::FETCH_ASSOC);
 
-$patient['medico_tratante'] = $consultData['medico_tratante'] ?? 'No registrado';
-$patient['especialidad'] = $consultData['especialidad'] ?? 'No registrado';
-$patient['servicio'] = $consultData['servicio'] ?? 'No registrado';
+    $patient['medico_tratante'] = $consultData['medico_tratante'] ?? 'No registrado';
+    $patient['especialidad'] = $consultData['especialidad'] ?? 'No registrado';
+    $patient['servicio'] = $consultData['servicio'] ?? 'No registrado';
+}
 
 $signoId = isset($_GET['signo_id']) ? (int) $_GET['signo_id'] : 0;
 
-if ($signoId > 0) {
-    $stSig = $connect->prepare('SELECT * FROM signos_vitales WHERE id = ? AND idpa = ? LIMIT 1');
-    $stSig->execute([$signoId, $idpa]);
-    $solo = $stSig->fetch(PDO::FETCH_ASSOC);
-    if (!$solo) {
-        die('Error: El registro de signos vitales no existe o no pertenece a este paciente.');
+if ($esAmbulatorio) {
+    if ($signoId > 0) {
+        $stSig = $connect->prepare(
+            'SELECT * FROM signos_vitales_outpatients WHERE id = ? AND id_outpatient = ? LIMIT 1'
+        );
+        $stSig->execute([$signoId, $idpa]);
+        $solo = $stSig->fetch(PDO::FETCH_ASSOC);
+        if (!$solo) {
+            die('Error: El registro de signos vitales no existe o no pertenece a este paciente ambulatorio.');
+        }
+        $data = [$solo];
+    } else {
+        $stmt = $connect->prepare(
+            'SELECT * FROM signos_vitales_outpatients WHERE id_outpatient = :id ORDER BY created_at DESC'
+        );
+        $stmt->execute([':id' => $idpa]);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    $data = [$solo];
 } else {
-    $stmt = $connect->prepare("SELECT * FROM signos_vitales WHERE idpa = :idpa ORDER BY created_at DESC");
-    $stmt->bindParam(':idpa', $idpa, PDO::PARAM_INT);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($signoId > 0) {
+        $stSig = $connect->prepare('SELECT * FROM signos_vitales WHERE id = ? AND idpa = ? LIMIT 1');
+        $stSig->execute([$signoId, $idpa]);
+        $solo = $stSig->fetch(PDO::FETCH_ASSOC);
+        if (!$solo) {
+            die('Error: El registro de signos vitales no existe o no pertenece a este paciente.');
+        }
+        $data = [$solo];
+    } else {
+        $stmt = $connect->prepare("SELECT * FROM signos_vitales WHERE idpa = :idpa ORDER BY created_at DESC");
+        $stmt->bindParam(':idpa', $idpa, PDO::PARAM_INT);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
 $pdf = new PDFWithFooter('P', 'mm', 'Letter');

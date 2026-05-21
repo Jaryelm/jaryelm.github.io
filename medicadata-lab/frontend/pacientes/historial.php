@@ -72,15 +72,61 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
+$data = array();
 
-$sentencia = $connect->prepare("SELECT * FROM patients ORDER BY idpa DESC;");
- $sentencia->execute();
-$data =  array();
-if($sentencia){
-  while($r = $sentencia->fetchObject()){
+$sentencia = $connect->prepare("SELECT *, 'hospital' AS _lista_origen FROM patients ORDER BY idpa DESC;");
+$sentencia->execute();
+while ($sentencia && ($r = $sentencia->fetchObject())) {
+    $r->_sort_ts = isset($r->fere) && $r->fere ? strtotime((string) $r->fere) : (int) $r->idpa;
     $data[] = $r;
-  }
 }
+
+// Pacientes registrados desde caja/checkout (pacientes_ambulatorios)
+try {
+    $chk = $connect->query("SHOW TABLES LIKE 'patients_ambulatorios'");
+    if ($chk && $chk->rowCount() > 0) {
+        $sAmb = $connect->query(
+            'SELECT * FROM patients_ambulatorios ORDER BY id DESC'
+        );
+        if ($sAmb) {
+            while ($a = $sAmb->fetchObject()) {
+                $row = new stdClass();
+                $row->_lista_origen = 'ambulatorio';
+                $row->_sort_ts = 0;
+                if (isset($a->fecha_registro) && $a->fecha_registro) {
+                    $row->_sort_ts = strtotime((string) $a->fecha_registro);
+                } elseif (!empty($a->cump)) {
+                    $row->_sort_ts = strtotime((string) $a->cump) ?: (int) $a->id;
+                } else {
+                    $row->_sort_ts = (int) ($a->id ?? 0);
+                }
+                $row->idpa = (int) ($a->id ?? 0);
+                $row->numhs = $a->numhs ?? '';
+                $row->nompa = $a->nompa ?? '';
+                $row->apepa = $a->apepa ?? '';
+                $tel = isset($a->telefono) ? trim((string) $a->telefono) : '';
+                if ($tel === '' && isset($a->phon)) {
+                    $tel = trim((string) $a->phon);
+                }
+                $row->phon = ($tel !== '') ? $tel : '—';
+                $row->sex = '—';
+                $row->state = '1';
+                $data[] = $row;
+            }
+        }
+    }
+} catch (Throwable $e) {
+    // Si la tabla o columnas difieren entre entornos, no romper la lista hospitalaria.
+}
+
+usort($data, function ($x, $y) {
+    $tx = (int) ($x->_sort_ts ?? 0);
+    $ty = (int) ($y->_sort_ts ?? 0);
+    if ($tx === $ty) {
+        return 0;
+    }
+    return ($tx > $ty) ? -1 : 1;
+});
      ?>
      <?php if(count($data)>0):?>
          <table id="example" class="responsive-table">
@@ -95,25 +141,31 @@ if($sentencia){
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($data as $d):?>
+                <?php foreach ($data as $d):
+                    $__es_amb = (($d->_lista_origen ?? '') === 'ambulatorio');
+                    $__chk_id = $__es_amb ? ('amb-' . (int)$d->idpa) : ('pac-' . (int)$d->idpa);
+                    $__hist_href = '../pacientes/historia.php?id=' . (int)$d->idpa . ($__es_amb ? '&amb=1' : '');
+                    ?>
                     <tr>
-                        <th scope="row"><?php echo $d->numhs ?></th>
-                        <td data-title="Paciente"><?php echo $d->nompa ?>&nbsp;<?php echo $d->apepa ?></td>
+                        <th scope="row"><?php echo htmlspecialchars((string)$d->numhs); ?></th>
+                        <td data-title="Paciente"><?php echo htmlspecialchars((string)$d->nompa); ?>&nbsp;<?php echo htmlspecialchars((string)$d->apepa); ?></td>
                         
-                        <td data-title="Sexo"><?php echo $d->sex ?></td>
-                        <td data-title="Teléfono"><a href="tel:<?php echo $d->phon ?>"><?php echo $d->phon ?></a></td>
+                        <td data-title="Sexo"><?php echo htmlspecialchars((string)$d->sex); ?></td>
+                        <td data-title="Teléfono"><?php echo ($d->phon !== '—')
+                            ? '<a href="tel:' . htmlspecialchars((string)$d->phon) . '">' . htmlspecialchars((string)$d->phon) . '</a>'
+                            : htmlspecialchars((string)$d->phon); ?></td>
                         
                         <td data-title="Estado">
     
                         <label class="switch">
-                          <input type="checkbox" id="<?=$d->idpa?>" value="<?=$d->state ?>" <?=$d->state == '1' ? 'checked' : '' ;?>/> 
+                          <input type="checkbox" id="<?php echo htmlspecialchars($__chk_id); ?>" value="<?php echo htmlspecialchars((string)$d->state); ?>" <?=$d->state == '1' ? 'checked' : '' ;?>/> 
 
                           <span class="slider"></span>
                         </label>
                         </td>
                         <td>
                            
-                            <a title="Historial médico" href="../pacientes/historia.php?id=<?php echo $d->idpa ?>" class="fa fa-stethoscope"></a>
+                            <a title="Historial médico" href="<?php echo htmlspecialchars($__hist_href); ?>" class="fa fa-stethoscope"></a>
                             
         
                         </td>

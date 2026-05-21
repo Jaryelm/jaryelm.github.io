@@ -9,25 +9,31 @@ session_start();
 date_default_timezone_set('America/Tegucigalpa');
 header('Content-Type: application/json; charset=utf-8');
 
-require_once dirname(__DIR__) . '/bd/Conexion.php';
+try {
+    require_once dirname(__DIR__) . '/bd/Conexion.php';
+} catch (Throwable $e) {
+    error_log('pre_clinica_save_vitals Conexion: ' . $e->getMessage());
+    echo json_encode(['error' => 'No se pudo conectar a la base de datos. Verifique el servidor MySQL.'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 try {
     if (!isset($_SESSION['id'])) {
-        echo json_encode(['error' => 'Sesión no válida. Reinicie sesión e intente de nuevo.']);
+        echo json_encode(['error' => 'Sesión no válida. Reinicie sesión e intente de nuevo.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     $userIdSession = (int) $_SESSION['id'];
     if ($userIdSession < 1) {
-        echo json_encode(['error' => 'Sesión no válida.']);
+        echo json_encode(['error' => 'Sesión no válida.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $tipo_paciente = $_POST['tipo_paciente'] ?? 'paciente';
-    $id_paciente = $_POST['id_paciente'] ?? '';
+    $tipo_paciente = isset($_POST['tipo_paciente']) ? trim((string) $_POST['tipo_paciente']) : 'paciente';
+    $id_paciente = isset($_POST['id_paciente']) ? trim((string) $_POST['id_paciente']) : '';
 
     if ($id_paciente === '' || $id_paciente === '0') {
-        throw new Exception('El ID del paciente es obligatorio.');
+        throw new RuntimeException('Seleccione un paciente, pulse Consultar y vuelva a guardar.');
     }
 
     $required_fields = [
@@ -36,16 +42,18 @@ try {
     ];
 
     foreach ($required_fields as $field) {
-        if (!isset($_POST[$field]) || $_POST[$field] === '') {
-            throw new Exception('El campo ' . str_replace('_', ' ', $field) . ' es obligatorio.');
+        if (!isset($_POST[$field]) || trim((string) $_POST[$field]) === '') {
+            throw new RuntimeException('Complete todos los signos vitales (' . str_replace('_', ' ', $field) . ' vacío).');
         }
     }
 
-    $stmtName = $connect->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+    $stmtName = $connect->prepare('SELECT name, username FROM users WHERE id = ? LIMIT 1');
     $stmtName->execute([$userIdSession]);
-    $nombreDb = trim((string) $stmtName->fetchColumn());
-
-    $processedBy = $nombreDb !== '' ? $nombreDb : trim((string) ($_POST['processed_by'] ?? ''));
+    $urow = $stmtName->fetch(PDO::FETCH_ASSOC);
+    $nombreDb = $urow ? trim((string) ($urow['name'] ?? '')) : '';
+    $userDb = $urow ? trim((string) ($urow['username'] ?? '')) : '';
+    $fallbackPost = trim((string) ($_POST['processed_by'] ?? ''));
+    $processedBy = $nombreDb !== '' ? $nombreDb : ($userDb !== '' ? $userDb : ($fallbackPost !== '' ? $fallbackPost : 'Usuario sistema'));
 
     $weight = $_POST['weight'];
     $stature = $_POST['stature'];
@@ -79,7 +87,7 @@ try {
                     :heartRate, :respiratoryRate, :oxygenSaturation, :glucose, :idpa
                 )";
         $params = [
-            ':idpa' => $id_paciente,
+            ':idpa' => (int) $id_paciente,
         ];
     } else {
         $sql = "INSERT INTO signos_vitales_outpatients (
@@ -100,7 +108,7 @@ try {
                     :heartRate, :respiratoryRate, :oxygenSaturation, :glucose, :id_outpatient
                 )";
         $params = [
-            ':id_outpatient' => $id_paciente,
+            ':id_outpatient' => (int) $id_paciente,
         ];
     }
 
@@ -125,21 +133,25 @@ try {
 
     echo json_encode([
         'success' => 'Signos vitales guardados correctamente.',
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 } catch (PDOException $e) {
     error_log('pre_clinica_save_vitals PDO: ' . $e->getMessage());
     $msg = $e->getMessage();
+    $hint = '';
+    if (strpos($msg, 'signos_vitales_outpatients') !== false && strpos($msg, "doesn't exist") !== false) {
+        $hint = ' Cree la tabla signos_vitales_outpatients en MySQL (como en producción).';
+    }
     if (
         strpos($msg, 'processed_by_user_id') !== false
         || strpos($msg, 'reviewed_by_user_id') !== false
         || strpos($msg, 'Unknown column') !== false
     ) {
         echo json_encode([
-            'error' => 'La base de datos no tiene las columnas de firma digital (processed_by_user_id / reviewed_by_user_id). Aplique la misma migración que usa expediente/signos vitales.',
-        ]);
+            'error' => 'La tabla signos_vitales debe estar actualizada con las columnas de expediente (processed_by, weight, blood_pressure, processed_by_user_id, etc.). Actualice el esquema desde producción o ejecute la migración de signos vitales.' . $hint,
+        ], JSON_UNESCAPED_UNICODE);
     } else {
-        echo json_encode(['error' => $msg]);
+        echo json_encode(['error' => $msg . $hint], JSON_UNESCAPED_UNICODE);
     }
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }

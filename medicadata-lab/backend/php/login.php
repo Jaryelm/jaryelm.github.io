@@ -1,5 +1,23 @@
 <?php
-require '../backend/bd/Conexion.php';
+declare(strict_types=1);
+
+/* Ruta estable (no depende del CWD del worker) + una sola carga por petición */
+try {
+    require_once dirname(__DIR__) . '/bd/Conexion.php';
+} catch (PDOException $e) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    $msg = strtolower($e->getMessage());
+    if (strpos($msg, 'too many connections') !== false || strpos($msg, '[1040]') !== false) {
+        $_SESSION['errMsg'] = 'El servidor de datos está al límite de conexiones. Espere unos segundos e intente iniciar sesión de nuevo.';
+    } else {
+        $_SESSION['errMsg'] = 'No se puede conectar a la base de datos en este momento. Intente de nuevo más tarde o contacte a Soporte TI.';
+    }
+    header('Location: ../frontend/login.php');
+    exit();
+}
+
 session_start();
 
 if (isset($_POST['login'])) {
@@ -73,7 +91,12 @@ if (isset($_POST['login'])) {
                 }
             }
         } catch (PDOException $e) {
-            $_SESSION['errMsg'] = 'Error en la base de datos. Por favor contacte a Soporte TI.';
+            $lower = strtolower($e->getMessage());
+            if (strpos($lower, 'too many connections') !== false || strpos($lower, '[1040]') !== false) {
+                $_SESSION['errMsg'] = 'El servidor de datos está saturado temporariamente. Espere unos segundos e intente de nuevo.';
+            } else {
+                $_SESSION['errMsg'] = 'Error en la base de datos. Por favor contacte a Soporte TI.';
+            }
             header('Location: ../frontend/login.php');
             exit();
         }

@@ -1,6 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-$medidataPuedeAprobarSignosVitales = (($_SESSION['rol'] ?? '') === 'Administrador');
 // incuir el archivo de sesion login
 ?>
 <!DOCTYPE html>
@@ -63,24 +62,55 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
            <?php 
 
- $id = $_GET['id'];
- $sentencia = $connect->prepare("SELECT * FROM patients  WHERE idpa= '$id';");
- $sentencia->execute();
+$patientClinicalId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$expedienteEsAmbulatorio = false;
+$data = array();
 
-$data =  array();
-if($sentencia){
-  while($r = $sentencia->fetchObject()){
-    $data[] = $r;
-  }
+try {
+    if ($patientClinicalId > 0 && isset($_GET['amb']) && (string) $_GET['amb'] === '1') {
+        $sentenciaAmb = $connect->prepare(
+            'SELECT * FROM patients_ambulatorios WHERE id = ? LIMIT 1'
+        );
+        $sentenciaAmb->execute([$patientClinicalId]);
+        if ($sentenciaAmb && ($r = $sentenciaAmb->fetchObject())) {
+            $expedienteEsAmbulatorio = true;
+            $d = new stdClass();
+            $d->idpa = $patientClinicalId;
+            $d->numhs = $r->numhs ?? '';
+            $d->nompa = $r->nompa ?? '';
+            $d->apepa = $r->apepa ?? '';
+            $d->direc = '—';
+            $d->cump = $r->cump ?? '';
+            $tel = isset($r->telefono) ? trim((string) $r->telefono) : '';
+            if ($tel === '' && isset($r->phon)) {
+                $tel = trim((string) $r->phon);
+            }
+            $d->phon = ($tel !== '') ? $tel : '—';
+            $d->sex = '—';
+            $data[] = $d;
+        }
+    } elseif ($patientClinicalId > 0) {
+        $sentencia = $connect->prepare('SELECT * FROM patients WHERE idpa = ? LIMIT 1');
+        $sentencia->execute([$patientClinicalId]);
+        if ($sentencia) {
+            while ($r = $sentencia->fetchObject()) {
+                $data[] = $r;
+            }
+        }
+    }
+} catch (Throwable $e) {
+    $data = array();
 }
    ?>
    <?php if(count($data)>0):?>
         <?php foreach($data as $d):?>
             <div class="input-block">
 
-<a type="button" href="imprimir.php?id=<?php echo $d->idpa; ?>" class="button">Informe General</a>
+<?php if (empty($expedienteEsAmbulatorio)): ?>
+<a type="button" href="imprimir.php?id=<?php echo (int)$d->idpa; ?>" class="button">Informe General</a>
 
 <br><br>
+<?php endif; ?>
 
 <div class="wrap-line">
 
@@ -400,8 +430,8 @@ if($sentencia){
 </div>
     <br>
     <h3>Datos Generales</h3>
-    <div class="table-responsive">
-        <table class="responsive-table">
+    <div class="table-responsive sv-dt-expediente-wrap sv-expediente-signos-vitals-acciones">
+        <table class="responsive-table sv-expediente-signos-vitals-table">
             <thead>
                 <tr>
                     <th scope="col">FECHA</th>
@@ -428,16 +458,24 @@ if($sentencia){
 </div>
 <!-- Función para descargar PDF -->
 <script>
+    function historiaSignosVitalesTipoAmbQuery() {
+        return <?php echo !empty($expedienteEsAmbulatorio) ? "'&tipo=ambulatorio'" : "''"; ?>;
+    }
     function descargarPDF() {
-    const idpa = <?php echo $_GET['id']; ?>; // Obtener el ID del paciente
-    const url = `generate_signos_vitales_pdf.php?idpa=${idpa}`;
-    window.open(url, '_blank'); // Abrir el PDF en una nueva pestaña
-}
-
+        var idpa = <?php echo (int) ($_GET['id'] ?? 0); ?>;
+        var url = 'generate_signos_vitales_pdf.php?idpa=' + encodeURIComponent(idpa) + historiaSignosVitalesTipoAmbQuery();
+        window.open(url, '_blank');
+    }
     function descargarPDFSignoVital(signoId) {
-        const idpa = <?php echo (int)($_GET['id'] ?? 0); ?>;
+        var idpa = <?php echo (int) ($_GET['id'] ?? 0); ?>;
         if (!signoId) return;
-        window.open(`generate_signos_vitales_pdf.php?idpa=${idpa}&signo_id=${signoId}`, '_blank');
+        var url =
+            'generate_signos_vitales_pdf.php?idpa=' +
+            encodeURIComponent(idpa) +
+            '&signo_id=' +
+            encodeURIComponent(signoId) +
+            historiaSignosVitalesTipoAmbQuery();
+        window.open(url, '_blank');
     }
 </script>
 <!-- Estilo para el boton "Registrar" -->
@@ -2084,90 +2122,38 @@ function descargarAltaExigidaPDF() {
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
     
-
+    
     <script>
-const medidataPuedeAprobarSv = <?php echo !empty($medidataPuedeAprobarSignosVitales) ? 'true' : 'false'; ?>;
-const medidataApproveSvUrl = 'approve_signos_vitales.php';
-
-function svEstaAprobadoHistoria(item) {
-    const txt = item.reviews_by != null ? String(item.reviews_by).trim() : '';
-    if (txt !== '' && txt !== '-') return true;
-    if (item.reviewed_at != null && String(item.reviewed_at).trim() !== '') return true;
-    const rid = item.reviewed_by_user_id != null ? parseInt(item.reviewed_by_user_id, 10) : 0;
-    return !isNaN(rid) && rid > 0;
-}
-
-function aprobarSignosVitalesRow(signoId) {
-    var idpac = <?php echo (int)($_GET['id'] ?? 0); ?>;
-    swal({
-        title: '¿Aprobar registro?',
-        text: 'Se registrarán su nombre y firma digital del perfil en "Revisado por".',
-        icon: 'info',
-        buttons: true,
-        dangerMode: false
-    }).then(function(ok) {
-        if (!ok) return;
-        $.ajax({
-            type: 'POST',
-            url: medidataApproveSvUrl,
-            dataType: 'json',
-            data: { signo_id: signoId, idpa: idpac },
-            success: function(resp) {
-                if (resp && resp.error) {
-                    swal('Error', resp.error, 'error');
-                    return;
-                }
-                swal('Listo', (resp && resp.message) ? resp.message : 'Aprobación guardada.', 'success');
-                cargarSignosVitales();
-            },
-            error: function(xhr) {
-                swal('Error', xhr.responseText || 'No se pudo aprobar.', 'error');
-            }
-        });
-    });
-}
+/*
+ * Expediente: solo vista + PDF por fila (mismo marcado ACCIONES que Pre-Clínica).
+ * La aprobación permanece en Pre-Clínica.
+ */
+const medidataExpedienteAmbulatorio = <?php echo !empty($expedienteEsAmbulatorio) ? 'true' : 'false'; ?>;
 
 function cargarSignosVitales() {
-    const idpa = <?php echo $_GET['id']; ?>;
+    var idpa = <?php echo (int) ($_GET['id'] ?? 0); ?>;
+    var fetchSvData = medidataExpedienteAmbulatorio ? { idpa: idpa, tipo: 'ambulatorio' } : { idpa: idpa };
 
     $.ajax({
         type: "GET",
         url: "fetch_signos_vitales.php",
-        data: { idpa: idpa },
+        data: fetchSvData,
         dataType: "json",
         success: function(result) {
-            let content = '';
-            result.forEach(item => {
-                const pdfSvBtn =
-                    '<button type="button" class="register-btn" title="PDF de este registro" onclick="descargarPDFSignoVital(' +
+            if (!$.isArray(result)) {
+                var errText = result && result.error ? String(result.error) : 'No se pudieron cargar los datos.';
+                $('#signosVitalesBody').html(
+                    '<tr><td colspan="14" style="text-align:center;">' + $('<div/>').text(errText).html() + '</td></tr>'
+                );
+                return;
+            }
+            var content = '';
+            result.forEach(function(item) {
+                var pdfSvBtn =
+                    '<button type="button" class="register-btn btn-pdf-individual" title="PDF de este registro" onclick="descargarPDFSignoVital(' +
                     item.id +
                     ')">PDF</button>';
-                const accFlexOpen = '<div style="display:flex;flex-direction:column;gap:10px;">';
-                const accFlexClose = '</div>';
-                let accBtns = '';
-                if (!svEstaAprobadoHistoria(item)) {
-                    if (medidataPuedeAprobarSv) {
-                        accBtns =
-                            accFlexOpen +
-                            pdfSvBtn +
-                            '<button type="button" class="register-btn" onclick="aprobarSignosVitalesRow(' +
-                            item.id +
-                            ')">Aprobar</button>' +
-                            accFlexClose;
-                    } else {
-                        accBtns =
-                            accFlexOpen +
-                            pdfSvBtn +
-                            '<button type="button" class="register-btn" disabled>Pendiente aprobación</button>' +
-                            accFlexClose;
-                    }
-                } else {
-                    accBtns =
-                        accFlexOpen +
-                        pdfSvBtn +
-                        '<button type="button" class="register-btn" disabled>Registrados</button>' +
-                        accFlexClose;
-                }
+                var accBtns = '<div class="sv-actions-cell-inner">' + pdfSvBtn + '</div>';
                 content += `
                     <tr>
                         <td>${item.fecha}</td>
@@ -2188,7 +2174,7 @@ function cargarSignosVitales() {
                 `;
             });
 
-            $("#signosVitalesBody").html(content);
+            $('#signosVitalesBody').html(content);
         },
         error: function(xhr) {
             console.error("Error al cargar los datos: " + xhr.responseText);
@@ -2196,9 +2182,11 @@ function cargarSignosVitales() {
     });
 }
 
-// Llamar a la función al cargar la página
+// Llamar a la función al cargar la página (historia hospitalaria u ambulatoria)
 $(document).ready(function() {
-    cargarSignosVitales();
+    if (document.getElementById('signosVitalesBody')) {
+        cargarSignosVitales();
+    }
 });
 </script>
 

@@ -55,32 +55,12 @@ include_once '../../backend/registros/session_check.php';
                     <hr class="preclinica-section-divider">
 
                     <form id="form-pre-clinica">
-                    <div class="head"><h3>Tipo de Paciente</h3></div>
+                    <div class="head"><h3>Paciente</h3></div>
                     <div class="selection-group">
-                        <div class="radio-options">
-                            <label class="radio-item">
-                                <input type="radio" name="tipo_paciente" value="paciente" checked>
-                                <span>Hospitalario</span>
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="tipo_paciente" value="ambulatorio">
-                                <span>Ambulatorio</span>
-                            </label>
-                        </div>
-
-                        <div id="wrapper_patients" class="form-group">
-                            <label for="patients">Seleccionar Paciente:</label>
-                            <div id="slot_patients" class="preclinica-select-slot is-loading">
-                            <select name="id_paciente_hosp" id="patients">
-                                <option value="">&nbsp;</option>
-                            </select>
-                            </div>
-                        </div>
-
-                        <div id="wrapper_outpatients" class="form-group" style="display: none;">
-                            <label for="outpatients">Seleccionar Paciente:</label>
-                            <div id="slot_outpatients" class="preclinica-select-slot is-loading">
-                            <select name="id_paciente_amb" id="outpatients">
+                        <div id="wrapper_patient_combined" class="form-group">
+                            <label for="preclinic_patient_select">Seleccionar paciente:</label>
+                            <div id="slot_patient_combined" class="preclinica-select-slot is-loading">
+                            <select name="paciente_sel" id="preclinic_patient_select">
                                 <option value="">&nbsp;</option>
                             </select>
                             </div>
@@ -234,14 +214,46 @@ include_once '../../backend/registros/session_check.php';
             const PRECLINICA_API = '../../backend/registros/';
             const FUNCIONES_PAC = '../../frontend/funciones/';
             let dataTableHistorial = null;
-            let outpatientsSelect2Ready = false;
             let catalogsLoaded = false;
 
             const select2Opts = {
-                placeholder: 'Seleccione un paciente',
+                placeholder: 'Seleccionar paciente',
                 allowClear: false,
                 width: '100%'
             };
+
+            function preclinicParsePatientValue(raw) {
+                const s = raw != null ? String(raw).trim() : '';
+                if (!s || s === '0') {
+                    return { tipo: null, id: null };
+                }
+                if (s.indexOf('a:') === 0) {
+                    return { tipo: 'ambulatorio', id: s.slice(2).trim() };
+                }
+                if (s.indexOf('p:') === 0) {
+                    return { tipo: 'paciente', id: s.slice(2).trim() };
+                }
+                return { tipo: null, id: null };
+            }
+
+            /** Une cat_patients + cat_outpatients en un solo select (valor p:id | a:id). Lista plana sin etiquetas de tipo. */
+            function preclinicPopulateUnifiedSelect($sel, patientsHtml, outpatientHtml) {
+                $sel.empty().append($('<option>', { value: '', text: 'Seleccionar paciente' }));
+                $('<select>' + patientsHtml + '</select>').find('option').each(function () {
+                    const v = ($(this).val() || '').trim();
+                    const txt = (($(this).text() || '').trim());
+                    if (v !== '' && v !== '0' && txt !== '') {
+                        $sel.append($('<option>', { value: 'p:' + v, text: txt }));
+                    }
+                });
+                $('<select>' + outpatientHtml + '</select>').find('option').each(function () {
+                    const v = ($(this).val() || '').trim();
+                    const txt = (($(this).text() || '').trim());
+                    if (v !== '' && v !== '0' && txt !== '') {
+                        $sel.append($('<option>', { value: 'a:' + v, text: txt }));
+                    }
+                });
+            }
 
             function resetHistoriaTablePlaceholder() {
                 if (dataTableHistorial) {
@@ -253,60 +265,34 @@ include_once '../../backend/registros/session_check.php';
                 );
             }
 
-            function initOutpatientsSelect2IfNeeded() {
-                if (!catalogsLoaded || outpatientsSelect2Ready) return;
-                $('#outpatients').select2(select2Opts);
-                outpatientsSelect2Ready = true;
-                $('#slot_outpatients').removeClass('is-loading');
-            }
-
             $.when($.post(FUNCIONES_PAC + 'cat_patients.php'), $.post(FUNCIONES_PAC + 'cat_outpatients.php'))
                 .done(function (resPatients, resOut) {
-                    $('#patients').html(resPatients[0]);
-                    $('#outpatients').html(resOut[0]);
-                    catalogsLoaded = true;
-
-                    $('#patients').select2(select2Opts);
-                    $('#slot_patients').removeClass('is-loading');
-
-                    if ($('input[name="tipo_paciente"]:checked').val() === 'ambulatorio') {
-                        initOutpatientsSelect2IfNeeded();
-                    } else {
-                        $('#slot_outpatients').removeClass('is-loading');
+                    const $sel = $('#preclinic_patient_select');
+                    if ($sel.hasClass('select2-hidden-accessible')) {
+                        $sel.select2('destroy');
                     }
+                    preclinicPopulateUnifiedSelect($sel, resPatients[0], resOut[0]);
+                    catalogsLoaded = true;
+                    $sel.select2(select2Opts);
+                    $('#slot_patient_combined').removeClass('is-loading');
                 })
                 .fail(function () {
-                    $('#slot_patients, #slot_outpatients').removeClass('is-loading');
+                    $('#slot_patient_combined').removeClass('is-loading');
                     swal('Error', 'No se pudieron cargar los listados de pacientes.', 'error');
                 });
 
-            // Cambio de tipo de paciente
-            $('input[name="tipo_paciente"]').change(function() {
-                const tipo = $(this).val();
-                if (tipo === 'paciente') {
-                    $('#wrapper_patients').show();
-                    $('#wrapper_outpatients').hide();
-                } else {
-                    $('#wrapper_patients').hide();
-                    $('#wrapper_outpatients').show();
-                    initOutpatientsSelect2IfNeeded();
-                }
-                $('#btn_save_vitals').prop('disabled', true);
-                resetHistoriaTablePlaceholder();
-            });
-
-            // Resetear estado al cambiar de paciente en el select
-            $('#patients, #outpatients').on('change', function() {
+            $('#preclinic_patient_select').on('change', function() {
                 $('#btn_save_vitals').prop('disabled', true);
                 resetHistoriaTablePlaceholder();
             });
 
             // Consultar datos
             $('#btn_fetch_vitals').click(function() {
-                const tipo = $('input[name="tipo_paciente"]:checked').val();
-                const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+                const parsed = preclinicParsePatientValue($('#preclinic_patient_select').val());
+                const tipo = parsed.tipo;
+                const id = parsed.id;
 
-                if (!id || id === '0') {
+                if (!tipo || !id || id === '0') {
                     swal('Aviso', 'Seleccione un paciente primero.', 'warning');
                     return;
                 }
@@ -393,7 +379,31 @@ include_once '../../backend/registros/session_check.php';
                         }
                     ],
                     language: {
-                        url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+                        processing: 'Procesando...',
+                        lengthMenu: 'Mostrar _MENU_ registros',
+                        zeroRecords: 'Ningun dato disponible',
+                        emptyTable: 'Ningun dato disponible',
+                        info: 'Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros',
+                        infoEmpty: 'Mostrando registros del 0 al 0 de un total de 0 registros',
+                        infoFiltered: '(filtrado de un total de _MAX_ registros)',
+                        infoPostFix: '',
+                        search: 'Buscar:',
+                        infoThousands: ',',
+                        loadingRecords: 'Cargando...',
+                        paginate: {
+                            first: 'Primero',
+                            last: 'Último',
+                            next: 'Siguiente',
+                            previous: 'Anterior'
+                        },
+                        aria: {
+                            sortAscending: ': Activar para ordenar la columna de manera ascendente',
+                            sortDescending: ': Activar para ordenar la columna de manera descendente'
+                        },
+                        buttons: {
+                            copy: 'Copiar',
+                            colvis: 'Visibilidad'
+                        }
                     },
                     /* rtip: una sola zona "info" (evita irtip = i duplicado encima y debajo de la tabla) */
                     dom: '<"sv-dt-toolbar-row"Bf>rtip',
@@ -410,22 +420,23 @@ include_once '../../backend/registros/session_check.php';
             // Lógica de Descarga PDF Individual
             $(document).on('click', '.btn-pdf-individual', function() {
                 const signoId = $(this).data('id');
-                const tipo = $('input[name="tipo_paciente"]:checked').val();
-                const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
-
-                if (tipo !== 'paciente') {
-                    swal('Aviso', 'La generación de PDF con membrete actualmente solo está soportada para pacientes hospitalarios.', 'info');
+                const parsed = preclinicParsePatientValue($('#preclinic_patient_select').val());
+                if (!parsed.tipo || !parsed.id || parsed.id === '0') {
+                    swal('Aviso', 'Seleccione paciente y pulse Consultar antes de generar el PDF.', 'warning');
                     return;
                 }
-                const url = `../pacientes/generate_signos_vitales_pdf.php?idpa=${id}&signo_id=${signoId}`;
+                const id = parsed.id;
+                const amb = parsed.tipo === 'ambulatorio' ? '&tipo=ambulatorio' : '';
+                const url = `../pacientes/generate_signos_vitales_pdf.php?idpa=${encodeURIComponent(id)}&signo_id=${signoId}${amb}`;
                 window.open(url, '_blank');
             });
 
             // Acción de Aprobar (Delegación de eventos)
             $(document).on('click', '.btn-aprobar', function() {
                 const idRegistro = $(this).data('id');
-                const tipo = $('input[name="tipo_paciente"]:checked').val();
-                const idPaciente = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+                const parsed = preclinicParsePatientValue($('#preclinic_patient_select').val());
+                const tipo = parsed.tipo;
+                const idPaciente = parsed.id;
 
                 swal({
                     title: "¿Confirmar Aprobación?",
@@ -433,25 +444,33 @@ include_once '../../backend/registros/session_check.php';
                     icon: "info",
                     buttons: ["Cancelar", "Aprobar"],
                 }).then((willApprove) => {
-                    if (willApprove) {
-                        // Aquí se llamará al backend para actualizar reviews_by
-                        $.post(PRECLINICA_API + 'pre_clinica_approve_vitals.php', { id: idRegistro, tipo: tipo }, function(resp) {
-                            if (resp.success) {
-                                swal("Éxito", resp.success, "success");
-                                cargarVitals(tipo, idPaciente);
-                            } else {
-                                swal("Error", resp.error || "No se pudo aprobar", "error");
-                            }
-                        }, 'json');
+                    if (!willApprove) return;
+                    if (!tipo || !idPaciente) {
+                        swal('Error', 'Selección de paciente no válida. Vuelva a elegir al paciente y pulse Consultar.', 'error');
+                        return;
                     }
+                    $.post(PRECLINICA_API + 'pre_clinica_approve_vitals.php', { id: idRegistro, tipo: tipo }, function(resp) {
+                        if (resp.success) {
+                            swal("Éxito", resp.success, "success");
+                            cargarVitals(tipo, idPaciente);
+                        } else {
+                            swal("Error", resp.error || "No se pudo aprobar", "error");
+                        }
+                    }, 'json');
                 });
             });
 
             // Guardar Vitals
             $('#vitals-form').submit(function(e) {
                 e.preventDefault();
-                const tipo = $('input[name="tipo_paciente"]:checked').val();
-                const id = (tipo === 'paciente') ? $('#patients').val() : $('#outpatients').val();
+                const parsed = preclinicParsePatientValue($('#preclinic_patient_select').val());
+                const tipo = parsed.tipo;
+                const id = parsed.id != null ? String(parsed.id).trim() : '';
+
+                if (!tipo || !id || id === '0') {
+                    swal('Aviso', 'Seleccione un paciente y pulse Consultar antes de guardar.', 'warning');
+                    return false;
+                }
 
                 // Construir valores compuestos solo para los que la BD espera como string "X/Y"
                 // Para los numéricos (Peso, Talla, Temp, Glucosa) enviamos solo la unidad base (KG, CM, °C, mg/dL)
@@ -480,16 +499,20 @@ include_once '../../backend/registros/session_check.php';
                 };
 
                 $.post(PRECLINICA_API + 'pre_clinica_save_vitals.php', formData, function(resp) {
-                    if (resp.success) {
+                    if (resp && resp.success) {
                         swal('Éxito', resp.success, 'success');
                         $('#vitals-form')[0].reset();
                         $('#map_pressure').val('N/A');
                         cargarVitals(tipo, id);
                     } else {
-                        swal('Error', resp.error || 'No se pudo guardar', 'error');
+                        swal('Error', (resp && resp.error) ? resp.error : 'No se pudo guardar', 'error');
                     }
-                }, 'json').fail(function() {
-                    swal('Error', 'Error de red al intentar guardar.', 'error');
+                }, 'json').fail(function(xhr) {
+                    let det = 'Respuesta no válida del servidor.';
+                    if (xhr.responseText) {
+                        det = xhr.responseText.substring(0, 500);
+                    }
+                    swal('Error', 'No se pudo guardar (' + (xhr.status || '?') + '). ' + det, 'error');
                 });
             });
         });
