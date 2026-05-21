@@ -21,7 +21,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 
 <body>
     <?php
-    include_once '../admin/menu.php';
+    include_once './menu.php';
     // incuir el archivo menu principal
     ?>
 
@@ -33,7 +33,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
             </form>
             <span class="divider"></span>
             <?php
-            include_once '../admin/perfil.php';
+            include_once './perfil.php';
             // incuir el archivo menu principal
             ?>
         </nav>
@@ -103,13 +103,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                             destroy: true,
                             pageLength: 10,
                             dom: 'Bfrtip',
-                            buttons: [
-                                { extend: 'copy', className: 'button' },
-                                { extend: 'csv', className: 'button' },
-                                { extend: 'excel', className: 'button' },
-                                { extend: 'pdf', className: 'button' },
-                                { extend: 'print', className: 'button' }
-                            ],
+                            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                             order: [
                                 [0, 'desc']
                             ], // Orden descendente en la columna de ID

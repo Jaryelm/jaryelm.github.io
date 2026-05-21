@@ -8,7 +8,7 @@
             <a href="#"><i class='bx bxs-user-detail icon'></i> RECURSOS HUMANOS<i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li>
-                    <a href="./lista_colaboradores.php">LISTA COLABORADORES</a>
+                    <a href="./lista_colaboradores_usr.php">LISTA COLABORADORES</a>
                 </li>
                 <li>
                     <a href="#" class="new-submenu-link">SOLICITUD EMPLEOS</a>
