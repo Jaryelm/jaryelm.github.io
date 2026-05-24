@@ -86,6 +86,20 @@
                     <a href="../recursos_humanos/lista_colaboradores.php">LISTA COLABORADORES</a>
                 </li>
                 <li>
+                    <a href="#" class="new-submenu-link">RECLUTAMIENTO</a>
+                    <ul class="new-side-dropdown">
+                        <li><a href="../recursos_humanos/puestos_trabajo.php">PUESTOS DE TRABAJO</a></li>
+                        <li><a href="../recursos_humanos/vacantes_trabajo.php">VACANTES DE TRABAJO</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">POSTULANTES</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">RECLUTAMIENTO</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">ENTREVISTAS</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">PRUEBAS PSICOMETRICAS</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">REQUISITOS DE CONTRATACION</a></li>
+                        <li><a href="./entrevista_competencia_usr.php">AGENDA DE ENTREVISTAS</a></li>
+                    </ul>
+                </li>
+
+                <li>
                     <a href="#" class="new-submenu-link">SOLICITUD EMPLEOS</a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos_humanos/entrevista_competencia.php">ENTREVISTA COMPETENCIA</a></li>
