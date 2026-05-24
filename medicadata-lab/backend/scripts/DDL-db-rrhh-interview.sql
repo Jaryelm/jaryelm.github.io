@@ -4,6 +4,8 @@ USE `medic9ue_medi_rrhh_interviews`;
 CREATE TABLE IF NOT EXISTS `positions` (
     id INT PRIMARY KEY auto_increment,
     name VARCHAR(100) not null,
+    description VARCHAR(1000) not null,
+    requirements VARCHAR(1000) not null,
     created_by VARCHAR(100) not null,
     updated_by VARCHAR(100) default null,
     created_at TIMESTAMP default CURRENT_TIMESTAMP(),
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `positions` (
 CREATE TABLE IF NOT EXISTS `vacant_positions` (
 	id INT primary key auto_increment,
 	id_position int not null,
+    benefits VARCHAR(1000) not null,
 	init_date DATE not null,
 	end_date DATE not null,
 	created_by VARCHAR(100) not null,
@@ -45,8 +48,8 @@ CREATE TABLE IF NOT EXISTS `candidates` (
 
 create table if not exists `candidates_docs` (
 	id int primary key auto_increment,
-	img_profile longblob not null,
-	cv longblob not null,
+	img_profile tinyblob not null,
+	cv tinyblob not null,
 	id_candidate int not null,
 	created_by VARCHAR(100) not null,
     updated_by VARCHAR(100) default null,
@@ -115,22 +118,22 @@ CREATE TABLE IF NOT EXISTS `psychometric_question_form` (
     CONSTRAINT `fk_psychometric_candidates` FOREIGN KEY (`id_candidate`) REFERENCES `candidates` (id)
 );
 
--- 4. Tabla de Requisitos de Contratación (Basada en la imagen, usando LONGBLOB temporalmente)
+-- 4. Tabla de Requisitos de Contratación (Basada en la imagen, usando tinyblob temporalmente)
 CREATE TABLE IF NOT EXISTS `hiring_requirements` (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_candidate INT NOT NULL,
     
     -- Documentos solicitados
-    birth_cert_children LONGBLOB DEFAULT NULL,     -- Copia de partida de nacimiento de hijos
-    photo_id_card LONGBLOB DEFAULT NULL,           -- Foto (Para su Carnet)
-    id_document LONGBLOB DEFAULT NULL,             -- Documento de identidad (revés y derecho)
-    utility_bill LONGBLOB DEFAULT NULL,            -- Copia de recibo (agua, luz teléfono) mas reciente
-    criminal_record LONGBLOB DEFAULT NULL,         -- Antecedentes Penales
-    police_record LONGBLOB DEFAULT NULL,           -- Antecedentes Policiales
-    personal_references LONGBLOB DEFAULT NULL,     -- 2 referencias personales
-    professional_references LONGBLOB DEFAULT NULL, -- 2 referencias profesionales
-    diplomas LONGBLOB DEFAULT NULL,                -- Diplomas o títulos recibidos
-    home_sketch LONGBLOB DEFAULT NULL,             -- Croquis de vivienda
+    birth_cert_children tinyblob DEFAULT NULL,     -- Copia de partida de nacimiento de hijos
+    photo_id_card tinyblob DEFAULT NULL,           -- Foto (Para su Carnet)
+    id_document tinyblob DEFAULT NULL,             -- Documento de identidad (revés y derecho)
+    utility_bill tinyblob DEFAULT NULL,            -- Copia de recibo (agua, luz teléfono) mas reciente
+    criminal_record tinyblob DEFAULT NULL,         -- Antecedentes Penales
+    police_record tinyblob DEFAULT NULL,           -- Antecedentes Policiales
+    personal_references tinyblob DEFAULT NULL,     -- 2 referencias personales
+    professional_references tinyblob DEFAULT NULL, -- 2 referencias profesionales
+    diplomas tinyblob DEFAULT NULL,                -- Diplomas o títulos recibidos
+    home_sketch tinyblob DEFAULT NULL,             -- Croquis de vivienda
     
     -- Control y Auditoría
     status ENUM('Incompleto', 'En Revisión', 'Completado') DEFAULT 'Incompleto',
