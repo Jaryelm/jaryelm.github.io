@@ -95,7 +95,6 @@
                         <li><a href="../recursos_humanos/entrevista.php">ENTREVISTAS</a></li>
                         <li><a href="../recursos_humanos/pruebas_psicometricas.php">PRUEBAS PSICOMETRICAS</a></li>
                         <li><a href="../recursos_humanos/requisitos_contratacion.php">REQUISITOS DE CONTRATACION</a></li>
-                        <li><a href="../recursos_humanos/entrevista_competencia.php">AGENDA DE ENTREVISTAS</a></li>
                     </ul>
                 </li>
 

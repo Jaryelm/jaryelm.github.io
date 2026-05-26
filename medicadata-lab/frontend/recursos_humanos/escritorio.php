@@ -2,39 +2,83 @@
 include_once '../../backend/registros/session_check.php';
 require_once('../../backend/bd/Conexion.php');
 
-// Consulta con JOIN para obtener datos relacionados para el calendario
-$req = $connect->prepare("
-    SELECT 
-        e.id,
-        e.title,
-        e.start,
-        e.end,
-        e.color,
-        p.nompa AS patient_name,
-        p.apepa AS patient_surname,
-        d.nodoc AS doctor_name,
-        d.apdoc AS doctor_surname,
-        d.nomesp AS specialty,
-        l.nomlab AS area_name,
-        e.room_number,
-        e.insurer,
-        e.policy_number,
-        e.certificate_number,
-        e.surgery,
-        e.hospitalization,
-        e.assistant,
-        e.anesthetist,
-        e.circulating,
-        e.technician,
-        e.instrumentist,
-        e.evaluation
-    FROM events e
-    INNER JOIN patients p ON e.idpa = p.idpa
-    INNER JOIN doctor d ON e.idodc = d.idodc
-    INNER JOIN laboratory l ON e.idlab = l.idlab
-");
-$req->execute();
-$events = $req->fetchAll(PDO::FETCH_ASSOC);
+// Consulta para obtener eventos de RRHH (Entrevistas y Cierres de Vacantes)
+$events = [];
+
+try {
+    // 1. Obtener Entrevistas
+    $stmt_interviews = $connect_rrhh->prepare("
+        SELECT 
+            i.id,
+            CONCAT('Entrevista: ', p.fullname) AS title,
+            CONCAT(i.date_interview, ' ', i.time_interview) AS start,
+            DATE_ADD(CONCAT(i.date_interview, ' ', i.time_interview), INTERVAL 1 HOUR) AS end,
+            CASE 
+                WHEN i.status = 'Programada' THEN '#0071c5'
+                WHEN i.status = 'En Proceso' THEN '#FF4500'
+                WHEN i.status = 'Terminada' THEN '#06adbf'
+                ELSE '#EE82EE'
+            END AS color,
+            p.fullname AS candidate_name,
+            p.dni AS candidate_dni,
+            p.email AS candidate_email,
+            p.phonenumber AS candidate_phone,
+            i.status AS interview_status,
+            pt.name AS position_name,
+            'interview' as type
+        FROM interviews i
+        INNER JOIN postulantes p ON i.id_candidate = p.id
+        LEFT JOIN vacantes_trabajo v ON p.id_vacant_position = v.id
+        LEFT JOIN puestos_trabajo pt ON v.id_position = pt.id
+        WHERE i.deleted = 0
+    ");
+    $stmt_interviews->execute();
+    $interviews = $stmt_interviews->fetchAll(PDO::FETCH_ASSOC);
+    $events = array_merge($events, $interviews);
+
+    // 2. Obtener Cierres de Vacantes
+    $stmt_vacantes_end = $connect_rrhh->prepare("
+        SELECT 
+            v.id,
+            CONCAT('Cierre Vacante: ', pt.name) AS title,
+            v.end_date AS start,
+            v.end_date AS end,
+            '#f44336' AS color,
+            pt.name AS position_name,
+            v.benefits,
+            'vacancy_end' as type
+        FROM vacantes_trabajo v
+        JOIN puestos_trabajo pt ON v.id_position = pt.id
+        WHERE v.deleted = 0
+    ");
+    $stmt_vacantes_end->execute();
+    $vacantes_end = $stmt_vacantes_end->fetchAll(PDO::FETCH_ASSOC);
+    $events = array_merge($events, $vacantes_end);
+
+} catch (Exception $e) {
+    error_log("Error al cargar eventos de RRHH: " . $e->getMessage());
+}
+
+// Conteos para el Dashboard
+try {
+    $totalColaboradores = $connect->query("WITH colaboradores AS (
+        SELECT COUNT(*) AS 'Colaborador' FROM medic9ue_medi_data.doctor
+        UNION ALL
+        SELECT COUNT(*) FROM medic9ue_medi_data.nurse
+        UNION ALL
+        SELECT COUNT(*) FROM medic9ue_medi_data.users
+        )
+        SELECT SUM(Colaborador) FROM colaboradores;")->fetchColumn();
+    
+    $totalVacantesActivas = $connect_rrhh->query("SELECT COUNT(*) FROM vacantes_trabajo WHERE deleted = 0 AND end_date >= CURDATE()")->fetchColumn();
+    $totalPostulantes = $connect_rrhh->query("SELECT COUNT(*) FROM postulantes WHERE deleted = 0")->fetchColumn();
+    $entrevistasHoy = $connect_rrhh->query("SELECT COUNT(*) FROM interviews WHERE deleted = 0 AND date_interview = CURDATE()")->fetchColumn();
+} catch (Exception $e) {
+    $totalColaboradores = 0;
+    $totalVacantesActivas = 0;
+    $totalPostulantes = 0;
+    $entrevistasHoy = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -83,6 +127,15 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
 
         #notification-panel h4 {
             margin-bottom: 10px;
+            color: #035c67;
+        }
+
+        #notification-panel h5 {
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #06adbf;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
 
         .notification-item {
@@ -101,12 +154,6 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
             background-color: #ddffdd;
         }
 
-        #weekly-status,
-        #future-events,
-        #past-events {
-            margin-top: 20px;
-        }
-
         @media (max-width: 768px) {
             #calendar-container {
                 flex-direction: column;
@@ -123,7 +170,7 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
         /* Estilo Dashboard */
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -135,25 +182,30 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             color: #fff;
             transition: transform 0.3s ease;
+            text-align: center;
         }
 
         .card h2 {
             margin-top: 0;
             color: #fff;
+            font-size: 1.1em;
+            text-transform: uppercase;
         }
 
         .card p {
-            color: #f4f4f4;
-            font-size: 1.5em;
+            color: #fff;
+            font-size: 2em;
             font-weight: bold;
+            margin: 10px 0 0 0;
         }
 
         .card:hover {
             transform: translateY(-5px);
+            background-color: #035c67;
         }
     </style>
 
-    <title>MEDIDATA</title>
+    <title>MEDIDATA - RRHH</title>
 </head>
 
 <body>
@@ -190,29 +242,25 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="dashboard-container">
                 <header>
-                    <h1>Recursos Humanos</h1>
+                    <h1 style="text-align: center; margin-bottom: 20px; color: #035c67;">Resumen de Recursos Humanos</h1>
                 </header>
                 
                 <div class="dashboard">
-                    <?php
-                    // Conteos rápidos
-                    $totalColaboradores = $connect->query("WITH colaboradores AS (
-                        SELECT COUNT(*) AS 'Colaborador' FROM medic9ue_medi_data.doctor
-                        UNION ALL
-                        SELECT COUNT(*) FROm medic9ue_medi_data.nurse
-                        UNION ALL
-                        SELECT COUNT(*) FROm medic9ue_medi_data.users
-                        )
-                        SELECT SUM(Colaborador) FROM colaboradores;")->fetchColumn();
-                    $totalPacientes = $connect->query("SELECT COUNT(*) FROM patients")->fetchColumn();
-                    ?>
                     <div class="card">
                         <h2>Colaboradores</h2>
                         <p><?php echo number_format($totalColaboradores); ?></p>
                     </div>
-                    <div class="card">
-                        <h2>Pacientes Registrados</h2>
-                        <p><?php echo number_format($totalPacientes); ?></p>
+                    <div class="card" style="background-color: #28a745;">
+                        <h2>Vacantes Activas</h2>
+                        <p><?php echo number_format($totalVacantesActivas); ?></p>
+                    </div>
+                    <div class="card" style="background-color: #ffc107;">
+                        <h2>Postulantes</h2>
+                        <p><?php echo number_format($totalPostulantes); ?></p>
+                    </div>
+                    <div class="card" style="background-color: #fd7e14;">
+                        <h2>Entrevistas Hoy</h2>
+                        <p><?php echo number_format($entrevistasHoy); ?></p>
                     </div>
                 </div>
             </div>
@@ -220,22 +268,25 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
             <div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Programación de Eventos</h3>
+                        <h3>Agenda de RRHH</h3>
                     </div>
                     <div id="calendar-container">
                         <div id="calendar"></div>
                         <div id="notification-panel">
-                            <h4>Notificaciones</h4>
-                            <div id="weekly-status">
-                                <h5>Ocupación Semanal</h5>
-                                <div id="weekly-occupancy"></div>
-                            </div>
+                            <h4>Notificaciones de Agenda</h4>
+                            
                             <div id="future-events">
-                                <h5>Próximos Eventos</h5>
+                                <h5>Próximas Entrevistas</h5>
                                 <div id="future-occupancy"></div>
                             </div>
+
+                            <div id="vacancy-deadlines">
+                                <h5>Cierres de Vacantes</h5>
+                                <div id="vacancy-occupancy"></div>
+                            </div>
+                            
                             <div id="past-events">
-                                <h5>Eventos Pasados</h5>
+                                <h5>Actividad Reciente</h5>
                                 <div id="past-occupancy"></div>
                             </div>
                         </div>
@@ -251,98 +302,127 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
     <script src="../../backend/vendor/datatables/jquery.dataTables.js"></script>
     <script src="../../backend/vendor/datatables/dataTables.bootstrap4.js"></script>
     <script src="../../backend/js/moment.min.js"></script>
-    <script src='../../backend/js/fullcalendar/lib/main.js'></script>
-    <script src='../../backend/js/fullcalendar/lib/locales/es.js'></script>
+    <script src='../../backend/js/fullcalendar/fullcalendar.min.js'></script>
+    <script src='../../backend/js/fullcalendar/locale/es.js'></script>
     
     <script>
         $(document).ready(function () {
             var events = <?php echo json_encode($events); ?>;
 
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'es',
-                headerToolbar: {
+            $('#calendar').fullCalendar({
+                header: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    right: 'month,basicWeek,basicDay'
                 },
+                locale: 'es',
+                editable: false,
+                eventLimit: true,
                 events: events,
-                eventClick: function (info) {
-                    showEventDetails(info.event);
+                eventClick: function (event) {
+                    showEventDetails(event);
                 },
-                datesSet: function (view) {
+                viewRender: function (view) {
                     updateNotifications(view);
                 }
             });
-            calendar.render();
 
             function showEventDetails(event) {
-                const props = event.extendedProps;
                 $('#modal-title').text(event.title);
-                $('#modal-patient').text(props.patient_name + ' ' + props.patient_surname);
-                $('#modal-doctor').text(props.doctor_name + ' ' + props.doctor_surname);
-                $('#modal-area').text(props.area_name);
-                $('#modal-start').text(moment(event.start).format('YYYY-MM-DD HH:mm'));
-                $('#modal-end').text(event.end ? moment(event.end).format('YYYY-MM-DD HH:mm') : 'N/A');
-                $('#modal-room-number').text(props.room_number || 'N/A');
-                $('#modal-insurer').text(props.insurer || 'N/A');
-                $('#modal-surgery').text(props.surgery || 'N/A');
+                
+                // Limpiar tabla
+                $('#event-details tbody').empty();
+
+                if (event.type === 'interview') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Candidato</th><td>${event.candidate_name}</td></tr>
+                        <tr><th>DNI</th><td>${event.candidate_dni}</td></tr>
+                        <tr><th>Puesto</th><td>${event.position_name}</td></tr>
+                        <tr><th>Estado</th><td>${event.interview_status}</td></tr>
+                        <tr><th>Inicio</th><td>${moment(event.start).format('YYYY-MM-DD HH:mm')}</td></tr>
+                        <tr><th>Teléfono</th><td>${event.candidate_phone}</td></tr>
+                        <tr><th>Email</th><td>${event.candidate_email}</td></tr>
+                    `);
+                } else if (event.type === 'vacancy_end') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Puesto</th><td>${event.position_name}</td></tr>
+                        <tr><th>Fecha Cierre</th><td>${moment(event.start).format('YYYY-MM-DD')}</td></tr>
+                        <tr><th>Beneficios</th><td>${event.benefits || 'N/A'}</td></tr>
+                        <tr><th>Tipo</th><td>Cierre de Vacante</td></tr>
+                    `);
+                }
                 
                 $('#eventModal').fadeIn();
             }
 
             function updateNotifications(view) {
-                updateWeeklyOccupancy();
-                updateFutureEvents();
-                updatePastEvents();
-            }
-
-            function updateWeeklyOccupancy() {
-                const weeklyOccupancy = $('#weekly-occupancy');
-                weeklyOccupancy.empty();
-                // Simulación de lógica (en una implementación real, filtrarías 'events')
-                weeklyOccupancy.append('<div class="notification-item available"><p>Consultar calendario para detalles semanales.</p></div>');
-            }
-
-            function updateFutureEvents() {
+                const now = moment();
+                
+                // Próximas Entrevistas
                 const futureOccupancy = $('#future-occupancy');
                 futureOccupancy.empty();
-                const now = moment();
-                let count = 0;
-                events.forEach(event => {
-                    if (moment(event.start).isAfter(now) && count < 5) {
+                let futureCount = 0;
+                events.filter(e => e.type === 'interview' && moment(e.start).isAfter(now))
+                      .sort((a,b) => moment(a.start) - moment(b.start))
+                      .forEach(event => {
+                    if (futureCount < 5) {
                         futureOccupancy.append(`
-                            <div class="notification-item occupied" style="background-color: ${event.color}; color: #fff;">
-                                <strong>${event.title}</strong>
-                                <p>${moment(event.start).format('DD/MM HH:mm')}</p>
+                            <div class="notification-item" style="border-left: 5px solid ${event.color};">
+                                <strong>${event.candidate_name}</strong>
+                                <p>${moment(event.start).format('DD/MM HH:mm')} - ${event.position_name}</p>
                             </div>
                         `);
-                        count++;
+                        futureCount++;
                     }
                 });
-            }
+                if (futureCount === 0) futureOccupancy.append('<p>No hay entrevistas próximas.</p>');
 
-            function updatePastEvents() {
+                // Cierres de Vacantes
+                const vacancyOccupancy = $('#vacancy-occupancy');
+                vacancyOccupancy.empty();
+                let vacancyCount = 0;
+                events.filter(e => e.type === 'vacancy_end' && moment(e.start).isSameOrAfter(now, 'day'))
+                      .sort((a,b) => moment(a.start) - moment(b.start))
+                      .forEach(event => {
+                    if (vacancyCount < 3) {
+                        vacancyOccupancy.append(`
+                            <div class="notification-item" style="border-left: 5px solid #f44336;">
+                                <strong>${event.position_name}</strong>
+                                <p>Cierra: ${moment(event.start).format('DD/MM/YYYY')}</p>
+                            </div>
+                        `);
+                        vacancyCount++;
+                    }
+                });
+                if (vacancyCount === 0) vacancyOccupancy.append('<p>No hay cierres de vacantes próximos.</p>');
+
+                // Actividad Reciente (Pasados)
                 const pastOccupancy = $('#past-occupancy');
                 pastOccupancy.empty();
-                const now = moment();
-                let count = 0;
-                events.forEach(event => {
-                    if (moment(event.start).isBefore(now) && count < 3) {
+                let pastCount = 0;
+                events.filter(e => moment(e.start).isBefore(now))
+                      .sort((a,b) => moment(b.start) - moment(a.start))
+                      .forEach(event => {
+                    if (pastCount < 3) {
                         pastOccupancy.append(`
-                            <div class="notification-item available">
+                            <div class="notification-item" style="opacity: 0.7;">
                                 <strong>${event.title}</strong>
                                 <p>${moment(event.start).format('DD/MM')}</p>
                             </div>
                         `);
-                        count++;
+                        pastCount++;
                     }
                 });
             }
 
             $('.close').on('click', function () {
                 $('#eventModal').fadeOut();
+            });
+
+            $(window).on('click', function(event) {
+                if (event.target == document.getElementById('eventModal')) {
+                    $('#eventModal').fadeOut();
+                }
             });
         });
     </script>
@@ -351,28 +431,23 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Detalles del Evento</h2>
-            <table class="details-table">
-                <tr><th>Título</th><td id="modal-title"></td></tr>
-                <tr><th>Paciente</th><td id="modal-patient"></td></tr>
-                <tr><th>Médico</th><td id="modal-doctor"></td></tr>
-                <tr><th>Área</th><td id="modal-area"></td></tr>
-                <tr><th>Inicio</th><td id="modal-start"></td></tr>
-                <tr><th>Fin</th><td id="modal-end"></td></tr>
-                <tr><th>Habitación</th><td id="modal-room-number"></td></tr>
-                <tr><th>Aseguradora</th><td id="modal-insurer"></td></tr>
-                <tr><th>Cirugía</th><td id="modal-surgery"></td></tr>
+            <h2 id="modal-title" style="color: #035c67; margin-bottom: 15px;">Detalles</h2>
+            <table id="event-details" class="details-table">
+                <tbody>
+                    <!-- Dinámico -->
+                </tbody>
             </table>
         </div>
     </div>
 
     <style>
         .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .details-table th { background: #06adbf; color: white; padding: 8px; text-align: left; }
-        .details-table td { border: 1px solid #ddd; padding: 8px; }
+        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 30%; }
+        .details-table td { border: 1px solid #ddd; padding: 10px; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
-        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 60%; max-height: 80vh; overflow-y: auto; }
-        .close { float: right; font-size: 28px; cursor: pointer; }
+        .modal-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .close:hover { color: #000; }
     </style>
 
     <script src="../../backend/js/script.js"></script>

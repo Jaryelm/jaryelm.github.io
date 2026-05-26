@@ -27,6 +27,66 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
 
+    <!-- FullCalendar -->
+    <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
+    <style>
+        #calendar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            width: 100%;
+        }
+        #calendar {
+            flex: 1;
+            max-width: 60%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #fff;
+        }
+        #notification-panel {
+            flex: 1;
+            max-width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            max-height: 75.5vh;
+        }
+        #notification-panel h4 {
+            margin-bottom: 10px;
+        }
+        .notification-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .notification-item.occupied {
+            background-color: #ffdddd;
+        }
+        .notification-item.available {
+            background-color: #ddffdd;
+        }
+        #weekly-status, #future-events, #past-events {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #calendar-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            #calendar, #notification-panel {
+                max-width: 100%;
+                flex: none;
+            }
+        }
+    </style>
+
     <title>MEDIDATA - Entrevistas</title>
 </head>
 <body>
@@ -146,7 +206,53 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
                     <?php endif; ?>
                 </div>
             </div>
-        </div>  
+        </div>
+
+        <div class="data">
+                <div class="content-data">
+                    <div class="head">
+                        <h3>Programación</h3>
+                       
+                    </div>
+                    <div id="calendar-container">
+                        <!-- Calendario -->
+                        <div id="calendar" class="col-centered"></div>
+
+                        <!-- Panel de Notificaciones -->
+                        <div id="notification-panel">
+                            <h4>Notificaciones</h4>
+                            <div id="notifications">
+                                <p>No hay eventos disponibles.</p>
+                            </div>
+
+                            <!-- Estado Semanal -->
+                            <div id="weekly-status">
+                                <h4>Estado Semanal Actual</h4>
+                                <div id="weekly-occupancy">
+                                    <p>Cargando estado semanal...</p>
+                                </div>
+                            </div>
+
+                            <!-- Eventos Futuros -->
+                            <div id="future-events">
+                                <h4>Eventos Proximos</h4>
+                                <div id="future-occupancy">
+                                    <p>Cargando eventos Proximos...</p>
+                                </div>
+                            </div>
+
+                            <!-- Eventos Antiguos -->
+                            <div id="past-events">
+                                <h4>Eventos Antiguos</h4>
+                                <div id="past-occupancy">
+                                    <p>Cargando eventos antiguos...</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+        </div>
 
         </main>
     </section>
@@ -164,6 +270,12 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
     <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 
+    <!-- FullCalendar -->
+    <script src='../../backend/js/moment.min.js'></script>
+    <script src='../../backend/js/fullcalendar/fullcalendar.min.js'></script>
+    <script src='../../backend/js/fullcalendar/fullcalendar.js'></script>
+    <script src='../../backend/js/fullcalendar/locale/es.js'></script>
+
     <script type="text/javascript">
     $(document).ready(function() {
         $('#example').DataTable({
@@ -173,6 +285,27 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
             }
+        });
+
+        // Inicializar Calendario
+        var date = new Date();
+        var yyyy = date.getFullYear().toString();
+        var mm = (date.getMonth() + 1).toString().padStart(2, '0');
+        var dd = date.getDate().toString().padStart(2, '0');
+
+        $('#calendar').fullCalendar({
+            header: {
+                language: 'es',
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,basicWeek,basicDay',
+            },
+            defaultDate: `${yyyy}-${mm}-${dd}`,
+            editable: true,
+            eventLimit: true,
+            selectable: true,
+            selectHelper: true,
+            events: []
         });
     });
     </script>

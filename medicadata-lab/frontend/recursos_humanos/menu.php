@@ -20,7 +20,6 @@
                         <li><a href="./entrevista_usr.php">ENTREVISTAS</a></li>
                         <li><a href="./pruebas_psicometricas_usr.php">PRUEBAS PSICOMETRICAS</a></li>
                         <li><a href="./requisitos_contratacion_usr.php">REQUISITOS DE CONTRATACION</a></li>
-                        <li><a href="./entrevista_competencia_usr.php">AGENDA DE ENTREVISTAS</a></li>
                     </ul>
                 </li>
                 <li>
