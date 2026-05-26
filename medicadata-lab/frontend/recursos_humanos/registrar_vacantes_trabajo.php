@@ -1,14 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-
-// Fetch job positions to populate the select dropdown
-try {
-    $stmt_puestos = $connect_rrhh->prepare("SELECT id, name FROM puestos_trabajo WHERE deleted = 0 ORDER BY name ASC");
-    $stmt_puestos->execute();
-    $puestos = $stmt_puestos->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $puestos = [];
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -57,11 +48,8 @@ try {
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="id_position">Puesto de Trabajo <span style="color:red;">*</span></label>
-                            <select name="id_position" id="id_position" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                            <select name="id_position" id="positions_datos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
                                 <option value="" disabled selected>Seleccione un puesto...</option>
-                                <?php foreach ($puestos as $puesto): ?>
-                                    <option value="<?php echo htmlspecialchars($puesto['id']); ?>"><?php echo htmlspecialchars($puesto['name']); ?></option>
-                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -97,6 +85,7 @@ try {
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="../../backend/js/cat_positions.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
