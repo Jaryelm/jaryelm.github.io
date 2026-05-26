@@ -1,9 +1,9 @@
 CREATE DATABASE IF NOT EXISTS `medic9ue_medi_rrhh_interviews`;
 USE `medic9ue_medi_rrhh_interviews`;
 
-CREATE TABLE IF NOT EXISTS `positions` (
+CREATE TABLE IF NOT EXISTS `positions_details` (
     id INT PRIMARY KEY auto_increment,
-    name VARCHAR(100) not null,
+    id_positions INT NOT NULL,
     description VARCHAR(1000) not null,
     requirements VARCHAR(1000) not null,
     created_by VARCHAR(100) not null,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `positions` (
     created_at TIMESTAMP default CURRENT_TIMESTAMP(),
     updated_at TIMESTAMP null on update CURRENT_TIMESTAMP(),
     deleted bool default false,
-    constraint `uq_name_position` unique key (`name`)
+    constraint `fk_medi_data_positions` foreign key (id_positions) references `medic9ue_medi_data`.`positions` (id)
 );
 CREATE TABLE IF NOT EXISTS `vacant_positions` (
 	id INT primary key auto_increment,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `vacant_positions` (
     created_at TIMESTAMP default CURRENT_TIMESTAMP(),
     updated_at TIMESTAMP null on update CURRENT_TIMESTAMP(),
     deleted bool default false,
-    constraint `fk_positions_vacantsPositions` foreign key (id_position) references `positions` (id)
+    constraint `fk_positions_vacantsPositions` foreign key (id_position) references `positions_details` (id)
 );
 
 CREATE TABLE IF NOT EXISTS `candidates` (
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `candidates` (
 	direction VARCHAR(500) not null,
 	email VARCHAR(100) not null,
 	isAvailability bool not null,
-	status ENUM("En Espera", "Entrevista", "Pruebas Psicometricas", "Descartado", "Llenando Expediente", "Contratado"),
+	status ENUM("En Espera", "Formulario Empleados", "Entrevista", "Agendado", "Entrevistado", "Pruebas Psicometricas", "Descartado", "Llenando Expediente", "Contratado"),
     created_by VARCHAR(100) not null,
     updated_by VARCHAR(100) default null,
     created_at TIMESTAMP default CURRENT_TIMESTAMP(),

@@ -33,4 +33,3 @@ $dbConfiguration = array (
         "singletons" => ["main", "rrhh"]
     )
 );
-
