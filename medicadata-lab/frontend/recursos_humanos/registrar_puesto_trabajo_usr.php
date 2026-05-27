@@ -39,7 +39,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                     <h3>Registrar Nuevo Puesto de Trabajo</h3>
                 </div>
                 
-                <form action="../../backend/php/recursos_humanos/add_puesto_trabajo.php" method="POST" autocomplete="off">
+                <form id="puestoForm" action="../../backend/php/add_puesto_trabajo.php" method="POST" autocomplete="off">
                     <div class="containerss">
                         <div class="alert-danger" style="margin-bottom: 20px;">
                             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -47,8 +47,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="name">Nombre del Puesto <span style="color:red;">*</span></label>
-                            <input type="text" name="name" id="name" placeholder="Ej: Desarrollador Senior" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <label for="id_position">Puesto de Trabajo <span style="color:red;">*</span></label>
+                            <select name="id_position" id="positions_datos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                                <option value="" disabled selected>Seleccione un puesto...</option>
+                            </select>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
@@ -62,9 +64,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         </div>
 
                         <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">
+                        <input type="hidden" name="add_puesto" value="1">
 
                         <div style="display: flex; gap: 10px; margin-top: 20px; align-items: center;">
-                            <button type="submit" name="add_puesto" class="registerbtn" style="flex: 1; margin: 0;">Guardar Puesto</button>
+                            <button type="submit" class="registerbtn" style="flex: 1; margin: 0;">Guardar Puesto</button>
                             <a href="puestos_trabajo_usr.php" class="pabtn" style="flex: 1; margin: 0; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancelar</a>
                         </div>
                     </div>
@@ -77,8 +80,38 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="../../backend/js/cat_positions.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#puestoForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    swal("¡Agregado!", response.message, "success").then(function() {
+                        window.location = "puestos_trabajo_usr.php";
+                    });
+                } else {
+                    swal("Error", response.message, "error");
+                }
+            },
+            error: function() {
+                swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>

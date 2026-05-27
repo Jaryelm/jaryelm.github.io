@@ -48,11 +48,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php 
                     try {
-                        $sentencia = $connect_rrhh->prepare("SELECT * FROM puestos_trabajo ORDER BY id DESC;");
+                        // Fetch positions for the modal select
+                        $stmt_p = $connect->prepare("SELECT id, name FROM positions ORDER BY name ASC");
+                        $stmt_p->execute();
+                        $puestos_list = $stmt_p->fetchAll(PDO::FETCH_ASSOC);
+
+                        $sentencia = $connect_rrhh->prepare("SELECT pd.*, p.name FROM positions_details pd JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id ORDER BY pd.id DESC;");
                         $sentencia->execute();
                         $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     } catch (Exception $e) {
                         $data = [];
+                        $puestos_list = [];
                     }
                     ?>
                     <?php if(count($data) > 0): ?>
@@ -79,7 +85,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                                             </label>
                                         </td>
                                         <td>
-                                            <a title="Ver detalles" href="detalle_puesto_trabajo_usr.php?id=<?php echo $d->id ?>" class="fa fa-eye"></a>
+                                            <label title="Ver detalles y Editar" for="btns-modal-puesto-<?php echo $d->id; ?>" style="cursor:pointer;">
+                                                <i class="fa fa-eye" style="color: #06adbf;"></i>
+                                            </label>
+                                            <?php include '../../backend/modal/md_puesto_trabajo.php'; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

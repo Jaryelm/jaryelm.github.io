@@ -39,7 +39,7 @@ include_once '../../backend/registros/session_check.php';
                     <h3>Registrar Nueva Vacante de Trabajo</h3>
                 </div>
                 
-                <form action="../../backend/php/recursos_humanos/add_vacante_trabajo.php" method="POST" autocomplete="off">
+                <form id="vacanteForm" action="../../backend/php/add_vacante_trabajo.php" method="POST" autocomplete="off">
                     <div class="containerss">
                         <div class="alert-danger" style="margin-bottom: 20px;">
                             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -70,9 +70,10 @@ include_once '../../backend/registros/session_check.php';
                         </div>
 
                         <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">
+                        <input type="hidden" name="add_vacante" value="1">
 
                         <div style="display: flex; gap: 10px; margin-top: 20px; align-items: center;">
-                            <button type="submit" name="add_vacante" class="registerbtn" style="flex: 1; margin: 0;">Guardar Vacante</button>
+                            <button type="submit" class="registerbtn" style="flex: 1; margin: 0;">Guardar Vacante</button>
                             <a href="vacantes_trabajo.php" class="pabtn" style="flex: 1; margin: 0; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancelar</a>
                         </div>
                     </div>
@@ -85,9 +86,38 @@ include_once '../../backend/registros/session_check.php';
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
-<script src="../../backend/js/cat_positions.js"></script>
+<script src="../../backend/js/cat_vacant_positions.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#vacanteForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    swal("¡Agregado!", response.message, "success").then(function() {
+                        window.location = "vacantes_trabajo.php";
+                    });
+                } else {
+                    swal("Error", response.message, "error");
+                }
+            },
+            error: function() {
+                swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>

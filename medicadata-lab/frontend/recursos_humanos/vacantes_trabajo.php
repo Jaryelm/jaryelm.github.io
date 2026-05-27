@@ -48,14 +48,20 @@ include_once '../../backend/registros/session_check.php';
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php 
                     try {
-                        $sentencia = $connect_rrhh->prepare("SELECT v.*, p.name as position_name FROM vacantes_trabajo v LEFT JOIN puestos_trabajo p ON v.id_position = p.id ORDER BY v.id DESC;");
+                        // Fetch detailed positions for the modal select
+                        $stmt_pd = $connect_rrhh->prepare("SELECT pd.id, p.name FROM positions_details pd JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id WHERE pd.deleted = 0 ORDER BY p.name ASC");
+                        $stmt_pd->execute();
+                        $puestos_detalles_list = $stmt_pd->fetchAll(PDO::FETCH_ASSOC);
+
+                        $sentencia = $connect_rrhh->prepare("SELECT vp.*, p.name as position_name FROM vacant_positions vp JOIN positions_details pd ON vp.id_position = pd.id JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id ORDER BY vp.id DESC;");
                         $sentencia->execute();
                         $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     } catch (Exception $e) {
                         $data = [];
+                        $puestos_detalles_list = [];
                     }
                     ?>
-                    <?php if(count($data) == 0): ?>
+                    <?php if(count($data) > 0): ?>
                         <table id="example" class="responsive-table">
                             <thead>
                                 <tr>
@@ -81,8 +87,10 @@ include_once '../../backend/registros/session_check.php';
                                             </label>
                                         </td>
                                         <td>
-                                            <a title="Editar" href="editar_vacante_trabajo.php?id=<?php echo $d->id ?>" class="fa fa-edit"></a>
-                                            <a title="Ver detalles" href="detalle_vacante_trabajo.php?id=<?php echo $d->id ?>" class="fa fa-eye" style="margin-left: 10px;"></a>
+                                            <label title="Ver detalles y Editar" for="btns-modal-vacante-<?php echo $d->id; ?>" style="cursor:pointer;">
+                                                <i class="fa fa-eye" style="color: #06adbf;"></i>
+                                            </label>
+                                            <?php include '../../backend/modal/md_vacante_trabajo.php'; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
