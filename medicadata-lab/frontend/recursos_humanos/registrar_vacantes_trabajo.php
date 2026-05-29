@@ -47,26 +47,78 @@ include_once '../../backend/registros/session_check.php';
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="id_position">Puesto de Trabajo <span style="color:red;">*</span></label>
+                            <label for="id_position">Puesto de Trabajo (Detallado) <span style="color:red;">*</span></label>
                             <select name="id_position" id="positions_datos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
-                                <option value="" disabled selected>Seleccione un puesto...</option>
+                                <option value="" disabled selected>Seleccione un puesto detallado...</option>
                             </select>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                            <div class="form-group" style="flex: 1;">
-                                <label for="init_date">Fecha de Inicio <span style="color:red;">*</span></label>
-                                <input type="date" name="init_date" id="init_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <div class="form-group" style="flex: 2;">
+                                <label for="vacant_name">Nombre de la Vacante <span style="color:red;">*</span></label>
+                                <input type="text" name="vacant_name" id="vacant_name" required placeholder="Ej: Enfermera de Noche" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label for="end_date">Fecha de Fin <span style="color:red;">*</span></label>
-                                <input type="date" name="end_date" id="end_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <label for="available_slots">Plazas Disponibles <span style="color:red;">*</span></label>
+                                <input type="number" name="available_slots" id="available_slots" min="1" value="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="requesting_department">Departamento Solicitante <span style="color:red;">*</span></label>
+                                <input type="text" name="requesting_department" id="requesting_department" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="requesting_boss">Jefe Solicitante</label>
+                                <input type="text" name="requesting_boss" id="requesting_boss" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="benefits">Beneficios <span style="color:red;">*</span></label>
-                            <textarea name="benefits" id="benefits" rows="4" placeholder="Lista de beneficios ofrecidos para esta vacante..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            <label for="reason">Motivo de la Vacante <span style="color:red;">*</span></label>
+                            <textarea name="reason" id="reason" rows="2" placeholder="Ej: Renuncia, Nuevo Puesto, Expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="init_date">Fecha de Apertura <span style="color:red;">*</span></label>
+                                <input type="date" name="init_date" id="init_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="end_date">Fecha Tentativa de Cierre <span style="color:red;">*</span></label>
+                                <input type="date" name="end_date" id="end_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="priority">Prioridad <span style="color:red;">*</span></label>
+                                <select name="priority" id="priority" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                                    <option value="Baja">Baja</option>
+                                    <option value="Media" selected>Media</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Urgente">Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="rrhh_responsible">Responsable en RRHH</label>
+                                <input type="text" name="rrhh_responsible" id="rrhh_responsible" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="publication_channel">Canal de Publicación</label>
+                                <input type="text" name="publication_channel" id="publication_channel" placeholder="Ej: LinkedIn, Computrabajo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="benefits">Beneficios (Generales / Adicionales al Puesto) <span style="color:red;">*</span></label>
+                            <textarea name="benefits" id="benefits" rows="3" placeholder="Lista de beneficios ofrecidos para esta vacante..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="internal_observations">Observaciones Internas</label>
+                            <textarea name="internal_observations" id="internal_observations" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
                         </div>
 
                         <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">
