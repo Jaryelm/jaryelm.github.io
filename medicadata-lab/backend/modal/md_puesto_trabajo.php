@@ -2,7 +2,7 @@
 <div class="modal-wrapper">
     <input type="checkbox" id="btns-modal-puesto-<?php echo $d->id; ?>" class="modal-check" style="display:none;">
     <div class="container-modal" id="modal-container-puesto-<?php echo $d->id; ?>">
-        <div class="content-modal" style="max-height: 90vh; overflow-y: auto; width: 600px;">
+        <div class="content-modal" style="max-height: 90vh; overflow-y: auto; width: 800px;">
             <div class="head" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 style="color: #035c67;">Detalles y Actualización de Puesto</h2>
             </div>
@@ -14,7 +14,7 @@
                 <input type="hidden" name="upd_puesto" value="1">
 
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="id_position_<?php echo $d->id; ?>"><b>Puesto de Trabajo</b></label><span class="badge-warning">*</span>
+                    <label for="id_position_<?php echo $d->id; ?>">Puesto de Trabajo (Base) <span style="color:red;">*</span></label>
                     <select name="id_position" id="id_position_<?php echo $d->id; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
                         <?php if (isset($puestos_list)): ?>
                             <?php foreach ($puestos_list as $p): ?>
@@ -28,14 +28,72 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="description_<?php echo $d->id; ?>"><b>Descripción</b></label><span class="badge-warning">*</span>
-                    <textarea name="description" id="description_<?php echo $d->id; ?>" rows="6" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->description); ?></textarea>
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="department_<?php echo $d->id; ?>">Departamento o Área <span style="color:red;">*</span></label>
+                        <input type="text" name="department" id="department_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->department); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="immediate_boss_<?php echo $d->id; ?>">Jefe Inmediato <span style="color:red;">*</span></label>
+                        <input type="text" name="immediate_boss" id="immediate_boss_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->immediate_boss); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="requirements_<?php echo $d->id; ?>"><b>Requerimientos</b></label><span class="badge-warning">*</span>
-                    <textarea name="requirements" id="requirements_<?php echo $d->id; ?>" rows="6" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->requirements); ?></textarea>
+                    <label for="objective_<?php echo $d->id; ?>">Objetivo del Puesto <span style="color:red;">*</span></label>
+                    <textarea name="objective" id="objective_<?php echo $d->id; ?>" rows="2" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->objective); ?></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="main_functions_<?php echo $d->id; ?>">Funciones Principales <span style="color:red;">*</span></label>
+                    <textarea name="main_functions" id="main_functions_<?php echo $d->id; ?>" rows="4" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->main_functions); ?></textarea>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="academic_requirements_<?php echo $d->id; ?>">Requisitos Académicos <span style="color:red;">*</span></label>
+                        <textarea name="academic_requirements" id="academic_requirements_<?php echo $d->id; ?>" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->academic_requirements); ?></textarea>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="required_experience_<?php echo $d->id; ?>">Experiencia Requerida <span style="color:red;">*</span></label>
+                        <textarea name="required_experience" id="required_experience_<?php echo $d->id; ?>" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->required_experience); ?></textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="technical_competencies_<?php echo $d->id; ?>">Competencias Técnicas <span style="color:red;">*</span></label>
+                        <textarea name="technical_competencies" id="technical_competencies_<?php echo $d->id; ?>" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->technical_competencies); ?></textarea>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="soft_competencies_<?php echo $d->id; ?>">Competencias Blandas <span style="color:red;">*</span></label>
+                        <textarea name="soft_competencies" id="soft_competencies_<?php echo $d->id; ?>" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->soft_competencies); ?></textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="schedule_<?php echo $d->id; ?>">Horario <span style="color:red;">*</span></label>
+                        <input type="text" name="schedule" id="schedule_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->schedule); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="shift_type_<?php echo $d->id; ?>">Tipo de Jornada <span style="color:red;">*</span></label>
+                        <input type="text" name="shift_type" id="shift_type_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->shift_type); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="salary_range_<?php echo $d->id; ?>">Rango Salarial</label>
+                        <input type="text" name="salary_range" id="salary_range_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->salary_range); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="special_conditions_<?php echo $d->id; ?>">Condiciones Especiales</label>
+                    <textarea name="special_conditions" id="special_conditions_<?php echo $d->id; ?>" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->special_conditions); ?></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="suggested_psychometric_tests_<?php echo $d->id; ?>">Pruebas Psicométricas Sugeridas</label>
+                    <textarea name="suggested_psychometric_tests" id="suggested_psychometric_tests_<?php echo $d->id; ?>" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->suggested_psychometric_tests); ?></textarea>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">

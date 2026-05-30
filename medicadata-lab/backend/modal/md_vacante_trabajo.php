@@ -2,7 +2,7 @@
 <div class="modal-wrapper">
     <input type="checkbox" id="btns-modal-vacante-<?php echo $d->id; ?>" class="modal-check" style="display:none;">
     <div class="container-modal" id="modal-container-vacante-<?php echo $d->id; ?>">
-        <div class="content-modal" style="max-height: 90vh; overflow-y: auto; width: 600px;">
+        <div class="content-modal" style="max-height: 90vh; overflow-y: auto; width: 800px;">
             <div class="head" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 style="color: #035c67;">Detalles y Actualización de Vacante</h2>
             </div>
@@ -14,7 +14,7 @@
                 <input type="hidden" name="upd_vacante" value="1">
 
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="id_position_v_<?php echo $d->id; ?>"><b>Puesto de Trabajo</b></label><span class="badge-warning">*</span>
+                    <label for="id_position_v_<?php echo $d->id; ?>">Puesto de Trabajo (Detallado) <span style="color:red;">*</span></label>
                     <select name="id_position" id="id_position_v_<?php echo $d->id; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
                         <?php if (isset($puestos_detalles_list)): ?>
                             <?php foreach ($puestos_detalles_list as $p): ?>
@@ -29,19 +29,71 @@
                 </div>
 
                 <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="init_date_<?php echo $d->id; ?>"><b>Fecha de Inicio</b></label><span class="badge-warning">*</span>
-                        <input type="date" name="init_date" id="init_date_<?php echo $d->id; ?>" value="<?php echo $d->init_date; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="vacant_name_<?php echo $d->id; ?>">Nombre de la Vacante <span style="color:red;">*</span></label>
+                        <input type="text" name="vacant_name" id="vacant_name_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->vacant_name); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                     </div>
                     <div class="form-group" style="flex: 1;">
-                        <label for="end_date_<?php echo $d->id; ?>"><b>Fecha de Fin</b></label><span class="badge-warning">*</span>
-                        <input type="date" name="end_date" id="end_date_<?php echo $d->id; ?>" value="<?php echo $d->end_date; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <label for="available_slots_<?php echo $d->id; ?>">Plazas Disponibles <span style="color:red;">*</span></label>
+                        <input type="number" name="available_slots" id="available_slots_<?php echo $d->id; ?>" value="<?php echo $d->available_slots; ?>" min="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="requesting_department_<?php echo $d->id; ?>">Departamento Solicitante <span style="color:red;">*</span></label>
+                        <input type="text" name="requesting_department" id="requesting_department_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->requesting_department); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="requesting_boss_<?php echo $d->id; ?>">Jefe Solicitante</label>
+                        <input type="text" name="requesting_boss" id="requesting_boss_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->requesting_boss); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="benefits_<?php echo $d->id; ?>"><b>Beneficios</b></label><span class="badge-warning">*</span>
-                    <textarea name="benefits" id="benefits_<?php echo $d->id; ?>" rows="6" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->benefits); ?></textarea>
+                    <label for="reason_<?php echo $d->id; ?>">Motivo de la Vacante <span style="color:red;">*</span></label>
+                    <textarea name="reason" id="reason_<?php echo $d->id; ?>" rows="2" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->reason); ?></textarea>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="init_date_<?php echo $d->id; ?>">Fecha de Apertura <span style="color:red;">*</span></label>
+                        <input type="date" name="init_date" id="init_date_<?php echo $d->id; ?>" value="<?php echo $d->init_date; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="end_date_<?php echo $d->id; ?>">Fecha Tentativa de Cierre <span style="color:red;">*</span></label>
+                        <input type="date" name="end_date" id="end_date_<?php echo $d->id; ?>" value="<?php echo $d->end_date; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="priority_<?php echo $d->id; ?>">Prioridad <span style="color:red;">*</span></label>
+                        <select name="priority" id="priority_<?php echo $d->id; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                            <option value="Baja" <?php echo ($d->priority == 'Baja') ? 'selected' : ''; ?>>Baja</option>
+                            <option value="Media" <?php echo ($d->priority == 'Media') ? 'selected' : ''; ?>>Media</option>
+                            <option value="Alta" <?php echo ($d->priority == 'Alta') ? 'selected' : ''; ?>>Alta</option>
+                            <option value="Urgente" <?php echo ($d->priority == 'Urgente') ? 'selected' : ''; ?>>Urgente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="rrhh_responsible_<?php echo $d->id; ?>">Responsable en RRHH</label>
+                        <input type="text" name="rrhh_responsible" id="rrhh_responsible_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->rrhh_responsible); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="publication_channel_<?php echo $d->id; ?>">Canal de Publicación</label>
+                        <input type="text" name="publication_channel" id="publication_channel_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->publication_channel); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="benefits_<?php echo $d->id; ?>">Beneficios (Generales / Adicionales al Puesto) <span style="color:red;">*</span></label>
+                    <textarea name="benefits" id="benefits_<?php echo $d->id; ?>" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->benefits); ?></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="internal_observations_<?php echo $d->id; ?>">Observaciones Internas</label>
+                    <textarea name="internal_observations" id="internal_observations_<?php echo $d->id; ?>" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo htmlspecialchars($d->internal_observations); ?></textarea>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">

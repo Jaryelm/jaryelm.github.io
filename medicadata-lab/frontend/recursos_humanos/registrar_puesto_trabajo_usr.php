@@ -47,20 +47,78 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="id_position">Puesto de Trabajo <span style="color:red;">*</span></label>
+                            <label for="id_position">Puesto de Trabajo (Base) <span style="color:red;">*</span></label>
                             <select name="id_position" id="positions_datos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
-                                <option value="" disabled selected>Seleccione un puesto...</option>
+                                <option value="" disabled selected>Seleccione un puesto base...</option>
                             </select>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="description">Descripción <span style="color:red;">*</span></label>
-                            <textarea name="description" id="description" rows="4" placeholder="Breve descripción de las funciones..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="department">Departamento o Área <span style="color:red;">*</span></label>
+                                <input type="text" name="department" id="department" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="immediate_boss">Jefe Inmediato <span style="color:red;">*</span></label>
+                                <input type="text" name="immediate_boss" id="immediate_boss" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="requirements">Requerimientos <span style="color:red;">*</span></label>
-                            <textarea name="requirements" id="requirements" rows="4" placeholder="Habilidades, experiencia, formación..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            <label for="objective">Objetivo del Puesto <span style="color:red;">*</span></label>
+                            <textarea name="objective" id="objective" rows="2" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="main_functions">Funciones Principales <span style="color:red;">*</span></label>
+                            <textarea name="main_functions" id="main_functions" rows="4" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="academic_requirements">Requisitos Académicos <span style="color:red;">*</span></label>
+                                <textarea name="academic_requirements" id="academic_requirements" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="required_experience">Experiencia Requerida <span style="color:red;">*</span></label>
+                                <textarea name="required_experience" id="required_experience" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="technical_competencies">Competencias Técnicas <span style="color:red;">*</span></label>
+                                <textarea name="technical_competencies" id="technical_competencies" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="soft_competencies">Competencias Blandas <span style="color:red;">*</span></label>
+                                <textarea name="soft_competencies" id="soft_competencies" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="schedule">Horario <span style="color:red;">*</span></label>
+                                <input type="text" name="schedule" id="schedule" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="shift_type">Tipo de Jornada <span style="color:red;">*</span></label>
+                                <input type="text" name="shift_type" id="shift_type" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="salary_range">Rango Salarial</label>
+                                <input type="text" name="salary_range" id="salary_range" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="special_conditions">Condiciones Especiales</label>
+                            <textarea name="special_conditions" id="special_conditions" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="suggested_psychometric_tests">Pruebas Psicométricas Sugeridas</label>
+                            <textarea name="suggested_psychometric_tests" id="suggested_psychometric_tests" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
                         </div>
 
                         <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">

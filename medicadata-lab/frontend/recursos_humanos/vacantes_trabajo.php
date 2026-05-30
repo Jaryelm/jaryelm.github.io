@@ -66,9 +66,10 @@ include_once '../../backend/registros/session_check.php';
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
+                                    <th scope="col">Vacante</th>
                                     <th scope="col">Puesto</th>
-                                    <th scope="col">Fecha Inicio</th>
-                                    <th scope="col">Fecha Fin</th>
+                                    <th scope="col">Plazas</th>
+                                    <th scope="col">Prioridad</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
@@ -77,9 +78,10 @@ include_once '../../backend/registros/session_check.php';
                                 <?php foreach($data as $d): ?>
                                     <tr>
                                         <th scope="row"><?php echo $d->id ?></th>
+                                        <td data-title="Vacante"><?php echo htmlspecialchars($d->vacant_name) ?></td>
                                         <td data-title="Puesto"><?php echo htmlspecialchars($d->position_name ?? 'N/A') ?></td>
-                                        <td data-title="Fecha Inicio"><?php echo date("d/m/Y", strtotime($d->init_date)) ?></td>
-                                        <td data-title="Fecha Fin"><?php echo date("d/m/Y", strtotime($d->end_date)) ?></td>
+                                        <td data-title="Plazas"><?php echo $d->available_slots ?></td>
+                                        <td data-title="Prioridad"><?php echo $d->priority ?></td>
                                         <td data-title="Estado">
                                             <label class="switch">
                                                 <input type="checkbox" class="status-toggle" data-id="<?=$d->id?>" <?=$d->deleted == '0' ? 'checked' : '' ;?>/> 

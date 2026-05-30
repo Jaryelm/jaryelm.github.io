@@ -67,7 +67,8 @@ include_once '../../backend/registros/session_check.php';
                                 <tr>
                                     <th scope="col">ID</th>
                                     <th scope="col">Nombre</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Departamento</th>
+                                    <th scope="col">Objetivo</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
@@ -77,7 +78,8 @@ include_once '../../backend/registros/session_check.php';
                                     <tr>
                                         <th scope="row"><?php echo $d->id ?></th>
                                         <td data-title="Nombre"><?php echo htmlspecialchars($d->name) ?></td>
-                                        <td data-title="Descripción"><?php echo htmlspecialchars(mb_strimwidth($d->description, 0, 50, "...")) ?></td>
+                                        <td data-title="Departamento"><?php echo htmlspecialchars($d->department) ?></td>
+                                        <td data-title="Objetivo"><?php echo htmlspecialchars(mb_strimwidth($d->objective, 0, 50, "...")) ?></td>
                                         <td data-title="Estado">
                                             <label class="switch">
                                                 <input type="checkbox" class="status-toggle" data-id="<?=$d->id?>" <?=$d->deleted == '0' ? 'checked' : '' ;?>/> 
