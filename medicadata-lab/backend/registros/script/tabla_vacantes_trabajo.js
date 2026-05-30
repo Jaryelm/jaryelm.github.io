@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Motivo:</strong> ${escapeHtml(d.reason)}
                     </div>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer" style="flex-wrap: wrap; gap: 10px;">
                     <div class="status-container">
                         <label class="switch">
                             <input type="checkbox" class="status-toggle" data-id="${d.id}" ${d.deleted == '0' ? 'checked' : ''}/> 
@@ -73,7 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${d.deleted == '0' ? 'Abierta' : 'Cerrada'}
                         </span>
                     </div>
-                    <div class="card-actions">
+                    <div class="card-actions" style="display: flex; gap: 10px; align-items: center;">
+                        <a href="postulantes_vacante.php?id_vacante=${d.id}" class="action-btn" style="background: var(--blue, #06adbf); color: white; padding: 5px 12px; border-radius: 5px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; text-decoration: none;">
+                            <i class="fa fa-users" style="color: white; background: transparent; padding: 0;"></i> Postulantes
+                        </a>
                         <a title="Ver detalles y Editar" href="${window.location.pathname.includes('_usr') ? 'registrar_vacantes_trabajo_usr.php' : 'registrar_vacantes_trabajo.php'}?id=${d.id}" class="action-btn">
                             <i class="fa fa-edit" style="color: #06adbf; background: none; padding: 0;"></i>
                         </a>
