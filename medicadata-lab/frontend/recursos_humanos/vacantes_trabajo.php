@@ -8,14 +8,13 @@ include_once '../../backend/registros/session_check.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-
-    <!-- Data Tables -->
-    <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
-    <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
-    <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="../../backend/js/jquery.min.js"></script>
 
     <title>MEDIDATA - Vacantes de Trabajo</title>
+
 </head>
 <body>
     
@@ -42,68 +41,58 @@ include_once '../../backend/registros/session_check.php';
 
         <div class="data">
             <div class="content-data">
-                <div class="head">
-                    <h3>Vacantes de Trabajo</h3>
+                <div class="head" style="margin-bottom: 20px;">
+                    <h3>Gestión de Vacantes de Trabajo</h3>
                 </div>
-                <div class="table-responsive" style="overflow-x:auto;">
-                    <?php 
-                    try {
-                        // Fetch detailed positions for the modal select
-                        $stmt_pd = $connect_rrhh->prepare("SELECT pd.id, p.name FROM positions_details pd JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id WHERE pd.deleted = 0 ORDER BY p.name ASC");
-                        $stmt_pd->execute();
-                        $puestos_detalles_list = $stmt_pd->fetchAll(PDO::FETCH_ASSOC);
 
-                        $sentencia = $connect_rrhh->prepare("SELECT vp.*, p.name as position_name FROM vacant_positions vp JOIN positions_details pd ON vp.id_position = pd.id JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id ORDER BY vp.id DESC;");
-                        $sentencia->execute();
-                        $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
-                    } catch (Exception $e) {
-                        $data = [];
-                        $puestos_detalles_list = [];
-                    }
-                    ?>
-                    <?php if(count($data) > 0): ?>
-                        <table id="example" class="responsive-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Vacante</th>
-                                    <th scope="col">Puesto</th>
-                                    <th scope="col">Plazas</th>
-                                    <th scope="col">Prioridad</th>
-                                    <th scope="col">Estado</th>
-                                    <th scope="col">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($data as $d): ?>
-                                    <tr>
-                                        <th scope="row"><?php echo $d->id ?></th>
-                                        <td data-title="Vacante"><?php echo htmlspecialchars($d->vacant_name) ?></td>
-                                        <td data-title="Puesto"><?php echo htmlspecialchars($d->position_name ?? 'N/A') ?></td>
-                                        <td data-title="Plazas"><?php echo $d->available_slots ?></td>
-                                        <td data-title="Prioridad"><?php echo $d->priority ?></td>
-                                        <td data-title="Estado">
-                                            <label class="switch">
-                                                <input type="checkbox" class="status-toggle" data-id="<?=$d->id?>" <?=$d->deleted == '0' ? 'checked' : '' ;?>/> 
-                                                <span class="slider"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label title="Ver detalles y Editar" for="btns-modal-vacante-<?php echo $d->id; ?>" style="cursor:pointer;">
-                                                <i class="fa fa-eye" style="color: #06adbf;"></i>
-                                            </label>
-                                            <?php include '../../backend/modal/md_vacante_trabajo.php'; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table> 
-                    <?php else: ?>
-                        <div class="alert">
-                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-                            <strong>Aviso:</strong> No hay vacantes de trabajo registradas.
+                <!-- Integrated Search Bar -->
+                <div class="search-container-inline">
+                    <input type="text" id="inline-search-input" placeholder="Buscar por vacante, puesto, departamento o motivo...">
+                    <button class="search-btn" id="inline-search-button">
+                        <i class="fa fa-search"></i> Buscar
+                    </button>
+                </div>
+
+                <!-- Priority Groups -->
+                <div id="vacantes-grouped-container">
+                    
+                    <div class="priority-section" id="section-urgente" style="display:none;">
+                        <div class="priority-title title-urgente">
+                            <i class="fa fa-fire"></i> Prioridad Urgente
                         </div>
-                    <?php endif; ?>
+                        <div id="grid-urgente" class="grid-container"></div>
+                    </div>
+
+                    <div class="priority-section" id="section-alta" style="display:none;">
+                        <div class="priority-title title-alta">
+                            <i class="fa fa-exclamation-circle"></i> Prioridad Alta
+                        </div>
+                        <div id="grid-alta" class="grid-container"></div>
+                    </div>
+
+                    <div class="priority-section" id="section-media" style="display:none;">
+                        <div class="priority-title title-media">
+                            <i class="fa fa-info-circle"></i> Prioridad Media
+                        </div>
+                        <div id="grid-media" class="grid-container"></div>
+                    </div>
+
+                    <div class="priority-section" id="section-baja" style="display:none;">
+                        <div class="priority-title title-baja">
+                            <i class="fa fa-check-circle"></i> Prioridad Baja
+                        </div>
+                        <div id="grid-baja" class="grid-container"></div>
+                    </div>
+
+                    <div id="no-results-message" class="empty-state" style="display:none;">
+                        <i class="fa fa-clipboard-list" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
+                        <p>No se encontraron vacantes con los criterios de búsqueda.</p>
+                    </div>
+
+                    <div id="loading-state" class="empty-state">
+                        <p>Cargando vacantes de trabajo...</p>
+                    </div>
+
                 </div>
             </div>
         </div>  
@@ -111,35 +100,26 @@ include_once '../../backend/registros/session_check.php';
         </main>
     </section>
 
-    <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src='../../backend/js/submenu.js'></script>
     <script src="../../backend/registros/script/botones_color.js"></script>
-    
-    <!-- Data Tables -->
-    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
+    <script src="../../backend/registros/script/tabla_vacantes_trabajo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script type="text/javascript">
     $(document).ready(function() {
-        $('#example').DataTable({
-            pageLength: 10,
-            dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+        $('#inline-search-button').on('click', function() {
+            if (window.filterVacantes) {
+                window.filterVacantes($('#inline-search-input').val());
             }
         });
-
-        $('.status-toggle').on('change', function() {
-            var id = $(this).data('id');
-            var status = $(this).is(':checked') ? 0 : 1;
-            console.log("Cambiando estado de vacante " + id + " a " + status);
+        $('#inline-search-input').on('keypress', function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                if (window.filterVacantes) {
+                    window.filterVacantes($(this).val());
+                }
+            }
         });
     });
     </script>

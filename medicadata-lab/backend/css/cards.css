@@ -1,0 +1,221 @@
+/* 
+ * MedicaData Lab - Responsive Management Cards 
+ * Shared classes for Job Positions and Vacancies grids.
+ */
+
+/* Container for the responsive grid */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+
+/* Base Card Style */
+.mgmt-card {
+    background: var(--light, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mgmt-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* Variant: Left Border (Job Positions) */
+.card-puesto {
+    border-left: 5px solid var(--blue, #06adbf);
+}
+
+/* Variant: Top Border (Vacancies) */
+.card-vacante {
+    border-top: 5px solid var(--blue, #06adbf);
+}
+
+.mgmt-card .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+
+.mgmt-card .card-header {
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.mgmt-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-blue, #035c67);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.mgmt-card .card-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.mgmt-card .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.mgmt-card .info-item i {
+    width: 20px;
+    color: var(--blue, #06adbf);
+    margin-right: 10px;
+    text-align: center;
+}
+
+.mgmt-card .card-description {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mgmt-card .card-footer {
+    padding: 15px 20px;
+    background: #fdfdfd;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mgmt-card .card-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.mgmt-card .action-btn {
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.mgmt-card .action-btn:hover {
+    color: var(--dark-blue, #035c67);
+}
+
+/* Priority Badges for Vacancies */
+.priority-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.priority-urgente { background: var(--red, #FC3B56); color: #fff; border: 1px solid var(--red, #FC3B56); }
+.priority-alta { background: var(--blue, #06adbf); color: #fff; border: 1px solid var(--blue, #06adbf); }
+.priority-media { background: var(--dark-blue, #035c67); color: #fff; border: 1px solid var(--dark-blue, #035c67); }
+.priority-baja { background: var(--dark-grey, #8D8D8D); color: #fff; border: 1px solid var(--dark-grey, #8D8D8D); }
+
+.slots-badge {
+    background: var(--blue, #06adbf);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.applicants-badge {
+    background: var(--green, #81D43A);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: #777;
+}
+
+/* Priority Sections for Vacancies */
+.priority-section {
+    margin-bottom: 40px;
+}
+.priority-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--grey, #F1F0F6);
+    color: var(--dark-blue, #035c67);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.priority-title i {
+    font-size: 1.4rem;
+}
+.priority-title .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+.title-urgente { color: var(--red, #FC3B56); border-color: var(--red, #FC3B56); }
+.title-alta { color: var(--blue, #06adbf); border-color: var(--blue, #06adbf); }
+.title-media { color: var(--dark-blue, #035c67); border-color: var(--dark-blue, #035c67); }
+.title-baja { color: var(--dark-grey, #8D8D8D); border-color: var(--dark-grey, #8D8D8D); }
+
+/* Inline Search Container */
+.search-container-inline {
+    background: var(--light, #fff);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.search-container-inline input {
+    flex-grow: 1;
+    margin: 0 !important;
+    border: 1px solid #ddd !important;
+    background: #fdfdfd !important;
+}
+.search-container-inline .search-btn {
+    background: var(--dark-blue, #035c67);
+    color: var(--light, #fff);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.search-container-inline .search-btn .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+.search-container-inline .search-btn:hover {
+    background: var(--blue, #06adbf);
+}

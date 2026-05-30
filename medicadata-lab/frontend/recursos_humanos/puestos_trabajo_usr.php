@@ -8,14 +8,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-
-    <!-- Data Tables -->
-    <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
-    <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
-    <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="../../backend/js/jquery.min.js"></script>
 
     <title>MEDIDATA - Puestos de Trabajo</title>
+
 </head>
 <body>
     
@@ -42,64 +41,23 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 
         <div class="data">
             <div class="content-data">
-                <div class="head">
+                <div class="head" style="margin-bottom: 20px;">
                     <h3>Puestos de Trabajo</h3>
                 </div>
-                <div class="table-responsive" style="overflow-x:auto;">
-                    <?php 
-                    try {
-                        // Fetch positions for the modal select
-                        $stmt_p = $connect->prepare("SELECT id, name FROM positions ORDER BY name ASC");
-                        $stmt_p->execute();
-                        $puestos_list = $stmt_p->fetchAll(PDO::FETCH_ASSOC);
 
-                        $sentencia = $connect_rrhh->prepare("SELECT pd.*, p.name FROM positions_details pd JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id ORDER BY pd.id DESC;");
-                        $sentencia->execute();
-                        $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
-                    } catch (Exception $e) {
-                        $data = [];
-                        $puestos_list = [];
-                    }
-                    ?>
-                    <?php if(count($data) > 0): ?>
-                        <table id="example" class="responsive-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Nombre</th>
-                                    <th scope="col">Descripción</th>
-                                    <th scope="col">Estado</th>
-                                    <th scope="col">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($data as $d): ?>
-                                    <tr>
-                                        <th scope="row"><?php echo $d->id ?></th>
-                                        <td data-title="Nombre"><?php echo htmlspecialchars($d->name) ?></td>
-                                        <td data-title="Descripción"><?php echo htmlspecialchars(mb_strimwidth($d->description, 0, 50, "...")) ?></td>
-                                        <td data-title="Estado">
-                                            <label class="switch">
-                                                <input type="checkbox" class="status-toggle" data-id="<?=$d->id?>" <?=$d->deleted == '0' ? 'checked' : '' ;?>/> 
-                                                <span class="slider"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label title="Ver detalles y Editar" for="btns-modal-puesto-<?php echo $d->id; ?>" style="cursor:pointer;">
-                                                <i class="fa fa-eye" style="color: #06adbf;"></i>
-                                            </label>
-                                            <?php include '../../backend/modal/md_puesto_trabajo.php'; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table> 
-                    <?php else: ?>
-                        <div class="alert">
-                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-                            <strong>Aviso:</strong> No hay puestos de trabajo registrados.
-                        </div>
-                    <?php endif; ?>
+                <!-- Integrated Search Bar -->
+                <div class="search-container-inline">
+                    <input type="text" id="inline-search-input" placeholder="Buscar por nombre, departamento, objetivo o jefe...">
+                    <button class="search-btn" id="inline-search-button">
+                        <i class="fa fa-search"></i> Buscar
+                    </button>
+                </div>
+
+                <!-- Grid Container for AJAX rendering -->
+                <div id="puestos-grid" class="grid-container">
+                    <div class="empty-state">
+                        <p>Cargando puestos de trabajo...</p>
+                    </div>
                 </div>
             </div>
         </div>  
@@ -107,35 +65,26 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
         </main>
     </section>
 
-    <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src='../../backend/js/submenu.js'></script>
     <script src="../../backend/registros/script/botones_color.js"></script>
-    
-    <!-- Data Tables -->
-    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
+    <script src="../../backend/registros/script/tabla_puestos_trabajo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script type="text/javascript">
     $(document).ready(function() {
-        $('#example').DataTable({
-            pageLength: 10,
-            dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+        $('#inline-search-button').on('click', function() {
+            if (window.filterPuestos) {
+                window.filterPuestos($('#inline-search-input').val());
             }
         });
-
-        $('.status-toggle').on('change', function() {
-            var id = $(this).data('id');
-            var status = $(this).is(':checked') ? 0 : 1;
-            console.log("Cambiando estado de " + id + " a " + status);
+        $('#inline-search-input').on('keypress', function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                if (window.filterPuestos) {
+                    window.filterPuestos($(this).val());
+                }
+            }
         });
     });
     </script>

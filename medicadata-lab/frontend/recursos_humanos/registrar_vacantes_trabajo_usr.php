@@ -1,5 +1,23 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
+
+$id_edit = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$is_edit = $id_edit > 0;
+$edit_data = null;
+
+if ($is_edit) {
+    try {
+        $stmt = $connect_rrhh->prepare("SELECT * FROM vacant_positions WHERE id = :id AND deleted = 0");
+        $stmt->bindParam(':id', $id_edit, PDO::PARAM_INT);
+        $stmt->execute();
+        $edit_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$edit_data) {
+            $is_edit = false; // Not found
+        }
+    } catch (Exception $e) {
+        $is_edit = false;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -9,7 +27,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-    <title>MEDIDATA - Registrar Vacante de Trabajo</title>
+    <title>MEDIDATA - <?php echo $is_edit ? 'Actualizar' : 'Registrar'; ?> Vacante de Trabajo</title>
 </head>
 <body>
 
@@ -36,10 +54,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
         <div class="data">
             <div class="content-data">
                 <div class="head">
-                    <h3>Registrar Nueva Vacante de Trabajo</h3>
+                    <h3><?php echo $is_edit ? 'Actualizar' : 'Registrar Nueva'; ?> Vacante de Trabajo</h3>
                 </div>
                 
-                <form id="vacanteForm" action="../../backend/php/add_vacante_trabajo.php" method="POST" autocomplete="off">
+                <form id="vacanteForm" action="../../backend/php/<?php echo $is_edit ? 'upd' : 'add'; ?>_vacante_trabajo.php" method="POST" autocomplete="off">
+                    <?php if ($is_edit): ?>
+                        <input type="hidden" name="id" value="<?php echo $id_edit; ?>">
+                        <input type="hidden" name="upd_vacante" value="1">
+                    <?php else: ?>
+                        <input type="hidden" name="add_vacante" value="1">
+                    <?php endif; ?>
+                    
                     <div class="containerss">
                         <div class="alert-danger" style="margin-bottom: 20px;">
                             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -48,54 +73,64 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="id_position">Puesto de Trabajo (Detallado) <span style="color:red;">*</span></label>
-                            <select name="id_position" id="positions_datos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
-                                <option value="" disabled selected>Seleccione un puesto detallado...</option>
+                            <select name="id_position" id="id_position" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                                <option value="" disabled <?php echo !$is_edit ? 'selected' : ''; ?>>Seleccione un puesto detallado...</option>
+                                <?php 
+                                try {
+                                    $stmt_pd = $connect_rrhh->prepare("SELECT pd.id, p.name FROM positions_details pd JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id WHERE pd.deleted = 0 ORDER BY p.name ASC");
+                                    $stmt_pd->execute();
+                                    while ($row = $stmt_pd->fetch(PDO::FETCH_ASSOC)) {
+                                        $selected = ($is_edit && $edit_data['id_position'] == $row['id']) ? 'selected' : '';
+                                        echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['name']) . '</option>';
+                                    }
+                                } catch(Exception $e) {}
+                                ?>
                             </select>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 2;">
                                 <label for="vacant_name">Nombre de la Vacante <span style="color:red;">*</span></label>
-                                <input type="text" name="vacant_name" id="vacant_name" required placeholder="Ej: Enfermera de Noche" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="vacant_name" id="vacant_name" value="<?php echo $is_edit ? htmlspecialchars($edit_data['vacant_name']) : ''; ?>" required placeholder="Ej: Enfermera de Noche" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="available_slots">Plazas Disponibles <span style="color:red;">*</span></label>
-                                <input type="number" name="available_slots" id="available_slots" min="1" value="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="number" name="available_slots" id="available_slots" value="<?php echo $is_edit ? htmlspecialchars($edit_data['available_slots']) : '1'; ?>" min="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
                                 <label for="requesting_department">Departamento Solicitante <span style="color:red;">*</span></label>
-                                <input type="text" name="requesting_department" id="requesting_department" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="requesting_department" id="requesting_department" value="<?php echo $is_edit ? htmlspecialchars($edit_data['requesting_department']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="requesting_boss">Jefe Solicitante</label>
-                                <input type="text" name="requesting_boss" id="requesting_boss" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="requesting_boss" id="requesting_boss" value="<?php echo $is_edit ? htmlspecialchars($edit_data['requesting_boss'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="reason">Motivo de la Vacante <span style="color:red;">*</span></label>
-                            <textarea name="reason" id="reason" rows="2" placeholder="Ej: Renuncia, Nuevo Puesto, Expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            <textarea name="reason" id="reason" rows="2" placeholder="Ej: Renuncia, Nuevo Puesto, Expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['reason']) : ''; ?></textarea>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
                                 <label for="init_date">Fecha de Apertura <span style="color:red;">*</span></label>
-                                <input type="date" name="init_date" id="init_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="date" name="init_date" id="init_date" value="<?php echo $is_edit ? htmlspecialchars($edit_data['init_date']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="end_date">Fecha Tentativa de Cierre <span style="color:red;">*</span></label>
-                                <input type="date" name="end_date" id="end_date" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="date" name="end_date" id="end_date" value="<?php echo $is_edit ? htmlspecialchars($edit_data['end_date']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="priority">Prioridad <span style="color:red;">*</span></label>
                                 <select name="priority" id="priority" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
-                                    <option value="Baja">Baja</option>
-                                    <option value="Media" selected>Media</option>
-                                    <option value="Alta">Alta</option>
-                                    <option value="Urgente">Urgente</option>
+                                    <option value="Baja" <?php echo ($is_edit && $edit_data['priority'] == 'Baja') ? 'selected' : ''; ?>>Baja</option>
+                                    <option value="Media" <?php echo ($is_edit && $edit_data['priority'] == 'Media') ? 'selected' : (!$is_edit ? 'selected' : ''); ?>>Media</option>
+                                    <option value="Alta" <?php echo ($is_edit && $edit_data['priority'] == 'Alta') ? 'selected' : ''; ?>>Alta</option>
+                                    <option value="Urgente" <?php echo ($is_edit && $edit_data['priority'] == 'Urgente') ? 'selected' : ''; ?>>Urgente</option>
                                 </select>
                             </div>
                         </div>
@@ -103,29 +138,28 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
                                 <label for="rrhh_responsible">Responsable en RRHH</label>
-                                <input type="text" name="rrhh_responsible" id="rrhh_responsible" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="rrhh_responsible" id="rrhh_responsible" value="<?php echo $is_edit ? htmlspecialchars($edit_data['rrhh_responsible'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="publication_channel">Canal de Publicación</label>
-                                <input type="text" name="publication_channel" id="publication_channel" placeholder="Ej: LinkedIn, Computrabajo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="publication_channel" id="publication_channel" value="<?php echo $is_edit ? htmlspecialchars($edit_data['publication_channel'] ?? '') : ''; ?>" placeholder="Ej: LinkedIn, Computrabajo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="benefits">Beneficios (Generales / Adicionales al Puesto) <span style="color:red;">*</span></label>
-                            <textarea name="benefits" id="benefits" rows="3" placeholder="Lista de beneficios ofrecidos para esta vacante..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            <textarea name="benefits" id="benefits" rows="3" placeholder="Lista de beneficios ofrecidos para esta vacante..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['benefits']) : ''; ?></textarea>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="internal_observations">Observaciones Internas</label>
-                            <textarea name="internal_observations" id="internal_observations" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                            <textarea name="internal_observations" id="internal_observations" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['internal_observations'] ?? '') : ''; ?></textarea>
                         </div>
 
-                        <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">
-                        <input type="hidden" name="add_vacante" value="1">
+                        <input type="hidden" name="<?php echo $is_edit ? 'updated_by' : 'created_by'; ?>" value="<?php echo htmlspecialchars($name); ?>">
 
                         <div style="display: flex; gap: 10px; margin-top: 20px; align-items: center;">
-                            <button type="submit" class="registerbtn" style="flex: 1; margin: 0;">Guardar Vacante</button>
+                            <button type="submit" class="registerbtn" style="flex: 1; margin: 0;"><?php echo $is_edit ? 'Actualizar Vacante' : 'Guardar Vacante'; ?></button>
                             <a href="vacantes_trabajo_usr.php" class="pabtn" style="flex: 1; margin: 0; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancelar</a>
                         </div>
                     </div>
@@ -138,7 +172,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
-<script src="../../backend/js/cat_vacant_positions.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
@@ -156,7 +189,7 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    swal("¡Agregado!", response.message, "success").then(function() {
+                    swal("<?php echo $is_edit ? '¡Actualizado!' : '¡Agregado!'; ?>", response.message, "success").then(function() {
                         window.location = "vacantes_trabajo_usr.php";
                     });
                 } else {
