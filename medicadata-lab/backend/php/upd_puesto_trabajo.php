@@ -13,8 +13,9 @@ if (isset($_POST['upd_puesto'])) {
     $required_experience = $_POST['required_experience'];
     $technical_competencies = $_POST['technical_competencies'];
     $soft_competencies = $_POST['soft_competencies'];
-    $schedule = $_POST['schedule'];
+    $schedule = $_POST['schedule'] ?? null;
     $shift_type = $_POST['shift_type'];
+
     $salary_range = $_POST['salary_range'] ?? null;
     $special_conditions = $_POST['special_conditions'] ?? null;
     $suggested_psychometric_tests = $_POST['suggested_psychometric_tests'] ?? null;

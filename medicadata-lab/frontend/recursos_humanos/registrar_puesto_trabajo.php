@@ -133,8 +133,8 @@ if ($is_edit) {
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
-                                <label for="schedule">Horario <span style="color:red;">*</span></label>
-                                <input type="text" name="schedule" id="schedule" value="<?php echo $is_edit ? htmlspecialchars($edit_data['schedule']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <label for="schedule">Horario</label>
+                                <input type="text" name="schedule" id="schedule" value="<?php echo $is_edit ? htmlspecialchars($edit_data['schedule']) : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="shift_type">Tipo de Jornada <span style="color:red;">*</span></label>

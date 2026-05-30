@@ -27,7 +27,7 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
 
-    <title>MEDIDATA - Reclutamiento</title>
+    <title>MEDIDATA - Solicitudes de Empleo</title>
 </head>
 <body>
     
@@ -77,7 +77,7 @@ $id_vacante = isset($_GET['id_vacante']) ? (int)$_GET['id_vacante'] : 0;
         <div class="data">
             <div class="content-data">
                 <div class="head">
-                    <h3>Listado de Reclutamiento</h3>
+                    <h3>Listado de Solicitudes de Empleo</h3>
                 </div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php 

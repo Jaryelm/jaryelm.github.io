@@ -74,8 +74,8 @@
 
                 <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1; min-width: 200px;">
-                        <label for="schedule_<?php echo $d->id; ?>">Horario <span style="color:red;">*</span></label>
-                        <input type="text" name="schedule" id="schedule_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->schedule); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
+                        <label for="schedule_<?php echo $d->id; ?>">Horario</label>
+                        <input type="text" name="schedule" id="schedule_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->schedule); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
                     </div>
                     <div class="form-group" style="flex: 1; min-width: 200px;">
                         <label for="shift_type_<?php echo $d->id; ?>">Tipo de Jornada <span style="color:red;">*</span></label>

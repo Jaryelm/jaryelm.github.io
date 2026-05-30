@@ -86,22 +86,18 @@
                     <a href="../recursos_humanos/lista_colaboradores.php">LISTA COLABORADORES</a>
                 </li>
                 <li>
-                    <a href="#" class="new-submenu-link">RECLUTAMIENTO</a>
+                    <a href="../recursos_humanos/positions.php">POSICIONES DE TRABAJO</a>
+                </li>
+                <li>
+                    <a href="#" class="new-submenu-link">PROCESO DE RECLUTAMIENTO</a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos_humanos/puestos_trabajo.php">PUESTOS DE TRABAJO</a></li>
                         <li><a href="../recursos_humanos/vacantes_trabajo.php">VACANTES DE TRABAJO</a></li>
+                        <li><a href="../recursos_humanos/reclutamiento.php">SOLICITUDES DE EMPLEO</a></li>
                         <li><a href="../recursos_humanos/postulantes.php">POSTULANTES</a></li>
-                        <li><a href="../recursos_humanos/reclutamiento.php">RECLUTAMIENTO</a></li>
                         <li><a href="../recursos_humanos/entrevista.php">ENTREVISTAS</a></li>
                         <li><a href="../recursos_humanos/pruebas_psicometricas.php">PRUEBAS PSICOMETRICAS</a></li>
                         <li><a href="../recursos_humanos/requisitos_contratacion.php">REQUISITOS DE CONTRATACION</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#" class="new-submenu-link">SOLICITUD EMPLEOS</a>
-                    <ul class="new-side-dropdown">
-                        <li><a href="../recursos_humanos/entrevista_competencia.php">ENTREVISTA COMPETENCIA</a></li>
                     </ul>
                 </li>
                 <li>
