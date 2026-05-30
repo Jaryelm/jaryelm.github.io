@@ -84,12 +84,12 @@ include_once '../../backend/registros/session_check.php';
                         <div id="grid-baja" class="grid-container"></div>
                     </div>
 
-                    <div id="no-results-message" style="display:none; grid-column: 1 / -1;">
-                        <p class="alert alert-warning">No hay datos</p>
+                    <div id="no-results-message" style="display:none; grid-column: 1 / -1; width: 100%;">
+                        <p class="alert alert-warning" style="margin: 0; display: block; width: 100%; border-radius: 5px; text-align: left;">No hay datos</p>
                     </div>
 
-                    <div id="loading-state" style="grid-column: 1 / -1;">
-                        <p class="alert alert-warning">Cargando...</p>
+                    <div id="loading-state" style="grid-column: 1 / -1; width: 100%;">
+                        <p class="alert alert-warning" style="margin: 0; display: block; width: 100%; border-radius: 5px; text-align: left;">Cargando...</p>
                     </div>
 
                 </div>

@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (data.length === 0) {
             gridContainer.innerHTML = `
-                <div style="grid-column: 1 / -1;">
-                    <p class="alert alert-warning" style="margin: 0;">No hay datos</p>
+                <div style="grid-column: 1 / -1; width: 100%;">
+                    <p class="alert alert-warning" style="margin: 0; display: block; width: 100%; border-radius: 5px; text-align: left;">No hay datos</p>
                 </div>
             `;
             return;

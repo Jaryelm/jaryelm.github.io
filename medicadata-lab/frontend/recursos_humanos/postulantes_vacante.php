@@ -64,8 +64,8 @@ if ($id_vacante > 0) {
 
                 <!-- Grid Container for AJAX rendering -->
                 <div id="postulantes-grid" class="grid-container">
-                    <div style="grid-column: 1 / -1;">
-                        <p class="alert alert-warning">Cargando...</p>
+                    <div style="grid-column: 1 / -1; width: 100%;">
+                        <p class="alert alert-warning" style="margin: 0; display: block; width: 100%; border-radius: 5px; text-align: left;">Cargando...</p>
                     </div>
                 </div>
 
