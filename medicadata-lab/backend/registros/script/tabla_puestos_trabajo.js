@@ -7,9 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (data.length === 0) {
             gridContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fa fa-folder-open" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
-                    <p>No se encontraron puestos de trabajo registrados.</p>
+                <div style="grid-column: 1 / -1;">
+                    <p class="alert alert-warning" style="margin: 0;">No hay datos</p>
                 </div>
             `;
             return;

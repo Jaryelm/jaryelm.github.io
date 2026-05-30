@@ -84,13 +84,12 @@ include_once '../../backend/registros/session_check.php';
                         <div id="grid-baja" class="grid-container"></div>
                     </div>
 
-                    <div id="no-results-message" class="empty-state" style="display:none;">
-                        <i class="fa fa-clipboard-list" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
-                        <p>No se encontraron vacantes con los criterios de búsqueda.</p>
+                    <div id="no-results-message" style="display:none; grid-column: 1 / -1;">
+                        <p class="alert alert-warning">No hay datos</p>
                     </div>
 
-                    <div id="loading-state" class="empty-state">
-                        <p>Cargando vacantes de trabajo...</p>
+                    <div id="loading-state" style="grid-column: 1 / -1;">
+                        <p class="alert alert-warning">Cargando...</p>
                     </div>
 
                 </div>

@@ -148,11 +148,9 @@
 
 .empty-state {
     grid-column: 1 / -1;
-    text-align: center;
-    padding: 50px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    color: #777;
+    color: #000;
+    margin-top: 10px;
+    font-weight: normal;
 }
 
 /* Priority Sections for Vacancies */

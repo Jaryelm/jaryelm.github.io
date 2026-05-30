@@ -55,8 +55,8 @@ include_once '../../backend/registros/session_check.php';
 
                 <!-- Grid Container for AJAX rendering -->
                 <div id="puestos-grid" class="grid-container">
-                    <div class="empty-state">
-                        <p>Cargando puestos de trabajo...</p>
+                    <div style="grid-column: 1 / -1;">
+                        <p class="alert alert-warning">Cargando...</p>
                     </div>
                 </div>
             </div>
