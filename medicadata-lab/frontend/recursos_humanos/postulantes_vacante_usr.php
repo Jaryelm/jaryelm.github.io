@@ -31,7 +31,7 @@ if ($id_vacante > 0) {
 </head>
 <body>
     
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once './menu.php'; ?>
 
     <section id="content">
         <nav>

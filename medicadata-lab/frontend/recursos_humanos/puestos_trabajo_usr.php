@@ -18,7 +18,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
 </head>
 <body>
     
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once './menu.php'; ?>
 
     <section id="content">
         <nav>
