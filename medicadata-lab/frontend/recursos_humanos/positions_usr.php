@@ -45,8 +45,8 @@ include_once '../../backend/registros/session_check.php';
 
         <!-- Botones de navegación (Tabs) -->
         <div style="margin-bottom: 20px;">
-            <button class="button tab-button active" onclick="showTab('list-tab', this)">Listado de Posiciones</button>
-            <button class="button tab-button" onclick="showTab('new-tab', this)">Nueva Posición</button>
+            <button class="button tab-button active" id="btn-list-tab" onclick="showTab('list-tab', this)">Listado de Posiciones</button>
+            <button class="button tab-button" id="btn-new-tab" onclick="prepareNew()">Nueva Posición</button>
         </div>
 
         <!-- Tab Listado -->
@@ -54,12 +54,12 @@ include_once '../../backend/registros/session_check.php';
             <div class="data">
                 <div class="content-data">
                     <div class="head" style="margin-bottom: 20px;">
-                        <h3>Listado de Posiciones</h3>
+                        <h3>Listado de Posiciones de Trabajo</h3>
                     </div>
                     <div class="table-responsive" style="overflow-x:auto;">
                         <?php 
                         try {
-                            $stmt = $connect->prepare("SELECT * FROM positions ORDER BY id DESC");
+                            $stmt = $connect->prepare("SELECT * FROM positions ORDER BY name ASC");
                             $stmt->execute();
                             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
                         } catch (Exception $e) {
@@ -70,17 +70,24 @@ include_once '../../backend/registros/session_check.php';
                             <table id="positionsTable" class="responsive-table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Creado por</th>
+                                        <th scope="col">Nombre de la Posición</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach($data as $d): ?>
                                         <tr>
-                                            <th scope="row"><?php echo $d->id ?></th>
                                             <td data-title="Nombre"><?php echo htmlspecialchars($d->name) ?></td>
-                                            <td data-title="Creado por"><?php echo htmlspecialchars($d->created_by) ?></td>
+                                            <td data-title="Estado">
+                                                <label class="switch">
+                                                    <input type="checkbox" class="state-toggle" data-id="<?php echo $d->id; ?>" <?php echo (isset($d->state) && $d->state == 0) ? '' : 'checked'; ?>>
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <button title="Editar" onclick="editPosition(<?php echo $d->id; ?>, '<?php echo addslashes($d->name); ?>')" class="fa fa-edit" style="color:#06adbf; background:none; border:none; cursor:pointer; font-size: 1.2rem; margin-right: 10px;"></button>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -96,25 +103,29 @@ include_once '../../backend/registros/session_check.php';
             </div>
         </div>
 
-        <!-- Tab Registro -->
+        <!-- Tab Registro / Edición -->
         <div id="new-tab" class="tab-content">
             <div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Registrar Nueva Posición</h3>
+                        <h3 id="form-title">Registrar Nueva Posición</h3>
                     </div>
-                    <form id="addPositionForm" method="POST" action="../../backend/php/add_position.php" autocomplete="off">
-                        <input type="hidden" name="add_position" value="1">
+                    <form id="positionForm" method="POST" autocomplete="off">
+                        <input type="hidden" name="id" id="pos_id">
+                        <input type="hidden" name="add_position" id="is_add" value="1">
+                        <input type="hidden" name="upd_position" id="is_upd" value="0">
+                        
                         <div class="containerss">
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label for="name_pos">Nombre de la Posición <span style="color:red;">*</span></label>
                                 <input type="text" name="name_pos" id="name_pos" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <input type="hidden" name="created_by" value="<?php echo htmlspecialchars($name); ?>">
+                            <input type="hidden" name="updated_by" value="<?php echo htmlspecialchars($name); ?>">
                             
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                <button type="submit" class="registerbtn" style="flex: 1; margin: 0;">Guardar Posición</button>
-                                <button type="button" class="pabtn" style="flex: 1; margin: 0;" onclick="showTab('list-tab', document.querySelector('.tab-button'))">Cancelar</button>
+                                <button type="submit" class="registerbtn" id="submit-btn" style="flex: 1; margin: 0;">Guardar Posición</button>
+                                <button type="button" class="pabtn" style="flex: 1; margin: 0;" onclick="showTab('list-tab', document.getElementById('btn-list-tab'))">Cancelar</button>
                             </div>
                         </div>
                     </form>
@@ -148,6 +159,26 @@ include_once '../../backend/registros/session_check.php';
         $(btn).addClass('active');
     }
 
+    function prepareNew() {
+        $('#form-title').text('Registrar Nueva Posición');
+        $('#submit-btn').text('Guardar Posición');
+        $('#pos_id').val('');
+        $('#name_pos').val('');
+        $('#is_add').val('1');
+        $('#is_upd').val('0');
+        showTab('new-tab', document.getElementById('btn-new-tab'));
+    }
+
+    function editPosition(id, name) {
+        $('#form-title').text('Modificar Posición de Trabajo');
+        $('#submit-btn').text('Actualizar Posición');
+        $('#pos_id').val(id);
+        $('#name_pos').val(name);
+        $('#is_add').val('0');
+        $('#is_upd').val('1');
+        showTab('new-tab', document.getElementById('btn-new-tab'));
+    }
+
     $(document).ready(function() {
         $('#positionsTable').DataTable({
             pageLength: 10,
@@ -158,11 +189,14 @@ include_once '../../backend/registros/session_check.php';
             }
         });
 
-        $('#addPositionForm').on('submit', function(e) {
+        $('#positionForm').on('submit', function(e) {
             e.preventDefault();
+            const isUpdate = $('#is_upd').val() === '1';
+            const targetUrl = isUpdate ? '../../backend/php/upd_position.php' : '../../backend/php/add_position.php';
+            
             $.ajax({
                 type: 'POST',
-                url: $(this).attr('action'),
+                url: targetUrl,
                 data: $(this).serialize(),
                 dataType: 'json',
                 success: function(response) {
@@ -176,6 +210,28 @@ include_once '../../backend/registros/session_check.php';
                 },
                 error: function() {
                     swal("Error", "Ocurrió un error en el servidor", "error");
+                }
+            });
+        });
+
+        $('.state-toggle').on('change', function() {
+            const id = $(this).data('id');
+            const state = this.checked ? 1 : 0;
+            
+            $.ajax({
+                type: 'POST',
+                url: '../../backend/php/toggle_position_state.php',
+                data: { id: id, state: state },
+                dataType: 'json',
+                success: function(response) {
+                    if (!response.success) {
+                        swal("Error", response.message, "error");
+                        window.location.reload();
+                    }
+                },
+                error: function() {
+                    swal("Error", "Ocurrió un error al cambiar el estado", "error");
+                    window.location.reload();
                 }
             });
         });

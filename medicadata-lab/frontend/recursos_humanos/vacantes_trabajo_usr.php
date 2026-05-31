@@ -13,19 +13,61 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="../../backend/js/jquery.min.js"></script>
 
+    <style>
+        .priority-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+            padding: 10px 15px;
+            border-radius: 5px;
+            user-select: none;
+        }
+        .priority-title:hover {
+            opacity: 0.9;
+        }
+        .priority-title .priority-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .priority-title .vacantes-count-badge {
+            background: #fff;
+            color: #333;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            min-width: 30px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        .priority-title .chevron-icon {
+            transition: transform 0.3s;
+        }
+        .priority-section.collapsed .chevron-icon {
+            transform: rotate(-90deg);
+        }
+        .priority-section.collapsed .grid-container {
+            display: none !important;
+        }
+    </style>
+
     <title>MEDIDATA - Vacantes de Trabajo</title>
 
 </head>
 <body>
     
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once './menu.php'; ?>
 
     <section id="content">
         <nav>
             <i class='bx bx-menu toggle-sidebar' ></i>
             <form action="#"><div class="form-group"></div></form>
             <span class="divider"></span>
-            <?php include_once '../admin/perfil.php'; ?>
+            <?php include_once './perfil.php'; ?>
         </nav>
 
         <main>
@@ -56,30 +98,46 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
                 <!-- Priority Groups -->
                 <div id="vacantes-grouped-container">
                     
-                    <div class="priority-section" id="section-urgente" style="display:none;">
-                        <div class="priority-title title-urgente">
-                            <i class="fa fa-fire"></i> Prioridad Urgente
+                    <div class="priority-section collapsed" id="section-urgente" style="display:none;">
+                        <div class="priority-title title-urgente" onclick="toggleSection('section-urgente')">
+                            <span><i class="fa fa-fire"></i> Prioridad Urgente</span>
+                            <div class="priority-meta">
+                                <span class="vacantes-count-badge" id="count-urgente">0</span>
+                                <i class="fa fa-chevron-down chevron-icon"></i>
+                            </div>
                         </div>
                         <div id="grid-urgente" class="grid-container"></div>
                     </div>
 
-                    <div class="priority-section" id="section-alta" style="display:none;">
-                        <div class="priority-title title-alta">
-                            <i class="fa fa-exclamation-circle"></i> Prioridad Alta
+                    <div class="priority-section collapsed" id="section-alta" style="display:none;">
+                        <div class="priority-title title-alta" onclick="toggleSection('section-alta')">
+                            <span><i class="fa fa-exclamation-circle"></i> Prioridad Alta</span>
+                            <div class="priority-meta">
+                                <span class="vacantes-count-badge" id="count-alta">0</span>
+                                <i class="fa fa-chevron-down chevron-icon"></i>
+                            </div>
                         </div>
                         <div id="grid-alta" class="grid-container"></div>
                     </div>
 
-                    <div class="priority-section" id="section-media" style="display:none;">
-                        <div class="priority-title title-media">
-                            <i class="fa fa-info-circle"></i> Prioridad Media
+                    <div class="priority-section collapsed" id="section-media" style="display:none;">
+                        <div class="priority-title title-media" onclick="toggleSection('section-media')">
+                            <span><i class="fa fa-info-circle"></i> Prioridad Media</span>
+                            <div class="priority-meta">
+                                <span class="vacantes-count-badge" id="count-media">0</span>
+                                <i class="fa fa-chevron-down chevron-icon"></i>
+                            </div>
                         </div>
                         <div id="grid-media" class="grid-container"></div>
                     </div>
 
-                    <div class="priority-section" id="section-baja" style="display:none;">
-                        <div class="priority-title title-baja">
-                            <i class="fa fa-check-circle"></i> Prioridad Baja
+                    <div class="priority-section collapsed" id="section-baja" style="display:none;">
+                        <div class="priority-title title-baja" onclick="toggleSection('section-baja')">
+                            <span><i class="fa fa-check-circle"></i> Prioridad Baja</span>
+                            <div class="priority-meta">
+                                <span class="vacantes-count-badge" id="count-baja">0</span>
+                                <i class="fa fa-chevron-down chevron-icon"></i>
+                            </div>
                         </div>
                         <div id="grid-baja" class="grid-container"></div>
                     </div>
@@ -107,6 +165,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/backend/registros/session_check.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script type="text/javascript">
+    function toggleSection(id) {
+        var section = document.getElementById(id);
+        if (section) {
+            section.classList.toggle('collapsed');
+        }
+    }
+
     $(document).ready(function() {
         $('#inline-search-button').on('click', function() {
             if (window.filterVacantes) {

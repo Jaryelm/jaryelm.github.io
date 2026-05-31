@@ -8,19 +8,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Define groups
         const groups = {
-            'Urgente': { grid: document.getElementById('grid-urgente'), section: document.getElementById('section-urgente') },
-            'Alta': { grid: document.getElementById('grid-alta'), section: document.getElementById('section-alta') },
-            'Media': { grid: document.getElementById('grid-media'), section: document.getElementById('section-media') },
-            'Baja': { grid: document.getElementById('grid-baja'), section: document.getElementById('section-baja') }
+            'Urgente': { grid: document.getElementById('grid-urgente'), section: document.getElementById('section-urgente'), countId: 'count-urgente' },
+            'Alta': { grid: document.getElementById('grid-alta'), section: document.getElementById('section-alta'), countId: 'count-alta' },
+            'Media': { grid: document.getElementById('grid-media'), section: document.getElementById('section-media'), countId: 'count-media' },
+            'Baja': { grid: document.getElementById('grid-baja'), section: document.getElementById('section-baja'), countId: 'count-baja' }
         };
 
-        // Reset all sections
-        Object.values(groups).forEach(g => {
+        // Reset all sections and counts
+        const counts = { 'Urgente': 0, 'Alta': 0, 'Media': 0, 'Baja': 0 };
+
+        Object.keys(groups).forEach(key => {
+            const g = groups[key];
             if (g.grid) g.grid.innerHTML = '';
             if (g.section) g.section.style.display = 'none';
+            const badge = document.getElementById(g.countId);
+            if (badge) badge.textContent = '0';
         });
 
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
             if (noResults) noResults.style.display = 'block';
             return;
         } else {
@@ -28,17 +33,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         data.forEach(d => {
-            const group = groups[d.priority];
+            // Find appropriate group (handling potential casing issues)
+            const groupKey = Object.keys(groups).find(k => k.toLowerCase() === (d.priority || '').trim().toLowerCase());
+            if (!groupKey) return;
+
+            const group = groups[groupKey];
             if (!group || !group.grid) return;
 
+            counts[groupKey]++;
             group.section.style.display = 'block';
             
             const card = document.createElement('div');
             card.className = 'mgmt-card card-vacante';
             card.innerHTML = `
                 <div class="card-header">
-                    <h4 class="card-title">${escapeHtml(d.vacant_name)}</h4>
-                    <span class="priority-badge priority-${d.priority.toLowerCase()}">
+                    <h4 class="card-title">
+                        ${escapeHtml(d.vacant_name)}
+                    </h4>
+                    <span class="priority-badge priority-${groupKey.toLowerCase()}">
                         ${escapeHtml(d.priority)}
                     </span>
                 </div>
@@ -84,6 +96,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
             group.grid.appendChild(card);
+        });
+
+        // Update counts in badges with final values
+        Object.keys(counts).forEach(key => {
+            const badge = document.getElementById(groups[key].countId);
+            if (badge) {
+                badge.textContent = counts[key];
+            }
         });
 
         attachStatusToggles();
