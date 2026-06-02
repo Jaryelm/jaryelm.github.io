@@ -1,0 +1,21 @@
+# Cron sede — cambiar run_once.php → run_once_db.php
+
+1) SSH al servidor sede como root
+
+2) Editar cron:
+   sudo crontab -e
+
+3) Buscar la línea que dice run_once.php y cambiar SOLO ese nombre a:
+   run_once_db.php
+
+   Línea completa correcta:
+   * * * * * set -a; . /etc/medicasa-biometric-agent.env; set +a; /usr/bin/php /home/medicasa/MedicasaDATAUpdate2/scripts/biometric_agent_linux/run_once_db.php >> /var/log/medicasa-biometric-agent.log 2>&1
+
+4) Guardar y salir (nano: Ctrl+O Enter, Ctrl+X)
+
+5) Probar:
+   set -a; . /etc/medicasa-biometric-agent.env; set +a
+   php /home/medicasa/MedicasaDATAUpdate2/scripts/biometric_agent_linux/run_once_db.php
+   echo exit=$?
+
+   exit=0 = listo
