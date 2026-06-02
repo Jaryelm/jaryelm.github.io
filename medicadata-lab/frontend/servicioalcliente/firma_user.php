@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
 
@@ -195,7 +196,7 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
     };
 
     if (isCanvasBlank()) {
-        swal('Error', 'El canvas está vacío. Por favor, firma antes de guardar.', 'error');
+        Swal.fire('Error', 'El canvas está vacío. Por favor, firma antes de guardar.', 'error');
         return;
     }
 
@@ -210,14 +211,14 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
 
         const result = await response.json();
         if (result.success) {
-            swal('Éxito', 'Firma guardada exitosamente.', 'success');
+            Swal.fire('Éxito', 'Firma guardada exitosamente.', 'success');
             loadSignatures();
         } else {
-            swal('Error', result.message || 'Error al guardar la firma.', 'error');
+            Swal.fire('Error', result.message || 'Error al guardar la firma.', 'error');
         }
     } catch (error) {
         console.error('Error al guardar la firma:', error);
-        swal('Error', 'Hubo un problema al guardar la firma.', 'error');
+        Swal.fire('Error', 'Hubo un problema al guardar la firma.', 'error');
     }
 });
 
@@ -257,7 +258,7 @@ async function loadSignatures() {
 // Eliminar firmas
 async function deleteSignature(id) {
     try {
-        const confirmation = await swal({
+        const confirmation = await Swal.fire({
             title: '¿Estás seguro?',
             text: 'Esta acción eliminará la firma de forma permanente.',
             icon: 'warning',
@@ -278,14 +279,14 @@ async function deleteSignature(id) {
 
         const result = await response.json();
         if (result.success) {
-            await swal('Eliminado', 'La firma ha sido eliminada correctamente.', 'success');
+            await Swal.fire('Eliminado', 'La firma ha sido eliminada correctamente.', 'success');
             loadSignatures();
         } else {
-            await swal('Error', result.message || 'No se pudo eliminar la firma.', 'error');
+            await Swal.fire('Error', result.message || 'No se pudo eliminar la firma.', 'error');
         }
     } catch (error) {
         console.error('Error al eliminar la firma:', error);
-        await swal('Error', 'Hubo un problema al eliminar la firma.', 'error');
+        await Swal.fire('Error', 'Hubo un problema al eliminar la firma.', 'error');
     }
 }
 
@@ -300,12 +301,12 @@ document.getElementById('uploadSignatureButton').addEventListener('click', () =>
 document.getElementById('uploadSignature').addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) {
-        swal('Error', 'Por favor, selecciona un archivo PNG.', 'error');
+        Swal.fire('Error', 'Por favor, selecciona un archivo PNG.', 'error');
         return;
     }
 
     if (file.type !== 'image/png') {
-        swal('Error', 'Solo se permiten imágenes PNG.', 'error');
+        Swal.fire('Error', 'Solo se permiten imágenes PNG.', 'error');
         return;
     }
 
@@ -341,14 +342,14 @@ async function sendSignatureToBackend(signature) {
 
         const result = await response.json();
         if (result.success) {
-            swal('Éxito', 'Firma cargada y guardada exitosamente.', 'success');
+            Swal.fire('Éxito', 'Firma cargada y guardada exitosamente.', 'success');
             loadSignatures();
         } else {
-            swal('Error', result.message || 'Error al guardar la firma.', 'error');
+            Swal.fire('Error', result.message || 'Error al guardar la firma.', 'error');
         }
     } catch (error) {
         console.error('Error al guardar la firma:', error);
-        swal('Error', 'Hubo un problema al guardar la firma.', 'error');
+        Swal.fire('Error', 'Hubo un problema al guardar la firma.', 'error');
     }
 }
 
@@ -503,7 +504,7 @@ table.responsive-table td {
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html>

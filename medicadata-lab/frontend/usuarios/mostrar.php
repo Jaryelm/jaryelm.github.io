@@ -1,13 +1,61 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-// incluir el archivo de sesión login
+
+// Eliminar usuario ANTES de cualquier HTML (header() falla si ya se envió salida).
+if (isset($_GET['eliminar']) && is_numeric($_GET['eliminar'])) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+
+    $idUsuario = (int) $_GET['eliminar'];
+
+    try {
+        if ($idUsuario === (int) ($_SESSION['id'] ?? 0)) {
+            $_SESSION['errorMsg'] = 'No puedes eliminar tu propia cuenta.';
+        } else {
+            $stmtCheck = $connect->prepare('SELECT username FROM users WHERE id = ?');
+            $stmtCheck->execute([$idUsuario]);
+            $usuario = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+            if ($usuario) {
+                $stmtDelete = $connect->prepare('DELETE FROM users WHERE id = ?');
+                if ($stmtDelete->execute([$idUsuario])) {
+                    $_SESSION['successMsg'] = "Usuario '{$usuario['username']}' eliminado correctamente.";
+                } else {
+                    $_SESSION['errorMsg'] = 'Error al eliminar el usuario.';
+                }
+            } else {
+                $_SESSION['errorMsg'] = 'Usuario no encontrado.';
+            }
+        }
+    } catch (Exception $e) {
+        $_SESSION['errorMsg'] = 'Error: ' . $e->getMessage();
+    }
+
+    session_write_close();
+    header('Location: mostrar.php', true, 303);
+    exit;
+}
+
+// session_check cierra la sesión; reabrir solo para leer/borrar mensajes flash (una sola vez).
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$usuariosFlashSuccess = $_SESSION['successMsg'] ?? null;
+$usuariosFlashError = $_SESSION['errorMsg'] ?? null;
+unset($_SESSION['successMsg'], $_SESSION['errorMsg']);
+
+if (function_exists('session_write_close')) {
+    session_write_close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='../../backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
@@ -16,8 +64,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     
     <!-- Estilos para botones de acción -->
     <style>
@@ -70,6 +117,11 @@ include_once '../../backend/registros/session_check.php';
         .btn-action i {
             font-size: 14px;
         }
+
+        .medidata-alert-user {
+            font-weight: 700;
+            color: #111827;
+        }
     </style>
     
     <title>MEDIDATA</title>
@@ -120,42 +172,7 @@ include_once '../admin/perfil.php';
     <button class="button" onclick="cambiarColor(this, '../usuarios/mostrar.php')">Lista de Usuarios</button>
 
 
-    <?php 
-    // Manejar eliminación de usuario
-    if (isset($_GET['eliminar']) && is_numeric($_GET['eliminar'])) {
-        $idUsuario = intval($_GET['eliminar']);
-        
-        try {
-            // Verificar que no sea el usuario actual
-            if ($idUsuario == $_SESSION['id']) {
-                $_SESSION['errorMsg'] = "No puedes eliminar tu propia cuenta.";
-            } else {
-                // Verificar si el usuario existe
-                $stmtCheck = $connect->prepare("SELECT username FROM users WHERE id = ?");
-                $stmtCheck->execute([$idUsuario]);
-                $usuario = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-                
-                if ($usuario) {
-                    // Eliminar el usuario
-                    $stmtDelete = $connect->prepare("DELETE FROM users WHERE id = ?");
-                    if ($stmtDelete->execute([$idUsuario])) {
-                        $_SESSION['successMsg'] = "Usuario '{$usuario['username']}' eliminado correctamente.";
-                    } else {
-                        $_SESSION['errorMsg'] = "Error al eliminar el usuario.";
-                    }
-                } else {
-                    $_SESSION['errorMsg'] = "Usuario no encontrado.";
-                }
-            }
-        } catch (Exception $e) {
-            $_SESSION['errorMsg'] = "Error: " . $e->getMessage();
-        }
-        
-        // Redireccionar para evitar reenvío del formulario
-        echo "<script>window.location.href = 'mostrar.php';</script>";
-        exit();
-    }
-    
+    <?php
     $sentencia = $connect->prepare("SELECT * FROM users ORDER BY id DESC;");
     $sentencia->execute();
     $data = array();
@@ -221,48 +238,41 @@ include_once '../admin/perfil.php';
         </div>
     </div>
 
-    <!-- Mostrar mensajes de éxito/error -->
-    <?php if (isset($_SESSION['successMsg'])): ?>
-        <script>
-            Swal.fire({
-                title: '¡Éxito!',
-                text: "<?php echo $_SESSION['successMsg']; ?>",
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                // Asegurar que la página se recargue después del mensaje
-                if (window.location.href.includes('?eliminar=')) {
-                    window.location.href = 'mostrar.php';
-                }
-            });
-        </script>
-        <?php unset($_SESSION['successMsg']); ?>
-    <?php endif; ?>
-    
-    <?php if (isset($_SESSION['errorMsg'])): ?>
-        <script>
-            Swal.fire({
-                title: 'Error',
-                text: "<?php echo $_SESSION['errorMsg']; ?>",
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                // Asegurar que la página se recargue después del mensaje
-                if (window.location.href.includes('?eliminar=')) {
-                    window.location.href = 'mostrar.php';
-                }
-            });
-        </script>
-        <?php unset($_SESSION['errorMsg']); ?>
-    <?php endif; ?>
-
     </main>
     <!-- MAIN -->
 </section>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<?php if ($usuariosFlashSuccess !== null): ?>
+<script>
+Swal.fire({
+    title: '¡Éxito!',
+    text: <?php echo json_encode($usuariosFlashSuccess, JSON_UNESCAPED_UNICODE); ?>,
+    icon: 'success',
+    confirmButtonText: 'Aceptar'
+}).then(function () {
+    if (window.location.href.includes('?eliminar=')) {
+        window.location.href = 'mostrar.php';
+    }
+});
+</script>
+<?php endif; ?>
+<?php if ($usuariosFlashError !== null): ?>
+<script>
+Swal.fire({
+    title: 'Error',
+    text: <?php echo json_encode($usuariosFlashError, JSON_UNESCAPED_UNICODE); ?>,
+    icon: 'error',
+    confirmButtonText: 'Aceptar'
+}).then(function () {
+    if (window.location.href.includes('?eliminar=')) {
+        window.location.href = 'mostrar.php';
+    }
+});
+</script>
+<?php endif; ?>
 <script src="../../backend/js/script.js"></script>
 <!-- SubMenu -->
 <script src='../../backend/js/submenu.js'></script>
@@ -306,30 +316,39 @@ $(document).ready(function() {
 // Función para confirmar eliminación de usuario
 function confirmarEliminacion(id, username) {
     Swal.fire({
-        title: '¿Estás seguro?',
-        text: `¿Deseas eliminar el usuario "${username}"? Esta acción no se puede deshacer.`,
-        icon: 'warning',
+        title: 'Confirmar eliminación',
+        html: `Se eliminará el usuario <span class="medidata-alert-user">${username}</span>.<br>Esta acción no se puede deshacer.`,
+        icon: 'question',
+        iconColor: '#f59e0b',
         showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        focusCancel: true,
+        buttonsStyling: false,
+        customClass: {
+            popup: 'medidata-alert',
+            title: 'medidata-alert-title',
+            htmlContainer: 'medidata-alert-html',
+            actions: 'medidata-alert-actions',
+            confirmButton: 'btn-medidata-danger',
+            cancelButton: 'btn-medidata-cancel'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
             // Mostrar mensaje de procesamiento
             Swal.fire({
                 title: 'Eliminando...',
-                text: 'Por favor espera',
+                text: 'Procesando solicitud...',
                 allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
                 didOpen: () => {
                     Swal.showLoading()
                 }
             });
             
-            // Redireccionar después de un breve delay
-            setTimeout(() => {
-                window.location.href = `mostrar.php?eliminar=${id}`;
-            }, 500);
+            window.location.replace(`mostrar.php?eliminar=${id}`);
         }
     });
 }

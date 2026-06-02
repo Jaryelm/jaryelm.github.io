@@ -4,9 +4,17 @@
 
 → **[GUIA_AGENTE_BIOMETRICO_MEDICASA.md](./GUIA_AGENTE_BIOMETRICO_MEDICASA.md)**
 
+<<<<<<< Updated upstream
 ---
 
 Sirve cuando el servidor web de MediDATA **no** llega por UDP al MB360 pero hay un equipo **en la LAN del reloj** (ej. servidor `medicasa` `192.168.1.102` junto al reloj `192.168.1.201`). Ese equipo hace **ZK pull** y envía los datos por **HTTPS** al mismo MediDATA que usás en laboratorio/producción.
+=======
+→ **Pruebas en servidor físico (192.168.1.102 / 201.190.11.6):** [PRUEBAS_SERVIDOR_FISICO_BIOMETRICO.md](./PRUEBAS_SERVIDOR_FISICO_BIOMETRICO.md)
+
+---
+
+Sirve cuando el servidor web de MediDATA **no** llega por UDP al MB360 pero hay un equipo **en la LAN del reloj** (ej. servidor `medicasa` `192.168.1.102` junto al reloj `192.168.1.91`). Ese equipo hace **ZK pull** y envía los datos por **HTTPS** al mismo MediDATA que usás en laboratorio/producción.
+>>>>>>> Stashed changes
 
 ## 1. Base de datos (servidor MediDATA central)
 
@@ -79,7 +87,11 @@ MEDIDATA_AGENT_REPO_ROOT=/opt/MedicasaDATAUpdate2
 MEDIDATA_AGENT_INGEST_URL=https://TU_DOMINIO/.../backend/api/agent_biometric_ingest.php
 MEDIDATA_AGENT_INGEST_SECRET=aquí-el-mismo-token-que-el-servidor-web
 MEDIDATA_AGENT_SITE_CODE=Sucursal_1
+<<<<<<< Updated upstream
 MEDIDATA_RELOJ_IP=192.168.1.201
+=======
+MEDIDATA_RELOJ_IP=192.168.1.91
+>>>>>>> Stashed changes
 MEDIDATA_RELOJ_PORT=4370
 # Opcional: MEDIDATA_AGENT_DEVICE_SERIAL=...
 # Solo pruebas con certificados dudosos: MEDIDATA_AGENT_VERIFY_SSL=0

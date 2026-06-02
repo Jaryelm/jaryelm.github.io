@@ -6,7 +6,7 @@ include_once '../../backend/registros/session_check.php'; // Archivo de sesión
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -215,7 +215,7 @@ include_once '../almacen/menu.php'; // Menú principal
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
     <?php include_once '../../backend/registros/reg_servicios.php' ?>
 </body>
 </html>

@@ -24,11 +24,12 @@ $retUrl = $returnTo ?: ($esAuxContable ? '../auxcontable/partida_manual_user.php
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - Editar Partida Manual</title>
 </head>
 <body>
@@ -113,17 +114,75 @@ $retUrl = $returnTo ?: ($esAuxContable ? '../auxcontable/partida_manual_user.php
 let cuentasCatalogo = [];
 let contadorLineas = 0;
 
+function parseJsonResponse(response) {
+    return response.text().then(function(text) {
+        var data = null;
+        try {
+            data = text ? JSON.parse(text) : {};
+        } catch (e) {
+            // Fallback: algunos endpoints inyectan texto antes/después del JSON válido.
+            var raw = String(text || '').trim();
+            var firstBrace = raw.indexOf('{');
+            var lastBrace = raw.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                try {
+                    data = JSON.parse(raw.slice(firstBrace, lastBrace + 1));
+                } catch (e2) {
+                    var snippet2 = raw.replace(/\s+/g, ' ').substring(0, 260);
+                    throw new Error(
+                        response.status >= 400
+                            ? ('Error del servidor (' + response.status + '). ' + (snippet2 || 'Respuesta no JSON.'))
+                            : ('Respuesta inválida del servidor. ' + (snippet2 || ''))
+                    );
+                }
+            } else {
+                var snippet = raw.replace(/\s+/g, ' ').substring(0, 260);
+                throw new Error(
+                    response.status >= 400
+                        ? ('Error del servidor (' + response.status + '). ' + (snippet || 'Respuesta no JSON.'))
+                        : ('Respuesta inválida del servidor. ' + (snippet || ''))
+                );
+            }
+        }
+        // Compatibilidad: si el backend devuelve JSON doblemente serializado.
+        if (typeof data === 'string') {
+            try {
+                data = JSON.parse(data);
+            } catch (e3) {
+                // Se mantiene string y seguirá al flujo de error manejado abajo.
+            }
+        }
+        if (!response.ok && (!data || typeof data.success === 'undefined')) {
+            throw new Error('Error HTTP ' + response.status);
+        }
+        return data;
+    });
+}
+
+function fetchJsonWithRetry(url, options, retries) {
+    return fetch(url, options).then(parseJsonResponse).catch(function(err) {
+        if (retries > 0) {
+            return fetchJsonWithRetry(url, options, retries - 1);
+        }
+        throw err;
+    });
+}
+
 $(document).ready(function() {
     cargarUnidadesServicio();
     cargarCuentas().then(function() { cargarPartida(); });
 });
 
 function cargarPartida() {
-    fetch('../../backend/registros/obtener_partida_manual.php?numero_partida=' + encodeURIComponent(document.getElementById('numero_partida').value))
-        .then(r => r.json())
+    var url = '../../backend/registros/obtener_partida_manual.php?numero_partida=' + encodeURIComponent(document.getElementById('numero_partida').value);
+    fetchJsonWithRetry(url, { cache: 'no-store' }, 1)
         .then(data => {
+            // Compatibilidad: algunos backends responden sin bandera success.
+            if (typeof data.success === 'undefined' && data && data.numero_partida && Array.isArray(data.lineas)) {
+                data.success = true;
+            }
             if (!data.success) {
-                swal('Error', data.message || 'Partida no encontrada', 'error').then(() => location.href = 'partida_manual.php');
+                Swal.fire('Error', data.message || 'Partida no encontrada', 'error').then(() => location.href = 'partida_manual.php');
                 return;
             }
             document.getElementById('fecha_ocurrencia').value = data.fecha_ocurrencia;
@@ -135,8 +194,9 @@ function cargarPartida() {
             });
             calcularTotales();
         })
-        .catch(function() {
-            swal('Error', 'Error al cargar partida', 'error').then(() => location.href = 'partida_manual.php');
+        .catch(function(err) {
+            var msg = (err && err.message) ? err.message : 'Error al cargar partida';
+            Swal.fire('Error', msg, 'error').then(() => location.href = 'partida_manual.php');
         });
 }
 
@@ -240,7 +300,7 @@ $('#formPartidaManual').on('submit', function(e) {
     });
     if (lineas.length < 2) {
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Guardar Cambios');
-        swal('Error', 'Debe agregar al menos 2 líneas válidas', 'error');
+        Swal.fire('Error', 'Debe agregar al menos 2 líneas válidas', 'error');
         return;
     }
     const totalDebe = lineas.reduce((s, l) => s + l.debe, 0);
@@ -248,13 +308,13 @@ $('#formPartidaManual').on('submit', function(e) {
     const diffCentavos = Math.round((totalDebe - totalHaber) * 100) / 100;
     if (diffCentavos !== 0) {
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Guardar Cambios');
-        swal('Error', 'La partida debe estar balanceada (Total Debe = Total Haber). Diferencia: L. ' + diffCentavos.toFixed(2), 'error');
+        Swal.fire('Error', 'La partida debe estar balanceada (Total Debe = Total Haber). Diferencia: L. ' + diffCentavos.toFixed(2), 'error');
         return;
     }
     const unidadServicio = ($('#unidad_servicio').val() || '').trim();
     if (!unidadServicio) {
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Guardar Cambios');
-        swal('Error', 'Debe seleccionar una Unidad de Servicio', 'error');
+        Swal.fire('Error', 'Debe seleccionar una Unidad de Servicio', 'error');
         return;
     }
     const payload = {
@@ -270,17 +330,18 @@ $('#formPartidaManual').on('submit', function(e) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(r => r.json())
+    .then(parseJsonResponse)
     .then(data => {
         if (data.success) {
-            swal('Éxito', 'Partida actualizada correctamente', 'success').then(() => location.href = '<?php echo addslashes($retUrl); ?>');
+            Swal.fire('Éxito', 'Partida actualizada correctamente', 'success').then(() => location.href = '<?php echo addslashes($retUrl); ?>');
         } else {
-            swal('Error', data.message || 'Error al actualizar', 'error');
+            Swal.fire('Error', data.message || 'Error al actualizar', 'error');
         }
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Guardar Cambios');
     })
     .catch(err => {
-        swal('Error', 'Error de conexión', 'error');
+        var msg = (err && err.message) ? err.message : 'No se pudo completar la petición (red o servidor).';
+        Swal.fire('Error', msg, 'error');
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Guardar Cambios');
     });
 });

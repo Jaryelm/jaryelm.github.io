@@ -8,8 +8,9 @@ $medidataPuedeAprobarSignosVitales = (($_SESSION['rol'] ?? '') === 'Administrado
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     
 
@@ -729,33 +730,33 @@ function guardarDato() {
     };
 
     if (!datos.temps.trim()) {
-        swal('Error', 'Por favor, ingrese la temperatura.', 'warning');
+        Swal.fire('Error', 'Por favor, ingrese la temperatura.', 'warning');
         return;
     }
 
     $.post('../pacientes/save_temperatura.php', datos, function(response) {
         if (response.error) {
-            swal('Error', response.error, 'error');
+            Swal.fire('Error', response.error, 'error');
         } else {
-            swal('Guardado', 'La temperatura se ha registrado correctamente.', 'success');
+            Swal.fire('Guardado', 'La temperatura se ha registrado correctamente.', 'success');
             cerrarModal();
             cargarDatos();
         }
     }).fail(function(xhr) {
-        swal('Error', 'Ocurrió un problema: ' + xhr.responseText, 'error');
+        Swal.fire('Error', 'Ocurrió un problema: ' + xhr.responseText, 'error');
     });
 }
 
 function cargarDatos() {
     const idpa = $('#idpa').val();
     if (!idpa) {
-        swal('Error', 'El ID del paciente es obligatorio.', 'error');
+        Swal.fire('Error', 'El ID del paciente es obligatorio.', 'error');
         return;
     }
 
     $.get('../pacientes/fetch_temperatura.php', { idpa }, function(response) {
         if (response.error) {
-            swal('Error', response.error, 'error');
+            Swal.fire('Error', response.error, 'error');
         } else {
             let rows1 = '', rows2 = '';
 
@@ -783,7 +784,7 @@ function cargarDatos() {
             $('#temperaturaBody2').html(rows2);
         }
     }).fail(function(xhr) {
-        swal('Error', 'Ocurrió un problema al cargar los datos: ' + xhr.responseText, 'error');
+        Swal.fire('Error', 'Ocurrió un problema al cargar los datos: ' + xhr.responseText, 'error');
     });
 }
 
@@ -848,7 +849,7 @@ function registrarGlucometrias() {
 
     // Validar campos vacíos
     if (!fecha || !turno || !hora || !glucometria || !insulinaCristalina || !nph || !procesadoPor || !signature) {
-        swal("Error", "Todos los campos son obligatorios.", "error");
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
         return;
     }
 
@@ -870,15 +871,15 @@ function registrarGlucometrias() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal("Error", response.error, "error");
+                Swal.fire("Error", response.error, "error");
             } else if (response.success) {
-                swal("Guardado", response.success, "success");
+                Swal.fire("Guardado", response.success, "success");
                 cargarGlucometrias();
             }
         },
         error: function(xhr) {
             console.error("Error en la solicitud:", xhr.responseText);
-            swal("Error", "Ocurrió un problema al registrar los datos.", "error");
+            Swal.fire("Error", "Ocurrió un problema al registrar los datos.", "error");
         }
     });
 }
@@ -894,7 +895,7 @@ function cargarGlucometrias() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1070,7 +1071,7 @@ function registrarDieta() {
     const procesadoPor = document.getElementById(`procesadoPor_${uniqueId}`).value;
 
     if (!fecha || !turno || !tipoDieta || !procesadoPor) {
-        swal("Error", "Todos los campos son obligatorios.", "error");
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
         return;
     }
 
@@ -1087,15 +1088,15 @@ function registrarDieta() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal("Error", response.error, "error");
+                Swal.fire("Error", response.error, "error");
             } else if (response.success) {
-                swal("Guardado", response.success, "success");
+                Swal.fire("Guardado", response.success, "success");
                 cargarDieta();
             }
         },
         error: function(xhr) {
             console.error("Error en la solicitud:", xhr.responseText);
-            swal("Error", "Ocurrió un problema al registrar los datos.", "error");
+            Swal.fire("Error", "Ocurrió un problema al registrar los datos.", "error");
         }
     });
 }
@@ -1111,7 +1112,7 @@ function cargarDieta() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1273,7 +1274,7 @@ $(document).ready(function() {
     const procesadoPor = document.getElementById('procesado_por_ingestas').value;
 
     if (!fecha || !hora || !viaOralTipo || !viaOralCantidad || !viaParenteralTipo || !viaParenteralCantidad || !procesadoPor) {
-        swal('Error', 'Todos los campos son obligatorios.', 'error');
+        Swal.fire('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
 
@@ -1293,9 +1294,9 @@ $(document).ready(function() {
         dataType: 'json',
         success: function (response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
             } else {
-                swal('Guardado', 'Registro de Ingestas guardado correctamente.', 'success');
+                Swal.fire('Guardado', 'Registro de Ingestas guardado correctamente.', 'success');
                 cargarIngestas();
             }
         },
@@ -1320,7 +1321,7 @@ $(document).ready(function() {
 
     // Validar que todos los campos estén completos
     if (!fecha || !hora || !orina || !vomito || !drenaje || !succion || !otros || !procesadoPor) {
-        swal('Error', 'Todos los campos son obligatorios.', 'error');
+        Swal.fire('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
 
@@ -1342,15 +1343,15 @@ $(document).ready(function() {
         dataType: 'json',
         success: function (response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
             } else {
-                swal('Guardado', 'Registro de Excretas guardado correctamente.', 'success');
+                Swal.fire('Guardado', 'Registro de Excretas guardado correctamente.', 'success');
                 cargarExcretas(); // Recargar la tabla después del registro
             }
         },
         error: function (xhr) {
             console.error('Error al registrar las Excretas:', xhr.responseText);
-            swal('Error', 'Ocurrió un problema al registrar las Excretas.', 'error');
+            Swal.fire('Error', 'Ocurrió un problema al registrar las Excretas.', 'error');
         },
     });
 }
@@ -1386,7 +1387,7 @@ function descargarPDFExcretas() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1426,7 +1427,7 @@ function descargarPDFExcretas() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1510,7 +1511,7 @@ function registrarEvolucion() {
     const procesadoPor = document.getElementById(`procesadoPor_${uniqueId}`).value;
 
     if (!notaEvolucion || !fechaHora || !ordenesMedicas || !procesadoPor) {
-        swal("Error", "Todos los campos son obligatorios.", "error");
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
         return;
     }
 
@@ -1527,15 +1528,15 @@ function registrarEvolucion() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal("Error", response.error, "error");
+                Swal.fire("Error", response.error, "error");
             } else if (response.success) {
-                swal("Guardado", response.success, "success");
+                Swal.fire("Guardado", response.success, "success");
                 cargarEvolucion();
             }
         },
         error: function(xhr) {
             console.error("Error en la solicitud:", xhr.responseText);
-            swal("Error", "Ocurrió un problema al registrar los datos.", "error");
+            Swal.fire("Error", "Ocurrió un problema al registrar los datos.", "error");
         }
     });
 }
@@ -1551,7 +1552,7 @@ function cargarEvolucion() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1642,7 +1643,7 @@ function registrarMedicamentos() {
     const procesadoPor = document.getElementById(`procesadoPor_${uniqueId}`).value;
 
     if (!medicamentoTratamiento || !fechaHora || !procesadoPor) {
-        swal("Error", "Todos los campos son obligatorios.", "error");
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
         return;
     }
 
@@ -1658,15 +1659,15 @@ function registrarMedicamentos() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal("Error", response.error, "error");
+                Swal.fire("Error", response.error, "error");
             } else if (response.success) {
-                swal("Guardado", response.success, "success");
+                Swal.fire("Guardado", response.success, "success");
                 cargarMedicamentos();
             }
         },
         error: function(xhr) {
             console.error("Error en la solicitud:", xhr.responseText);
-            swal("Error", "Ocurrió un problema al registrar los datos.", "error");
+            Swal.fire("Error", "Ocurrió un problema al registrar los datos.", "error");
         }
     });
 }
@@ -1682,7 +1683,7 @@ function cargarMedicamentos() {
         dataType: "json",
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -1895,7 +1896,7 @@ $(document).ready(function() {
 
     // Validar campos
     if (!pt || !mb || !cb || !ar || !pesoHabitual || !talla || !imc || !pesoActual || !csidpa || !csnopa) {
-        swal('Error', 'Todos los campos obligatorios deben ser completados.', 'error');
+        Swal.fire('Error', 'Todos los campos obligatorios deben ser completados.', 'error');
         return;
     }
 
@@ -1925,10 +1926,10 @@ $(document).ready(function() {
             edad
         },
         success: function (response) {
-            swal('Agregado correctamente', 'Buen trabajo', 'success');
+            Swal.fire('Agregado correctamente', 'Buen trabajo', 'success');
         },
         error: function () {
-            swal('Error', 'No se pudo agregar el registro', 'error');
+            Swal.fire('Error', 'No se pudo agregar el registro', 'error');
         },
     });
 }
@@ -1996,7 +1997,7 @@ function registrarAltaExigida() {
     const diagnostico = document.getElementById("diagnostico_alta").value;
 
     if (!motivo.trim() || !diagnostico.trim()) {
-        swal('Error', 'Debe ingresar un motivo y un diagnóstico.', 'error');
+        Swal.fire('Error', 'Debe ingresar un motivo y un diagnóstico.', 'error');
         return;
     }
 
@@ -2006,15 +2007,15 @@ function registrarAltaExigida() {
         data: { idpa, motivo, diagnostico },
         success: function (response) {
             if (response.success) {
-                swal('Guardado', response.message, 'success').then(() => {
+                Swal.fire('Guardado', response.message, 'success').then(() => {
                     cargarDatosAlta();
                 });
             } else {
-                swal(response.type === "warning" ? 'Advertencia' : 'Error', response.message, response.type);
+                Swal.fire(response.type === "warning" ? 'Advertencia' : 'Error', response.message, response.type);
             }
         },
         error: function (xhr) {
-            swal('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar la solicitud.', 'error');
+            Swal.fire('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar la solicitud.', 'error');
         }
     });
 }
@@ -2053,14 +2054,14 @@ function descargarAltaExigidaPDF() {
                     window.open(`../pacientes/generate_alta_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay motivo guardado
-                    swal('Advertencia', 'No se puede generar la hoja de Solicitud de Alta Exigida ya que no has registrado el Dianostico y Motivo para completar la solicitud.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar la hoja de Solicitud de Alta Exigida ya que no has registrado el Dianostico y Motivo para completar la solicitud.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -2117,7 +2118,7 @@ function svEstaAprobadoHistoria(item) {
 
 function aprobarSignosVitalesRow(signoId) {
     var idpac = <?php echo (int)($_GET['id'] ?? 0); ?>;
-    swal({
+    Swal.fire({
         title: '¿Aprobar registro?',
         text: 'Se registrarán su nombre y firma digital del perfil en "Revisado por".',
         icon: 'info',
@@ -2132,14 +2133,14 @@ function aprobarSignosVitalesRow(signoId) {
             data: { signo_id: signoId, idpa: idpac },
             success: function(resp) {
                 if (resp && resp.error) {
-                    swal('Error', resp.error, 'error');
+                    Swal.fire('Error', resp.error, 'error');
                     return;
                 }
-                swal('Listo', (resp && resp.message) ? resp.message : 'Aprobación guardada.', 'success');
+                Swal.fire('Listo', (resp && resp.message) ? resp.message : 'Aprobación guardada.', 'success');
                 cargarSignosVitales();
             },
             error: function(xhr) {
-                swal('Error', xhr.responseText || 'No se pudo aprobar.', 'error');
+                Swal.fire('Error', xhr.responseText || 'No se pudo aprobar.', 'error');
             }
         });
     });
@@ -2162,7 +2163,7 @@ function registrarSignosVitales() {
 
     // Validar que no haya campos vacíos (excepto reviews_by que puede ser opcional)
     if (!fecha || !hora || !processedBy || !bloodPressure || !mapPressure || !temperature || !heartRate || !respiratoryRate || !oxygenSaturation || !weight || !stature || !glucose) {
-        swal('Error', 'Todos los campos son obligatorios.', 'error');
+        Swal.fire('Error', 'Todos los campos son obligatorios.', 'error');
         return;
     }
 
@@ -2188,14 +2189,14 @@ function registrarSignosVitales() {
         },
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
             } else {
-                swal('Guardado', 'Los signos vitales se han registrado correctamente.', 'success');
+                Swal.fire('Guardado', 'Los signos vitales se han registrado correctamente.', 'success');
                 cargarSignosVitales(); // Recargar la tabla con los datos actualizados
             }
         },
         error: function(xhr) {
-            swal('Error', 'Ocurrió un problema: ' + xhr.responseText, 'error');
+            Swal.fire('Error', 'Ocurrió un problema: ' + xhr.responseText, 'error');
         }
     });
 }
@@ -2315,7 +2316,7 @@ for (i = 0; i < acc.length; i++) {
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <?php include_once '../../backend/modal/md_geog.php' ?>
 <?php include_once '../../backend/modal/md_consul.php' ?>
 <?php include_once '../../backend/modal/md_trat.php' ?>
@@ -2356,7 +2357,7 @@ $(document).ready(function() {
 
         // Validar que todos los campos estén llenos
         if (geidpa === '' || genopa === '') {
-            swal(
+            Swal.fire(
                 'Campos vacíos',
                 'Por favor, complete todos los campos obligatorios.',
                 'error'
@@ -2389,13 +2390,13 @@ $(document).ready(function() {
             dataType: "json", // Espera respuesta en JSON
             success: function(result) {
                 if (result.error) {
-                    swal(
+                    Swal.fire(
                         'Error',
                         result.error,
                         'error'
                     );
                 } else {
-                    swal(
+                    Swal.fire(
                         'Agregado correctamente',
                         'Buen trabajo.',
                         'success'
@@ -2405,7 +2406,7 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                swal(
+                Swal.fire(
                     'Error',
                     'Ocurrió un problema: ' + xhr.responseText,
                     'error'
@@ -2432,7 +2433,7 @@ $(document).ready(function() {
 
         // Verificar si todos los campos tienen valores
         if (!consl || !csidpa || !csnopa || !medico_tratante || !especialidad || !servicio || !habitacion_no || !fecha_hora_ingreso || !fecha_hora_egreso) {
-            swal(
+            Swal.fire(
                 'Error',
                 'Todos los campos son obligatorios',
                 'error'
@@ -2459,14 +2460,14 @@ $(document).ready(function() {
             data: dataen,
             cache: false,
             success: function (result) {
-                swal(
+                Swal.fire(
                     'Agregado correctamente',
                     'Buen trabajo',
                     'success'
                 );
             },
             error: function () {
-                swal(
+                Swal.fire(
                     'Error',
                     'No se pudo agregar la consulta',
                     'error'
@@ -2491,7 +2492,7 @@ $(document).ready(function() {
                     cache: false,
                     success: function(result){
 
-                    swal(
+                    Swal.fire(
                             'Agregado correctamente',
                             'Buen trabajo',
                             'success'
@@ -2506,7 +2507,7 @@ $(document).ready(function() {
 function getIdpa() {
     const idpa = document.getElementById('idpa')?.value || '';
     if (!idpa) {
-        swal('Error', 'El ID del paciente no se encontró.', 'error');
+        Swal.fire('Error', 'El ID del paciente no se encontró.', 'error');
         throw new Error('ID del paciente no definido.');
     }
     return idpa;
@@ -2515,7 +2516,7 @@ function getIdpa() {
     function registrarHospitalizacion() {
         const idpa = document.getElementById('idpa').value; // Obtener ID del paciente
         if (!idpa) {
-            swal('Error', 'ID del paciente no encontrado.', 'error');
+            Swal.fire('Error', 'ID del paciente no encontrado.', 'error');
             return;
         }
 
@@ -2540,7 +2541,7 @@ function getIdpa() {
 
         // Verificar si hay datos además de `idpa`
         if (Object.keys(data).length === 1) { // Solo `idpa` significa que no hay datos adicionales
-            swal('Error', 'Debe completar al menos un campo antes de guardar.', 'error');
+            Swal.fire('Error', 'Debe completar al menos un campo antes de guardar.', 'error');
             return;
         }
 
@@ -2551,12 +2552,12 @@ function getIdpa() {
             data: data,
             cache: false,
             success: function (response) {
-                swal('Guardado', 'Datos registrados correctamente.', 'success');
+                Swal.fire('Guardado', 'Datos registrados correctamente.', 'success');
                 actualizarVista(); // Refrescar datos
             },
             error: function (response) {
                 const error = response.responseJSON?.error || 'No se pudieron guardar los datos.';
-                swal('Error', error, 'error');
+                Swal.fire('Error', error, 'error');
             }
         });
     }

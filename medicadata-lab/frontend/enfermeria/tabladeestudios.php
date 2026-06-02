@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
     <title>MEDIDATA</title>
@@ -123,6 +124,11 @@ function hideLoadingModal() {
 <h2 class="table-title">MH-PACS</h2>
 <p id="total-studies">Cargando Estudios...</p>
 
+<div style="margin: 10px 0;">
+    <button id="btn-sync-orthanc" class="button" type="button">Sincronizar Orthanc</button>
+    <span id="sync-status" style="margin-left: 12px; color: #1a7f37;"></span>
+</div>
+
 <script>
     // Función para obtener el número total de estudios
     async function fetchTotalStudies() {
@@ -144,21 +150,35 @@ function hideLoadingModal() {
 
     // Función para sincronizar con Orthanc
     async function syncWithOrthanc() {
+        const btn = document.getElementById('btn-sync-orthanc');
+        if (!btn) return;
+        btn.disabled = true;
+        const prevText = btn.textContent;
+        btn.textContent = 'Sincronizando...';
         try {
-            const response = await fetch('sync_orthanc.php');
+            const response = await fetch('sync_orthanc.php', { cache: 'no-store' });
             const data = await response.json();
             if (!data.success) {
-                throw new Error(data.error);
+                throw new Error(data.error || 'Error al sincronizar');
             }
+            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Sincronización OK');
+            fetchTotalStudies();
         } catch (error) {
             console.error('Error syncing with Orthanc:', error);
+            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Error al sincronizar');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = prevText;
         }
     }
 
     // Cargar estudios al cargar la página
-    document.addEventListener('DOMContentLoaded', async function() {
-        await syncWithOrthanc(); // Sincronizar primero
+    document.addEventListener('DOMContentLoaded', function() {
         fetchTotalStudies();
+        const btn = document.getElementById('btn-sync-orthanc');
+        if (btn) {
+            btn.addEventListener('click', () => syncWithOrthanc());
+        }
     });
 </script>
             
@@ -215,7 +235,7 @@ async function fetchStudies() {
         updateTable();
     } catch (error) {
         console.error('Error fetching studies:', error);
-        swal("error", "Error", "No se pudieron cargar los estudios");
+        Swal.fire("error", "Error", "No se pudieron cargar los estudios");
     } finally {
         hideLoadingModal();
     }
@@ -433,14 +453,14 @@ async function handleFile(dni) {
                     documentStatusCache[dni] = true;
                     button.textContent = 'Descargar Adjunto';
                     button.classList.add('has-document');
-                    swal("Éxito", result.message, "success");
+                    Swal.fire("Éxito", result.message, "success");
                 } else {
                     // Mostrar advertencia o error
-                    swal(result.type.charAt(0).toUpperCase() + result.type.slice(1), result.message, result.type);
+                    Swal.fire(result.type.charAt(0).toUpperCase() + result.type.slice(1), result.message, result.type);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                swal("Error", "Ocurrió un error al cargar el archivo.", "error");
+                Swal.fire("Error", "Ocurrió un error al cargar el archivo.", "error");
             } finally {
                 button.disabled = false;
                 if (!documentStatusCache[dni]) {
@@ -472,10 +492,10 @@ async function downloadFile(dni) {
         window.URL.revokeObjectURL(url);
 
         // Mostrar mensaje de éxito
-        swal("Éxito", "El archivo se descargó correctamente.", "success");
+        Swal.fire("Éxito", "El archivo se descargó correctamente.", "success");
     } catch (error) {
         console.error('Error:', error);
-        swal("Error", "No se pudo descargar el archivo.", "error");
+        Swal.fire("Error", "No se pudo descargar el archivo.", "error");
     }
 }
 </script>
@@ -658,7 +678,7 @@ th:nth-child(9), td:nth-child(9) {
     <script src="../../backend/registros/script/botones_color.js"></script>
 
     <!-- Alertas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html>

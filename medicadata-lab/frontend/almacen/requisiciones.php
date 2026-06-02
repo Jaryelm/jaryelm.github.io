@@ -6,12 +6,13 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     
     <!-- Select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     
     <title>MEDIDATA</title>
 </head>
@@ -229,7 +230,7 @@ include_once '../../backend/registros/session_check.php';
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
@@ -253,13 +254,13 @@ $(document).ready(function() {
         const nombre = articulo.text().split('(')[0].trim();
         
         if (!cantidad || !codigo) {
-            swal('Error', 'Por favor complete todos los campos', 'error');
+            Swal.fire('Error', 'Por favor complete todos los campos', 'error');
             return;
         }
 
         // Verificar si el artículo ya existe en la tabla
         if ($(`#tablaArticulos tr[data-codigo="${codigo}"]`).length > 0) {
-            swal('Error', 'Este artículo ya ha sido agregado', 'error');
+            Swal.fire('Error', 'Este artículo ya ha sido agregado', 'error');
             return;
         }
 
@@ -292,7 +293,7 @@ $(document).ready(function() {
         e.preventDefault();
         
         if ($('#tablaArticulos tbody tr').length === 0) {
-            swal('Error', 'Debe agregar al menos un artículo', 'error');
+            Swal.fire('Error', 'Debe agregar al menos un artículo', 'error');
             return;
         }
 
@@ -304,16 +305,16 @@ $(document).ready(function() {
             success: function(response) {
                 const res = JSON.parse(response);
                 if (res.success) {
-                    swal('Éxito', res.message, 'success')
+                    Swal.fire('Éxito', res.message, 'success')
                     .then(() => {
                         window.location.href = 'lista_requisiciones.php';
                     });
                 } else {
-                    swal('Error', res.message, 'error');
+                    Swal.fire('Error', res.message, 'error');
                 }
             },
             error: function() {
-                swal('Error', 'Hubo un problema al guardar la requisición', 'error');
+                Swal.fire('Error', 'Hubo un problema al guardar la requisición', 'error');
             }
         });
     });

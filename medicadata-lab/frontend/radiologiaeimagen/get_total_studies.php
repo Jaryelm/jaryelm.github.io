@@ -1,30 +1,24 @@
 <?php
-header('Content-Type: application/json');
+declare(strict_types=1);
 
-// URL base de la API de Orthanc
-$orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies';
+header('Content-Type: application/json; charset=utf-8');
 
-// Configurar las credenciales de Orthanc
-$username = 'dev'; // Usuario registrado en Orthanc
-$password = 'Mrecords7'; // Contraseña del usuario
+require_once __DIR__ . '/../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../../backend/php/mh_pacs_studies_repository.php';
 
-// Iniciar cURL para obtener los estudios
-$ch = curl_init($orthanc_url);
-
-// Configurar las opciones de cURL
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Devolver la respuesta como string
-curl_setopt($ch, CURLOPT_USERPWD, "$username:$password"); // Agregar credenciales
-curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); // Usar autenticación básica
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Ignorar verificación del certificado (opcional)
-
-// Ejecutar la solicitud
-$response = curl_exec($ch);
-
-// Verificar si hubo un error en la solicitud
-if (curl_errno($ch)) {
-    error_log("cURL error: " . curl_error($ch)); // Registrar el error
-    die(json_encode(['error' => 'Error al obtener los estudios desde Orthanc']));
+try {
+    $summary = medidata_mh_pacs_studies_summary($connect);
+    echo json_encode([
+        'total'     => $summary['total'],
+        'last_sync' => $summary['last_sync'],
+        'source'    => 'worklist',
+    ], JSON_UNESCAPED_UNICODE);
+} catch (Throwable $e) {
+    error_log('get_total_studies.php: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al obtener el total de estudios'], JSON_UNESCAPED_UNICODE);
 }
+<<<<<<< Updated upstream
 
 // Obtener el código de estado HTTP
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -46,3 +40,5 @@ $totalStudies = is_array($data) ? count($data) : 0;
 // Devolver el total de estudios
 echo json_encode(['total' => $totalStudies]);
 ?>
+=======
+>>>>>>> Stashed changes

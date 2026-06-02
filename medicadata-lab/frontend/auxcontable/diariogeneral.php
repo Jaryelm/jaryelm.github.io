@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css">
@@ -219,6 +219,54 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     #tablaDiarioGeneral tbody tr.partida-group-header:hover {
         background-color: #e3f2fd !important;
     }
+
+    /* Evita el "pantallazo blanco" de DataTables al procesar */
+    #tablaDiarioGeneral_wrapper {
+        position: relative;
+    }
+
+    #tablaDiarioGeneral_wrapper .dataTables_processing {
+        /* Mantener centrado (como admin.css) pero SIN capa blanca */
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        pointer-events: none !important;
+        z-index: 9998 !important;
+    }
+
+    #tablaDiarioGeneral_wrapper .dt-medidata-processing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        color: #035c67;
+    }
+
+    #tablaDiarioGeneral_wrapper .dt-medidata-processing p {
+        margin: 0;
+        color: #fff;
+        font-weight: 600;
+    }
 </style>
 
         </main>
@@ -375,7 +423,7 @@ $(function () {
                     .append('<td colspan="2" class="' + balanceClass + '"><strong>' + balanceIcon + ' ' + balanceText + '</strong></td>');
             }
         },
-        order: [[0, 'desc'], [1, 'desc']], // Ordenar por número de partida y fecha de ocurrencia descendente
+        order: [[2, 'desc']], // Ordenar por fecha de registro descendente (más recientes primero)
         pageLength: 10,
         lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Todos"]],
         language: {

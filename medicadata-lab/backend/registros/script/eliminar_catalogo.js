@@ -15,17 +15,17 @@ document.getElementById('eliminar-form').addEventListener('submit', function(e) 
     .then(data => {
         // Mostrar la alerta de acuerdo a la respuesta
         if (data.success) {
-            swal("¡Éxito!", data.message, "success");
+            Swal.fire({ title: "¡Éxito!", text: data.message || "Operación completada", icon: "success", confirmButtonText: "OK" });
             // Limpiar el campo del formulario
             document.getElementById('eliminar-form').reset();
             // Opcional: Actualizar la lista de cuentas
             // Puedes llamar a la función que carga los registros nuevamente
         } else {
-            swal("Error", data.message, "error");
+            Swal.fire({ title: "Error", text: data.message || "No se pudo completar la operación", icon: "error", confirmButtonText: "OK" });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        swal("Error", "Ocurrió un error inesperado.", "error");
+        Swal.fire({ title: "Error", text: "Ocurrió un error inesperado.", icon: "error", confirmButtonText: "OK" });
     });
 });

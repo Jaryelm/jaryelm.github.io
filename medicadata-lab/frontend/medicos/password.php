@@ -7,10 +7,10 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
 
 
@@ -83,7 +83,6 @@ if($sentencia){
 <form action="" enctype="multipart/form-data" method="POST"  autocomplete="off" onsubmit="return validacion()">
   <div class="containerss">
     <h1>Cambiar contraseña del médico</h1>
-    <?php include_once '../../backend/php/upd_pass_doctor.php' ?>
    <br>
     <hr>
 
@@ -111,19 +110,10 @@ if($sentencia){
         <!-- MAIN -->
     </section>
     <script src="../../backend/js/jquery.min.js"></script>
-
-
-    <!-- NAVBAR -->
-    
     <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/js/multistep.js"></script>
-    <script src="../../backend/js/vpat.js"></script>
-
-    <!-- SubMenu -->
-    <script src='../../backend/js/submenu.js'></script>    
-    
-
-   
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <?php include_once '../../backend/php/upd_pass_doctor.php' ?>
+    <script src='../../backend/js/submenu.js'></script>
 </body>
 </html>
 

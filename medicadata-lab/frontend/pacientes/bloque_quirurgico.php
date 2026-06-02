@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     
 
@@ -360,16 +361,16 @@ function enviarGasto() {
         success: function (response) {
             console.log("Respuesta del servidor:", response);
             if (response.success) {
-                swal("Éxito", "Gasto de quirófano registrado correctamente", "success")
+                Swal.fire("Éxito", "Gasto de quirófano registrado correctamente", "success")
                 .then(() => {
                     window.location.reload();
                 });
             } else {
-                swal("Error", response.error || "No se pudo registrar el gasto", "error");
+                Swal.fire("Error", response.error || "No se pudo registrar el gasto", "error");
             }
         },
         error: function (xhr) {
-            swal("Error", "No se pudo registrar el gasto. Intente nuevamente.", "error");
+            Swal.fire("Error", "No se pudo registrar el gasto. Intente nuevamente.", "error");
             console.error("Error en AJAX:", xhr);
         }
     });
@@ -393,14 +394,14 @@ function descargarGastosQuirofanoPDF() {
                     window.open(`gastos_quirurgico_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay registros
-                    swal('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -622,7 +623,7 @@ function enviarPostOperativo() {
 
     // Validación de campos obligatorios
     if (!formData.get("idpa") || !formData.get("procesado_por")) {
-        swal("Error", "ID del paciente y procesado por son obligatorios", "error");
+        Swal.fire("Error", "ID del paciente y procesado por son obligatorios", "error");
         return;
     }
 
@@ -634,11 +635,11 @@ function enviarPostOperativo() {
         contentType: false,
         cache: false,
         success: function (result) {
-            swal("Éxito", "Datos de post operatorio registrados correctamente", "success")
+            Swal.fire("Éxito", "Datos de post operatorio registrados correctamente", "success")
                 .then(() => window.location.reload());
         },
         error: function () {
-            swal("Error", "No se pudieron registrar los datos", "error");
+            Swal.fire("Error", "No se pudieron registrar los datos", "error");
         }
     });
 }
@@ -661,14 +662,14 @@ function descargarPostOperativoPDF() {
                     window.open(`generate_post_operatorio_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay registros
-                    swal('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -916,15 +917,15 @@ function enviarRecuperacion() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            swal("Éxito", "Datos guardados correctamente", "success")
+            Swal.fire("Éxito", "Datos guardados correctamente", "success")
                 .then(() => window.location.reload());
         } else {
-            swal("Error", result.error, "error");
+            Swal.fire("Error", result.error, "error");
         }
     })
     .catch(error => {
         console.error("Error en la petición:", error);
-        swal("Error", "No se pudieron registrar los datos", "error");
+        Swal.fire("Error", "No se pudieron registrar los datos", "error");
     });
 }
 </script>
@@ -946,14 +947,14 @@ function descargarRecuperacionPDF() {
                     window.open(`generate_recuperacion_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay registros
-                    swal('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -1206,15 +1207,15 @@ function enviarAnestesia() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            swal("Éxito", "Registro guardado correctamente", "success")
+            Swal.fire("Éxito", "Registro guardado correctamente", "success")
                 .then(() => window.location.reload());
         } else {
-            swal("Error", result.error, "error");
+            Swal.fire("Error", result.error, "error");
         }
     })
     .catch(error => {
         console.error("Error en la petición:", error);
-        swal("Error", "No se pudieron registrar los datos", "error");
+        Swal.fire("Error", "No se pudieron registrar los datos", "error");
     });
 }
 </script>
@@ -1236,14 +1237,14 @@ function enviarAnestesia() {
                     window.open(`generate_anestesia_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay registros
-                    swal('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar el PDF porque no hay datos registrados.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar los datos.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar los datos. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -1300,7 +1301,7 @@ for (i = 0; i < acc.length; i++) {
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <?php include_once '../../backend/modal/md_gastos_quirofano.php' ?>
 <?php include_once '../../backend/modal/md_post_operatorio.php' ?>
 <?php include_once '../../backend/modal/md_recuperacion.php' ?>

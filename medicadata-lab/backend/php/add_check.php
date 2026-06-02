@@ -1,4 +1,54 @@
 <?php
+if (!function_exists('ac_fmt')) {
+    function ac_fmt($value, int $scale = 2): string
+    {
+        return number_format((float)$value, $scale, '.', '');
+    }
+}
+
+if (!function_exists('ac_add')) {
+    function ac_add($left, $right, int $scale = 2): string
+    {
+        if (function_exists('bcadd')) {
+            return bcadd((string)$left, (string)$right, $scale);
+        }
+        return ac_fmt(((float)$left + (float)$right), $scale);
+    }
+}
+
+if (!function_exists('ac_sub')) {
+    function ac_sub($left, $right, int $scale = 2): string
+    {
+        if (function_exists('bcsub')) {
+            return bcsub((string)$left, (string)$right, $scale);
+        }
+        return ac_fmt(((float)$left - (float)$right), $scale);
+    }
+}
+
+if (!function_exists('ac_mul')) {
+    function ac_mul($left, $right, int $scale = 2): string
+    {
+        if (function_exists('bcmul')) {
+            return bcmul((string)$left, (string)$right, $scale);
+        }
+        return ac_fmt(((float)$left * (float)$right), $scale);
+    }
+}
+
+if (!function_exists('ac_div')) {
+    function ac_div($left, $right, int $scale = 2): string
+    {
+        if ((float)$right == 0.0) {
+            return ac_fmt(0, $scale);
+        }
+        if (function_exists('bcdiv')) {
+            return bcdiv((string)$left, (string)$right, $scale);
+        }
+        return ac_fmt(((float)$left / (float)$right), $scale);
+    }
+}
+
 if (isset($_POST['order'])) {
     try {
         date_default_timezone_set('America/Tegucigalpa');
@@ -65,6 +115,24 @@ if (isset($_POST['order'])) {
             // No lanzar excepción aquí, solo registrar el error
         }
 
+        // DDL fuera de transacción: en MySQL ALTER/CREATE hacen commit implícito y rompen commit() después.
+        try {
+            $stmt_col = $connect->prepare("SHOW COLUMNS FROM patients_ambulatorios LIKE 'telefono'");
+            $stmt_col->execute();
+            if ($stmt_col->rowCount() == 0) {
+                $connect->exec("ALTER TABLE patients_ambulatorios ADD COLUMN telefono VARCHAR(30) DEFAULT NULL");
+            }
+        } catch (Exception $e) {
+            error_log('add_check patients_ambulatorios telefono: ' . $e->getMessage());
+        }
+
+        require_once __DIR__ . '/facturacion_cai_config.php';
+        $invoiceData = medidata_factura_next_invoice($connect);
+        $invoice_number = (string) ($invoiceData['invoice_number'] ?? '');
+        if ($invoice_number === '') {
+            throw new Exception('No se pudo generar el número de factura.');
+        }
+
         $placed_on = date('Y-m-d H:i:s');
         $connect->beginTransaction();
 
@@ -106,14 +174,6 @@ if (isset($_POST['order'])) {
                 }
 
                 if (!$ya_existe) {
-                    // Asegurar que la columna telefono existe en patients_ambulatorios
-                    try {
-                        $stmt_col = $connect->prepare("SHOW COLUMNS FROM patients_ambulatorios LIKE 'telefono'");
-                        $stmt_col->execute();
-                        if ($stmt_col->rowCount() == 0) {
-                            $connect->exec("ALTER TABLE patients_ambulatorios ADD COLUMN telefono VARCHAR(30) DEFAULT NULL");
-                        }
-                    } catch (Exception $e) { /* ignorar si ya existe */ }
                     $stmt_ins = $connect->prepare("INSERT INTO patients_ambulatorios (nompa, apepa, numhs, cump, telefono) VALUES (?, ?, ?, ?, ?)");
                     $stmt_ins->execute([$nompa_amb, $apepa_amb, $dni_amb, $cump_amb, $telefono_manual]);
                     error_log("Paciente ambulatorio guardado: " . $nombre_ambulatorio);
@@ -233,24 +293,6 @@ if (isset($_POST['order'])) {
         $total_discount_amount = '0.00';
         $cart_products_list = [];
 
-        // Generar número de factura
-        // Número de factura inicial: 410000 (según CAI autorizado)
-        $numeroFacturaInicial = 410000;
-        
-        $stmt = $connect->prepare("SELECT MAX(invoice_number) AS last_invoice FROM orders");
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $lastInvoice = $result['last_invoice'] ?? "000-001-01-0000000";
-        
-        // Extraer los últimos 7 dígitos del último número de factura
-        $ultimoNumero = (int)substr($lastInvoice, -7);
-        
-        // Si el último número es menor al inicial, usar el inicial
-        // Si es mayor o igual, continuar con la secuencia
-        $nuevoNumero = max($ultimoNumero + 1, $numeroFacturaInicial);
-        
-        $invoice_number = sprintf("000-001-01-%07d", $nuevoNumero);
-
         // Consultar carrito
         $cart_query = $connect->prepare("
             SELECT cart.idv, cart.name, cart.price, cart.quantity, 
@@ -297,21 +339,21 @@ if (isset($_POST['order'])) {
                 
                 $price = (float)$cart_item['price'];
                 $quantity = (int)$cart_item['quantity'];
-                $sub_total = bcmul($price, $quantity, 2);
+                $sub_total = ac_mul($price, $quantity, 2);
 
-                $item_discount = bcmul($sub_total, bcdiv((float)($cart_item['discount'] ?? '0.00'), '100', 2), 2);
-                $promotion_discount = bcmul($sub_total, bcdiv((float)($cart_item['promotion_discount'] ?? '0.00'), '100', 2), 2);
+                $item_discount = ac_mul($sub_total, ac_div((float)($cart_item['discount'] ?? '0.00'), '100', 2), 2);
+                $promotion_discount = ac_mul($sub_total, ac_div((float)($cart_item['promotion_discount'] ?? '0.00'), '100', 2), 2);
                 // Otros descuento ahora es monto fijo en Lempiras, no porcentaje
                 $other_discount = (string)floatval($cart_item['other_discount'] ?? '0.00');
-                $age_discount_30 = $cart_item['age_discount_30'] ? bcmul($sub_total, '0.30', 2) : '0.00';
-                $age_discount_40 = $cart_item['age_discount_40'] ? bcmul($sub_total, '0.40', 2) : '0.00';
+                $age_discount_30 = $cart_item['age_discount_30'] ? ac_mul($sub_total, '0.30', 2) : '0.00';
+                $age_discount_40 = $cart_item['age_discount_40'] ? ac_mul($sub_total, '0.40', 2) : '0.00';
 
-                $total_discount = bcadd(
-                    bcadd(bcadd($item_discount, $promotion_discount, 2), $other_discount, 2),
-                    bcadd($age_discount_30, $age_discount_40, 2),
+                $total_discount = ac_add(
+                    ac_add(ac_add($item_discount, $promotion_discount, 2), $other_discount, 2),
+                    ac_add($age_discount_30, $age_discount_40, 2),
                     2
                 );
-                $total_after_discount = bcsub($sub_total, $total_discount, 2);
+                $total_after_discount = ac_sub($sub_total, $total_discount, 2);
 
                 // ISV (15%) - se considera "gravado" cualquier flag que NO sea 'E','N','0' (exento/no-aplica).
                 // El precio del carrito ya incluye el ISV, por lo que se extrae con la fórmula 15/115.
@@ -329,12 +371,12 @@ if (isset($_POST['order'])) {
                 }
                 $flag_imp = strtoupper(trim($flag_imp_raw));
                 $es_gravado = !in_array($flag_imp, ['', 'E', 'N', '0'], true);
-                $item_tax = $es_gravado ? bcdiv(bcmul($total_after_discount, '15', 4), '115', 2) : '0.00';
+                $item_tax = $es_gravado ? ac_div(ac_mul($total_after_discount, '15', 4), '115', 2) : '0.00';
 
-                $cart_original_total = bcadd($cart_original_total, $sub_total, 2);
-                $cart_grand_total = bcadd($cart_grand_total, $total_after_discount, 2);
-                $total_discount_amount = bcadd($total_discount_amount, $total_discount, 2);
-                $tax_amount_total = bcadd($tax_amount_total, $item_tax, 2);
+                $cart_original_total = ac_add($cart_original_total, $sub_total, 2);
+                $cart_grand_total = ac_add($cart_grand_total, $total_after_discount, 2);
+                $total_discount_amount = ac_add($total_discount_amount, $total_discount, 2);
+                $tax_amount_total = ac_add($tax_amount_total, $item_tax, 2);
             }
 
             // 2. Insertar la orden con los totales correctos - INCLUYENDO NUEVOS CAMPOS DE TARJETA, EFECTIVO Y PAGO MIXTO
@@ -402,21 +444,21 @@ if (isset($_POST['order'])) {
             foreach ($cart_items as $cart_item) {
                 $price = (float)$cart_item['price'];
                 $quantity = (int)$cart_item['quantity'];
-                $sub_total = bcmul($price, $quantity, 2);
+                $sub_total = ac_mul($price, $quantity, 2);
 
-                $item_discount = bcmul($sub_total, bcdiv((float)($cart_item['discount'] ?? '0.00'), '100', 2), 2);
-                $promotion_discount = bcmul($sub_total, bcdiv((float)($cart_item['promotion_discount'] ?? '0.00'), '100', 2), 2);
+                $item_discount = ac_mul($sub_total, ac_div((float)($cart_item['discount'] ?? '0.00'), '100', 2), 2);
+                $promotion_discount = ac_mul($sub_total, ac_div((float)($cart_item['promotion_discount'] ?? '0.00'), '100', 2), 2);
                 // Otros descuento ahora es monto fijo en Lempiras, no porcentaje
                 $other_discount = (string)floatval($cart_item['other_discount'] ?? '0.00');
-                $age_discount_30 = $cart_item['age_discount_30'] ? bcmul($sub_total, '0.30', 2) : '0.00';
-                $age_discount_40 = $cart_item['age_discount_40'] ? bcmul($sub_total, '0.40', 2) : '0.00';
+                $age_discount_30 = $cart_item['age_discount_30'] ? ac_mul($sub_total, '0.30', 2) : '0.00';
+                $age_discount_40 = $cart_item['age_discount_40'] ? ac_mul($sub_total, '0.40', 2) : '0.00';
 
-                $total_discount = bcadd(
-                    bcadd(bcadd($item_discount, $promotion_discount, 2), $other_discount, 2),
-                    bcadd($age_discount_30, $age_discount_40, 2),
+                $total_discount = ac_add(
+                    ac_add(ac_add($item_discount, $promotion_discount, 2), $other_discount, 2),
+                    ac_add($age_discount_30, $age_discount_40, 2),
                     2
                 );
-                $total_after_discount = bcsub($sub_total, $total_discount, 2);
+                $total_after_discount = ac_sub($sub_total, $total_discount, 2);
 
                 // Insertar detalle en order_details
                 $insert_detail = $connect->prepare("
@@ -498,24 +540,41 @@ if (isset($_POST['order'])) {
             $delete_cart = $connect->prepare("DELETE FROM cart WHERE user_id = ?");
             $delete_cart->execute([$user_id]);
 
-            $connect->commit();
+            if ($connect->inTransaction()) {
+                $connect->commit();
+            } else {
+                throw new RuntimeException('La transacción de pago se interrumpió (DDL o commit implícito). Intente de nuevo.');
+            }
 
             echo '<script type="text/javascript">
-            swal("¡Registrado!", "Compra completada correctamente", "success").then(function() {
+            Swal.fire({
+                title: "¡Registrado!",
+                text: "Compra completada correctamente",
+                icon: "success",
+                confirmButtonText: "Aceptar"
+            }).then(function() {
                 window.location = "venta.php";
             });
             </script>';
         } else {
             throw new Exception("El carrito está vacío.");
         }
-    } catch (Exception $e) {
-        // Verificar si hay una transacción activa antes de hacer rollback
+    } catch (Throwable $e) {
         if ($connect->inTransaction()) {
-            $connect->rollBack();
+            try {
+                $connect->rollBack();
+            } catch (Throwable $rb) {
+                error_log('add_check rollBack: ' . $rb->getMessage());
+            }
         }
-        error_log($e->getMessage());
+        error_log('add_check: ' . $e->getMessage());
         echo '<script type="text/javascript">
-        swal("Error!", "Hubo un problema al procesar el pago: ' . $e->getMessage() . '", "error");
+        Swal.fire({
+            title: "Error!",
+            text: ' . json_encode('Hubo un problema al procesar el pago: ' . $e->getMessage(), JSON_UNESCAPED_UNICODE) . ',
+            icon: "error",
+            confirmButtonText: "Aceptar"
+        });
         </script>';
     }
 }

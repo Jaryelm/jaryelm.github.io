@@ -7,10 +7,10 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <!-- Include CSS de Select2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
@@ -62,14 +62,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera_nuevo.php')">Registrar Enfermeria</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera.php')">Enfermeria</button>
-<button class="button" onclick="cambiarColor(this, '#')">Registrar Administrativo</button>
-<button class="button" onclick="cambiarColor(this, '#')">Administrativo</button>
-<button class="button" onclick="cambiarColor(this, '#')">Registrar Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '#')">Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/nuevo.php')">Registrar Médicos</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Médicos</button>
+        <button class="button" onclick="cambiarColor(this, '../medicos/nuevo.php')">Registrar Médicos</button>
+        <button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Médicos</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/reclutamiento.php')">Reclutamiento</button>
 <button class="button" onclick="cambiarColor(this, '#')">Proceso de Entrevista</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/laboratorios_nuevo.php')">Registrar Área de Servicio</button>
@@ -81,7 +75,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 <form action="" enctype="multipart/form-data" method="POST" autocomplete="off" onsubmit="return validacion()">
     <div class="containerss">
         <h1>Nuevo médico</h1>
-        <?php include_once '../../backend/php/add_doctor.php' ?>
         <div class="alert-danger">
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
             <strong>Importante!</strong> Es importante rellenar los campos con &nbsp;<span class="badge-warning">*</span>
@@ -139,63 +132,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         <!-- MAIN -->
     </section>
     <script src="../../backend/js/jquery.min.js"></script>
-
-
-    <!-- NAVBAR -->
-    
     <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/js/multistep.js"></script>
-    <script src="../../backend/js/vpat.js"></script>
-    <!-- SubMenu -->
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <?php include_once '../../backend/php/add_doctor.php' ?>
     <script src='../../backend/js/submenu.js'></script>
-
-    <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
-
-    <!-- Include Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('.select2').select2(); // Inicializa Select2 para todos los select con clase select2
-    });
-</script>
-    
-
-    <script type="text/javascript">
-    let popUp = document.getElementById("cookiePopup");
-//When user clicks the accept button
-document.getElementById("acceptCookie").addEventListener("click", () => {
-  //Create date object
-  let d = new Date();
-  //Increment the current time by 1 minute (cookie will expire after 1 minute)
-  d.setMinutes(2 + d.getMinutes());
-  //Create Cookie withname = myCookieName, value = thisIsMyCookie and expiry time=1 minute
-  document.cookie = "myCookieName=thisIsMyCookie; expires = " + d + ";";
-  //Hide the popup
-  popUp.classList.add("hide");
-  popUp.classList.remove("shows");
-});
-//Check if cookie is already present
-const checkCookie = () => {
-  //Read the cookie and split on "="
-  let input = document.cookie.split("=");
-  //Check for our cookie
-  if (input[0] == "myCookieName") {
-    //Hide the popup
-    popUp.classList.add("hide");
-    popUp.classList.remove("shows");
-  } else {
-    //Show the popup
-    popUp.classList.add("shows");
-    popUp.classList.remove("hide");
-  }
-};
-//Check if cookie exists when page loads
-window.onload = () => {
-  setTimeout(() => {
-    checkCookie();
-  }, 2000);
-};
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
     </script>
    
 </body>

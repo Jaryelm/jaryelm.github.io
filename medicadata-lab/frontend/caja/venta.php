@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,6 +15,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <title>MEDIDATA</title>
 </head>
@@ -83,34 +84,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
-                   <?php 
-
-$sentencia = $connect->prepare("
-    SELECT 
-        orders.*, 
-        GROUP_CONCAT(COALESCE(order_details.codpro, ah.codpro, product.codpro, servicios_hospital.codigo_servicio) SEPARATOR ', ') AS codigos_productos,
-        AVG(order_details.discount_percentage) AS avg_discount_percentage,
-        GROUP_CONCAT(COALESCE(product.impuesto, ah.impuesto, servicios_hospital.impuesto) SEPARATOR ', ') AS impuestos
-    FROM orders 
-    LEFT JOIN order_details ON orders.idord = order_details.order_id
-    LEFT JOIN product ON order_details.product_id = product.idprcd AND order_details.item_type = 'producto'
-    LEFT JOIN almacen_hospitalario ah ON order_details.hospitalario_id = ah.idprcd AND order_details.item_type = 'producto_hospitalario'
-    LEFT JOIN servicios_hospital ON order_details.service_id = servicios_hospital.id AND order_details.item_type = 'servicio'
-    GROUP BY orders.idord
-    ORDER BY orders.placed_on DESC;
-");
-
-$sentencia->execute();
-$data = [];
-
-if ($sentencia) {
-    while ($r = $sentencia->fetchObject()) {
-        $data[] = $r;
-    }
-}
-?>
-
-<?php if(count($data) > 0): ?>
+                   
 <!-- En `venta.php`, dentro de la tabla de resumen de ventas -->
 <table id="example" class="responsive-table">
     <thead>
@@ -130,83 +104,55 @@ if ($sentencia) {
             <th scope="col" class="columna-acciones-caja" style="display: none;">Acciones</th>
         </tr>
     </thead>
-    <tbody>
-        <?php foreach ($data as $d): ?>
-            <tr>
-                <td data-title="N. Factura"><?php echo htmlspecialchars($d->invoice_number); ?></td>
-                <td data-title="Procesado Por"><?php echo htmlspecialchars($d->processed_by); ?></td>
-                <td data-title="Fecha"><?php echo htmlspecialchars($d->placed_on); ?></td>
-                <td data-title="Cliente"><?php echo htmlspecialchars($d->nomcl); ?></td>
-                <td data-title="Método"><?php echo htmlspecialchars($d->method); ?></td>
-                <td data-title="Precio Sin Descuento">LPS. <?php echo number_format($d->price_without_discount, 2); ?></td>
-                <td data-title="Total con Descuento">LPS. <?php echo number_format($d->total_price, 2); ?></td>
-                <td style="text-align: center;">
-                    <?php 
-                        if ($d->tipc === 'Boleta') {
-                            echo '<i class="bx bx-show" title="Ver Factura General" onclick="verPDF(\'../almacen/documento_general.php?id='.htmlspecialchars($d->idord).'\', \'Factura General\')" style="cursor: pointer; color: #06adbf; font-size: 24px; display: inline-block; vertical-align: middle;"></i>';
-                        }
-                    ?>
-                </td>
-                <td style="text-align: center;">
-                    <?php 
-                        if ($d->tipc === 'Boleta') {
-                            echo '<i class="bx bx-show" title="Ver Factura Desglosada" onclick="verPDF(\'../almacen/documento.php?id='.htmlspecialchars($d->idord).'\', \'Factura Desglosada\')" style="cursor: pointer; color: #06adbf; font-size: 24px; display: inline-block; vertical-align: middle;"></i>';
-                        }
-                    ?>
-                </td>
-                <td>
-                    <button class="btn_ver_detalles" onclick="viewDetails(<?php echo htmlspecialchars($d->idord); ?>)">Ver Detalles</button>
-                </td>
-                <td>
-<label class="status-switch">
-        <input 
-            type="checkbox" 
-            data-id="<?php echo htmlspecialchars($d->idord); ?>" 
-            data-current-status="<?php echo htmlspecialchars($d->invoice_status); ?>"
-            onchange="updateStatus(<?php echo htmlspecialchars($d->idord); ?>, this.checked ? 'Cobrada' : 'Pendiente')" 
-            <?php echo $d->invoice_status == 'Cobrada' ? 'checked' : ''; ?>>
-        <span class="status-slider"></span>
-    </label>
-</td>
-                <td data-title="Procesado Por"><?php echo htmlspecialchars($d->updated_by); ?></td>
-<td class="columna-acciones-caja" style="display: none;">
-    <button class="btn_devolucion" onclick="iniciarDevolucion(<?php echo htmlspecialchars($d->idord); ?>)">Devolución</button>
-</td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 <script>
 function updateStatus(id, status) {
-    swal({
+    const slider = document.querySelector(`input[data-id="${id}"]`);
+
+    // Regla de negocio: solo se permite marcar a Cobrada una vez.
+    if (status !== 'Cobrada') {
+        if (slider) slider.checked = true;
+        Swal.fire({
+            title: "Acción no permitida",
+            text: "Esta factura ya fue cobrada y no puede volver a Pendiente.",
+            icon: "warning",
+            confirmButtonText: "Aceptar"
+        });
+        return;
+    }
+
+    Swal.fire({
         title: "¿Estás seguro?",
-        text: `Vas a cambiar el estado a "${status}". Esta acción solo puede realizarse una vez y no se puede deshacer.`,
+        text: 'Vas a cambiar el estado a "Cobrada". Esta acción solo puede realizarse una vez y no se puede deshacer.',
         icon: "warning",
-        buttons: ["Cancelar", "Confirmar"],
-        dangerMode: true,
-    }).then((willChange) => {
-        if (willChange) {
+        showCancelButton: true,
+        confirmButtonText: "Confirmar",
+        cancelButtonText: "Cancelar",
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
             // Si el usuario confirma, envía la solicitud al backend
             $.ajax({
                 url: 'update_invoice_status.php',
                 method: 'POST',
                 data: { id: id, status: status },
-                success: function(response) {
-                    swal("¡Actualizado!", "El estado de la factura se actualizó correctamente", "success").then(function() {
-                        location.reload(); // Recargar la página para reflejar los cambios
+                success: function(html) {
+                    var $tmp = $('<div>').html(html);
+                    $tmp.find('script').each(function() {
+                        $.globalEval(this.text || this.textContent || this.innerHTML || '');
                     });
                 },
                 error: function() {
-                    swal("Error!", "Hubo un problema al actualizar el estado", "error").then(function() {
+                    Swal.fire("Error!", "Hubo un problema al actualizar el estado", "error").then(function() {
                         location.reload(); // Intentar nuevamente recargando
                     });
                 }
             });
         } else {
             // Si el usuario cancela, revertir el cambio en el deslizador
-            const slider = document.querySelector(`input[data-id="${id}"]`);
-            slider.checked = status === 'Cobrada';
+            if (slider) slider.checked = false;
         }
     });
 }
@@ -276,13 +222,6 @@ input:checked + .slider:before {
     left: 30px;
 }
 </style>
-
-<?php else: ?>
-    <div class="alert">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-        <strong>Danger!</strong> No hay datos.
-    </div>
-<?php endif; ?>
 
 <!-- Modal para Detalles -->
 <div id="detailsModal" class="modal" style="display: none !important;">
@@ -418,7 +357,7 @@ function viewDetails(orderId) {
             hideLoadingModal();
             if (loadingP) loadingP.textContent = "Cargando devolución...";
             console.error('Error al obtener detalles:', err);
-            swal("Error", "No se pudieron cargar los detalles", "error");
+            Swal.fire("Error", "No se pudieron cargar los detalles", "error");
         });
 }
 
@@ -503,7 +442,7 @@ function iniciarDevolucion(orderId) {
         .catch(err => {
             hideLoadingModal();
             console.error("Error al cargar devolución:", err);
-            swal("Error", "No se pudieron cargar los datos de devolución", "error");
+            Swal.fire("Error", "No se pudieron cargar los datos de devolución", "error");
         });
 }
 
@@ -521,7 +460,7 @@ function procesarDevolucion(orderId, productId, buttonElement) {
     if (motivo === 'otros') {
         const otroMotivo = otroMotivoTextarea.value.trim();
         if (!otroMotivo) {
-            swal("Error", "Por favor especifique el motivo de la devolución", "error");
+            Swal.fire("Error", "Por favor especifique el motivo de la devolución", "error");
             return;
         }
         motivo = `Otros: ${otroMotivo}`;
@@ -529,12 +468,12 @@ function procesarDevolucion(orderId, productId, buttonElement) {
 
     // Validaciones
     if (!cantidad || !motivo) {
-        swal("Error", "Por favor complete todos los campos", "error");
+        Swal.fire("Error", "Por favor complete todos los campos", "error");
         return;
     }
 
     // Confirmar devolución
-    swal({
+    Swal.fire({
         title: "¿Está seguro?",
         text: "Esta acción no se puede deshacer",
         icon: "warning",
@@ -558,12 +497,12 @@ function procesarDevolucion(orderId, productId, buttonElement) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    swal("¡Éxito!", "Devolución procesada correctamente", "success")
+                    Swal.fire("¡Éxito!", "Devolución procesada correctamente", "success")
                     .then(() => {
                         location.reload();
                     });
                 } else {
-                    swal("Error", data.message || "Error al procesar la devolución", "error");
+                    Swal.fire("Error", data.message || "Error al procesar la devolución", "error");
                 }
             });
         }
@@ -615,7 +554,8 @@ let pdfUrlActual = '';
 function verPDF(url, titulo) {
     // Agregar parámetro view=inline para mostrar el PDF en línea
     const separator = url.includes('?') ? '&' : '?';
-    const urlConView = url + separator + 'view=inline';
+    const defaultZoom = 125;
+    const urlConView = url + separator + 'view=inline#zoom=' + defaultZoom;
     
     pdfUrlActual = url; // Guardar URL original para descarga
     const modal = document.getElementById('pdfModal');
@@ -928,10 +868,54 @@ window.addEventListener('click', function(event) {
     <script type="text/javascript">
 $(document).ready(function() {
     $('#example').DataTable({
+        processing: true,
+        serverSide: true,
+        searchDelay: 500,
         pageLength: 10, // Registros por página
         dom: 'Bfrtip',
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[1, 'desc']], // Asegúrate de que el índice de la columna de fecha sea correcto (por ejemplo, 1 si es la segunda columna)
+        ajax: {
+            url: '../../backend/registros/ventas_datatable.php',
+            type: 'POST',
+            data: function (d) {
+                return {
+                    draw: d.draw,
+                    start: d.start,
+                    length: d.length,
+                    search: d.search ? d.search.value : '',
+                    order_column: (d.order && d.order[0]) ? d.order[0].column : 2,
+                    order_dir: (d.order && d.order[0]) ? d.order[0].dir : 'desc',
+                    include_anular: false
+                };
+            },
+            dataFilter: function (rawResponse) {
+                const text = (rawResponse || '').toString().trim();
+                if (!text) return text;
+                const firstBrace = text.indexOf('{');
+                const lastBrace = text.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                    return text.slice(firstBrace, lastBrace + 1);
+                }
+                return text;
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                const responseText = (xhr && xhr.responseText ? xhr.responseText : '').toString();
+                console.error('DataTables AJAX error debug =>', {
+                    url: xhr.responseURL,
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    textStatus: textStatus,
+                    errorThrown: errorThrown,
+                    responseText: responseText
+                });
+                const dtInfo = document.querySelector('#example_info');
+                if (dtInfo) {
+                    dtInfo.textContent = 'Error de búsqueda. Revisa consola para detalle.';
+                    dtInfo.style.color = '#b42318';
+                }
+            }
+        },
+        order: [[2, 'desc']],
         language: {
             "sProcessing": "Procesando...",
             "sLengthMenu": "Mostrar _MENU_ registros",
@@ -949,21 +933,28 @@ $(document).ready(function() {
         },
         columnDefs: [
             {
-                targets: 1, // Ajustar al índice correcto de la columna de fecha
-                type: 'datetime', // Configurar la columna como datetime para un orden correcto
-                render: function(data, type, row) {
-                    // Asegurarte de que la fecha esté en el formato correcto para la ordenación
-                    return type === 'sort' ? new Date(data).getTime() : data;
-                }
-            }
+                targets: [7, 8, 9, 10, 12],
+                orderable: false,
+                searchable: false
+            },
+            { targets: [5, 6], className: 'dt-body-right' }
         ],
-        "ordering": true, // Asegúrate de que la opción de ordenar está habilitada
-        "orderMulti": false // Desactivar ordenación múltiple si no se necesita
+        "ordering": true,
+        "orderMulti": false
+    });
+
+    const table = $('#example').DataTable();
+    const $searchInput = $('div.dataTables_filter input');
+    $searchInput.off('.DT');
+    $searchInput.on('keyup.DT', function (e) {
+        if (e.key === 'Enter') {
+            table.search(this.value).draw();
+        }
     });
 });
 </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>

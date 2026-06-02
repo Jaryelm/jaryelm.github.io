@@ -6,12 +6,13 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - Partida Manual</title>
 </head>
 <body>
@@ -280,7 +281,7 @@ $('#formPartidaManual').on('submit', function(e) {
         var msg = 'En una partida manual el diario debe cuadrar: agregue al menos 2 líneas con cuenta y monto, de modo que la suma del Debe sea igual a la suma del Haber (un mismo asiento con varios movimientos).';
         msg += ' Ahora hay ' + lineas.length + ' línea(s) válida(s)' + (numFilas ? ' (' + numFilas + ' filas en la tabla).' : '.');
         msg += ' Use "+ Agregar línea" si hace falta.';
-        swal('Error', msg, 'error');
+        Swal.fire('Error', msg, 'error');
         return;
     }
     const totalDebe = lineas.reduce((s, l) => s + l.debe, 0);
@@ -288,13 +289,13 @@ $('#formPartidaManual').on('submit', function(e) {
     const diffCentavos = Math.round((totalDebe - totalHaber) * 100) / 100;
     if (diffCentavos !== 0) {
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Registrar Partida');
-        swal('Error', 'La partida debe estar balanceada (Total Debe = Total Haber). Diferencia: L. ' + diffCentavos.toFixed(2), 'error');
+        Swal.fire('Error', 'La partida debe estar balanceada (Total Debe = Total Haber). Diferencia: L. ' + diffCentavos.toFixed(2), 'error');
         return;
     }
     const unidadServicio = ($('#unidad_servicio').val() || '').trim();
     if (!unidadServicio) {
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Registrar Partida');
-        swal('Error', 'Debe seleccionar una Unidad de Servicio', 'error');
+        Swal.fire('Error', 'Debe seleccionar una Unidad de Servicio', 'error');
         return;
     }
     const payload = {
@@ -325,7 +326,7 @@ $('#formPartidaManual').on('submit', function(e) {
     })
     .then(data => {
         if (data.success) {
-            swal('Éxito', 'Partida ' + data.numero_partida + ' registrada correctamente', 'success');
+            Swal.fire('Éxito', 'Partida ' + data.numero_partida + ' registrada correctamente', 'success');
             document.getElementById('formPartidaManual').reset();
             document.getElementById('fecha_ocurrencia').valueAsDate = new Date();
             $('#unidad_servicio').val('').trigger('change');
@@ -335,12 +336,12 @@ $('#formPartidaManual').on('submit', function(e) {
             agregarLinea();
             cargarTablaPartidasManuales();
         } else {
-            swal('Error', data.message || 'Error al registrar', 'error');
+            Swal.fire('Error', data.message || 'Error al registrar', 'error');
         }
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Registrar Partida');
     })
     .catch(err => {
-        swal('Error', (err && err.message) ? err.message : 'No se pudo completar la petición (red o servidor).', 'error');
+        Swal.fire('Error', (err && err.message) ? err.message : 'No se pudo completar la petición (red o servidor).', 'error');
         btnSubmit.prop('disabled', false).text(btnSubmit.data('texto-orig') || 'Registrar Partida');
     });
 });
@@ -439,7 +440,7 @@ function cargarTablaPartidasManuales() {
             if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.error) {
                 msg = jqXHR.responseJSON.error;
             }
-            swal('Error', msg, 'error');
+            Swal.fire('Error', msg, 'error');
         });
 }
 

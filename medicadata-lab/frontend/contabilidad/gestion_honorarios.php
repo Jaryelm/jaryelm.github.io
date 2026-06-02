@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <!-- Data Tables -->
@@ -16,6 +16,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <!-- Select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
     <style>
         .form-control {
@@ -294,7 +295,7 @@ function loadServiciosParaDoctor(doctorId) {
         },
         success: function(response) {
             if (response.error) {
-                swal('Error', response.error, 'error');
+                Swal.fire('Error', response.error, 'error');
                 return;
             }
 
@@ -375,7 +376,7 @@ function loadServiciosParaDoctor(doctorId) {
             });
         },
         error: function() {
-            swal('Error', 'No se pudo comunicar con el servidor.', 'error');
+            Swal.fire('Error', 'No se pudo comunicar con el servidor.', 'error');
         }
     });
 }
@@ -414,12 +415,12 @@ function guardarConfiguracion(doctorId, servicioId) {
     
     // Validar que solo uno esté activo
     if (cuotaValue > 0 && porcentajeValue > 0) {
-        swal('Error', 'No puede tener activos tanto la cuota fija como el porcentaje al mismo tiempo.', 'warning');
+        Swal.fire('Error', 'No puede tener activos tanto la cuota fija como el porcentaje al mismo tiempo.', 'warning');
         return;
     }
     
     if (cuotaValue === 0 && porcentajeValue === 0) {
-        swal('Error', 'Debe especificar una cuota fija o un porcentaje.', 'warning');
+        Swal.fire('Error', 'Debe especificar una cuota fija o un porcentaje.', 'warning');
         return;
     }
     
@@ -443,7 +444,7 @@ function guardarConfiguracion(doctorId, servicioId) {
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                swal('¡Guardado!', response.message, 'success');
+                Swal.fire('¡Guardado!', response.message, 'success');
                 
                 // Actualizar estado visual
                 if (cuotaValue > 0) {
@@ -452,17 +453,17 @@ function guardarConfiguracion(doctorId, servicioId) {
                     $(`#tipo-${servicioId}`).removeClass('ninguno').text('Porcentaje');
                 }
             } else {
-                swal('Error', response.message, 'error');
+                Swal.fire('Error', response.message, 'error');
             }
         },
         error: function() {
-            swal('Error', 'Error de comunicación con el servidor.', 'error');
+            Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
         }
     });
 }
 
 function limpiarConfiguracion(doctorId, servicioId) {
-    swal({
+    Swal.fire({
         title: "¿Limpiar configuración?",
         text: "Esto eliminará tanto la cuota fija como el porcentaje para este servicio.",
         icon: "warning",
@@ -484,20 +485,20 @@ function limpiarConfiguracion(doctorId, servicioId) {
                                                  $(`#cuota-${servicioId}`).val('0.00').prop('disabled', false);
                          $(`#porcentaje-${servicioId}`).val('0.00').prop('disabled', false);
                          $(`#tipo-${servicioId}`).addClass('ninguno').text('Ninguno');
-                        swal('¡Limpiado!', 'Configuración eliminada correctamente.', 'success');
+                        Swal.fire('¡Limpiado!', 'Configuración eliminada correctamente.', 'success');
                     } else {
-                        swal('Error', response.message, 'error');
+                        Swal.fire('Error', response.message, 'error');
                     }
                 },
                 error: function() {
-                    swal('Error', 'Error de comunicación con el servidor.', 'error');
+                    Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
                 }
             });
         }
     });
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src='../../backend/js/submenu.js'></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 

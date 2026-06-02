@@ -1,12 +1,41 @@
 <?php
 require_once('../../backend/bd/Conexion.php');
+require_once __DIR__ . '/orthanc_curl_config.php';
 header('Content-Type: application/json');
 
 // Aumentar límites de tiempo y memoria
 ini_set('max_execution_time', 300); // 5 minutos
 ini_set('memory_limit', '256M');
 
+// Lock global para evitar sincronizaciones simultáneas (picos de escrituras/MySQL)
+// Nota: en hosting compartido idealmente el directorio del temp es escribible.
+$lockFp = null;
+$lockFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'medidata_sync_orthanc.lock';
+$lockFp = @fopen($lockFile, 'c');
+if ($lockFp !== false) {
+    if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
+        http_response_code(409);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Sincronizacion en progreso. Intente en unos segundos.',
+        ], JSON_UNESCAPED_UNICODE);
+        exit(0);
+    }
+} else {
+    // Si no se puede abrir lock, dejamos un log pero seguimos (riesgo: concurrencia).
+    error_log('sync_orthanc: no se pudo abrir lock file: ' . $lockFile);
+}
+
 try {
+    // Ajuste solo en producción (la DB no la puedo configurar): guardamos last_sync con hora Tegucigalpa desde PHP.
+    $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $isProd = preg_match('/\.hn$/', $host) === 1;
+    $nowTegucigalpa = null;
+    if ($isProd) {
+        $tzTeg = new DateTimeZone('America/Tegucigalpa');
+        $nowTegucigalpa = (new DateTime('now', $tzTeg))->format('Y-m-d H:i:s');
+    }
+
     // URL base de la API de Orthanc
     $orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies?expand=true';
     $username = 'dev';
@@ -22,7 +51,7 @@ try {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    medicasa_orthanc_apply_curl_tls($ch);
     curl_setopt($ch, CURLOPT_TIMEOUT, 60); // Timeout de 60 segundos para la conexión
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Timeout de 30 segundos para establecer conexión
 
@@ -49,39 +78,81 @@ try {
         throw new Exception('La respuesta de Orthanc no es un array válido');
     }
 
-    $connect->beginTransaction();
+    // Priorizar lo más reciente primero (si se corta por timeout, al menos quedan los últimos sincronizados).
+    usort($studies, static function ($a, $b) {
+        $aU = isset($a['LastUpdate']) ? strtotime((string) $a['LastUpdate']) : 0;
+        $bU = isset($b['LastUpdate']) ? strtotime((string) $b['LastUpdate']) : 0;
+        if ($aU === $bU) {
+            $aId = (string)($a['ID'] ?? '');
+            $bId = (string)($b['ID'] ?? '');
+            return strcmp($bId, $aId);
+        }
+        return $bU <=> $aU;
+    });
 
-    // Preparar las consultas
-    $check_stmt = $connect->prepare("SELECT id, last_update FROM worklist WHERE study_id = ?");
-    $insert_stmt = $connect->prepare("
-        INSERT INTO worklist (
-            study_id,
-            series_id,
-            patient_id,
-            patient_name,
-            study_date,
-            modality,
-            study_description,
-            status,
-            priority,
-            last_sync,
-            last_update,
-            created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 'routine', NOW(), ?, NOW())
-    ");
-    $update_stmt = $connect->prepare("
-        UPDATE worklist SET 
-            series_id = ?,
-            patient_name = ?,
-            study_date = ?,
-            modality = ?,
-            study_description = ?,
-            last_sync = NOW(),
-            last_update = ?
-        WHERE study_id = ? AND last_update < ?
-    ");
+    /**
+     * Sincronización sin transacción global: antes beginTransaction() cubría TODOS los estudios
+     * y retenía bloqueos InnoDB durante minutos → Lock wait timeout (1205).
+     * UPSERT atómico evita carrera SELECT+INSERT entre crons/usuarios y duplicados unique_study (1062).
+     */
+    if ($isProd) {
+        // Usar hora Tegucigalpa desde PHP para que last_sync coincida con el huso esperado.
+        $upsert_stmt = $connect->prepare(
+            'INSERT INTO worklist (
+                study_id,
+                series_id,
+                patient_id,
+                patient_name,
+                study_date,
+                modality,
+                study_description,
+                status,
+                priority,
+                last_sync,
+                last_update,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, \'pending\', \'routine\', ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                series_id = VALUES(series_id),
+                patient_id = VALUES(patient_id),
+                patient_name = VALUES(patient_name),
+                study_date = VALUES(study_date),
+                modality = VALUES(modality),
+                study_description = VALUES(study_description),
+                last_sync = VALUES(last_sync),
+                last_update = VALUES(last_update)'
+        );
+    } else {
+        // Local: se mantiene el comportamiento original usando NOW() de MySQL.
+        $upsert_stmt = $connect->prepare(
+            'INSERT INTO worklist (
+                study_id,
+                series_id,
+                patient_id,
+                patient_name,
+                study_date,
+                modality,
+                study_description,
+                status,
+                priority,
+                last_sync,
+                last_update,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, \'pending\', \'routine\', NOW(), ?, NOW())
+            ON DUPLICATE KEY UPDATE
+                series_id = VALUES(series_id),
+                patient_id = VALUES(patient_id),
+                patient_name = VALUES(patient_name),
+                study_date = VALUES(study_date),
+                modality = VALUES(modality),
+                study_description = VALUES(study_description),
+                last_sync = NOW(),
+                last_update = VALUES(last_update)'
+        );
+    }
 
-    $batch_size = 25; // Reducido el tamaño del lote para mejor rendimiento
+    // Más grande = menos overhead de curl_multi; suficientemente pequeño para no saturar.
+    $batch_size = 60;
     $processed = 0;
     $total_studies = count($studies);
 
@@ -89,21 +160,30 @@ try {
         $mh = curl_multi_init();
         $channels = [];
 
-        // Preparar todas las solicitudes de series en paralelo
+        // Preparar SOLO las solicitudes necesarias (evitar /studies/{id}/series?expand para todos).
+        // Con studies?expand=true ya viene Series[0] y a veces Modality.
         foreach ($study_batch as $index => $study) {
-            $series_url = "https://medicloud.medicasa.hn/orthanc/studies/{$study['ID']}/series?expand";
+            $modality = $study['MainDicomTags']['Modality'] ?? null;
+            $series_id = $study['Series'][0] ?? null;
+
+            if ($modality || !$series_id) {
+                continue;
+            }
+
+            $series_url = "https://medicloud.medicasa.hn/orthanc/series/{$series_id}";
             $ch = curl_init($series_url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-            
+            medicasa_orthanc_apply_curl_tls($ch);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 8);
+
             curl_multi_add_handle($mh, $ch);
             $channels[$index] = [
                 'ch' => $ch,
-                'study' => $study
+                'study' => $study,
+                'series_id' => $series_id,
             ];
         }
 
@@ -112,45 +192,41 @@ try {
         do {
             curl_multi_exec($mh, $running);
             if ($running > 0) {
-                curl_multi_select($mh);
+                curl_multi_select($mh, 0.7);
             }
         } while ($running > 0);
 
-        // Procesar los resultados
-        foreach ($channels as $index => $channel) {
+        // Cache de modalidades obtenidas de series (por si se repite un series_id).
+        $seriesModalityCache = [];
+        foreach ($channels as $channel) {
             $ch = $channel['ch'];
-            $study = $channel['study'];
-            
-            $series_response = curl_multi_getcontent($ch);
-            $series_id = null;
+            $series_id = (string) ($channel['series_id'] ?? '');
             $modality = null;
 
+            $series_response = curl_multi_getcontent($ch);
             if ($series_response) {
-                $series_list = json_decode($series_response, true);
-                if (!empty($series_list)) {
-                    $series_id = $series_list[0]['ID'] ?? null;
-                    // Intentar obtener la modalidad en este orden:
-                    // 1. Del estudio directamente
-                    $modality = $study['MainDicomTags']['Modality'] ?? null;
-                    
-                    // 2. Si no está en el estudio, buscar en la primera serie
-                    if (!$modality && isset($series_list[0])) {
-                        $modality = $series_list[0]['MainDicomTags']['Modality'] ?? null;
-                    }
-                    
-                    // 3. Si aún no hay modalidad, buscar en todas las series hasta encontrar una
-                    if (!$modality) {
-                        foreach ($series_list as $series) {
-                            if (isset($series['MainDicomTags']['Modality'])) {
-                                $modality = $series['MainDicomTags']['Modality'];
-                                break;
-                            }
-                        }
-                    }
+                $series_data = json_decode($series_response, true);
+                if (is_array($series_data) && isset($series_data['MainDicomTags']['Modality'])) {
+                    $modality = $series_data['MainDicomTags']['Modality'];
                 }
             }
+            if ($series_id !== '' && $modality) {
+                $seriesModalityCache[$series_id] = $modality;
+            }
 
-            $study_last_update = $study['LastUpdate'] ?? date('Y-m-d H:i:s');
+            curl_multi_remove_handle($mh, $ch);
+        }
+        curl_multi_close($mh);
+
+        // Procesar UPSERT para todo el lote (con o sin llamada extra).
+        foreach ($study_batch as $study) {
+            $series_id = $study['Series'][0] ?? null;
+            $modality = $study['MainDicomTags']['Modality'] ?? null;
+            if (!$modality && $series_id && isset($seriesModalityCache[(string) $series_id])) {
+                $modality = $seriesModalityCache[(string) $series_id];
+            }
+
+            $study_last_update = $study['LastUpdate'] ?? ($isProd ? $nowTegucigalpa : date('Y-m-d H:i:s'));
 
             // Procesar la fecha del estudio
             $study_date = $study['MainDicomTags']['StudyDate'] ?? null;
@@ -172,50 +248,39 @@ try {
             }
 
             try {
-                // Verificar si el estudio existe y necesita actualización
-                $check_stmt->execute([$study['ID']]);
-                $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
-
-                if (!$existing) {
-                    // Insertar nuevo estudio
-                    $insert_stmt->execute([
+                if ($isProd) {
+                    $upsert_stmt->execute([
                         $study['ID'],
                         $series_id,
                         $study['PatientMainDicomTags']['PatientID'] ?? null,
                         $study['PatientMainDicomTags']['PatientName'] ?? null,
-                        $study_date, // Usar la fecha procesada
-                        $modality, // Ahora guardamos la modalidad correctamente
+                        $study_date,
+                        $modality,
                         $study['MainDicomTags']['StudyDescription'] ?? null,
-                        $study_last_update
+                        $nowTegucigalpa,
+                        $study_last_update,
+                        $nowTegucigalpa,
                     ]);
-                } else if ($existing['last_update'] < $study_last_update || empty($existing['modality'])) {
-                    // Actualizar estudio existente, incluyendo la modalidad si está vacía
-                    $update_stmt->execute([
+                } else {
+                    $upsert_stmt->execute([
+                        $study['ID'],
                         $series_id,
+                        $study['PatientMainDicomTags']['PatientID'] ?? null,
                         $study['PatientMainDicomTags']['PatientName'] ?? null,
-                        $study_date, // Usar la fecha procesada
-                        $modality, // Actualizamos la modalidad
+                        $study_date,
+                        $modality,
                         $study['MainDicomTags']['StudyDescription'] ?? null,
                         $study_last_update,
-                        $study['ID'],
-                        $study_last_update
                     ]);
                 }
-                
                 $processed++;
-                
             } catch (PDOException $e) {
                 error_log("Error procesando estudio {$study['ID']}: " . $e->getMessage());
-                continue; // Continuar con el siguiente estudio
+                continue;
             }
-
-            curl_multi_remove_handle($mh, $ch);
         }
-        
-        curl_multi_close($mh);
     }
 
-    $connect->commit();
     echo json_encode([
         'success' => true,
         'message' => "Sincronización completada. Procesados: $processed de $total_studies estudios",
@@ -233,5 +298,10 @@ try {
         'success' => false,
         'error' => $e->getMessage()
     ]);
+} finally {
+    if (isset($lockFp) && is_resource($lockFp)) {
+        @flock($lockFp, LOCK_UN);
+        @fclose($lockFp);
+    }
 }
 ?> 

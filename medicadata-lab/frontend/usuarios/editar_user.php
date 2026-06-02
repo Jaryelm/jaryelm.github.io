@@ -1,14 +1,25 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$editarFlashError = $_SESSION['errorMsg'] ?? null;
+unset($_SESSION['errorMsg']);
+if (function_exists('session_write_close')) {
+    session_write_close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='../../backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
+    <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
+<?php include __DIR__ . '/_usuarios_select2_head.php'; ?>
     <title>MEDIDATA - Editar Usuario</title>
 </head>
 <body>
@@ -35,12 +46,6 @@ include_once '../../backend/registros/session_check.php';
 
         <br>
 
-        <?php if (isset($_SESSION['errorMsg'])): ?>
-            <div class="alert" style="background:#f8d7da;color:#721c24;padding:12px;border-radius:6px;margin-bottom:15px;">
-                <?php echo htmlspecialchars($_SESSION['errorMsg']); unset($_SESSION['errorMsg']); ?>
-            </div>
-        <?php endif; ?>
-
         <?php
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         if ($id <= 0) {
@@ -65,16 +70,16 @@ include_once '../../backend/registros/session_check.php';
                 <input type="hidden" name="user_id" value="<?php echo (int)$user->id; ?>">
 
                 <label for="username"><b>Nombre de Usuario</b></label><span class="badge-warning">*</span>
-                <input type="text" name="username" value="<?php echo htmlspecialchars($user->username); ?>" required>
+                <input type="text" name="username" maxlength="25" value="<?php echo htmlspecialchars($user->username); ?>" required>
 
-                <label for="name"><b>Nombre Completo</b></label><span class="badge-warning">*</span>
-                <input type="text" name="name" value="<?php echo htmlspecialchars($user->name); ?>" required>
+                <label for="nombre_completo"><b>Nombre Completo</b></label><span class="badge-warning">*</span>
+                <input type="text" id="nombre_completo" name="nombre_completo" maxlength="50" value="<?php echo htmlspecialchars($user->name); ?>" required>
 
                 <label for="email"><b>Correo Electrónico</b></label><span class="badge-warning">*</span>
-                <input type="email" name="email" value="<?php echo htmlspecialchars($user->email); ?>" required>
+                <input type="email" name="email" maxlength="35" value="<?php echo htmlspecialchars($user->email); ?>" required>
 
                 <label for="rol"><b>Rol del Usuario</b></label><span class="badge-warning">*</span>
-                <select name="rol" required>
+                <select name="rol" id="rol" class="select2" data-placeholder="Seleccione un rol..." required>
                     <option value="">Seleccione...</option>
                     <option value="Administrador" <?php echo ($user->rol === 'Administrador') ? 'selected' : ''; ?>>Administrador</option>
                     <option value="Caja" <?php echo ($user->rol === 'Caja') ? 'selected' : ''; ?>>Caja</option>
@@ -93,7 +98,17 @@ include_once '../../backend/registros/session_check.php';
                     <option value="Radiologo" <?php echo ($user->rol === 'Radiologo') ? 'selected' : ''; ?>>Medico Radiologo</option>
                     <option value="Tecnico" <?php echo ($user->rol === 'Tecnico') ? 'selected' : ''; ?>>Técnico</option>
                     <option value="Medifarma Almacen" <?php echo ($user->rol === 'Medifarma Almacen') ? 'selected' : ''; ?>>Medifarma Almacen</option>
+                    <option value="Aseo" <?php echo ($user->rol === 'Aseo') ? 'selected' : ''; ?>>Aseo</option>
+                    <option value="Estacionamiento" <?php echo ($user->rol === 'Estacionamiento') ? 'selected' : ''; ?>>Estacionamiento</option>
+                    <option value="Farmacia" <?php echo ($user->rol === 'Farmacia') ? 'selected' : ''; ?>>Farmacia</option>
+                    <option value="Administracion" <?php echo ($user->rol === 'Administracion') ? 'selected' : ''; ?>>Administración</option>
+                    <option value="Optica" <?php echo ($user->rol === 'Optica') ? 'selected' : ''; ?>>Óptica</option>
+                    <option value="Odontologo" <?php echo ($user->rol === 'Odontologo') ? 'selected' : ''; ?>>Odontólogo</option>
+                    <option value="Servicios Generales" <?php echo ($user->rol === 'Servicios Generales') ? 'selected' : ''; ?>>Servicios Generales</option>
                 </select>
+
+                <label for="uid_biometrico"><b>ID Biométrico (MB360)</b></label>
+                <input type="text" name="uid_biometrico" value="<?php echo htmlspecialchars((string)($user->uid_biometrico ?? '')); ?>" maxlength="20">
 
                 <p style="color:#666;font-size:13px;"><i class='bx bx-info-circle'></i> Para cambiar la contraseña use el botón "Cambiar Contraseña" en la lista de usuarios.</p>
 
@@ -106,9 +121,20 @@ include_once '../../backend/registros/session_check.php';
 </section>
 
 <script src="../../backend/js/jquery.min.js"></script>
+<?php include __DIR__ . '/_usuarios_select2_foot.php'; ?>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<?php if ($editarFlashError !== null): ?>
+<script>
+Swal.fire({
+    title: 'Error',
+    text: <?php echo json_encode($editarFlashError, JSON_UNESCAPED_UNICODE); ?>,
+    icon: 'error',
+    confirmButtonText: 'Aceptar'
+});
+</script>
+<?php endif; ?>
 </body>
 </html>

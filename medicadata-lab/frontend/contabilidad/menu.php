@@ -38,6 +38,7 @@
                 <li><a href="../../frontend/contabilidad/reporte_detalle_pago_user.php">DETALLE PAGO</a></li>
                 <li><a href="../../frontend/contabilidad/reporte_detalle_factura_user.php">DETALLE FACTURA</a></li>
                 <li><a href="../../frontend/contabilidad/reporte_devoluciones_ventas_user.php">DEVOLUCIONES</a></li>
+                <li><a href="../../frontend/contabilidad/rango_facturacion_user.php">RANGO CAI FACTURACIÓN</a></li>
                 <li><a href="#">INFORMACIÓN DE VENTAS</a></li>
                 <li><a href="#">COTIZACIONES ORDENES FACTURAS</a></li>
                 <li><a href="#">REGISTROS DE VENTAS</a></li>

@@ -6,9 +6,10 @@ date_default_timezone_set('America/Tegucigalpa');
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <meta charset="UTF-8">
     <title>Actualizar Estado Honorario</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 </head>
 <body>
 <?php
@@ -26,7 +27,7 @@ if ($id_factura > 0 && $id_doctor > 0) {
     $honorario_existente = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
     if ($honorario_existente && $honorario_existente['estado_pago'] === 'pagado') {
-        echo '<script>swal("No permitido", "El estado de pago ya fue marcado como pagado y no puede ser modificado ni revertido.", "warning").then(function(){ window.location.href = "honorarios.php"; });</script>';
+        echo '<script>Swal.fire("No permitido", "El estado de pago ya fue marcado como pagado y no puede ser modificado ni revertido.", "warning").then(function(){ window.location.href = "honorarios.php"; });</script>';
         exit;
     }
 
@@ -54,12 +55,12 @@ if ($id_factura > 0 && $id_doctor > 0) {
     $result = $stmt->execute($params);
 
     if ($result) {
-        echo '<script>swal("¡Actualizado!", "El estado del honorario se actualizó correctamente", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
+        echo '<script>Swal.fire("¡Actualizado!", "El estado del honorario se actualizó correctamente", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
     } else {
-        echo '<script>swal("Error", "No se pudo actualizar el estado.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
+        echo '<script>Swal.fire("Error", "No se pudo actualizar el estado.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
     }
 } else {
-    echo '<script>swal("Error", "Datos incompletos.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
+    echo '<script>Swal.fire("Error", "Datos incompletos.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
 }
 ?>
 </body>

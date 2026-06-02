@@ -20,6 +20,61 @@ if (!isset($connect)) {
 }
 
 /**
+ * SQL Desde/Hasta para Diario General: rango por fecha de ocurrencia o de registro.
+ *
+ * @param string $suffix Sufijo único por placeholder PDO (p. ej. _in, _out)
+ * @return array{sql: string, params: array<string, string>, types: array<string, int>}
+ */
+function medidata_diario_sql_filtro_rango_fechas(
+    ?string $fechaDesde,
+    ?string $fechaHasta,
+    string $alias = 'dg',
+    string $suffix = ''
+): array {
+    $fechaDesde = ($fechaDesde !== null && $fechaDesde !== '') ? $fechaDesde : null;
+    $fechaHasta = ($fechaHasta !== null && $fechaHasta !== '') ? $fechaHasta : null;
+
+    if ($fechaDesde === null && $fechaHasta === null) {
+        return ['sql' => '', 'params' => [], 'types' => []];
+    }
+
+    $fo = ($alias !== '' ? $alias . '.' : '') . 'fecha_ocurrencia';
+    $fr = 'DATE(' . ($alias !== '' ? $alias . '.' : '') . 'fecha_registro)';
+    $params = [];
+    $types = [];
+
+    if ($fechaDesde !== null && $fechaHasta !== null) {
+        $pDesde = ':fechaDesde' . $suffix;
+        $pHasta = ':fechaHasta' . $suffix;
+        $pDesdeReg = ':fechaDesdeReg' . $suffix;
+        $pHastaReg = ':fechaHastaReg' . $suffix;
+        $sql = " AND (($fo >= $pDesde AND $fo <= $pHasta) OR ($fr >= $pDesdeReg AND $fr <= $pHastaReg))";
+        $params[$pDesde] = $fechaDesde;
+        $params[$pHasta] = $fechaHasta;
+        $params[$pDesdeReg] = $fechaDesde;
+        $params[$pHastaReg] = $fechaHasta;
+    } elseif ($fechaDesde !== null) {
+        $pDesde = ':fechaDesde' . $suffix;
+        $pDesdeReg = ':fechaDesdeReg' . $suffix;
+        $sql = " AND ($fo >= $pDesde OR $fr >= $pDesdeReg)";
+        $params[$pDesde] = $fechaDesde;
+        $params[$pDesdeReg] = $fechaDesde;
+    } else {
+        $pHasta = ':fechaHasta' . $suffix;
+        $pHastaReg = ':fechaHastaReg' . $suffix;
+        $sql = " AND ($fo <= $pHasta OR $fr <= $pHastaReg)";
+        $params[$pHasta] = $fechaHasta;
+        $params[$pHastaReg] = $fechaHasta;
+    }
+
+    foreach (array_keys($params) as $key) {
+        $types[$key] = PDO::PARAM_STR;
+    }
+
+    return ['sql' => $sql, 'params' => $params, 'types' => $types];
+}
+
+/**
  * Genera o obtiene el número de partida para una fecha específica
  * Formato: YYYYMMDDNNN (año + mes + día + secuencial del día)
  * 
@@ -696,6 +751,85 @@ function obtenerCuentaCostosProducto($linea) {
 }
 
 /**
+ * Indica si la factura ya tiene renglones en el diario (CIERRE_VENTA).
+ */
+function medidata_existe_partida_diario_factura(string $referencia): bool
+{
+    global $connect;
+    $referencia = trim($referencia);
+    if ($referencia === '') {
+        return false;
+    }
+    $stmt = $connect->prepare(
+        "SELECT 1 FROM diario_general_transacciones
+         WHERE referencia = ? AND tipo_transaccion = 'CIERRE_VENTA'
+         LIMIT 1"
+    );
+    $stmt->execute([$referencia]);
+
+    return (bool) $stmt->fetchColumn();
+}
+
+/**
+ * Registra la partida contable si la factura está cobrada y aún no existe en diario.
+ *
+ * @return array{ok: bool, skipped: bool, numero_partida: ?string, message: string}
+ */
+function medidata_asegurar_partida_diario_factura_cobrada(int $order_id): array
+{
+    global $connect;
+
+    $stmt = $connect->prepare('SELECT idord, invoice_number, invoice_status FROM orders WHERE idord = ? LIMIT 1');
+    $stmt->execute([$order_id]);
+    $orden = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$orden) {
+        return ['ok' => false, 'skipped' => false, 'numero_partida' => null, 'message' => 'Orden no encontrada.'];
+    }
+
+    $referencia = trim((string) ($orden['invoice_number'] ?? ''));
+    if ($referencia === '') {
+        $referencia = (string) $order_id;
+    }
+
+    if (medidata_existe_partida_diario_factura($referencia)) {
+        $stPartida = $connect->prepare(
+            "SELECT numero_partida FROM diario_general_transacciones
+             WHERE referencia = ? AND tipo_transaccion = 'CIERRE_VENTA'
+             ORDER BY id DESC LIMIT 1"
+        );
+        $stPartida->execute([$referencia]);
+        $numero = $stPartida->fetchColumn();
+
+        return [
+            'ok' => true,
+            'skipped' => true,
+            'numero_partida' => $numero ? (string) $numero : null,
+            'message' => 'La partida ya estaba registrada en el diario.',
+        ];
+    }
+
+    try {
+        $numeroPartida = registrarTransaccionesFacturaCobrada($order_id);
+
+        return [
+            'ok' => true,
+            'skipped' => false,
+            'numero_partida' => $numeroPartida,
+            'message' => 'Partida registrada en el diario: ' . $numeroPartida,
+        ];
+    } catch (Throwable $e) {
+        error_log('medidata_asegurar_partida_diario_factura_cobrada: ' . $e->getMessage());
+
+        return [
+            'ok' => false,
+            'skipped' => false,
+            'numero_partida' => null,
+            'message' => $e->getMessage(),
+        ];
+    }
+}
+
+/**
  * Registra las transacciones contables cuando se marca una factura como "Cobrada"
  * 
  * @param int $order_id ID de la orden/factura
@@ -721,6 +855,22 @@ function registrarTransaccionesFacturaCobrada($order_id) {
         
         if (!$orden) {
             throw new Exception("Orden no encontrada");
+        }
+
+        $referenciaFactura = trim((string) ($orden['invoice_number'] ?? ''));
+        if ($referenciaFactura === '') {
+            $referenciaFactura = (string) $order_id;
+        }
+        if (medidata_existe_partida_diario_factura($referenciaFactura)) {
+            $stPartida = $connect->prepare(
+                "SELECT numero_partida FROM diario_general_transacciones
+                 WHERE referencia = ? AND tipo_transaccion = 'CIERRE_VENTA'
+                 ORDER BY id DESC LIMIT 1"
+            );
+            $stPartida->execute([$referenciaFactura]);
+            $existente = $stPartida->fetchColumn();
+
+            return $existente ? (string) $existente : generarNumeroPartida(date('Y-m-d'));
         }
         
         // Obtener detalles de la orden con sus cuentas contables y precios de costo
@@ -969,8 +1119,9 @@ function registrarTransaccionesFacturaCobrada($order_id) {
                     // Se registran solo en el cierre de caja para mantener el balance
                 }
             } elseif ($itemType === 'producto') {
-                // Para productos: NO generan ingresos, solo inventario y costos
+                // Para productos: generan ingresos + costos + salida de inventario (al costo)
                 $cuentaInventario = obtenerCuentaInventario($categoria);
+                $cuentaIngresosProducto = obtenerCuentaIngresosProducto($categoria);
                 
                 // Detectar si es PLACA DE RAYOS X
                 $descripcion = $detalle['descripcion'] ?? '';
@@ -1001,23 +1152,33 @@ function registrarTransaccionesFacturaCobrada($order_id) {
                     }
                     $otrosIngresosPorCuenta[$cuentaOtrosIngresos] += $costoItem;
                 } else {
-                    // Otros productos: registrar inventario al PRECIO DE VENTA (comportamiento normal)
-                    $totalInventario = $totalItem + $descuentoItem; // Precio de venta sin descuento
-                    if (!isset($inventarioPorCuenta[$cuentaInventario])) {
-                        $inventarioPorCuenta[$cuentaInventario] = 0;
+                    // Ingreso de producto (HABER) por valor de venta antes de descuento.
+                    if (!isset($ingresosPorCuenta[$cuentaIngresosProducto])) {
+                        $ingresosPorCuenta[$cuentaIngresosProducto] = 0;
                     }
-                    $inventarioPorCuenta[$cuentaInventario] += $totalInventario;
-                    
-                    // Costos de otros productos
-                    if ($precioCosto > 0) {
-                        $costoItem = $precioCosto * $cantidad;
-                        $cuentaCostosProducto = obtenerCuentaCostosProducto($categoria);
-                        if ($cuentaCostosProducto) {
-                            if (!isset($costosPorCuenta[$cuentaCostosProducto])) {
-                                $costosPorCuenta[$cuentaCostosProducto] = 0;
-                            }
-                            $costosPorCuenta[$cuentaCostosProducto] += $costoItem;
+                    $ingresosPorCuenta[$cuentaIngresosProducto] += $totalItem + $descuentoItem;
+
+                    // Descuento de producto (DEBE) en la cuenta de descuentos de esa línea.
+                    if ($descuentoItem > 0) {
+                        if (!isset($descuentosPorCuenta[$cuentaIngresosProducto])) {
+                            $descuentosPorCuenta[$cuentaIngresosProducto] = 0;
                         }
+                        $descuentosPorCuenta[$cuentaIngresosProducto] += $descuentoItem;
+                    }
+
+                    // Salida de inventario y costo de venta SIEMPRE al costo.
+                    $costoItem = max(0, $precioCosto * $cantidad);
+                    if ($costoItem > 0) {
+                        if (!isset($inventarioPorCuenta[$cuentaInventario])) {
+                            $inventarioPorCuenta[$cuentaInventario] = 0;
+                        }
+                        $inventarioPorCuenta[$cuentaInventario] += $costoItem;
+
+                        $cuentaCostosProducto = obtenerCuentaCostosProducto($categoria);
+                        if (!isset($costosPorCuenta[$cuentaCostosProducto])) {
+                            $costosPorCuenta[$cuentaCostosProducto] = 0;
+                        }
+                        $costosPorCuenta[$cuentaCostosProducto] += $costoItem;
                     }
                 }
             }
@@ -1486,9 +1647,10 @@ function registrarTransaccionesCierreCaja($fechaCierre, $usuarioCierre, $factura
                         }
                     }
                 } elseif ($itemType === 'producto') {
-                    // Para productos: NO generan ingresos, solo inventario y costos
+                    // Para productos: generan ingresos + costos + salida de inventario (al costo)
                     $linea = $detalle['categoria'] ?? '';
                     $cuentaInventario = obtenerCuentaInventario($linea);
+                    $cuentaIngresosProducto = obtenerCuentaIngresosProducto($linea);
                     
                     // Detectar si es PLACA DE RAYOS X
                     $descripcion = $detalle['descripcion'] ?? '';
@@ -1541,20 +1703,36 @@ function registrarTransaccionesCierreCaja($fechaCierre, $usuarioCierre, $factura
                         }
                         $otrosIngresosPorCuenta[$cuentaOtrosIngresos] += $costoItem;
                     } else {
-                        // Otros productos: registrar inventario al PRECIO DE VENTA (comportamiento normal)
-                        $totalInventario = $totalItem + $descuentoItem;
-                        if (!isset($inventarioPorCuenta[$cuentaInventario])) {
-                            $inventarioPorCuenta[$cuentaInventario] = 0;
+                        // Ingreso de producto (HABER) por valor de venta antes de descuento.
+                        if (!isset($ingresosPorCuenta[$cuentaIngresosProducto])) {
+                            $ingresosPorCuenta[$cuentaIngresosProducto] = 0;
                         }
-                        $inventarioPorCuenta[$cuentaInventario] += $totalInventario;
-                        
+                        $ingresosPorCuenta[$cuentaIngresosProducto] += $totalItem + $descuentoItem;
+
+                        // Descuento de producto (DEBE) en la cuenta de descuentos de esa línea.
+                        if ($descuentoItem > 0) {
+                            if (!isset($descuentosPorCuenta[$cuentaIngresosProducto])) {
+                                $descuentosPorCuenta[$cuentaIngresosProducto] = 0;
+                            }
+                            $descuentosPorCuenta[$cuentaIngresosProducto] += $descuentoItem;
+                        }
+
+                        // Salida de inventario y costo de venta al costo.
+                        $costoItem = max(0, $precioCosto * $cantidad);
+                        if ($costoItem > 0) {
+                            if (!isset($inventarioPorCuenta[$cuentaInventario])) {
+                                $inventarioPorCuenta[$cuentaInventario] = 0;
+                            }
+                            $inventarioPorCuenta[$cuentaInventario] += $costoItem;
+                        }
+
                         // Costos de otros productos
                         $cuentaCostosProducto = obtenerCuentaCostosProducto($linea);
-                        if ($cuentaCostosProducto && $precioCosto > 0) {
+                        if ($cuentaCostosProducto && $costoItem > 0) {
                             if (!isset($costosPorCuenta[$cuentaCostosProducto])) {
                                 $costosPorCuenta[$cuentaCostosProducto] = 0;
                             }
-                            $costosPorCuenta[$cuentaCostosProducto] += ($precioCosto * $cantidad);
+                            $costosPorCuenta[$cuentaCostosProducto] += $costoItem;
                         }
                     }
                 }

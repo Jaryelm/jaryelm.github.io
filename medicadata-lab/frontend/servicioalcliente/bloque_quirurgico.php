@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     
 
@@ -272,7 +273,7 @@ if($sentencia){
         var procesado_por = document.getElementById('procesado_por').value;
 
         if (!insumo_material_descartable || !cantidad_material_descartable || !insumo_medicamentos || !cantidad_medicamentos) {
-            swal("Error", "Todos los campos son obligatorios", "error");
+            Swal.fire("Error", "Todos los campos son obligatorios", "error");
             return;
         }
 
@@ -290,13 +291,13 @@ if($sentencia){
             data: dataen,
             cache: false,
             success: function (result) {
-                swal("Éxito", "Gasto de quirófano registrado correctamente", "success")
+                Swal.fire("Éxito", "Gasto de quirófano registrado correctamente", "success")
                 .then(() => {
                     window.location.reload();
                 });
             },
             error: function () {
-                swal("Error", "No se pudo registrar el gasto", "error");
+                Swal.fire("Error", "No se pudo registrar el gasto", "error");
             }
         });
     }
@@ -474,7 +475,7 @@ if($sentencia){
         var procesado_por = document.getElementById('procesado_por')?.value || '';
 
         if (!riesgo_caidas || !hora_dolor || !grado_dolor || !localizacion_dolor || !actividad_dolor || !hora_alta) {
-            swal("Error", "Todos los campos obligatorios deben ser llenados", "error");
+            Swal.fire("Error", "Todos los campos obligatorios deben ser llenados", "error");
             return;
         }
 
@@ -504,13 +505,13 @@ if($sentencia){
             data: dataen,
             cache: false,
             success: function (result) {
-                swal("Éxito", "Datos de post operatorio registrados correctamente", "success")
+                Swal.fire("Éxito", "Datos de post operatorio registrados correctamente", "success")
                 .then(() => {
                     window.location.reload();
                 });
             },
             error: function () {
-                swal("Error", "No se pudieron registrar los datos", "error");
+                Swal.fire("Error", "No se pudieron registrar los datos", "error");
             }
         });
     }
@@ -721,15 +722,15 @@ function enviarRecuperacion() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            swal("Éxito", "Datos guardados correctamente", "success")
+            Swal.fire("Éxito", "Datos guardados correctamente", "success")
                 .then(() => window.location.reload());
         } else {
-            swal("Error", result.error, "error");
+            Swal.fire("Error", result.error, "error");
         }
     })
     .catch(error => {
         console.error("Error en la petición:", error);
-        swal("Error", "No se pudieron registrar los datos", "error");
+        Swal.fire("Error", "No se pudieron registrar los datos", "error");
     });
 }
 </script>
@@ -875,15 +876,15 @@ function enviarMedifarma() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            swal("Éxito", "Registro guardado correctamente", "success")
+            Swal.fire("Éxito", "Registro guardado correctamente", "success")
                 .then(() => window.location.reload());
         } else {
-            swal("Error", result.error, "error");
+            Swal.fire("Error", result.error, "error");
         }
     })
     .catch(error => {
         console.error("Error en la petición:", error);
-        swal("Error", "No se pudieron registrar los datos", "error");
+        Swal.fire("Error", "No se pudieron registrar los datos", "error");
     });
 }
 </script>
@@ -939,7 +940,7 @@ for (i = 0; i < acc.length; i++) {
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <?php include_once '../../backend/modal/md_gastos_quirofano.php' ?>
 <?php include_once '../../backend/modal/md_post_operatorio.php' ?>
 <?php include_once '../../backend/modal/md_recuperacion.php' ?>

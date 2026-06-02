@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,7 +15,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
 
 
@@ -110,8 +110,7 @@ if($sentencia){
                         <td data-title="Estado">
     
                         <label class="switch">
-                          <input type="checkbox" id="<?=$d->idodc?>" value="<?=$d->state ?>" <?=$d->state == '1' ? 'checked' : '' ;?>/> 
-
+                          <input type="checkbox" class="doctor-state-toggle" data-id="<?php echo (int) $d->idodc; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
                           <span class="slider"></span>
                         </label>
                         </td>
@@ -140,13 +139,10 @@ if($sentencia){
         </main>
         <!-- MAIN -->
     </section>
-    <?php include_once '../../backend/php/delete_doctor.php' ?>
-    <!-- NAVBAR -->
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.js"></script>
-     
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="../../backend/registros/script/tabla_medicos.js"></script>
     
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

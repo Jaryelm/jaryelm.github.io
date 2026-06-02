@@ -37,6 +37,10 @@
                         <li><a href="../../frontend/contabilidad/reporte_detalle_pago.php"><span>DETALLE PAGO</span></a></li>
                         <li><a href="../../frontend/contabilidad/reporte_detalle_factura.php"><span>DETALLE FACTURA</span></a></li>
                         <li><a href="../../frontend/contabilidad/reporte_devoluciones_ventas.php"><span>DEVOLUCIONES</span></a></li>
+<<<<<<< Updated upstream
+=======
+                        <li><a href="../../frontend/contabilidad/rango_facturacion.php"><span>RANGO CAI FACTURACIÓN</span></a></li>
+>>>>>>> Stashed changes
                         <li><a href="#"><span>INFORMACIÓN DE VENTAS</span></a></li>
                         <li><a href="#"><span>COTIZACIONES ORDENES FACTURAS</span></a></li>
                         <li><a href="#"><span>REGISTROS DE VENTAS</span></a></li>
@@ -82,16 +86,34 @@
                     <a href="../recursos_humanos/lista_colaboradores.php"><span>LISTA COLABORADORES</span></a>
                 </li>
                 <li>
+<<<<<<< Updated upstream
                     <a href="#" class="new-submenu-link"><span>SOLICITUD EMPLEOS</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos_humanos/entrevista_competencia.php"><span>ENTREVISTA COMPETENCIA</span></a></li>
+=======
+                    <a href="../recursos_humanos/positions.php"><span>POSICIONES DE TRABAJO</span></a>
+                </li>
+                <li>
+                    <a href="#" class="new-submenu-link"><span>PROCESO DE RECLUTAMIENTO</span></a>
+                    <ul class="new-side-dropdown">
+                        <li><a href="../recursos_humanos/puestos_trabajo.php"><span>PUESTOS DE TRABAJO</span></a></li>
+                        <li><a href="../recursos_humanos/vacantes_trabajo.php"><span>VACANTES DE TRABAJO</span></a></li>
+                        <li><a href="../recursos_humanos/reclutamiento.php"><span>SOLICITUDES DE EMPLEO</span></a></li>
+                        <li><a href="../recursos_humanos/postulantes.php"><span>POSTULANTES</span></a></li>
+                        <li><a href="../recursos_humanos/entrevista.php"><span>ENTREVISTAS</span></a></li>
+                        <li><a href="../recursos_humanos/pruebas_psicometricas.php"><span>PRUEBAS PSICOMETRICAS</span></a></li>
+                        <li><a href="../recursos_humanos/requisitos_contratacion.php"><span>REQUISITOS DE CONTRATACION</span></a></li>
+>>>>>>> Stashed changes
                     </ul>
                 </li>
                 <li>
                     <a href="#" class="new-submenu-link"><span>PERSONAL</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos/reclutamiento.php"><span>RECLUTAMIENTO</span></a></li>
+<<<<<<< Updated upstream
                         <li><a href="#"><span>PROCESO DE ENTREVISTAS</span></a></li>
+=======
+>>>>>>> Stashed changes
                         <li><a href="../recursos/relojbio.php"><span>RELOJ BIOMÉTRICO</span></a></li>
                     </ul>
                 </li>
@@ -99,8 +121,13 @@
                     <a href="#" class="new-submenu-link"><span>COLABORADORES</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos/enfermera_nuevo.php"><span>REGISTRAR ENFERMERÍA</span></a></li>
+<<<<<<< Updated upstream
                         <li><a href="#"><span>REGISTRAR ADMINISTRATIVO</span></a></li>
                         <li><a href="#"><span>REGISTRAR SERVICIOS GENERALES</span></a></li>
+=======
+                        <li><a href="../recursos_humanos/administrativo_nuevo.php"><span>REGISTRAR ADMINISTRATIVO</span></a></li>
+                        <li><a href="../recursos_humanos/servicios_generales_nuevo.php"><span>REGISTRAR SERVICIOS GENERALES</span></a></li>
+>>>>>>> Stashed changes
                         <li><a href="../medicos/nuevo.php"><span>REGISTRAR MÉDICO</span></a></li>
                     </ul>
                 </li>

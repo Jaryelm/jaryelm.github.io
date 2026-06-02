@@ -11,12 +11,13 @@ $rol_usuario = $_SESSION['rol'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
     <!-- Select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 </head>
 <body>
     <?php include_once '../admin/menu.php'; ?>
@@ -89,9 +90,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
             <!-- Filtros -->
             <div class="filters">
-                <input type="text" id="searchBar" placeholder="Buscar por nombre, ID o descripción..." oninput="applyFilters()" />
+                <input type="text" id="searchBar" placeholder="Buscar por nombre, ID o descripción..." />
                 <select id="modalityFilter">
                     <option value="">Todas las Modalidades</option>
+                    <option value="DX">Radiografía (DX)</option>
                     <option value="CR">Radiografía Computarizada</option>
                     <option value="CT">Tomografía Computarizada</option>
                     <option value="MR">Resonancia Magnética</option>
@@ -972,244 +974,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="worklist_core.js"></script>
     <script>
-    // Variables globales para paginación y datos
-    let allStudies = [];
-    let currentPage = 1;
-    const studiesPerPage = 10;
-
     document.addEventListener('DOMContentLoaded', function() {
-        const rolUsuario = '<?php echo $rol_usuario; ?>';
-        if (rolUsuario === 'Radiologo') {
-            // Oculta la tabla, filtros y paginación
-            document.querySelector('.table-container').style.display = 'none';
-            document.getElementById('pagination').style.display = 'none';
-            document.querySelector('.filters').style.display = 'none';
-            document.getElementById('noWorklistMsg').style.display = 'block';
-            document.getElementById('noWorklistText').textContent = 'No tienes permisos para ver este apartado. Solo los técnicos radiólogos pueden acceder.';
-            return; // No sigas cargando nada más
-        }
-        // Si no es radiologo, carga la tabla y las estadísticas normalmente
-        loadStats();
-        loadWorklist();
-    });
-
-    function updateTable() {
-        const rolUsuario = '<?php echo $rol_usuario; ?>';
-        const noWorklistMsg = document.getElementById('noWorklistMsg');
-        const noWorklistText = document.getElementById('noWorklistText');
-
-        if (rolUsuario === 'Radiologo') {
-            // Oculta la tabla y muestra el mensaje
-            noWorklistMsg.style.display = 'block';
-            noWorklistText.textContent = 'No tienes permisos para ver este apartado. Solo los técnicos radiólogos pueden acceder.';
-            document.querySelector('.table-container').style.display = 'none';
-            return;
-        } else {
-            // Si no es radiologo, muestra la tabla normalmente
-            document.querySelector('.table-container').style.display = '';
-            noWorklistMsg.style.display = 'none';
-        }
-
-        // ... el resto de la función updateTable ...
-    }
-
-    // Función para cargar las estadísticas
-    async function loadStats() {
-        try {
-            const response = await fetch('get_technician_stats.php');
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            // Actualizar los elementos del DOM con las estadísticas
-            document.getElementById('pending-count').textContent = data.pending;
-            document.getElementById('completed-today').textContent = data.completed_today;
-            document.getElementById('completed-global').textContent = data.completed_global;
-            document.getElementById('in-progress-count').textContent = data.in_progress;
-            document.getElementById('cancelled-today').textContent = data.cancelled_today;
-            document.getElementById('avg-time').textContent = formatAvgTime(data.avg_time);
-            document.getElementById('quality-percentage').textContent = `${data.quality}%`;
-        } catch (error) {
-            console.error('Error loading stats:', error);
-            swal("Error", "No se pudieron cargar las estadísticas", "error");
-        }
-    }
-
-    // Nueva función para formatear el tiempo promedio
-    function formatAvgTime(minutes) {
-        if (!minutes || isNaN(minutes)) return '0 min';
-        minutes = Math.round(minutes);
-        if (minutes < 60) {
-            return `${minutes} min`;
-        } else {
-            const h = Math.floor(minutes / 60);
-            const m = minutes % 60;
-            return m > 0 ? `${h} h ${m} min` : `${h} h`;
-        }
-    }
-
-    // Función para aplicar filtros y búsqueda
-    function applyFilters() {
-        currentPage = 1;
-        updateTable();
-    }
-
-    // Cargar todos los estudios una sola vez
-    async function loadWorklist() {
-        try {
-            const filters = {
-                modality: document.getElementById('modalityFilter').value,
-                priority: document.getElementById('priorityFilter').value,
-                status: document.getElementById('statusFilter').value,
-                date: document.getElementById('dateFilter').value
-            };
-            // Traer todos los estudios (sin búsqueda, solo filtros principales)
-            const response = await fetch('get_worklist.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(filters)
-            });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            allStudies = await response.json();
-            updateTable();
-        } catch (error) {
-            console.error('Error loading worklist:', error);
-            swal("Error", "No se pudo cargar la lista de trabajo", "error");
-        }
-    }
-
-    // Filtrar estudios según búsqueda y filtros
-    function filterStudies() {
-        const search = document.getElementById('searchBar').value.trim().toLowerCase();
-        const modality = document.getElementById('modalityFilter').value;
-        const priority = document.getElementById('priorityFilter').value;
-        const status = document.getElementById('statusFilter').value;
-        const date = document.getElementById('dateFilter').value;
-        return allStudies.filter(study => {
-            const patientName = (study.patient_name || '').toLowerCase();
-            const patientId = (study.patient_id || '').toLowerCase();
-            const description = (study.description || '').toLowerCase();
-            // Filtro de búsqueda
-            const matchesSearch = (
-                patientName.includes(search) ||
-                patientId.includes(search) ||
-                description.includes(search)
-            );
-            // Filtros adicionales
-            const matchesModality = !modality || study.modality === modality;
-            const matchesPriority = !priority || study.priority === priority;
-            const matchesStatus = !status || study.status === status;
-            // Filtro de fecha (solo comparar la parte de la fecha, no la hora)
-            let matchesDate = true;
-            if (date) {
-                const studyDate = study.study_date ? study.study_date.substring(0, 10) : '';
-                matchesDate = studyDate === date;
-            }
-            return matchesSearch && matchesModality && matchesPriority && matchesStatus && matchesDate;
-        });
-    }
-
-    // Actualizar la tabla según la página y búsqueda
-    function updateTable() {
-        const filtered = filterStudies();
-        const totalPages = Math.ceil(filtered.length / studiesPerPage) || 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        const start = (currentPage - 1) * studiesPerPage;
-        const end = start + studiesPerPage;
-        const studiesToShow = filtered.slice(start, end);
-        const tbody = document.getElementById('worklistBody');
-        tbody.innerHTML = '';
-        if (studiesToShow.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px;">No se encontraron estudios con los filtros seleccionados</td></tr>`;
-        } else {
-            studiesToShow.forEach(study => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${study.patient_id || 'N/A'}</td>
-                    <td>${study.patient_name || 'N/A'}</td>
-                    <td>${study.Modality || study.modality || 'N/A'}</td>
-                    <td>${study.description || 'Sin descripción'}</td>
-                    <td>${formatStudyDate(study.study_date)}</td>
-                    <td>${formatPriority(study.priority)}</td>
-                    <td>${formatStatus(study.status)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button onclick="openDicomViewer('${study.series_id}')" class="btn-view"><i class='bx bx-show'></i> Ver</button>
-                            <button onclick="openQualityControl('${study.id}')" class="btn-quality"><i class='bx bx-check-circle'></i> Control</button>
-                            <button onclick="openIncident('${study.id}')" class="btn-incident"><i class='bx bx-error'></i> Incidencia</button>
-                            <button onclick="openRepeat('${study.id}')" class="btn-repeat"><i class='bx bx-refresh'></i> Repetir</button>
-                            <button onclick="openDoseModal('${study.id}')" class="dose-btn"><i class='bx bx-radiation'></i> Dosis</button>
-                            <button onclick="showAssignmentInfo('${study.id}')" class="btn-assignment"><i class='bx bx-user-check'></i> Asignado</button>
-                            <button onclick="${study.status === 'cancelled' ? `showCancelDetail('${study.id}')` : `openCancelModal('${study.id}', '${study.status}')`}" class="btn-cancel" ${study.status === 'cancelled' ? '' : ''}><i class='bx bx-x-circle'></i> ${study.status === 'cancelled' ? 'Ver motivo' : 'Cancelar'}</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-                row.dataset.studyId = study.id;
-                row.dataset.status = study.status;
-                row.dataset.seriesId = study.series_id;
-                updateActionButtons(row);
-            });
-        }
-        updatePagination(totalPages);
-    }
-
-    // Paginación visual
-    function updatePagination(totalPages) {
-        let paginationDiv = document.getElementById('pagination');
-        if (!paginationDiv) {
-            paginationDiv = document.createElement('div');
-            paginationDiv.id = 'pagination';
-            paginationDiv.className = 'pagination';
-            document.querySelector('.table-container').appendChild(paginationDiv);
-        }
-        paginationDiv.innerHTML = '';
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-        // Botón anterior
-        const prevButton = document.createElement('button');
-        prevButton.textContent = 'Anterior';
-        prevButton.disabled = currentPage === 1;
-        prevButton.onclick = () => { if (currentPage > 1) { currentPage--; updateTable(); } };
-        paginationDiv.appendChild(prevButton);
-        if (startPage > 1) {
-            const ellipsisBefore = document.createElement('button');
-            ellipsisBefore.textContent = '...';
-            ellipsisBefore.disabled = true;
-            paginationDiv.appendChild(ellipsisBefore);
-        }
-        for (let i = startPage; i <= endPage; i++) {
-            const button = document.createElement('button');
-            button.textContent = i;
-            button.classList.toggle('active', i === currentPage);
-            button.onclick = () => { currentPage = i; updateTable(); };
-            paginationDiv.appendChild(button);
-        }
-        if (endPage < totalPages) {
-            const ellipsisAfter = document.createElement('button');
-            ellipsisAfter.textContent = '...';
-            ellipsisAfter.disabled = true;
-            paginationDiv.appendChild(ellipsisAfter);
-        }
-        // Botón siguiente
-        const nextButton = document.createElement('button');
-        nextButton.textContent = 'Siguiente';
-        nextButton.disabled = currentPage === totalPages;
-        nextButton.onclick = () => { if (currentPage < totalPages) { currentPage++; updateTable(); } };
-        paginationDiv.appendChild(nextButton);
-    }
-
-    // Actualizar tabla al escribir en la barra de búsqueda
-    document.getElementById('searchBar').addEventListener('input', function() {
-        currentPage = 1;
-        updateTable();
+        WorklistCore.init('<?php echo htmlspecialchars($rol_usuario, ENT_QUOTES, 'UTF-8'); ?>');
     });
 
     function openDicomViewer(seriesId) {
@@ -1273,7 +1041,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             console.log('Nueva ventana abierta exitosamente');
         } else {
             console.error('No se pudo abrir la nueva ventana');
-            swal('Error', 'No se pudo abrir el visor en nueva ventana. Verifique que el bloqueador de ventanas emergentes esté deshabilitado.', 'error');
+            Swal.fire('Error', 'No se pudo abrir el visor en nueva ventana. Verifique que el bloqueador de ventanas emergentes esté deshabilitado.', 'error');
         }
     }
 
@@ -1316,7 +1084,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             })
             .catch(error => {
                 console.error('Error fetching quality control data:', error);
-                swal("Error", "No se pudieron cargar los datos de control de calidad", "error");
+                Swal.fire("Error", "No se pudieron cargar los datos de control de calidad", "error");
             });
     }
 
@@ -1346,7 +1114,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             })
             .catch(error => {
                 console.error('Error fetching incident data:', error);
-                swal("Error", "No se pudieron cargar los datos de la incidencia", "error");
+                Swal.fire("Error", "No se pudieron cargar los datos de la incidencia", "error");
                 document.getElementById('incidentType').value = '';
                 document.getElementById('incidentDescription').value = '';
                 document.getElementById('incidentActions').value = '';
@@ -1379,7 +1147,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             })
             .catch(error => {
                 console.error('Error fetching repeat data:', error);
-                swal("Error", "No se pudieron cargar los datos de repetición", "error");
+                Swal.fire("Error", "No se pudieron cargar los datos de repetición", "error");
                 document.getElementById('repeatReason').value = '';
                 document.getElementById('repeatComments').value = '';
                 saveButton.disabled = false;
@@ -1408,17 +1176,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                swal("Éxito", "Control de calidad guardado correctamente", "success");
+                Swal.fire("Éxito", "Control de calidad guardado correctamente", "success");
                 document.getElementById('qualityModal').style.display = 'none';
-                loadWorklist();
-                loadStats();
+                refreshWorklistAndStats();
             } else {
-                swal("Error", "Error al guardar el control de calidad", "error");
+                Swal.fire("Error", "Error al guardar el control de calidad", "error");
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+            Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
         });
     };
 
@@ -1441,16 +1208,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                swal("Éxito", "Incidencia registrada correctamente", "success");
+                Swal.fire("Éxito", "Incidencia registrada correctamente", "success");
                 document.getElementById('incidentModal').style.display = 'none';
-                loadWorklist(); // Recargar la lista de trabajo
+                reloadWorklistPage();
             } else {
-                swal("Error", data.message || "Error al registrar la incidencia", "error");
+                Swal.fire("Error", data.message || "Error al registrar la incidencia", "error");
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+            Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
         });
     };
 
@@ -1474,15 +1241,15 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                swal("Éxito", "Repetición programada correctamente", "success");
+                Swal.fire("Éxito", "Repetición programada correctamente", "success");
                 document.getElementById('repeatModal').style.display = 'none';
-                loadWorklist();
+                reloadWorklistPage();
             } else {
-                swal("Error", "Error al programar la repetición", "error");
+                Swal.fire("Error", "Error al programar la repetición", "error");
             }
         })
         .catch(error => {
-            swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+            Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
         });
     };
 
@@ -1548,7 +1315,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             })
             .catch(error => {
                 console.error('Error fetching dose data:', error);
-                swal("Error", "No se pudieron cargar los datos de dosis", "error");
+                Swal.fire("Error", "No se pudieron cargar los datos de dosis", "error");
                 document.getElementById('doseValue').value = '';
                 document.getElementById('doseUnit').value = 'mGy';
                 document.getElementById('exposureTime').value = '';
@@ -1585,15 +1352,15 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                swal("Éxito", "Registro de dosis guardado correctamente", "success");
+                Swal.fire("Éxito", "Registro de dosis guardado correctamente", "success");
                 document.getElementById('doseModal').style.display = 'none';
-                loadWorklist(); // Recargar la lista de trabajo
+                reloadWorklistPage();
             } else {
                 throw new Error(data.message);
             }
         })
         .catch(error => {
-            swal("Error", error.message, "error");
+            Swal.fire("Error", error.message, "error");
         });
     });
 
@@ -1683,7 +1450,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         const reason = document.getElementById('cancelReason').value;
         const comments = document.getElementById('cancelComments').value;
         if (!reason) {
-            swal('Error', 'Debe seleccionar un motivo de cancelación', 'error');
+            Swal.fire('Error', 'Debe seleccionar un motivo de cancelación', 'error');
             return;
         }
         fetch('cancel_study.php', {
@@ -1694,17 +1461,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                swal('Éxito', 'Estudio cancelado correctamente', 'success');
+                Swal.fire('Éxito', 'Estudio cancelado correctamente', 'success');
                 closeCancelModal();
-                loadWorklist();
-                loadStats();
+                refreshWorklistAndStats();
             } else {
-                swal('Error', data.message || 'No se pudo cancelar el estudio', 'error');
+                Swal.fire('Error', data.message || 'No se pudo cancelar el estudio', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            swal('Error', 'Ocurrió un error al cancelar el estudio', 'error');
+            Swal.fire('Error', 'Ocurrió un error al cancelar el estudio', 'error');
         });
     };
 
@@ -1720,11 +1486,11 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     document.getElementById('cancelDetailDate').textContent = formatDateTime(data.cancellation.created_at);
                     document.getElementById('cancelDetailModal').style.display = 'block';
                 } else {
-                    swal('Info', 'No se encontró información de cancelación para este estudio.', 'info');
+                    Swal.fire('Info', 'No se encontró información de cancelación para este estudio.', 'info');
                 }
             })
             .catch(error => {
-                swal('Error', 'No se pudo obtener el detalle de cancelación', 'error');
+                Swal.fire('Error', 'No se pudo obtener el detalle de cancelación', 'error');
             });
     }
     function closeCancelDetailModal() {
@@ -1839,7 +1605,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         document.getElementById('assignStudyId').value = studyId;
         
         // Buscar información del estudio
-        const study = allStudies.find(s => s.id == studyId);
+        const study = getWorklistStudy(studyId);
         if (study) {
             document.getElementById('modalPatientName').textContent = study.patient_name || 'No disponible';
             document.getElementById('modalPatientId').textContent = study.patient_id || 'No disponible';
@@ -2023,7 +1789,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         const notes = document.getElementById('assignmentNotes').value;
         
         if (!radiologistId) {
-            swal('Error', 'Debe seleccionar un médico radiólogo', 'error');
+            Swal.fire('Error', 'Debe seleccionar un médico radiólogo', 'error');
             return;
         }
         
@@ -2067,22 +1833,21 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     mensaje += '\n\nNotas: ' + notes;
                 }
                 
-                swal({
+                Swal.fire({
                     title: 'Estudio Finalizado',
                     text: mensaje,
                     icon: 'success',
                     button: 'Entendido'
                 });
                 closeAssignModal();
-                loadWorklist();
-                loadStats();
+                refreshWorklistAndStats();
             } else {
-                swal('Error', data.message || 'No se pudo procesar la asignación', 'error');
+                Swal.fire('Error', data.message || 'No se pudo procesar la asignación', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            swal('Error', 'Ocurrió un error al procesar la solicitud', 'error');
+            Swal.fire('Error', 'Ocurrió un error al procesar la solicitud', 'error');
         });
     };
 
@@ -2179,7 +1944,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             })
             .catch(error => {
                 console.error('Error:', error);
-                swal('Error', 'No se pudo cargar la información de asignación', 'error');
+                Swal.fire('Error', 'No se pudo cargar la información de asignación', 'error');
             });
     }
 
@@ -2232,7 +1997,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     </style>
 
     <!-- Alertas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <script src="../../backend/js/submenu.js"></script>
     <script src="../../backend/registros/script/botones_color.js"></script>

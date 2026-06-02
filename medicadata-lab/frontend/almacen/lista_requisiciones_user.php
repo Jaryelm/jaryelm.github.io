@@ -6,7 +6,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -14,6 +14,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     
     <title>MEDIDATA</title>
 </head>
@@ -146,7 +147,7 @@ include_once '../../backend/registros/session_check.php';
 <script src="../../backend/js/buttonshtml5.js"></script>
 <script src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
 
@@ -196,7 +197,7 @@ function verDetalles(id) {
 }
 
 function aprobarRequisicion(id) {
-    swal({
+    Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Deseas aprobar esta requisición?",
         icon: "warning",
@@ -213,7 +214,7 @@ function aprobarRequisicion(id) {
                     accion: 'aprobar'
                 },
                 success: function(response) {
-                    swal("¡Aprobado!", "La requisición ha sido aprobada.", "success")
+                    Swal.fire("¡Aprobado!", "La requisición ha sido aprobada.", "success")
                     .then(() => {
                         location.reload();
                     });
@@ -224,7 +225,7 @@ function aprobarRequisicion(id) {
 }
 
 function rechazarRequisicion(id) {
-    swal({
+    Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Deseas rechazar esta requisición?",
         icon: "warning",
@@ -241,7 +242,7 @@ function rechazarRequisicion(id) {
                     accion: 'rechazar'
                 },
                 success: function(response) {
-                    swal("Rechazado", "La requisición ha sido rechazada.", "success")
+                    Swal.fire("Rechazado", "La requisición ha sido rechazada.", "success")
                     .then(() => {
                         location.reload();
                     });

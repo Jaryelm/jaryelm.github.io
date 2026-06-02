@@ -43,7 +43,7 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -54,6 +54,7 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- FullCalendar -->
     <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     
     <style>
         #calendar-container {
@@ -1066,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </section>
     <!-- NAVBAR -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="/backend/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../../backend/js/script.js"></script>
 
     <!-- Data Tables -->
@@ -1086,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src='../../backend/js/fullcalendar/locale/es.js'></script>
 
     <!-- SweetAlert - Cargar ANTES de perfil.php y cierre_caja.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
@@ -1588,62 +1589,34 @@ function verificarTurnoYMostrarAlerta() {
             if (!data.turno_iniciado) {
                 // No hay turno activo - alerta para iniciar turno
                 setTimeout(() => {
-                    swal({
+                    Swal.fire({
                         title: "RECORDATORIO",
                         text: "Debe iniciar su turno antes de comenzar a trabajar.",
                         icon: "warning",
-                        buttons: {
-                            cancel: {
-                                text: "Más tarde",
-                                value: null,
-                                visible: true,
-                                className: "btn-cancel",
-                                closeModal: true,
-                            },
-                            confirm: {
-                                text: "Iniciar Turno",
-                                value: true,
-                                visible: true,
-                                className: "btn-confirm",
-                                closeModal: false,
-                            },
-                        },
-                    }).then((willStart) => {
-                        if (willStart) {
-                            if (typeof iniciarTurno === 'function') {
-                                iniciarTurno();
-                            }
+                        showCancelButton: true,
+                        confirmButtonText: "Iniciar Turno",
+                        cancelButtonText: "Más tarde",
+                        confirmButtonColor: "#035c67",
+                    }).then((result) => {
+                        if (result.isConfirmed && typeof iniciarTurno === 'function') {
+                            iniciarTurno();
                         }
                     });
                 }, 1000); // Esperar 1 segundo después de cargar la página
             } else {
                 // Hay turno activo - recordatorio de cierre de caja
                 setTimeout(() => {
-                    swal({
+                    Swal.fire({
                         title: "RECORDATORIO",
                         text: "Tiene un turno activo. Recuerde realizar el cierre de caja al finalizar su jornada.",
                         icon: "info",
-                        buttons: {
-                            cancel: {
-                                text: "Entendido",
-                                value: null,
-                                visible: true,
-                                className: "btn-cancel",
-                                closeModal: true,
-                            },
-                            confirm: {
-                                text: "Cerrar Caja",
-                                value: true,
-                                visible: true,
-                                className: "btn-confirm",
-                                closeModal: false,
-                            },
-                        },
-                    }).then((willClose) => {
-                        if (willClose) {
-                            if (typeof cierreCaja === 'function') {
-                                cierreCaja();
-                            }
+                        showCancelButton: true,
+                        confirmButtonText: "Cerrar Caja",
+                        cancelButtonText: "Entendido",
+                        confirmButtonColor: "#035c67",
+                    }).then((result) => {
+                        if (result.isConfirmed && typeof cierreCaja === 'function') {
+                            cierreCaja();
                         }
                     });
                 }, 1000); // Esperar 1 segundo después de cargar la página

@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,6 +15,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
 
 
@@ -243,7 +244,7 @@ try {
         $update_cart_stmt = $connect->prepare("UPDATE cart SET quantity = ? WHERE idv = ?");
         $update_cart_stmt->execute([(int)$new_quantity, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Cantidad actualizada correctamente.", "success")
+            Swal.fire("Actualizado!", "Cantidad actualizada correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -256,7 +257,7 @@ try {
         $update_discount_stmt = $connect->prepare("UPDATE cart SET discount = ? WHERE idv = ?");
         $update_discount_stmt->execute([(float)$new_discount, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Descuento general aplicado correctamente.", "success")
+            Swal.fire("Actualizado!", "Descuento general aplicado correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -270,7 +271,7 @@ try {
         $update_age30_stmt = $connect->prepare("UPDATE cart SET age_discount_30 = ? WHERE idv = ?");
         $update_age30_stmt->execute([(int)$new_age_discount_30, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Descuento de 3ra Edad aplicado correctamente.", "success")
+            Swal.fire("Actualizado!", "Descuento de 3ra Edad aplicado correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -284,7 +285,7 @@ try {
         $update_age40_stmt = $connect->prepare("UPDATE cart SET age_discount_40 = ? WHERE idv = ?");
         $update_age40_stmt->execute([(int)$new_age_discount_40, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Descuento de 4ta Edad aplicado correctamente.", "success")
+            Swal.fire("Actualizado!", "Descuento de 4ta Edad aplicado correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -297,7 +298,7 @@ try {
         $update_promotion_stmt = $connect->prepare("UPDATE cart SET promotion_discount = ? WHERE idv = ?");
         $update_promotion_stmt->execute([(float)$new_promotion_discount, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Descuento de Promoción aplicado correctamente.", "success")
+            Swal.fire("Actualizado!", "Descuento de Promoción aplicado correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -310,7 +311,7 @@ try {
         $update_other_stmt = $connect->prepare("UPDATE cart SET other_discount = ? WHERE idv = ?");
         $update_other_stmt->execute([(float)$new_other_discount, $cart_id]);
         echo '<script type="text/javascript">
-            swal("Actualizado!", "Descuento de Otros aplicado correctamente.", "success")
+            Swal.fire("Actualizado!", "Descuento de Otros aplicado correctamente.", "success")
                 .then(function() {
                     window.location.href = window.location.pathname; // Recarga la página para reflejar los cambios
                 });
@@ -321,7 +322,7 @@ try {
 } catch (PDOException $e) {
     // Manejo de errores SQL
     echo '<script type="text/javascript">
-        swal("Error!", "No se pudo actualizar el carrito: ' . htmlspecialchars($e->getMessage()) . '", "error");
+        Swal.fire("Error!", "No se pudo actualizar el carrito: ' . htmlspecialchars($e->getMessage()) . '", "error");
     </script>';
 }
 ?>
@@ -379,7 +380,7 @@ $(document).ready(function() {
     <script src='../../backend/registros/script/cierre_caja.js'></script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <?php include_once '../../backend/php/upd_cart.php' ?>
 </body>
 </html>

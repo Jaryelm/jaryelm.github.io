@@ -1,61 +1,68 @@
 <?php
-// Conexión a la base de datos
-$servername = "162.241.123.41";
-$username = "medic9ue_moisesc";
-$password = "Mrecords%7";
-$dbname = "medic9ue_postulaciones";
+require_once __DIR__ . '/../registros/session_check.php';
+require_once __DIR__ . '/../registros/postulaciones_guard.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$inline = isset($_GET['view']) && (string) $_GET['view'] === 'inline';
+$forceDownload = isset($_GET['download']) && (string) $_GET['download'] === '1';
 
-// Verificar la conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+if ($id <= 0) {
+    http_response_code(400);
+    echo 'ID inválido.';
+    exit;
 }
 
-// Obtener el ID de la URL
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$pdo = medidata_postulaciones_pdo();
+if (!$pdo) {
+    http_response_code(503);
+    echo 'Base de datos de postulaciones no disponible.';
+    exit;
+}
 
-// Buscar el registro en la base de datos para obtener el nombre original del archivo adjunto
-$sql = "SELECT cv FROM aplica WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    $stmt = $pdo->prepare('SELECT cv FROM aplica WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    error_log('download_cv: ' . $e->getMessage());
+    http_response_code(500);
+    echo 'Error al consultar el registro.';
+    exit;
+}
 
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+if (!$row) {
+    http_response_code(404);
+    echo 'Registro no encontrado.';
+    exit;
+}
 
-    // El nombre del archivo en la base de datos
-    $cvPath = $row['cv'];
+$cvRaw = $row['cv'] ?? '';
+if ($cvRaw === '' || $cvRaw === null) {
+    http_response_code(404);
+    echo 'No se encontró el nombre del archivo en la base de datos.';
+    exit;
+}
 
-    // Verificar si el campo cv contiene el nombre del archivo
-    if (!empty($cvPath)) {
-        // Generar la ruta completa del archivo basado en el nombre obtenido
-        $filePath = "/home4/medic9ue/uploads/" . basename($cvPath);
+$filePath = medidata_postulaciones_resolver_ruta_cv($cvRaw);
+if ($filePath === null || !is_readable($filePath)) {
+    http_response_code(404);
+    echo 'El archivo no existe en el servidor.';
+    exit;
+}
 
-        // Verificar si el archivo existe
-        if (file_exists($filePath)) {
-            // Configurar los encabezados para la descarga
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($cvPath) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($filePath));
+$downloadName = basename($filePath);
+$mime = medidata_postulaciones_cv_mime_type($filePath);
 
-            // Leer el archivo y enviar el contenido al navegador
-            readfile($filePath);
-            exit;
-        } else {
-            echo "El archivo no existe.";
-        }
-    } else {
-        echo "No se encontró el nombre del archivo en la base de datos.";
-    }
+header('Content-Description: File Transfer');
+header('Content-Type: ' . $mime);
+if ($inline && !$forceDownload) {
+    header('Content-Disposition: inline; filename="' . $downloadName . '"');
 } else {
-    echo "Registro no encontrado.";
+    header('Content-Disposition: attachment; filename="' . $downloadName . '"');
 }
-
-$stmt->close();
-$conn->close();
+header('Expires: 0');
+header('Cache-Control: must-revalidate');
+header('Pragma: public');
+header('Content-Length: ' . filesize($filePath));
+readfile($filePath);
+exit;

@@ -79,29 +79,33 @@ try {
     }
 
     if ($searchValue !== '') {
-        $whereInner .= ' AND (
-            dg.numero_partida LIKE :search_in OR
-            dg.cuenta LIKE :search_in OR
-            dg.nombre_cuenta LIKE :search_in OR
-            dg.descripcion LIKE :search_in OR
-            dg.unidad_servicio LIKE :search_in OR
-            dg.usuario LIKE :search_in OR
-            dg.referencia LIKE :search_in
-        )';
-        $whereOuter .= ' AND (
-            d.numero_partida LIKE :search_out OR
-            d.cuenta LIKE :search_out OR
-            d.nombre_cuenta LIKE :search_out OR
-            d.descripcion LIKE :search_out OR
-            d.unidad_servicio LIKE :search_out OR
-            d.usuario LIKE :search_out OR
-            d.referencia LIKE :search_out
-        )';
+        $concatMatch = "CONCAT_WS(' ',
+            IFNULL(numero_partida, ''),
+            IFNULL(cuenta, ''),
+            IFNULL(nombre_cuenta, ''),
+            IFNULL(descripcion, ''),
+            IFNULL(unidad_servicio, ''),
+            IFNULL(usuario, ''),
+            IFNULL(referencia, '')
+        ) LIKE :search_partida_inner";
+        $concatMatchOuter = str_replace(':search_partida_inner', ':search_partida_outer', $concatMatch);
+        $partidasInner = "(
+            SELECT DISTINCT numero_partida
+            FROM diario_general_transacciones
+            WHERE {$concatMatch}
+        )";
+        $partidasOuter = "(
+            SELECT DISTINCT numero_partida
+            FROM diario_general_transacciones
+            WHERE {$concatMatchOuter}
+        )";
+        $whereInner .= ' AND dg.numero_partida IN ' . $partidasInner;
+        $whereOuter .= ' AND d.numero_partida IN ' . $partidasOuter;
         $like = '%' . $searchValue . '%';
-        $params[':search_in'] = $like;
-        $params[':search_out'] = $like;
-        $types[':search_in'] = PDO::PARAM_STR;
-        $types[':search_out'] = PDO::PARAM_STR;
+        $params[':search_partida_inner'] = $like;
+        $params[':search_partida_outer'] = $like;
+        $types[':search_partida_inner'] = PDO::PARAM_STR;
+        $types[':search_partida_outer'] = PDO::PARAM_STR;
     }
 
     $fromJoin = '
@@ -149,10 +153,10 @@ INNER JOIN (
     ];
 
     $orderBy = $columns[$orderColumn] ?? 'numero_partida';
-    if ($orderBy !== 'numero_partida') {
-        $orderClause = " ORDER BY d.numero_partida DESC, d.$orderBy $orderDir, d.id DESC";
+    if ($orderBy === 'numero_partida') {
+        $orderClause = " ORDER BY d.numero_partida $orderDir, d.fecha_registro DESC, d.id DESC";
     } else {
-        $orderClause = " ORDER BY d.$orderBy $orderDir, d.fecha_ocurrencia DESC, d.id DESC";
+        $orderClause = " ORDER BY d.$orderBy $orderDir, d.id DESC";
     }
 
     $query = $selectFields . $fromJoin . $orderClause . ' LIMIT :start, :length';
@@ -214,9 +218,11 @@ INNER JOIN (
             'id' => $row['id'],
             'numero_partida' => $row['numero_partida'],
             'fecha_ocurrencia' => $fechaOcurrencia,
+            'fecha_ocurrencia_iso' => $row['fecha_ocurrencia'],
             'fecha_registro' => $fechaRegistro,
             'referencia' => $row['referencia'] ?? '',
             'tipo_etiqueta' => medidata_etiqueta_tipo_transaccion($row['tipo_transaccion'] ?? null),
+            'tipo_transaccion' => $row['tipo_transaccion'] ?? '',
             'unidad_servicio' => $row['unidad_servicio'] ?? '',
             'cuenta' => $colsCuenta['cuenta'],
             'nombre_cuenta' => $colsCuenta['nombre_cuenta'],
@@ -230,6 +236,7 @@ INNER JOIN (
             'partida_total_haber' => $ptHaber,
             'detalle_modo' => $detMeta['modo'],
             'detalle_id' => $detMeta['id'],
+            'editable' => in_array(strtoupper((string) ($row['tipo_transaccion'] ?? '')), ['COMPRA_PROVEEDOR', 'CIERRE_VENTA'], true),
         ];
     }
 

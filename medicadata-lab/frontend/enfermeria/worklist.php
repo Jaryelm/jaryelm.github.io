@@ -7,8 +7,9 @@ require_once('../../backend/bd/Conexion.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
 </head>
@@ -442,7 +443,7 @@ require_once('../../backend/bd/Conexion.php');
             document.getElementById('quality-percentage').textContent = `${data.quality}%`;
         } catch (error) {
             console.error('Error loading stats:', error);
-            swal("Error", "No se pudieron cargar las estadísticas", "error");
+            Swal.fire("Error", "No se pudieron cargar las estadísticas", "error");
         }
     }
 
@@ -518,7 +519,7 @@ require_once('../../backend/bd/Conexion.php');
             });
         } catch (error) {
             console.error('Error loading worklist:', error);
-            swal("Error", "No se pudo cargar la lista de trabajo", "error");
+            Swal.fire("Error", "No se pudo cargar la lista de trabajo", "error");
         }
     }
 
@@ -573,7 +574,7 @@ require_once('../../backend/bd/Conexion.php');
         })
         .catch(error => {
             console.error('Error fetching quality control data:', error);
-            swal("Error", "No se pudieron cargar los datos de control de calidad", "error");
+            Swal.fire("Error", "No se pudieron cargar los datos de control de calidad", "error");
         });
 }
 
@@ -620,7 +621,7 @@ function openIncident(studyId) {
         })
         .catch(error => {
             console.error('Error fetching incident data:', error);
-            swal("Error", "No se pudieron cargar los datos de la incidencia", "error");
+            Swal.fire("Error", "No se pudieron cargar los datos de la incidencia", "error");
         });
 }
 
@@ -650,17 +651,17 @@ function openIncident(studyId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            swal("Éxito", "Control de calidad guardado correctamente", "success");
+            Swal.fire("Éxito", "Control de calidad guardado correctamente", "success");
             document.getElementById('qualityModal').style.display = 'none';
             loadWorklist();
             loadStats();
         } else {
-            swal("Error", "Error al guardar el control de calidad", "error");
+            Swal.fire("Error", "Error al guardar el control de calidad", "error");
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+        Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
     });
 };
 
@@ -683,16 +684,16 @@ function openIncident(studyId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            swal("Éxito", "Incidencia registrada correctamente", "success");
+            Swal.fire("Éxito", "Incidencia registrada correctamente", "success");
             document.getElementById('incidentModal').style.display = 'none';
             loadWorklist(); // Recargar la lista de trabajo
         } else {
-            swal("Error", data.message || "Error al registrar la incidencia", "error");
+            Swal.fire("Error", data.message || "Error al registrar la incidencia", "error");
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        swal("Error", "Ocurrió un error al procesar la solicitud", "error");
+        Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
     });
 };
 
@@ -761,7 +762,7 @@ function openIncident(studyId) {
     </script>
 
     <!-- Alertas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html> 

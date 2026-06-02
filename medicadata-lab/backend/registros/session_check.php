@@ -14,7 +14,18 @@ if (!function_exists('medidata_session_json_api_script')) {
     {
         $script = $_SERVER['SCRIPT_NAME'] ?? '';
         $base = strtolower(basename((string) $script));
-        $allowed = ['registrar_partida_manual.php', 'get_partidas_manuales.php'];
+        $allowed = [
+            'registrar_partida_manual.php',
+            'get_partidas_manuales.php',
+            'fetch_collaborators.php',
+            'fetch_postulaciones_aplica.php',
+            'fetch_biometric_marcas.php',
+            'fetch_rrhh_vacantes_abiertas.php',
+            'rrhh_aplica_incorporar.php',
+            'rrhh_aplica_descartar.php',
+            'rrhh_aplica_reasignar.php',
+            'rrhh_candidato_estado.php',
+        ];
         return in_array($base, $allowed, true) ? $base : null;
     }
 }
@@ -36,6 +47,8 @@ if (!function_exists('medidata_session_emit_json_db_unavailable')) {
                 'data' => [],
                 'error' => $msg,
             ]);
+        } elseif ($apiScript === 'fetch_collaborators.php') {
+            echo json_encode(['error' => $msg]);
         } else {
             echo json_encode([
                 'success' => false,
@@ -54,7 +67,12 @@ try {
     if (medidata_session_emit_json_db_unavailable(medidata_session_json_api_script())) {
         exit();
     }
-    $_SESSION['errMsg'] = 'No se pudo conectar a la base de datos. Contacte a Soporte TI.';
+    $msgLower = strtolower($e->getMessage());
+    if (strpos($msgLower, 'too many connections') !== false || strpos($msgLower, '[1040]') !== false) {
+        $_SESSION['errMsg'] = 'El servidor de datos está al límite de conexiones. Espere unos segundos e intente de nuevo.';
+    } else {
+        $_SESSION['errMsg'] = 'No se pudo conectar a la base de datos. Contacte a Soporte TI.';
+    }
     header('Location: ../../frontend/login.php');
     exit();
 }
@@ -75,37 +93,40 @@ try {
         cerrarSesion();
     }
 
-    // Obtener el ID del usuario actual
-    $userId = $_SESSION['id'];
+    $userId = (int) $_SESSION['id'];
 
-    // Consultar la última actividad del usuario desde la base de datos
-    $stmt = $connect->prepare("SELECT last_activity FROM users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Inactividad: 5 horas sin uso (usa marca en sesión; evita lectura/escritura en cada request)
+    $inactivityLimit = 5 * 60 * 60;
+    // En hosting compartido: no actualizar last_activity en cada página (reduce conexiones MySQL)
+    $dbActivitySyncInterval = 15 * 60;
 
-    // Establecer límite de inactividad a una hora (3600 segundos)
-    $inactivityLimit = 60 * 60; // 1 hora en segundos
+    $now = time();
 
-    if ($user && isset($user['last_activity'])) {
-        $lastActivity = strtotime($user['last_activity']);
-        $currentTime = time();
-
-        // Verificar inactividad y cerrar sesión si se excede el límite
-        if (($currentTime - $lastActivity) > $inactivityLimit) {
-            cerrarSesion();
-        }
+    if (!isset($_SESSION['last_activity_ts'])) {
+        $_SESSION['last_activity_ts'] = $now;
     }
 
-    // Generar la hora local en formato MySQL (YYYY-MM-DD HH:MM:SS)
-    $localTime = date('Y-m-d H:i:s');
+    if (($now - (int) $_SESSION['last_activity_ts']) > $inactivityLimit) {
+        cerrarSesion();
+    }
 
-    // Actualizar el tiempo de última actividad en la base de datos
-    $updateStmt = $connect->prepare("UPDATE users SET last_activity = ? WHERE id = ?");
-    $updateStmt->execute([$localTime, $userId]);
+    $_SESSION['last_activity_ts'] = $now;
 
-    // Variables de usuario para usar en páginas internas
+    $lastDbSync = (int) ($_SESSION['last_activity_db_sync_ts'] ?? 0);
+    if ($lastDbSync === 0 || ($now - $lastDbSync) >= $dbActivitySyncInterval) {
+        $localTime = date('Y-m-d H:i:s');
+        $updateStmt = $connect->prepare('UPDATE users SET last_activity = ? WHERE id = ?');
+        $updateStmt->execute([$localTime, $userId]);
+        $_SESSION['last_activity_db_sync_ts'] = $now;
+    }
+
     $id = $_SESSION['id'] ?? null;
     $name = $_SESSION['name'] ?? 'Invitado';
+
+    // Liberar candado de sesión (otras pestañas del mismo usuario no quedan bloqueadas)
+    if (function_exists('session_write_close')) {
+        session_write_close();
+    }
 
 } catch (PDOException $e) {
     error_log('session_check PDO: ' . $e->getMessage());

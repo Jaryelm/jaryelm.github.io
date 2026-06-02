@@ -20,6 +20,18 @@ if (!function_exists('medidata_parse_precio_unitario_compra')) {
     }
 }
 
+if (!function_exists('medidata_parse_decimal_compra')) {
+    function medidata_parse_decimal_compra($raw, int $decimals = 2): float
+    {
+        $s = str_replace(',', '.', trim((string) $raw));
+        if ($s === '' || !is_numeric($s)) {
+            return 0.0;
+        }
+
+        return round((float) $s, $decimals);
+    }
+}
+
 try {
     $sucursal = strtoupper(trim($_POST['sucursal']));
     $bodega = strtoupper(trim($_POST['bodega']));
@@ -134,12 +146,12 @@ try {
             ':unidad' => $unidad[$i],
             ':descripcion' => $descripcion[$i],
             ':precio_unitario' => $puLine,
-            ':isv' => $isv[$i],
-            ':subtotal' => $subtotal[$i],
-            ':total_item' => $total_item[$i],
+            ':isv' => medidata_parse_decimal_compra($isv[$i] ?? 0),
+            ':subtotal' => medidata_parse_decimal_compra($subtotal[$i] ?? 0),
+            ':total_item' => medidata_parse_decimal_compra($total_item[$i] ?? 0),
             ':exento' => $exento,
             ':gravado' => $gravado,
-            ':descuento_porcentaje' => $descuento_porcentaje[$i] ?? 0,
+            ':descuento_porcentaje' => medidata_parse_decimal_compra($descuento_porcentaje[$i] ?? 0),
         ];
         $stmt_detalle->execute($params);
     }
@@ -156,11 +168,11 @@ try {
     $connect->commit();
 
     echo "<script>
-        swal({
+        Swal.fire({
             title: 'Compra Guardada',
             text: 'La compra se ha registrado correctamente.',
             icon: 'success',
-            button: 'OK',
+            confirmButtonText: 'OK'
         }).then(function() {
             window.location = 'mostrar_compras.php';
         });
@@ -169,10 +181,10 @@ try {
     if ($connect->inTransaction()) {
         $connect->rollBack();
     }
-    echo "<script>swal({title:'Error',text:'" . addslashes($e->getMessage()) . "',icon:'error',button:'OK'});</script>";
+    echo "<script>Swal.fire({title:'Error',text:'" . addslashes($e->getMessage()) . "',icon:'error',confirmButtonText:'OK'});</script>";
 } catch (Exception $e) {
     if ($connect->inTransaction()) {
         $connect->rollBack();
     }
-    echo "<script>swal({title:'Error',text:'" . addslashes($e->getMessage()) . "',icon:'error',button:'OK'});</script>";
+    echo "<script>Swal.fire({title:'Error',text:'" . addslashes($e->getMessage()) . "',icon:'error',confirmButtonText:'OK'});</script>";
 }

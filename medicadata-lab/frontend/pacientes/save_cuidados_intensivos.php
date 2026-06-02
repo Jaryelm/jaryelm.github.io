@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result['total'] > 0) {
             echo "<script>
-                swal({
+                Swal.fire({
                     title: '¡Atención!',
                     text: 'Este paciente ya tiene un registro para esta fecha.',
                     icon: 'warning',
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         echo "<script>
-            swal({
+            Swal.fire({
                 title: '¡Éxito!',
                 text: 'Registro guardado correctamente.',
                 icon: 'success',
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>";
     } catch (Exception $e) {
         echo "<script>
-            swal({
+            Swal.fire({
                 title: '¡Error!',
                 text: '" . addslashes($e->getMessage()) . "',
                 icon: 'error',

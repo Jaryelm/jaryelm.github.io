@@ -11,7 +11,11 @@ Servidor físico en sede (Ubuntu, hostname `medicasa`):
 
 - IP LAN hacia el reloj biométrico: ejemplo `192.168.1.102`
 - IP pública SSH/acceso: `201.190.11.6`
+<<<<<<< Updated upstream
 - Reloj MB360 LAN: ejemplo `192.168.1.201:4370`
+=======
+- Reloj MB360 LAN: ejemplo `192.168.1.91:4370`
+>>>>>>> Stashed changes
 
 El agente solo necesita salida HTTPS hacia MediDATA (**no** abrir puertos entrantes desde Internet hacia el agente por este flujo).
 
@@ -188,7 +192,11 @@ MEDIDATA_AGENT_INGEST_SECRET=pégue-aquí-el-mismo-valor-de-producción
 MEDIDATA_AGENT_SITE_CODE=Sucursal_1
 
 # Reloj en esta LAN
+<<<<<<< Updated upstream
 MEDIDATA_RELOJ_IP=192.168.1.201
+=======
+MEDIDATA_RELOJ_IP=192.168.1.91
+>>>>>>> Stashed changes
 MEDIDATA_RELOJ_PORT=4370
 ```
 

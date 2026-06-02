@@ -1,0 +1,125 @@
+/**
+ * Estilos unificados para reportes de compras (ingresadas + detalladas)
+ * y para los reportes de contabilidad que usan la clase
+ * `.dt-reporte-compras-unificado` (Cuadre Caja, Detalle Pago,
+ * Detalle Factura, Devoluciones).
+ *
+ * DEBE cargarse DESPUÉS de datatable.css y buttonsdataTables.css para
+ * anular el modo "display" de DataTables (box-shadow en celdas que
+ * cambia colores).
+ *
+ * IMPORTANTE: Los selectores NO requieren la clase `.dataTable`. Esto
+ * asegura que la tabla se vea con los colores teal correctos desde la
+ * primera pintura del navegador, antes de que DataTables se inicialice.
+ * De lo contrario los estilos de `admin.css` (.responsive-table) pintan
+ * un encabezado azul oscuro que cambia a teal al terminar la inicia-
+ * lización, generando un parpadeo molesto.
+ */
+.catalog-container table.dt-reporte-compras-unificado {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+/* Quitar overlays de DataTables .display (stripes, hover, columnas ordenadas) */
+.catalog-container table.dt-reporte-compras-unificado.display > tbody > tr > *,
+.catalog-container table.dt-reporte-compras-unificado.display > tbody > tr.odd > *,
+.catalog-container table.dt-reporte-compras-unificado.display > tbody > tr.even > *,
+.catalog-container table.dt-reporte-compras-unificado.display > tbody > tr:hover > *,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_1,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_2,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_3,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr.odd > .sorting_1,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr.even > .sorting_1,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr:hover > .sorting_1 {
+  box-shadow: none !important;
+}
+
+/* Encabezado MEDIDATA (color teal definitivo, aplicado SIEMPRE,
+   incluso antes de que DataTables agregue la clase .dataTable). */
+.catalog-container table.dt-reporte-compras-unificado thead th,
+.catalog-container table.dt-reporte-compras-unificado thead td {
+  background-color: var(--dark-blue, #035c67) !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  padding: 12px !important;
+  text-align: left !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Celdas del cuerpo: anulan el borde azul oscuro de admin.css
+   (.responsive-table tbody td/tr usa #1e2c4b) y dejan un borde
+   gris claro coherente con el resto del layout. */
+.catalog-container table.dt-reporte-compras-unificado tbody tr {
+  border: none !important;
+  margin-bottom: 0 !important;
+}
+.catalog-container table.dt-reporte-compras-unificado tbody th,
+.catalog-container table.dt-reporte-compras-unificado tbody td {
+  padding: 10px !important;
+  border: none !important;
+  border-bottom: 1px solid #ddd !important;
+  background-color: transparent !important;
+  text-align: left !important;
+}
+
+/* Franjas: zebra estable.
+   Antes de que DataTables agregue .odd/.even usamos :nth-child para que
+   el patrón esté presente desde el inicio. Después, las clases .odd/.even
+   que agrega DataTables siguen funcionando porque también las cubrimos. */
+.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(even) {
+  background-color: #fff;
+}
+.catalog-container table.dt-reporte-compras-unificado tbody tr.odd {
+  background-color: #f2f2f2 !important;
+}
+.catalog-container table.dt-reporte-compras-unificado tbody tr.even {
+  background-color: #fff !important;
+}
+
+.catalog-container table.dt-reporte-compras-unificado tbody tr:hover {
+  background-color: #e0f7fa !important;
+}
+
+.catalog-container table.dt-reporte-compras-unificado tbody tr:hover td,
+.catalog-container table.dt-reporte-compras-unificado tbody tr:hover th {
+  background-color: transparent !important;
+}
+
+/* Controles DataTables solo dentro del reporte de compras */
+.catalog-container .dataTables_wrapper .dataTables_length,
+.catalog-container .dataTables_wrapper .dataTables_filter,
+.catalog-container .dataTables_wrapper .dataTables_info,
+.catalog-container .dataTables_wrapper .dataTables_paginate {
+  color: #333;
+}
+
+.catalog-container .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.catalog-container .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  color: #fff !important;
+  border: 1px solid var(--dark-blue, #035c67) !important;
+  background: var(--dark-blue, #035c67) !important;
+  background-image: none !important;
+}
+
+.catalog-container .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  color: #fff !important;
+  border: 1px solid var(--blue, #06adbf) !important;
+  background: var(--blue, #06adbf) !important;
+  background-image: none !important;
+}
+
+.catalog-container .dataTables_wrapper button.dt-button {
+  border-color: rgba(3, 92, 103, 0.35) !important;
+  background: rgba(3, 92, 103, 0.08) !important;
+  background-image: none !important;
+}
+
+.catalog-container .dataTables_wrapper button.dt-button:hover:not(.disabled) {
+  border-color: var(--dark-blue, #035c67) !important;
+  background: rgba(6, 173, 191, 0.15) !important;
+  background-image: none !important;
+}

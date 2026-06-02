@@ -48,6 +48,18 @@ if (!function_exists('medidata_parse_precio_unitario_compra')) {
     }
 }
 
+if (!function_exists('medidata_parse_decimal_compra')) {
+    function medidata_parse_decimal_compra($raw, int $decimals = 2): float
+    {
+        $s = str_replace(',', '.', trim((string) $raw));
+        if ($s === '' || !is_numeric($s)) {
+            return 0.0;
+        }
+
+        return round((float) $s, $decimals);
+    }
+}
+
 /**
  * Normaliza cantidad de stock para columnas INT UNSIGNED (product.stock,
  * almacen_hospitalario.stock). Tras migración alter_product_stock_int_unsigned.sql
@@ -93,10 +105,10 @@ try {
         $otros_terminos = 'CONSIGNACION';
     }
 
-    $isv_global = trim($_POST['isv_global'] ?? '0');
+    $isv_global = medidata_parse_decimal_compra($_POST['isv_global'] ?? '0');
     $fech_vence = trim($_POST['fech_vence'] ?? '');
-    $sub_total = trim($_POST['sub_total'] ?? '0');
-    $total = trim($_POST['total'] ?? '0');
+    $sub_total = medidata_parse_decimal_compra($_POST['sub_total'] ?? '0');
+    $total = medidata_parse_decimal_compra($_POST['total'] ?? '0');
 
     $codigo_producto = $_POST['codigo_producto'] ?? [];
     if (!is_array($codigo_producto) || count($codigo_producto) === 0) {
@@ -358,12 +370,12 @@ try {
             ':unidad' => $unidad[$i] ?? '',
             ':descripcion' => $descripcion[$i] ?? '',
             ':precio_unitario' => $pu,
-            ':isv' => $isv[$i] ?? 0,
-            ':subtotal' => $subtotal[$i] ?? 0,
-            ':total_item' => $total_item[$i] ?? 0,
+            ':isv' => medidata_parse_decimal_compra($isv[$i] ?? 0),
+            ':subtotal' => medidata_parse_decimal_compra($subtotal[$i] ?? 0),
+            ':total_item' => medidata_parse_decimal_compra($total_item[$i] ?? 0),
             ':exento' => $exento ? 1 : 0,
             ':gravado' => $gravado ? 1 : 0,
-            ':descuento_porcentaje' => $descuento_porcentaje[$i] ?? 0,
+            ':descuento_porcentaje' => medidata_parse_decimal_compra($descuento_porcentaje[$i] ?? 0),
         ]);
     }
 
@@ -383,11 +395,11 @@ try {
         : "window.location = 'mostrar_compras.php';";
 
     echo '<script>
-        swal({
+        Swal.fire({
             title: "Compra guardada",
             text: "La compra se registró y el inventario se actualizó correctamente.",
             icon: "success",
-            button: "OK",
+            confirmButtonText: "OK"
         }).then(function() {
             ' . $medNavigateAfterSave . '
         });
@@ -398,11 +410,11 @@ try {
     }
     $msg = addslashes($e->getMessage());
     echo "<script>
-        swal({
+        Swal.fire({
             title: 'Error',
             text: '" . $msg . "',
             icon: 'error',
-            button: 'OK',
+            confirmButtonText: 'OK'
         });
     </script>";
 }

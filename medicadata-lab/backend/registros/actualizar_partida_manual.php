@@ -4,22 +4,32 @@
  * Sistema: MEDIDATA
  */
 
+ob_start();
 include_once __DIR__ . '/session_check.php';
 include_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/../php/funciones_diario_general.php';
 
 header('Content-Type: application/json');
+ini_set('display_errors', '0');
+
+function apm_json(array $payload): void
+{
+    if (ob_get_length()) {
+        ob_clean();
+    }
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+}
 
 // Solo Contabilidad y Administrador pueden editar partidas manuales
 $rol = $_SESSION['rol'] ?? '';
 if ($rol === 'Auxiliar Contable') {
-    echo json_encode(['success' => false, 'message' => 'No tiene permisos para editar partidas manuales']);
+    apm_json(['success' => false, 'message' => 'No tiene permisos para editar partidas manuales']);
     exit;
 }
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        apm_json(['success' => false, 'message' => 'Método no permitido']);
         exit;
     }
 
@@ -33,27 +43,27 @@ try {
     $lineas = $input['lineas'] ?? [];
 
     if (empty($numeroPartida)) {
-        echo json_encode(['success' => false, 'message' => 'Número de partida requerido']);
+        apm_json(['success' => false, 'message' => 'Número de partida requerido']);
         exit;
     }
 
     if (empty($fechaOcurrencia)) {
-        echo json_encode(['success' => false, 'message' => 'La fecha de ocurrencia es obligatoria']);
+        apm_json(['success' => false, 'message' => 'La fecha de ocurrencia es obligatoria']);
         exit;
     }
 
     if (empty($referencia)) {
-        echo json_encode(['success' => false, 'message' => 'La referencia es obligatoria']);
+        apm_json(['success' => false, 'message' => 'La referencia es obligatoria']);
         exit;
     }
 
     if (empty($descripcionGeneral)) {
-        echo json_encode(['success' => false, 'message' => 'La descripción general es obligatoria']);
+        apm_json(['success' => false, 'message' => 'La descripción general es obligatoria']);
         exit;
     }
 
     if (!is_array($lineas) || count($lineas) < 2) {
-        echo json_encode(['success' => false, 'message' => 'Debe agregar al menos 2 líneas a la partida']);
+        apm_json(['success' => false, 'message' => 'Debe agregar al menos 2 líneas a la partida']);
         exit;
     }
 
@@ -61,7 +71,7 @@ try {
     $stmtCheck = $connect->prepare("SELECT COUNT(*) FROM diario_general_transacciones WHERE numero_partida = :np AND tipo_transaccion = 'PARTIDA_MANUAL'");
     $stmtCheck->execute([':np' => $numeroPartida]);
     if ($stmtCheck->fetchColumn() == 0) {
-        echo json_encode(['success' => false, 'message' => 'Partida no encontrada o no es editable']);
+        apm_json(['success' => false, 'message' => 'Partida no encontrada o no es editable']);
         exit;
     }
 
@@ -78,17 +88,17 @@ try {
         $descripcionLinea = trim($linea['descripcion'] ?? $descripcionGeneral);
 
         if (empty($cuenta) || empty($nombreCuenta)) {
-            echo json_encode(['success' => false, 'message' => "Línea " . ($i + 1) . ": Cuenta y nombre son obligatorios"]);
+            apm_json(['success' => false, 'message' => "Línea " . ($i + 1) . ": Cuenta y nombre son obligatorios"]);
             exit;
         }
 
         if ($debe <= 0 && $haber <= 0) {
-            echo json_encode(['success' => false, 'message' => "Línea " . ($i + 1) . ": Debe o Haber debe ser mayor a 0"]);
+            apm_json(['success' => false, 'message' => "Línea " . ($i + 1) . ": Debe o Haber debe ser mayor a 0"]);
             exit;
         }
 
         if ($debe > 0 && $haber > 0) {
-            echo json_encode(['success' => false, 'message' => "Línea " . ($i + 1) . ": Solo debe tener Debe O Haber, no ambos"]);
+            apm_json(['success' => false, 'message' => "Línea " . ($i + 1) . ": Solo debe tener Debe O Haber, no ambos"]);
             exit;
         }
 
@@ -110,7 +120,7 @@ try {
 
     $diferencia = abs($totalDebe - $totalHaber);
     if ($diferencia > 0.01) {
-        echo json_encode([
+        apm_json([
             'success' => false,
             'message' => 'La partida no está balanceada. Total Debe: L. ' . number_format($totalDebe, 2) . ' | Total Haber: L. ' . number_format($totalHaber, 2) . ' | Diferencia: L. ' . number_format($diferencia, 2)
         ]);
@@ -135,7 +145,7 @@ try {
         }
 
         $connect->commit();
-        echo json_encode([
+        apm_json([
             'success' => true,
             'message' => 'Partida actualizada correctamente',
             'numero_partida' => $numeroPartida
@@ -147,7 +157,7 @@ try {
 
 } catch (Exception $e) {
     error_log("Error actualizar_partida_manual: " . $e->getMessage());
-    echo json_encode([
+    apm_json([
         'success' => false,
         'message' => 'Error al actualizar: ' . $e->getMessage()
     ]);

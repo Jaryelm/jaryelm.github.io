@@ -4,12 +4,37 @@ session_start();
 
 /* Llamar a la librería FPDF */
 require('../../backend/fpdf/fpdf.php');
+require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
+require_once dirname(__DIR__, 2) . '/backend/php/facturacion_cai_config.php';
+
+$sarRangoAutorizado = 'Rango autorizado: 000-001-01-00382801 AL 000-001-01-00412800';
+$sarFechaLimite = 'Fecha límite de emisión: 04/08/2026';
+$sarCai = 'CAI: 3B8BA5-53CA59-8A06E0-63BE03-09091E-9A';
+try {
+    $cfgCai = medidata_factura_config_get_active($connect);
+    if ($cfgCai) {
+        $prefijo = (string) ($cfgCai['prefijo_factura'] ?? '000-001-01');
+        $ri = str_pad((string) ((int) ($cfgCai['rango_inicial'] ?? 0)), 7, '0', STR_PAD_LEFT);
+        $rf = str_pad((string) ((int) ($cfgCai['rango_final'] ?? 0)), 7, '0', STR_PAD_LEFT);
+        $sarRangoAutorizado = 'Rango autorizado: ' . $prefijo . '-' . $ri . ' AL ' . $prefijo . '-' . $rf;
+        $fechaLimiteRaw = (string) ($cfgCai['fecha_limite'] ?? '');
+        if ($fechaLimiteRaw !== '') {
+            $tsLim = strtotime($fechaLimiteRaw);
+            $fechaFmt = $tsLim ? date('d/m/Y', $tsLim) : $fechaLimiteRaw;
+            $sarFechaLimite = 'Fecha límite de emisión: ' . $fechaFmt;
+        }
+        $sarCai = 'CAI: ' . (string) ($cfgCai['cai'] ?? '');
+    }
+} catch (Throwable $e) {
+    error_log('documento_hospitalario.php CAI dinámico: ' . $e->getMessage());
+}
 
 class PDF_MC extends FPDF {
     public $invoice_number = '';
     public $is_first_page = true;
 
     function Header() {
+        global $sarRangoAutorizado, $sarFechaLimite, $sarCai;
         // Header hospital
         $this->Image('../../backend/img/factura_logo.png', 10, 10, 50);
         $this->SetXY(65, 15);
@@ -18,11 +43,11 @@ class PDF_MC extends FPDF {
         $this->SetXY(65, 20); 
         $this->Cell(0, 5, mb_convert_encoding('RTN : 08019995294814', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
         $this->SetXY(65, 25);
-        $this->Cell(0, 5, mb_convert_encoding('Rango autorizado: 000-001-01-00382801 AL 000-001-01-00412800', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+        $this->Cell(0, 5, mb_convert_encoding($sarRangoAutorizado, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
         $this->SetXY(65, 30);
-        $this->Cell(0, 5, mb_convert_encoding('Fecha límite de emisión: 04/08/2026', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+        $this->Cell(0, 5, mb_convert_encoding($sarFechaLimite, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
         $this->SetXY(65, 35);
-        $this->Cell(0, 5, mb_convert_encoding('CAI: 3B8BA5-53CA59-8A06E0-63BE03-09091E-9A', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+        $this->Cell(0, 5, mb_convert_encoding($sarCai, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
         
         // Espacio suficiente después del header para que el contenido no se monte
         $this->Ln(30); // Ajusta este valor según la altura real de tu header
@@ -50,14 +75,12 @@ $pdf->Cell(0, 5, mb_convert_encoding('HOSPITAL MEDICASA S. D R.L.', 'ISO-8859-1'
 $pdf->SetXY(65, 20); 
 $pdf->Cell(0, 5, mb_convert_encoding('RTN : 08019995294814', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 $pdf->SetXY(65, 25);
-$pdf->Cell(0, 5, mb_convert_encoding('Rango autorizado: 000-001-01-00382801 AL 000-001-01-00412800', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+$pdf->Cell(0, 5, mb_convert_encoding($sarRangoAutorizado, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 $pdf->SetXY(65, 30);
-$pdf->Cell(0, 5, mb_convert_encoding('Fecha límite de emisión: 04/08/2026', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+$pdf->Cell(0, 5, mb_convert_encoding($sarFechaLimite, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 $pdf->SetXY(65, 35);
-$pdf->Cell(0, 5, mb_convert_encoding('CAI: 3B8BA5-53CA59-8A06E0-63BE03-09091E-9A', 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
+$pdf->Cell(0, 5, mb_convert_encoding($sarCai, 'ISO-8859-1', 'UTF-8'), 0, 1, 'L');
 
-/* Conexión a la base de datos */
-require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id <= 0) {
     exit('Solicitud inválida.');

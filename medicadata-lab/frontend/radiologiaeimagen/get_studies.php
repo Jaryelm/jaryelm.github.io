@@ -1,41 +1,75 @@
 <?php
-// Aumentar el tiempo máximo de ejecución y memoria
-ini_set('max_execution_time', 300); // 5 minutos
-ini_set('memory_limit', '256M');
+declare(strict_types=1);
 
-header('Content-Type: application/json');
+/**
+ * Lista paginada MH-PACS desde worklist (MySQL local).
+ * Evita descargar miles de estudios de Orthanc en cada visita.
+ */
 
-// Archivo de caché
-$cacheFile = 'orthanc_cache.json';
-$cacheDuration = 900; // Duración del caché en segundos (15 minutos)
+while (ob_get_level() > 0) {
+    ob_end_clean();
+}
+ob_start();
 
-// Obtener parámetros de paginación y búsqueda
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+@ini_set('display_errors', '0');
+@ini_set('html_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
 
-// Calcular el offset
-$offset = ($page - 1) * $limit;
+require_once __DIR__ . '/../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../../backend/php/mh_pacs_studies_repository.php';
+
+if (!function_exists('getStudiesSendJson')) {
+    function getStudiesSendJson(array $payload, int $httpCode = 200): void
+    {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        if (!headers_sent()) {
+            http_response_code($httpCode);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        $flags = JSON_UNESCAPED_UNICODE;
+        if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+            $flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+        }
+        $json = json_encode($payload, $flags);
+        if ($json === false) {
+            $json = json_encode(
+                ['success' => false, 'error' => 'No se pudo generar la respuesta JSON.'],
+                JSON_UNESCAPED_UNICODE
+            );
+        }
+        echo $json;
+        exit;
+    }
+}
+
+register_shutdown_function(function (): void {
+    $err = error_get_last();
+    if ($err === null) {
+        return;
+    }
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+    if (!in_array($err['type'], $fatalTypes, true) || headers_sent()) {
+        return;
+    }
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    getStudiesSendJson(
+        ['success' => false, 'error' => 'Error interno al procesar estudios. Revise el log del servidor.'],
+        500
+    );
+});
+
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
+$search = isset($_GET['search']) ? trim((string) $_GET['search']) : '';
 
 try {
-    // Verificar si el archivo caché existe y es válido
-    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheDuration) {
-        // Leer los datos desde el archivo caché
-        $cacheContent = file_get_contents($cacheFile);
-        if ($cacheContent === false) {
-            throw new Exception("Error leyendo el archivo de caché");
-        }
-        
-        $allData = json_decode($cacheContent, true);
-        if ($allData === null && json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Error decodificando el caché: " . json_last_error_msg());
-        }
-    } else {
-        // URL base de la API de Orthanc
-        $orthanc_url = 'https://medicloud.medicasa.hn/orthanc/studies?expand=true';
-        $username = 'dev';
-        $password = 'Mrecords7';
+    $result = medidata_mh_pacs_fetch_studies($connect, $page, $limit, $search);
 
+<<<<<<< Updated upstream
         $ch = curl_init($orthanc_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
@@ -204,8 +238,22 @@ try {
     error_log("Error en get_studies.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
+=======
+    getStudiesSendJson([
+        'success'   => true,
+        'studies'   => $result['studies'],
+        'total'     => $result['total'],
+        'page'      => $result['page'],
+        'limit'     => $result['limit'],
+        'totalPages'=> $result['totalPages'],
+        'last_sync' => $result['last_sync'],
+        'source'    => 'worklist',
+    ], 200);
+} catch (Throwable $e) {
+    error_log('get_studies.php: ' . $e->getMessage());
+    getStudiesSendJson([
+>>>>>>> Stashed changes
         'success' => false,
-        'error' => $e->getMessage()
-    ]);
+        'error'   => 'No se pudieron cargar los estudios. Use «Sincronizar Orthanc» si la lista está vacía.',
+    ], 500);
 }
-?>

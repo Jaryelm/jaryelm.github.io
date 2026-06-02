@@ -9,6 +9,10 @@
  */
 declare(strict_types=1);
 
+<<<<<<< Updated upstream
+=======
+require_once __DIR__ . '/biometric_marcas_db.php';
+>>>>>>> Stashed changes
 require_once __DIR__ . '/medidata_zkteco_autoload.php';
 
 use Jmrashed\Zkteco\Lib\ZKTeco;
@@ -278,6 +282,7 @@ function medidata_mb360_pull_attendance(array $cfg): array
     }
 }
 
+<<<<<<< Updated upstream
 /**
  * Lectura de marcas sincronizadas desde el agente (tabla biometric_marcas).
  *
@@ -332,3 +337,5 @@ function medidata_biometric_fetch_marcas_agent_db(PDO $connect, string $siteCode
     }
 }
 
+=======
+>>>>>>> Stashed changes

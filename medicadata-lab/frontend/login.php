@@ -10,7 +10,7 @@ include_once '../backend/php/login.php';
     <title>MEDIDATA</title>
     <link rel="stylesheet" href="../backend/css/style.css" />
     <link rel="icon" type="image/png" sizes="96x96" href="../backend/img/icon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
 </head>
 <body>
     <div class="form-container">

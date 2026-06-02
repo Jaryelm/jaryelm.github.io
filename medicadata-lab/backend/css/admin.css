@@ -159,7 +159,13 @@ li {
 	transition: all .15s ease;
 }
 #sidebar .side-dropdown.show {
+<<<<<<< Updated upstream
 	max-height: 1000px;
+=======
+	max-height: min(1000px, 70vh);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+>>>>>>> Stashed changes
 }
 #sidebar .side-dropdown a:hover {
 	color: #035c67;
@@ -1185,6 +1191,10 @@ main .data.preclinica-stack .preclinica-select-slot.is-loading::after {
  * aquí solo flujo horizontal, spacing y línea teal bajo la barra.
  */
 main .data.preclinica-stack .content-data div.dt-buttons,
+<<<<<<< Updated upstream
+=======
+main .data .content-data div.dt-buttons,
+>>>>>>> Stashed changes
 .sv-dt-expediente-wrap div.dt-buttons,
 .modal-content-custom div.dt-buttons {
 	float: none !important;
@@ -1197,6 +1207,10 @@ main .data.preclinica-stack .content-data div.dt-buttons,
 	border-bottom: 1px solid rgba(6, 173, 191, 0.45);
 }
 main .data.preclinica-stack .content-data div.dt-buttons .dt-button,
+<<<<<<< Updated upstream
+=======
+main .data .content-data div.dt-buttons .dt-button,
+>>>>>>> Stashed changes
 .sv-dt-expediente-wrap div.dt-buttons .dt-button,
 .modal-content-custom div.dt-buttons .dt-button {
 	margin-right: 0 !important;
@@ -1741,6 +1755,49 @@ select {
   border: none;
   background: #f1f1f1;
 }
+
+/* Select2 — formularios de usuarios (.containerss), mismo look que inputs nativos */
+main .containerss select.select2:not(.select2-hidden-accessible) {
+  width: 100%;
+  margin: 5px 0 22px 0;
+}
+
+main .containerss .select2-container {
+  width: 100% !important;
+  margin: 5px 0 22px 0;
+  display: block;
+}
+
+main .containerss .select2-container--default .select2-selection--single {
+  min-height: 48px;
+  height: auto;
+  border: none;
+  border-radius: 0;
+  background: #f1f1f1;
+  box-sizing: border-box;
+}
+
+main .containerss .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 48px;
+  padding-left: 15px;
+  padding-right: 32px;
+  color: #333;
+}
+
+main .containerss .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 48px;
+  right: 8px;
+}
+
+main .containerss .select2-container--default.select2-container--focus .select2-selection--single,
+main .containerss .select2-container--default.select2-container--open .select2-selection--single {
+  background: #ddd;
+  outline: none;
+}
+
+main .containerss .select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: #666;
+}
 input[type=text], input[type=password], input[type=email], input[type=date], input[type=datetime-local], input[type=file], input[type=number], input[type=tel], input[type=radio], textarea {
   width: 100%;
   padding: 15px;
@@ -2257,12 +2314,13 @@ a.registerbtn {
   height: 26px;
   width: 26px;
   left: 4px;
+  right: auto;
   bottom: 4px;
   background-color: #fff;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   -webkit-transition: .4s;
-  transition: .4s;
+  transition: left .4s, right .4s, transform .4s;
 }
 
 input:checked + .slider {
@@ -2274,9 +2332,11 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+  left: auto;
+  right: 4px;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
 }
 
 /* Rounded sliders */
@@ -2379,7 +2439,9 @@ input:checked + .slider:before {
 }
 
 .new-side-dropdown.show {
-  max-height: 500px; /* Ajusta esto según el contenido de tus submenús */
+  max-height: min(700px, 65vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .new-side-dropdown a {
@@ -3821,8 +3883,20 @@ input:checked + .slider:before {
   padding: 10px;
   border: 1px solid #ddd;
 }
+<<<<<<< Updated upstream
 .modal .table-container .responsive-table th {
+=======
+/* Modal ventas: no heredar texto blanco de .responsive-table thead th sobre fondo gris (#f2f2f2) */
+.modal .table-container .responsive-table thead th {
+  background-color: #1e2c4b;
+  border-color: #1e2c4b;
+  color: #ffffff;
+  font-weight: bold;
+}
+.modal .table-container .responsive-table tbody th {
+>>>>>>> Stashed changes
   background-color: #f2f2f2;
+  color: #212121;
   font-weight: bold;
 }
 .close-btn {
@@ -4176,4 +4250,191 @@ input:checked + .slider:before {
 /* Tablas reporte compras: ver reporte_compras_datatable.css (carga después de DataTables) */
 .text-right {
   text-align: right;
+}
+
+/* ==========================
+   SweetAlert2 Global Theme
+   ========================== */
+.swal2-popup {
+  border-radius: 10px !important;
+  padding: 1.25rem 1.15rem 1rem !important;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22) !important;
+  width: min(32em, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  box-sizing: border-box !important;
+}
+.swal2-title {
+  font-size: 1.55rem !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin-bottom: 0.35rem !important;
+}
+.swal2-html-container {
+  font-size: 1rem !important;
+  line-height: 1.45 !important;
+  color: #4b5563 !important;
+  margin-top: 0.2rem !important;
+  overflow: hidden !important;
+  word-break: break-word;
+}
+.swal2-actions {
+  gap: 10px !important;
+  margin-top: 1.05rem !important;
+}
+.swal2-styled {
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 0.55rem 1.2rem !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+  min-width: 122px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+.swal2-confirm.swal2-styled {
+  background: #06adbf !important;
+  color: #fff !important;
+}
+.swal2-cancel.swal2-styled {
+  background: #6c757d !important;
+  color: #fff !important;
+}
+.swal2-deny.swal2-styled {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+
+.swal2-popup.medidata-swal-rrhh .swal2-input,
+.swal2-popup.medidata-swal-rrhh .swal2-select,
+.swal2-popup.medidata-swal-rrhh select.swal2-select {
+  display: none !important;
+}
+
+.swal2-popup.medidata-swal-rrhh.medidata-swal-rrhh--pick select.swal2-select,
+.swal2-popup.medidata-swal-rrhh.medidata-swal-rrhh--pick .swal2-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 12px 0 0 !important;
+  padding: 10px 12px !important;
+  display: block !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  font-size: 0.95rem !important;
+  line-height: 1.35 !important;
+  min-height: 44px;
+}
+
+.swal2-popup.medidata-swal-rrhh.medidata-swal-rrhh--pick input.swal2-input {
+  display: none !important;
+}
+
+.swal2-popup.medidata-swal-rrhh .medidata-swal-rrhh-meta {
+  text-align: left;
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+.swal2-popup.medidata-swal-rrhh .medidata-swal-rrhh-meta strong {
+  color: #1f2937;
+}
+
+/* Compatibilidad con customClass ya usado en algunos modales */
+.swal2-popup.medidata-alert {
+  border-radius: 10px !important;
+  padding: 1.35rem 1.25rem 1.1rem !important;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22) !important;
+}
+.swal2-title.medidata-alert-title {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin-bottom: 0.35rem !important;
+}
+.swal2-html-container.medidata-alert-html {
+  font-size: 1.02rem !important;
+  line-height: 1.45 !important;
+  color: #4b5563 !important;
+  margin-top: 0.2rem !important;
+}
+.swal2-actions.medidata-alert-actions {
+  gap: 10px !important;
+  margin-top: 1.1rem !important;
+}
+.swal2-confirm.btn-medidata-danger,
+.swal2-cancel.btn-medidata-cancel {
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 0.55rem 1.2rem !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+  min-width: 122px !important;
+  margin: 0 !important;
+}
+.swal2-confirm.btn-medidata-danger {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+.swal2-cancel.btn-medidata-cancel {
+  background: #6c757d !important;
+  color: #fff !important;
+}
+
+main > .alert {
+  margin-top: 15px;
+}
+
+main .containerss .rrhh-panel-hint {
+  margin: 8px 0 16px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+main .containerss h4.demo-flujo-subtitle {
+  margin: 20px 0 10px;
+  color: var(--dark-blue, #035c67);
+}
+
+main .containerss .demo-flujo-hero {
+  background: var(--light-blue, #d0e4ff);
+  border-left: 5px solid var(--blue, #06adbf);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+
+main .containerss .demo-flujo-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+main .containerss .demo-flujo-step {
+  border: 1px solid #e0e0e0;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+main .containerss .demo-flujo-step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+main .containerss .demo-flujo-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--dark-blue, #035c67);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
 }

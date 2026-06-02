@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     
 
@@ -231,7 +232,7 @@ function registrarAutorizacion() {
     const intervencion_quirurgica = document.getElementById("intervencion_quirurgica").value;
 
     if (!consistente_en.trim() || !intervencion_quirurgica.trim()) {
-        swal('Error', 'Debe ingresar los datos indicados.', 'error');
+        Swal.fire('Error', 'Debe ingresar los datos indicados.', 'error');
         return;
     }
 
@@ -241,15 +242,15 @@ function registrarAutorizacion() {
         data: { idpa, consistente_en, intervencion_quirurgica },
         success: function (response) {
             if (response.success) {
-                swal('Guardado', response.message, 'success').then(() => {
+                Swal.fire('Guardado', response.message, 'success').then(() => {
                     cargarDatosAlta();
                 });
             } else {
-                swal(response.type === "warning" ? 'Advertencia' : 'Error', response.message, response.type);
+                Swal.fire(response.type === "warning" ? 'Advertencia' : 'Error', response.message, response.type);
             }
         },
         error: function (xhr) {
-            swal('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar la solicitud.', 'error');
+            Swal.fire('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar la solicitud.', 'error');
         }
     });
 }
@@ -288,14 +289,14 @@ function descargarAutorizacionPDF() {
                     window.open(`autorizacion_quirurgica_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay motivo guardado
-                    swal('Advertencia', 'No se puede generar la hoja de Solicitud de Alta Exigida ya que no has registrado el Dianostico y Motivo para completar la solicitud.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar la hoja de Solicitud de Alta Exigida ya que no has registrado el Dianostico y Motivo para completar la solicitud.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -338,7 +339,7 @@ function registrarProcedimiento() {
     const procesado_por = "<?php echo $_SESSION['name']; ?>"; // Capturar usuario actual
 
     if (!turno.trim() || !procedimiento_realizado.trim()) {
-        swal('Error', 'Debe ingresar los datos indicados.', 'error');
+        Swal.fire('Error', 'Debe ingresar los datos indicados.', 'error');
         return;
     }
 
@@ -348,15 +349,15 @@ function registrarProcedimiento() {
         data: { idpa, turno, procedimiento_realizado, procesado_por },
         success: function (response) {
             if (response.success) {
-                swal('Guardado', response.message, 'success').then(() => {
+                Swal.fire('Guardado', response.message, 'success').then(() => {
                     cargarDatosProcedimientos();
                 });
             } else {
-                swal(response.message, 'error');
+                Swal.fire(response.message, 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar el procedimiento.', 'error');
+            Swal.fire('Error', xhr.responseJSON?.message || 'Hubo un problema al registrar el procedimiento.', 'error');
         }
     });
 }
@@ -436,14 +437,14 @@ function descargarProcedimientosPDF() {
                     window.open(`procedimientos_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay motivo guardado
-                    swal('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -565,15 +566,15 @@ function registrarAnexoReferencia() {
         data,
         success: function(response) {
             if (response.success) {
-                swal('Guardado', response.message, 'success').then(() => {
+                Swal.fire('Guardado', response.message, 'success').then(() => {
                     cargarDatosAnexoReferencia();
                 });
             } else {
-                swal('Error', response.message, 'error');
+                Swal.fire('Error', response.message, 'error');
             }
         },
         error: function(xhr) {
-            swal('Error', 'Hubo un problema al registrar el anexo de referencia.', 'error');
+            Swal.fire('Error', 'Hubo un problema al registrar el anexo de referencia.', 'error');
         }
     });
 }
@@ -627,7 +628,7 @@ function cargarDatosAnexoReferencia() {
             }
         },
         error: function(xhr) {
-            swal('Error', 'Hubo un problema al cargar los datos.', 'error');
+            Swal.fire('Error', 'Hubo un problema al cargar los datos.', 'error');
         }
     });
 }
@@ -649,14 +650,14 @@ function descargarAnexoReferenciaPDF() {
                     window.open(`anexo_ref_pdf.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay motivo guardado
-                    swal('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -691,7 +692,7 @@ document.addEventListener("DOMContentLoaded", cargarDatosAnexoReferencia);
                 document.addEventListener("DOMContentLoaded", function() {
                     document.getElementById("btnRegistrarTransfusion").addEventListener("click", function(event) {
                         event.preventDefault();
-                        swal("Advertencia", "Este paciente ya tiene un registro de transfusión y no puede agregar otro.", "warning");
+                        Swal.fire("Advertencia", "Este paciente ya tiene un registro de transfusión y no puede agregar otro.", "warning");
                     });
                 });
             </script>
@@ -926,7 +927,7 @@ document.querySelectorAll("input, textarea").forEach(input => {
 
     if (faltantes.length > 0) {
         console.error("❌ Faltan los siguientes campos:", faltantes);
-        swal('Error', 'Faltan los siguientes campos: ' + faltantes.join(', '), 'error');
+        Swal.fire('Error', 'Faltan los siguientes campos: ' + faltantes.join(', '), 'error');
         return;
     }
 
@@ -941,18 +942,18 @@ document.querySelectorAll("input, textarea").forEach(input => {
         success: function (response) {
             console.log("✅ Respuesta del servidor:", response);
             if (response.warning) {
-                swal("Advertencia", response.message, "warning");
+                Swal.fire("Advertencia", response.message, "warning");
             } else if (response.success) {
-                swal('Agregado correctamente', 'Buen trabajo', 'success').then(() => {
+                Swal.fire('Agregado correctamente', 'Buen trabajo', 'success').then(() => {
                     location.reload();
                 });
             } else {
-                swal('Error', response.message, 'error');
+                Swal.fire('Error', response.message, 'error');
             }
         },
         error: function (xhr, status, error) {
             console.error("❌ Error en AJAX:", xhr.responseText);
-            swal('Error', 'No se pudo agregar el registro', 'error');
+            Swal.fire('Error', 'No se pudo agregar el registro', 'error');
         }
     });
 }
@@ -974,14 +975,14 @@ function descargarTransfusionPDF() {
                     window.open(`generate_transfusión_hemoderivados.php?idpa=${idpa}`, '_blank');
                 } else {
                     // Mostrar advertencia si no hay motivo guardado
-                    swal('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
+                    Swal.fire('Advertencia', 'No se puede generar la hoja solicitada ya que no has registrado los datos para completar la solicitud.', 'warning');
                 }
             } else {
-                swal('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
+                Swal.fire('Error', response.message || 'Hubo un problema al verificar el motivo.', 'error');
             }
         },
         error: function (xhr) {
-            swal('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
+            Swal.fire('Error', 'No se pudo verificar el motivo. Intente nuevamente más tarde.', 'error');
         }
     });
 }
@@ -1039,7 +1040,7 @@ for (i = 0; i < acc.length; i++) {
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <?php include_once '../../backend/modal/md_geog.php' ?>
 <?php include_once '../../backend/modal/md_consul.php' ?>
 <?php include_once '../../backend/modal/md_trat.php' ?>

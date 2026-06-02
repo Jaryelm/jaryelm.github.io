@@ -7,8 +7,9 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
     <title>MEDIDATA</title>
@@ -134,7 +135,11 @@ function hideLoadingModal() {
                 console.error('Error fetching total studies:', data.error);
                 document.getElementById('total-studies').textContent = 'Error al cargar el total de estudios';
             } else {
-                document.getElementById('total-studies').textContent = `Total Estudios: ${data.total.toLocaleString()}`;
+                let label = `Total Estudios: ${data.total.toLocaleString()}`;
+                if (data.last_sync) {
+                    label += ' · Sync: ' + data.last_sync;
+                }
+                document.getElementById('total-studies').textContent = label;
             }
         } catch (error) {
             console.error('Error fetching total studies:', error);
@@ -142,28 +147,48 @@ function hideLoadingModal() {
         }
     }
 
-    // Función para sincronizar con Orthanc
+    // Botón manual: sincronizar con Orthanc (para evitar escrituras globales por cada usuario)
     async function syncWithOrthanc() {
+        const btn = document.getElementById('btn-sync-orthanc');
+        if (!btn) return;
+        btn.disabled = true;
+        const prevText = btn.textContent;
+        btn.textContent = 'Sincronizando...';
         try {
-            const response = await fetch('sync_orthanc.php');
+            const response = await fetch('sync_orthanc.php', { cache: 'no-store' });
             const data = await response.json();
             if (!data.success) {
-                throw new Error(data.error);
+                throw new Error(data.error || 'Error al sincronizar');
             }
+            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Sincronización OK');
+            // Refrescar contadores y listado
+            fetchTotalStudies();
+            fetchStudies();
         } catch (error) {
             console.error('Error syncing with Orthanc:', error);
+            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Error al sincronizar');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = prevText;
         }
     }
 
-    // Cargar estudios al cargar la página
-    document.addEventListener('DOMContentLoaded', async function() {
-        await syncWithOrthanc(); // Sincronizar primero
+    document.addEventListener('DOMContentLoaded', function () {
         fetchTotalStudies();
+        const btn = document.getElementById('btn-sync-orthanc');
+        if (btn) {
+            btn.addEventListener('click', () => syncWithOrthanc());
+        }
     });
 </script>
             
 <!-- Barra de Búsqueda -->
 <input type="text" id="search-bar" placeholder="Buscar..." />
+
+<div style="margin: 10px 0;">
+    <button id="btn-sync-orthanc" class="button" type="button">Sincronizar Orthanc</button>
+    <span id="sync-status" style="margin-left: 12px; color: #1a7f37;"></span>
+</div>
 
 <!-- Tabla de Estudios -->
 <table id="studies-table">
@@ -216,7 +241,18 @@ async function fetchStudies() {
 
     try {
         const response = await fetch(`get_studies.php?page=${currentPage}&limit=${studiesPerPage}&search=${encodeURIComponent(searchQuery)}`);
-        const data = await response.json();
+        const raw = await response.text();
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (parseErr) {
+            const htmlLike = raw.trim().startsWith('<');
+            throw new Error(
+                (htmlLike ? 'El servidor devolvió una página HTML en lugar de JSON (404, error PHP o redirección). ' : '') +
+                'HTTP ' + response.status + '. ' +
+                raw.substring(0, 180).replace(/\s+/g, ' ')
+            );
+        }
 
         if (!data.success) {
             throw new Error(data.error || 'Error desconocido al cargar estudios');
@@ -226,7 +262,7 @@ async function fetchStudies() {
 
     } catch (error) {
         console.error('Error fetching studies:', error);
-        swal("Error", "No se pudieron cargar los estudios: " + error.message, "error");
+        Swal.fire("Error", "No se pudieron cargar los estudios: " + error.message, "error");
         document.querySelector('#studies-tbody').innerHTML = '<tr><td colspan="9">Error de conexión al cargar estudios.</td></tr>';
         updatePagination(0);
     } finally {
@@ -374,7 +410,7 @@ document.getElementById('search-bar')?.addEventListener('input', function() {
 // Función para ver una serie
 function viewSeries(seriesId) {
     if (!seriesId) {
-        swal("Información", "No hay serie disponible para ver.", "info");
+        Swal.fire("Información", "No hay serie disponible para ver.", "info");
         return;
     }
     
@@ -405,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Función para descargar un estudio
 function downloadStudy(studyId) {
     if (!studyId || studyId === 'N/A') {
-        swal("Información", "No hay ID de estudio válido para descargar.", "info");
+        Swal.fire("Información", "No hay ID de estudio válido para descargar.", "info");
         return;
     }
     
@@ -668,7 +704,7 @@ th:nth-child(9), td:nth-child(9) {
     <script src="../../backend/registros/script/botones_color.js"></script>
 
     <!-- Alertas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html>

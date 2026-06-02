@@ -4,20 +4,30 @@
  * Sistema: MEDIDATA
  */
 
+ob_start();
 include_once __DIR__ . '/session_check.php';
 include_once __DIR__ . '/../bd/Conexion.php';
 header('Content-Type: application/json');
+ini_set('display_errors', '0');
+
+function opm_json(array $payload): void
+{
+    if (ob_get_length()) {
+        ob_clean();
+    }
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+}
 
 // Solo Contabilidad y Administrador pueden editar partidas manuales
 if (($_SESSION['rol'] ?? '') === 'Auxiliar Contable') {
-    echo json_encode(['success' => false, 'message' => 'No tiene permisos']);
+    opm_json(['success' => false, 'message' => 'No tiene permisos']);
     exit;
 }
 
 try {
     $numeroPartida = trim($_GET['numero_partida'] ?? '');
     if (empty($numeroPartida)) {
-        echo json_encode(['success' => false, 'message' => 'Número de partida requerido']);
+        opm_json(['success' => false, 'message' => 'Número de partida requerido']);
         exit;
     }
 
@@ -32,7 +42,7 @@ try {
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($rows)) {
-        echo json_encode(['success' => false, 'message' => 'Partida no encontrada']);
+        opm_json(['success' => false, 'message' => 'Partida no encontrada']);
         exit;
     }
 
@@ -56,7 +66,7 @@ try {
         ];
     }
 
-    echo json_encode([
+    opm_json([
         'success' => true,
         'numero_partida' => $numeroPartida,
         'fecha_ocurrencia' => $fechaOcurrencia,
@@ -68,5 +78,5 @@ try {
 
 } catch (Exception $e) {
     error_log("Error obtener_partida_manual: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Error al obtener partida']);
+    opm_json(['success' => false, 'message' => 'Error al obtener partida']);
 }

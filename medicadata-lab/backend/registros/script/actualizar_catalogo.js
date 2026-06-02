@@ -21,18 +21,18 @@ document.getElementById('actualizar-form').addEventListener('submit', function(e
     .then(data => {
         // Mostrar la alerta de acuerdo a la respuesta
         if (data.success) {
-            swal("¡Éxito!", data.message, "success");
+            Swal.fire({ title: "¡Éxito!", text: data.message || "Operación completada", icon: "success", confirmButtonText: "OK" });
             // Limpiar el formulario después de la actualización
             document.getElementById('actualizar-form').reset();
             if (typeof jQuery !== 'undefined' && jQuery.fn.select2 && jQuery('#tipo-cuenta-actualizar').length) {
                 jQuery('#tipo-cuenta-actualizar').trigger('change');
             }
         } else {
-            swal("Error", data.message, "error");
+            Swal.fire({ title: "Error", text: data.message || "No se pudo completar la operación", icon: "error", confirmButtonText: "OK" });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        swal("Error", "Ocurrió un error inesperado.", "error");
+        Swal.fire({ title: "Error", text: "Ocurrió un error inesperado.", icon: "error", confirmButtonText: "OK" });
     });
 });

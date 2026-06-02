@@ -7,7 +7,11 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< Updated upstream
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+=======
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
+>>>>>>> Stashed changes
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -17,6 +21,10 @@ include_once '../../backend/registros/session_check.php';
     
     <!-- Select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<<<<<<< Updated upstream
+=======
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+>>>>>>> Stashed changes
 
     <title>MEDIDATA - Pre-Clínica</title>
 </head>
@@ -76,6 +84,7 @@ include_once '../../backend/registros/session_check.php';
                 </div>
 
             <div id="vitals_display_area">
+<<<<<<< Updated upstream
                 <div class="preclinica-split">
                     <div class="content-data preclinica-col-form">
                         <div class="head"><h3>Registrar Nuevos Signos Vitales</h3></div>
@@ -152,6 +161,82 @@ include_once '../../backend/registros/session_check.php';
                 </div>
 
                 <div class="content-data preclinica-historial-full">
+=======
+                <div class="preclinica-vitals-stack">
+                    <div class="content-data preclinica-col-form">
+                        <div class="head"><h3>Registrar Nuevos Signos Vitales</h3></div>
+                        <hr class="preclinica-section-divider">
+                        <form id="vitals-form">
+                            <div id="vitals-form-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <div class="form-group">
+                                    <label for="weight_kg">Peso (KG)</label>
+                                    <input type="number" step="0.01" id="weight_kg" class="form-control" placeholder="Ej: 70.5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="stature_cm">Talla (CM)</label>
+                                    <input type="number" step="0.01" id="stature_cm" class="form-control" placeholder="Ej: 175" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Presión Arterial (mmHg)</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="number" id="bp_sys" class="form-control" placeholder="120" required style="width: 45%;">
+                                        <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                        <input type="number" id="bp_dia" class="form-control" placeholder="80" required style="width: 45%;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Frec. Cardíaca (lpm)</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="number" id="hr_1" class="form-control" placeholder="60" required style="width: 45%;">
+                                        <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                        <input type="number" id="hr_2" class="form-control" placeholder="100" required style="width: 45%;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Frec. Respiratoria (rpm)</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="number" id="rr_1" class="form-control" placeholder="14" required style="width: 45%;">
+                                        <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                        <input type="number" id="rr_2" class="form-control" placeholder="16" required style="width: 45%;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Saturación (SatO2)</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="number" id="sat_1" class="form-control" placeholder="96" required style="width: 45%;">
+                                        <span style="font-size: 1.5rem; font-weight: bold; color: #555;">/</span>
+                                        <input type="number" id="sat_2" class="form-control" placeholder="80" required style="width: 45%;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="temp_c">Temperatura (°C)</label>
+                                    <input type="number" step="0.1" id="temp_c" class="form-control" placeholder="Ej: 36.5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="map_pressure">P.A. Media (PAM)</label>
+                                    <input type="text" id="map_pressure" class="form-control" value="N/A" required>
+                                </div>
+
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label for="glucose_mg">Glucosa (mg/dL)</label>
+                                    <input type="number" step="0.01" id="glucose_mg" class="form-control" placeholder="Ej: 110" required>
+                                </div>
+                            </div>
+                            <div class="preclinica-form-actions">
+                                <button type="submit" id="btn_save_vitals" class="register-btn preclinica-save-vitals-btn" disabled>
+                                    Guardar signos vitales
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="content-data preclinica-historial-full">
+>>>>>>> Stashed changes
                     <div class="head">
                         <h3>Registro de Signos Vitales</h3>
                     </div>
@@ -181,6 +266,10 @@ include_once '../../backend/registros/session_check.php';
                             </tbody>
                         </table>
                     </div>
+<<<<<<< Updated upstream
+=======
+                    </div>
+>>>>>>> Stashed changes
                 </div>
             </div>
 
@@ -193,7 +282,11 @@ include_once '../../backend/registros/session_check.php';
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src='../../backend/js/submenu.js'></script>
+<<<<<<< Updated upstream
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+=======
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+>>>>>>> Stashed changes
 
     <!-- DataTables Scripts -->
     <script src="../../backend/vendor/datatables/dataTables.min.js"></script>
@@ -278,7 +371,11 @@ include_once '../../backend/registros/session_check.php';
                 })
                 .fail(function () {
                     $('#slot_patient_combined').removeClass('is-loading');
+<<<<<<< Updated upstream
                     swal('Error', 'No se pudieron cargar los listados de pacientes.', 'error');
+=======
+                    Swal.fire('Error', 'No se pudieron cargar los listados de pacientes.', 'error');
+>>>>>>> Stashed changes
                 });
 
             $('#preclinic_patient_select').on('change', function() {
@@ -293,7 +390,11 @@ include_once '../../backend/registros/session_check.php';
                 const id = parsed.id;
 
                 if (!tipo || !id || id === '0') {
+<<<<<<< Updated upstream
                     swal('Aviso', 'Seleccione un paciente primero.', 'warning');
+=======
+                    Swal.fire('Aviso', 'Seleccione un paciente primero.', 'warning');
+>>>>>>> Stashed changes
                     return;
                 }
 
@@ -313,7 +414,11 @@ include_once '../../backend/registros/session_check.php';
                         data: { id, tipo },
                         dataSrc: function (json) {
                             if (json && typeof json === 'object' && !Array.isArray(json) && json.error) {
+<<<<<<< Updated upstream
                                 swal('Error', json.error, 'error');
+=======
+                                Swal.fire('Error', json.error, 'error');
+>>>>>>> Stashed changes
                                 return [];
                             }
                             return Array.isArray(json) ? json : [];
@@ -422,7 +527,11 @@ include_once '../../backend/registros/session_check.php';
                 const signoId = $(this).data('id');
                 const parsed = preclinicParsePatientValue($('#preclinic_patient_select').val());
                 if (!parsed.tipo || !parsed.id || parsed.id === '0') {
+<<<<<<< Updated upstream
                     swal('Aviso', 'Seleccione paciente y pulse Consultar antes de generar el PDF.', 'warning');
+=======
+                    Swal.fire('Aviso', 'Seleccione paciente y pulse Consultar antes de generar el PDF.', 'warning');
+>>>>>>> Stashed changes
                     return;
                 }
                 const id = parsed.id;
@@ -438,7 +547,11 @@ include_once '../../backend/registros/session_check.php';
                 const tipo = parsed.tipo;
                 const idPaciente = parsed.id;
 
+<<<<<<< Updated upstream
                 swal({
+=======
+                Swal.fire({
+>>>>>>> Stashed changes
                     title: "¿Confirmar Aprobación?",
                     text: "Se registrará su nombre como revisor de estos signos vitales.",
                     icon: "info",
@@ -446,15 +559,26 @@ include_once '../../backend/registros/session_check.php';
                 }).then((willApprove) => {
                     if (!willApprove) return;
                     if (!tipo || !idPaciente) {
+<<<<<<< Updated upstream
                         swal('Error', 'Selección de paciente no válida. Vuelva a elegir al paciente y pulse Consultar.', 'error');
+=======
+                        Swal.fire('Error', 'Selección de paciente no válida. Vuelva a elegir al paciente y pulse Consultar.', 'error');
+>>>>>>> Stashed changes
                         return;
                     }
                     $.post(PRECLINICA_API + 'pre_clinica_approve_vitals.php', { id: idRegistro, tipo: tipo }, function(resp) {
                         if (resp.success) {
+<<<<<<< Updated upstream
                             swal("Éxito", resp.success, "success");
                             cargarVitals(tipo, idPaciente);
                         } else {
                             swal("Error", resp.error || "No se pudo aprobar", "error");
+=======
+                            Swal.fire("Éxito", resp.success, "success");
+                            cargarVitals(tipo, idPaciente);
+                        } else {
+                            Swal.fire("Error", resp.error || "No se pudo aprobar", "error");
+>>>>>>> Stashed changes
                         }
                     }, 'json');
                 });
@@ -468,17 +592,28 @@ include_once '../../backend/registros/session_check.php';
                 const id = parsed.id != null ? String(parsed.id).trim() : '';
 
                 if (!tipo || !id || id === '0') {
+<<<<<<< Updated upstream
                     swal('Aviso', 'Seleccione un paciente y pulse Consultar antes de guardar.', 'warning');
                     return false;
                 }
 
                 // Construir valores compuestos solo para los que la BD espera como string "X/Y"
                 // Para los numéricos (Peso, Talla, Temp, Glucosa) enviamos solo la unidad base (KG, CM, °C, mg/dL)
+=======
+                    Swal.fire('Aviso', 'Seleccione un paciente y pulse Consultar antes de guardar.', 'warning');
+                    return false;
+                }
+
+>>>>>>> Stashed changes
                 const weight = $('#weight_kg').val();
                 const stature = $('#stature_cm').val();
                 const temperature = $('#temp_c').val();
                 const glucose = $('#glucose_mg').val();
+<<<<<<< Updated upstream
                 
+=======
+
+>>>>>>> Stashed changes
                 const blood_pressure = $('#bp_sys').val() + '/' + $('#bp_dia').val();
                 const heart_rate = $('#hr_1').val() + '/' + $('#hr_2').val();
                 const respiratory_rate = $('#rr_1').val() + '/' + $('#rr_2').val();
@@ -500,19 +635,31 @@ include_once '../../backend/registros/session_check.php';
 
                 $.post(PRECLINICA_API + 'pre_clinica_save_vitals.php', formData, function(resp) {
                     if (resp && resp.success) {
+<<<<<<< Updated upstream
                         swal('Éxito', resp.success, 'success');
+=======
+                        Swal.fire('Éxito', resp.success, 'success');
+>>>>>>> Stashed changes
                         $('#vitals-form')[0].reset();
                         $('#map_pressure').val('N/A');
                         cargarVitals(tipo, id);
                     } else {
+<<<<<<< Updated upstream
                         swal('Error', (resp && resp.error) ? resp.error : 'No se pudo guardar', 'error');
+=======
+                        Swal.fire('Error', (resp && resp.error) ? resp.error : 'No se pudo guardar', 'error');
+>>>>>>> Stashed changes
                     }
                 }, 'json').fail(function(xhr) {
                     let det = 'Respuesta no válida del servidor.';
                     if (xhr.responseText) {
                         det = xhr.responseText.substring(0, 500);
                     }
+<<<<<<< Updated upstream
                     swal('Error', 'No se pudo guardar (' + (xhr.status || '?') + '). ' + det, 'error');
+=======
+                    Swal.fire('Error', 'No se pudo guardar (' + (xhr.status || '?') + '). ' + det, 'error');
+>>>>>>> Stashed changes
                 });
             });
         });

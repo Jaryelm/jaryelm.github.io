@@ -8,7 +8,11 @@
         <li>
             <a href="#"><i class='bx bx-accessibility icon'></i><span>ENFERMERÍA</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
+<<<<<<< Updated upstream
                 <li><a href="../enfermeria/pre_clinica_user.php"><span>ADMISIÓN</span></a></li>
+=======
+                <li><a href="../enfermeria/pre_clinica_user.php"><span>PRE CLINICA</span></a></li>
+>>>>>>> Stashed changes
                 <li><a href="../enfermeria/preadmision.php"><span>ADMISIÓN</span></a></li>
                 <li><a href="../enfermeria/historial_user.php"><span>EXPEDIENTE CLINICO</span></a></li>
                 <li><a href="../enfermeria/otros_anexos_paciente.php"><span>OTROS ANEXOS</span></a></li>

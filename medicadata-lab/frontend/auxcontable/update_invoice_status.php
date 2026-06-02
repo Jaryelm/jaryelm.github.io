@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($currentStatus === 'Cobrada' && $status === 'Pendiente') {
             echo '<script type="text/javascript">
-            swal("Operación no permitida", "No se puede revertir el estado de una factura cobrada.", "warning").then(function() {
+            Swal.fire("Operación no permitida", "No se puede revertir el estado de una factura cobrada.", "warning").then(function() {
                 window.location.reload();
             });
             </script>';
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($currentStatus === 'Cobrada' && $status === 'Cobrada') {
             echo '<script type="text/javascript">
-            swal("Factura ya cobrada", "Esta factura ya fue cobrada. No se puede volver a actualizar.", "info").then(function() {
+            Swal.fire("Factura ya cobrada", "Esta factura ya fue cobrada. No se puede volver a actualizar.", "info").then(function() {
                 window.location.reload();
             });
             </script>';
@@ -64,27 +64,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             echo '<script type="text/javascript">
-            swal("¡Actualizado!", "Estado actualizado correctamente. Esta acción no se puede deshacer.", "success").then(function() {
+            Swal.fire("¡Actualizado!", "Estado actualizado correctamente. Esta acción no se puede deshacer.", "success").then(function() {
                 window.location.reload();
             });
             </script>';
         } else {
             echo '<script type="text/javascript">
-            swal("Error!", "Error al actualizar el estado", "error").then(function() {
+            Swal.fire("Error!", "Error al actualizar el estado", "error").then(function() {
                 window.location.reload();
             });
             </script>';
         }
     } else {
         echo '<script type="text/javascript">
-        swal("Datos inválidos!", "Verifica los datos proporcionados", "warning").then(function() {
+        Swal.fire("Datos inválidos!", "Verifica los datos proporcionados", "warning").then(function() {
             window.location.reload();
         });
         </script>';
     }
 } else {
     echo '<script type="text/javascript">
-    swal("Método no permitido!", "Usa el método POST para esta acción", "error").then(function() {
+    Swal.fire("Método no permitido!", "Usa el método POST para esta acción", "error").then(function() {
         window.location.reload();
     });
     </script>';

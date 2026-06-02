@@ -10,7 +10,7 @@ date_default_timezone_set('America/Tegucigalpa');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <!-- Data Tables -->
@@ -19,6 +19,7 @@ date_default_timezone_set('America/Tegucigalpa');
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
 </head>
 <body>
@@ -295,9 +296,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             ]);
         
             if ($ok) {
-                echo '<script>swal("¡Guardado!", "Los ajustes se han guardado correctamente.", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
+                echo '<script>Swal.fire("¡Guardado!", "Los ajustes se han guardado correctamente.", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
             } else {
-                echo '<script>swal("Error", "No se pudieron guardar los ajustes.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
+                echo '<script>Swal.fire("Error", "No se pudieron guardar los ajustes.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
             }
         }
 
@@ -343,7 +344,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             $sql = "UPDATE honorarios_medicos SET estado_pago = 'pagado', fecha_pago = ?, updated_by = ?, updated_at = ? WHERE id_factura = ? AND id_doctor = ?";
             $stmt = $connect->prepare($sql);
             $stmt->execute([$fecha_actual, $usuario, $fecha_actual, $id_factura, $id_doctor]);
-            echo '<script>swal("¡Pagado!", "Honorario marcado como pagado", "success").then(function(){location.reload();});</script>';
+            echo '<script>Swal.fire("¡Pagado!", "Honorario marcado como pagado", "success").then(function(){location.reload();});</script>';
         }
 
         // Procesar guardado de remitentes
@@ -360,7 +361,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             $stmt_check->execute([$id_factura, $id_servicio]);
             
             if ($stmt_check->fetchColumn() > 0) {
-                echo '<script>swal("Error", "Este servicio ya está asignado a un remitente para esta factura.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
+                echo '<script>Swal.fire("Error", "Este servicio ya está asignado a un remitente para esta factura.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
             } else {
                 // Obtener si el médico comisiona
                 $stmt_doctor = $connect->prepare("SELECT comisiona FROM doctor WHERE idodc = ?");
@@ -396,9 +397,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 ]);
 
                 if ($ok) {
-                    echo '<script>swal("¡Guardado!", "El remitente se ha guardado correctamente.", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
+                    echo '<script>Swal.fire("¡Guardado!", "El remitente se ha guardado correctamente.", "success").then(function(){ window.location.href = "honorarios.php"; });</script>';
                 } else {
-                    echo '<script>swal("Error", "No se pudo guardar el remitente.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
+                    echo '<script>Swal.fire("Error", "No se pudo guardar el remitente.", "error").then(function(){ window.location.href = "honorarios.php"; });</script>';
                 }
             }
         }
@@ -756,7 +757,7 @@ function exportarConDetalles(dt) {
         facturas.push(data[0]); // Ajusta el índice si la factura no está en la primera columna
     });
 
-    swal({ title: "Preparando exportación...", text: "Por favor espera...", buttons: false, closeOnClickOutside: false, closeOnEsc: false });
+    Swal.fire({ title: "Preparando exportación...", text: "Por favor espera...", buttons: false, closeOnClickOutside: false, closeOnEsc: false });
 
     $.ajax({
         url: 'get_datos_exportacion.php',
@@ -770,12 +771,12 @@ function exportarConDetalles(dt) {
             dt.button('.buttons-excel').trigger();
         },
         error: function() {
-            swal("Error", "No se pudieron obtener los datos extendidos para exportar.", "error");
+            Swal.fire("Error", "No se pudieron obtener los datos extendidos para exportar.", "error");
         }
     });
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src='../../backend/js/submenu.js'></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 
@@ -863,7 +864,7 @@ window.onclick = function (event) {
 };
 function verServicios(idFactura, idDoctor) {
     if (!idDoctor) {
-        swal('Información', 'Esta factura no tiene un médico asignado para calcular honorarios.', 'info');
+        Swal.fire('Información', 'Esta factura no tiene un médico asignado para calcular honorarios.', 'info');
         return;
     }
     $.ajax({
@@ -1043,7 +1044,7 @@ function cargarMedicos() {
             });
         },
         error: function() {
-            swal('Error', 'No se pudieron cargar los médicos.', 'error');
+            Swal.fire('Error', 'No se pudieron cargar los médicos.', 'error');
         }
     });
 }
@@ -1070,7 +1071,7 @@ function cargarServiciosFactura(idFactura) {
             });
         },
         error: function() {
-            swal('Error', 'No se pudieron cargar los servicios.', 'error');
+            Swal.fire('Error', 'No se pudieron cargar los servicios.', 'error');
         }
     });
 }

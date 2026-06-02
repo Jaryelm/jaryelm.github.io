@@ -1,65 +1,58 @@
-<?php  
-if (isset($_POST['upd_doctors'])) {
-    $idodc = $_POST['midp'];
-    $ceddoc = $_POST['docce'];
-    $nodoc = $_POST['docna'];
-    $apdoc = $_POST['docap'];
-    $nomesp = $_POST['doces'];
-    $direcd = $_POST['docdi'];
-    $sexd = $_POST['docge'];
-    $phd = $_POST['docte'];
-    $nacd = $_POST['docda'];
-    $corr = $_POST['doccorr'];
+<?php
+if (!isset($_POST['upd_doctors'])) {
+    return;
+}
 
-    try {
-        // Consulta para actualizar todos los campos
-        $query = "UPDATE doctor SET 
-                  ceddoc = :ceddoc, 
-                  nodoc = :nodoc, 
-                  apdoc = :apdoc, 
-                  nomesp = :nomesp, 
-                  direcd = :direcd, 
-                  sexd = :sexd, 
-                  phd = :phd, 
-                  nacd = :nacd, 
-                  corr = :corr 
-                  WHERE idodc = :idodc";
+$idodc = (int) ($_POST['midp'] ?? 0);
+$ceddoc = trim((string) ($_POST['docce'] ?? ''));
+$nodoc = trim((string) ($_POST['docna'] ?? ''));
+$apdoc = trim((string) ($_POST['docap'] ?? ''));
+$nomesp = trim((string) ($_POST['doces'] ?? ''));
+$direcd = trim((string) ($_POST['docdi'] ?? ''));
+$sexd = trim((string) ($_POST['docge'] ?? ''));
+$phd = trim((string) ($_POST['docte'] ?? ''));
+$nacd = trim((string) ($_POST['docda'] ?? ''));
+$corr = trim((string) ($_POST['doccorr'] ?? ''));
 
-        $statement = $connect->prepare($query);
-
-        // Datos a ser actualizados
-        $data = [
-            ':ceddoc' => $ceddoc,
-            ':nodoc' => $nodoc,
-            ':apdoc' => $apdoc,
-            ':nomesp' => $nomesp,
-            ':direcd' => $direcd,
-            ':sexd' => $sexd,
-            ':phd' => $phd,
-            ':nacd' => $nacd,
-            ':corr' => $corr,
-            ':idodc' => $idodc
-        ];
-
-        $query_execute = $statement->execute($data);
-
-        if ($query_execute) {
-            echo '<script type="text/javascript">
-                swal("Actualizado!", "Actualizado correctamente", "success").then(function() {
-                    window.location = "mostrar.php";
-                });
-            </script>';
-            exit(0);
-        } else {
-            echo '<script type="text/javascript">
-                swal("Error!", "Error al actualizar", "error").then(function() {
-                    window.location = "mostrar.php";
-                });
-            </script>';
-            exit(0);
-        }
-
-    } catch (PDOException $e) {
-        echo $e->getMessage();
+try {
+    if ($idodc <= 0) {
+        throw new RuntimeException('Identificador de médico no válido.');
     }
+
+    $query = 'UPDATE doctor SET
+              ceddoc = :ceddoc,
+              nodoc = :nodoc,
+              apdoc = :apdoc,
+              nomesp = :nomesp,
+              direcd = :direcd,
+              sexd = :sexd,
+              phd = :phd,
+              nacd = :nacd,
+              corr = :corr
+              WHERE idodc = :idodc';
+
+    $statement = $connect->prepare($query);
+    $ok = $statement->execute([
+        ':ceddoc' => $ceddoc,
+        ':nodoc' => $nodoc,
+        ':apdoc' => $apdoc,
+        ':nomesp' => $nomesp,
+        ':direcd' => $direcd,
+        ':sexd' => $sexd,
+        ':phd' => $phd,
+        ':nacd' => $nacd,
+        ':corr' => $corr,
+        ':idodc' => $idodc,
+    ]);
+
+    if ($ok) {
+        echo '<script>Swal.fire("Actualizado", "Médico actualizado correctamente", "success").then(function(){ window.location="mostrar.php"; });</script>';
+    } else {
+        echo '<script>Swal.fire("Error", "No se pudo actualizar el médico", "error");</script>';
+    }
+    exit;
+} catch (Throwable $e) {
+    error_log('upd_doctor: ' . $e->getMessage());
+    echo '<script>Swal.fire("Error", ' . json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE) . ', "error");</script>';
+    exit;
 }

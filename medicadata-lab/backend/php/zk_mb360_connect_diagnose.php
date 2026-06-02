@@ -6,7 +6,11 @@
  *   C:\xampp\php\php.exe backend\php\zk_mb360_connect_diagnose.php
  *
  * IPs distintas a reloj_biometrico_config.php:
+<<<<<<< Updated upstream
  *   C:\xampp\php\php.exe backend\php\zk_mb360_connect_diagnose.php 192.168.1.205 4370
+=======
+ *   C:\xampp\php\php.exe backend\php\zk_mb360_connect_diagnose.php 192.168.1.91 4370
+>>>>>>> Stashed changes
  */
 declare(strict_types=1);
 

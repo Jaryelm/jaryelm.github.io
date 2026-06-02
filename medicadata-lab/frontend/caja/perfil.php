@@ -70,67 +70,64 @@ function iniciarTurno() {
         </div>
     `;
     
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = formHTML;
-    const formContainer = tempDiv.firstElementChild;
-    
-    swal({
+    Swal.fire({
         title: "Iniciar Turno",
-        content: formContainer,
-        buttons: {
-            cancel: "Cancelar",
-            confirm: "Iniciar Turno"
-        },
-    }).then((continuar) => {
-        if (continuar) {
-            const turno = document.getElementById('turno-select-modal').value;
-            
-            if (!turno) {
-                swal("Error", "Debe seleccionar un turno.", "error");
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('turno', turno);
-            
-            fetch('../../backend/registros/iniciar_turno.php', { 
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.text())
-                .then(script => {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = script;
-                    const scripts = tempDiv.querySelectorAll('script');
-                    scripts.forEach((scriptEl) => {
-                        const newScript = document.createElement('script');
-                        newScript.textContent = scriptEl.textContent;
-                        document.body.appendChild(newScript);
-                        newScript.remove();
-                    });
-                    
-                    // Actualizar botones
-                    setTimeout(() => verificarEstadoTurno(), 500);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    swal("Error", "Error al iniciar turno.", "error");
-                });
+        html: formHTML,
+        showCancelButton: true,
+        confirmButtonText: "Iniciar Turno",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#035c67",
+        focusConfirm: false,
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
         }
+        const turno = document.getElementById('turno-select-modal')?.value || '';
+
+        if (!turno) {
+            Swal.fire("Error", "Debe seleccionar un turno.", "error");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('turno', turno);
+
+        fetch('../../backend/registros/iniciar_turno.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text())
+            .then(script => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = script;
+                const scripts = tempDiv.querySelectorAll('script');
+                scripts.forEach((scriptEl) => {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = scriptEl.textContent;
+                    document.body.appendChild(newScript);
+                    newScript.remove();
+                });
+
+                setTimeout(() => verificarEstadoTurno(), 500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire("Error", "Error al iniciar turno.", "error");
+            });
     });
 }
 
 function cierreCaja() {
-    swal({
+    Swal.fire({
         title: "CONFIRMAR CIERRE DE CAJA",
         text: "¿Está seguro que desea realizar el cierre de caja?",
         icon: "warning",
-        buttons: {
-            cancel: "Cancelar",
-            confirm: "Sí, realizar cierre"
-        },
-    }).then((willClose) => {
-        if (willClose) {
+        showCancelButton: true,
+        confirmButtonText: "Sí, realizar cierre",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#035c67",
+    }).then((result) => {
+        if (result.isConfirmed) {
             fetch('../../backend/registros/cierre_caja.php', { 
                 method: 'POST',
                 body: new FormData()
@@ -149,7 +146,7 @@ function cierreCaja() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    swal("Error", "Error al realizar el cierre.", "error");
+                    Swal.fire("Error", "Error al realizar el cierre.", "error");
                 });
         }
     });

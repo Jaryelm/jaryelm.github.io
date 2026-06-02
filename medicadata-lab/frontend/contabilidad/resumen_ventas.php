@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,6 +15,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <title>MEDIDATA</title>
 </head>
@@ -180,7 +181,7 @@ if ($sentencia) {
 
 <script>
 function updateStatus(id, status) {
-    swal({
+    Swal.fire({
         title: "¿Estás seguro?",
         text: `Vas a cambiar el estado a "${status}". Esta acción solo puede realizarse una vez y no se puede deshacer.`,
         icon: "warning",
@@ -194,12 +195,12 @@ function updateStatus(id, status) {
                 method: 'POST',
                 data: { id: id, status: status },
                 success: function(response) {
-                    swal("¡Actualizado!", "El estado de la factura se actualizó correctamente", "success").then(function() {
+                    Swal.fire("¡Actualizado!", "El estado de la factura se actualizó correctamente", "success").then(function() {
                         location.reload(); // Recargar la página para reflejar los cambios
                     });
                 },
                 error: function() {
-                    swal("Error!", "Hubo un problema al actualizar el estado", "error").then(function() {
+                    Swal.fire("Error!", "Hubo un problema al actualizar el estado", "error").then(function() {
                         location.reload(); // Intentar nuevamente recargando
                     });
                 }
@@ -435,7 +436,7 @@ function viewDetails(orderId) {
             hideLoadingModal();
             if (loadingP) loadingP.textContent = "Cargando devolución...";
             console.error('Error al obtener detalles:', err);
-            swal("Error", "No se pudieron cargar los detalles", "error");
+            Swal.fire("Error", "No se pudieron cargar los detalles", "error");
         });
 }
 
@@ -520,7 +521,7 @@ function iniciarDevolucion(orderId) {
         .catch(err => {
             hideLoadingModal();
             console.error("Error al cargar devolución:", err);
-            swal("Error", "No se pudieron cargar los datos de devolución", "error");
+            Swal.fire("Error", "No se pudieron cargar los datos de devolución", "error");
         });
 }
 
@@ -538,7 +539,7 @@ function procesarDevolucion(orderId, productId, buttonElement) {
     if (motivo === 'otros') {
         const otroMotivo = otroMotivoTextarea.value.trim();
         if (!otroMotivo) {
-            swal("Error", "Por favor especifique el motivo de la devolución", "error");
+            Swal.fire("Error", "Por favor especifique el motivo de la devolución", "error");
             return;
         }
         motivo = `Otros: ${otroMotivo}`;
@@ -546,12 +547,12 @@ function procesarDevolucion(orderId, productId, buttonElement) {
 
     // Validaciones
     if (!cantidad || !motivo) {
-        swal("Error", "Por favor complete todos los campos", "error");
+        Swal.fire("Error", "Por favor complete todos los campos", "error");
         return;
     }
 
     // Confirmar devolución
-    swal({
+    Swal.fire({
         title: "¿Está seguro?",
         text: "Esta acción no se puede deshacer",
         icon: "warning",
@@ -575,12 +576,12 @@ function procesarDevolucion(orderId, productId, buttonElement) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    swal("¡Éxito!", "Devolución procesada correctamente", "success")
+                    Swal.fire("¡Éxito!", "Devolución procesada correctamente", "success")
                     .then(() => {
                         location.reload();
                     });
                 } else {
-                    swal("Error", data.message || "Error al procesar la devolución", "error");
+                    Swal.fire("Error", data.message || "Error al procesar la devolución", "error");
                 }
             });
         }
@@ -612,11 +613,11 @@ function cerrarModalAnulacion() {
 function confirmarAnulacion() {
     const observacion = (document.getElementById('observacionAnulacion').value || '').trim();
     if (!observacion) {
-        swal("Campo requerido", "Por favor escriba el motivo de la anulación.", "warning");
+        Swal.fire("Campo requerido", "Por favor escriba el motivo de la anulación.", "warning");
         return;
     }
     if (!anulacionOrderId) {
-        swal("Error", "No se encontró la orden.", "error");
+        Swal.fire("Error", "No se encontró la orden.", "error");
         return;
     }
     fetch('../../backend/registros/anular_factura.php', {
@@ -627,12 +628,12 @@ function confirmarAnulacion() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            swal("¡Factura anulada!", data.message, "success").then(() => location.reload());
+            Swal.fire("¡Factura anulada!", data.message, "success").then(() => location.reload());
         } else {
-            swal("Error", data.message || "No se pudo anular la factura", "error");
+            Swal.fire("Error", data.message || "No se pudo anular la factura", "error");
         }
     })
-    .catch(() => swal("Error", "No se pudo conectar con el servidor", "error"));
+    .catch(() => Swal.fire("Error", "No se pudo conectar con el servidor", "error"));
     cerrarModalAnulacion();
 }
 
@@ -1032,7 +1033,7 @@ $(document).ready(function() {
 });
 </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>

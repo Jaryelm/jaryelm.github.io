@@ -20,7 +20,11 @@ function medidata_reloj_biometrico_config(): array
 {
     $ip = getenv('MEDIDATA_RELOJ_IP');
     if ($ip === false || trim($ip) === '') {
+<<<<<<< Updated upstream
         $ip = '192.168.1.201';
+=======
+        $ip = '192.168.1.91';
+>>>>>>> Stashed changes
     }
 
     $portRaw = getenv('MEDIDATA_RELOJ_PORT');

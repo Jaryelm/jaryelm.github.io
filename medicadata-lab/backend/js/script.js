@@ -276,3 +276,4 @@ if (chartElement) {
     var chart = new ApexCharts(chartElement, options);
     chart.render();
 }
+

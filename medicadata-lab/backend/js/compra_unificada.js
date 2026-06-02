@@ -60,6 +60,19 @@
     function clearRowInputs(mainEl, maestroEl) {
         mainEl.querySelectorAll('input:not([type=hidden]):not([type=radio]), textarea').forEach(function (i) {
             if (i.classList.contains('stock-actual') || i.classList.contains('stock-resultado')) return;
+            var n = i.getAttribute('name') || '';
+            if (i.type === 'number') {
+                if (n.indexOf('cantidad') !== -1) {
+                    i.value = '1';
+                } else if (n.indexOf('descuento_porcentaje') !== -1) {
+                    i.value = '0';
+                } else if (n.indexOf('isv') !== -1 || n.indexOf('subtotal') !== -1 || n.indexOf('total_item') !== -1) {
+                    i.value = '0.00';
+                } else {
+                    i.value = '';
+                }
+                return;
+            }
             i.value = '';
         });
         maestroEl.querySelectorAll('input:not([type=radio]), textarea, select').forEach(function (i) {

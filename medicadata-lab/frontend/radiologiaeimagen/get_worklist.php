@@ -1,91 +1,140 @@
 <?php
-// Configurar zona horaria para Honduras
+declare(strict_types=1);
+
 date_default_timezone_set('America/Tegucigalpa');
 
-require_once('../../backend/bd/Conexion.php');
-session_start();
-header('Content-Type: application/json');
+require_once __DIR__ . '/../../backend/bd/Conexion.php';
 
-// Verificar si el usuario ha iniciado sesión
+session_start();
+header('Content-Type: application/json; charset=utf-8');
+
 if (!isset($_SESSION['id'])) {
-    http_response_code(401); // No autorizado
-    echo json_encode(['error' => 'Acceso no autorizado. Inicia sesión para continuar.']);
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Acceso no autorizado. Inicia sesión para continuar.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-try {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $technician_id = $_SESSION['id'];
+/**
+ * @param array<string, mixed> $filters
+ * @param list<mixed> $params
+ */
+function medidata_worklist_sql_where(int $technicianId, array $filters, array &$params): string
+{
+    $where = ' WHERE (w.technician_id = ? OR w.technician_id IS NULL)';
+    $params = [$technicianId];
 
-    // Construir la consulta base
-    $query = "
-        SELECT 
-            w.*,
-            COALESCE(w.patient_name, 'N/A') AS patient_name,
-            COALESCE(w.study_description, 'Sin descripción') AS description,
-            w.study_id AS study_id,
-            CASE WHEN qc.study_id IS NOT NULL THEN 1 ELSE 0 END AS has_quality_control
-        FROM worklist w
-        LEFT JOIN quality_control qc ON w.id = qc.study_id
-        WHERE (w.technician_id = ? OR w.technician_id IS NULL)
-    ";
-    $params = [$technician_id];
-
-    // Aplicar filtros dinámicamente
-    if (!empty($data['modality'])) {
-        $query .= " AND w.modality = ?";
-        $params[] = $data['modality'];
+    if (!empty($filters['modality'])) {
+        $where .= ' AND w.modality = ?';
+        $params[] = (string) $filters['modality'];
     }
 
-    if (!empty($data['priority'])) {
-        $query .= " AND w.priority = ?";
-        $params[] = $data['priority'];
+    if (!empty($filters['priority'])) {
+        $where .= ' AND w.priority = ?';
+        $params[] = (string) $filters['priority'];
     }
 
-    if (!empty($data['status'])) {
-        $query .= " AND w.status = ?";
-        $params[] = $data['status'];
+    if (!empty($filters['status'])) {
+        $where .= ' AND w.status = ?';
+        $params[] = (string) $filters['status'];
     }
 
-    if (!empty($data['date'])) {
-        $query .= " AND DATE(w.study_date) = ?";
-        $params[] = $data['date'];
+    if (!empty($filters['date'])) {
+        $where .= ' AND DATE(w.study_date) = ?';
+        $params[] = (string) $filters['date'];
     }
 
-    // Filtro de búsqueda general
-    if (!empty($data['search'])) {
-        $query .= " AND (w.patient_name LIKE ? OR w.patient_id LIKE ? OR w.study_description LIKE ?)";
-        $searchTerm = '%' . $data['search'] . '%';
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
+    if (!empty($filters['search'])) {
+        $where .= ' AND (w.patient_name LIKE ? OR w.patient_id LIKE ? OR w.study_description LIKE ?)';
+        $term = '%' . (string) $filters['search'] . '%';
+        $params[] = $term;
+        $params[] = $term;
+        $params[] = $term;
     }
 
-    // Ordenar por prioridad y fecha
-    $query .= " ORDER BY 
-        FIELD(w.priority, 'emergency', 'urgent', 'routine'),
-        w.study_date DESC";
-
-    $stmt = $connect->prepare($query);
-    $stmt->execute($params);
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Transformar los resultados si es necesario
-    foreach ($results as &$row) {
-        $row['id'] = $row['id'] ?? null;
-        $row['series_id'] = $row['series_id'] ?? null;
-        $row['patient_id'] = $row['patient_id'] ?? 'N/A';
-        $row['modality'] = $row['modality'] ?? 'N/A';
-        $row['description'] = $row['description'] ?? 'Sin descripción';
-        $row['priority'] = $row['priority'] ?? 'routine';
-        $row['status'] = $row['status'] ?? 'pending';
-        $row['has_quality_control'] = $row['has_quality_control'] ?? 0; // Asegurar que este campo exista
-    }
-
-    echo json_encode($results);
-
-} catch (Exception $e) {
-    http_response_code(500); // Error interno del servidor
-    echo json_encode(['error' => 'Error al cargar la lista de trabajo: ' . $e->getMessage()]);
+    return $where;
 }
-?>
+
+try {
+    $payload = json_decode((string) file_get_contents('php://input'), true);
+    if (!is_array($payload)) {
+        $payload = [];
+    }
+
+    $technicianId = (int) $_SESSION['id'];
+    $page = max(1, (int) ($payload['page'] ?? 1));
+    $limit = (int) ($payload['limit'] ?? 10);
+    $limit = max(5, min(50, $limit));
+    $offset = ($page - 1) * $limit;
+
+    $filters = [
+        'modality' => trim((string) ($payload['modality'] ?? '')),
+        'priority' => trim((string) ($payload['priority'] ?? '')),
+        'status'   => trim((string) ($payload['status'] ?? '')),
+        'date'     => trim((string) ($payload['date'] ?? '')),
+        'search'   => trim((string) ($payload['search'] ?? '')),
+    ];
+
+    $params = [];
+    $where = medidata_worklist_sql_where($technicianId, $filters, $params);
+
+    $countStmt = $connect->prepare('SELECT COUNT(*) FROM worklist w' . $where);
+    $countStmt->execute($params);
+    $total = (int) $countStmt->fetchColumn();
+
+    $sql = "
+        SELECT
+            w.id,
+            w.study_id,
+            w.series_id,
+            w.patient_id,
+            COALESCE(w.patient_name, 'N/A') AS patient_name,
+            w.study_date,
+            w.modality,
+            COALESCE(w.study_description, 'Sin descripción') AS description,
+            w.status,
+            w.priority,
+            w.technician_id,
+            w.radiologist_id,
+            w.radiologist_name,
+            w.last_sync,
+            w.last_update,
+            CASE WHEN EXISTS (
+                SELECT 1 FROM quality_control qc WHERE qc.study_id = w.id LIMIT 1
+            ) THEN 1 ELSE 0 END AS has_quality_control
+        FROM worklist w
+        {$where}
+        ORDER BY
+            FIELD(w.priority, 'emergency', 'urgent', 'routine'),
+            w.study_date DESC,
+            w.id DESC
+        LIMIT {$limit} OFFSET {$offset}
+    ";
+
+    $stmt = $connect->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($rows as &$row) {
+        $row['has_quality_control'] = (int) ($row['has_quality_control'] ?? 0);
+    }
+    unset($row);
+
+    $totalPages = $total > 0 ? (int) ceil($total / $limit) : 1;
+
+    echo json_encode([
+        'success'     => true,
+        'data'        => $rows,
+        'total'       => $total,
+        'page'        => $page,
+        'limit'       => $limit,
+        'totalPages'  => $totalPages,
+    ], JSON_UNESCAPED_UNICODE);
+
+} catch (Throwable $e) {
+    error_log('get_worklist.php: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Error al cargar la lista de trabajo.',
+    ], JSON_UNESCAPED_UNICODE);
+}

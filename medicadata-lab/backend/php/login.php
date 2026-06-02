@@ -50,8 +50,11 @@ if (isset($_POST['login'])) {
                     $_SESSION['name'] = $data['name'];
                     $_SESSION['email'] = $data['email'];
                     $_SESSION['rol'] = $data['rol'];
-                
-                    // ✅ Registrar nueva hora de actividad
+
+                    $nowLogin = time();
+                    $_SESSION['last_activity_ts'] = $nowLogin;
+                    $_SESSION['last_activity_db_sync_ts'] = $nowLogin;
+
                     $localTime = date('Y-m-d H:i:s');
                     $updateStmt = $connect->prepare("UPDATE users SET last_activity = ? WHERE id = ?");
                     $updateStmt->execute([$localTime, $data['id']]);
@@ -73,7 +76,14 @@ if (isset($_POST['login'])) {
                         'Almacen Hospitalario' => 'almacen_hospitalario/escritorio.php',
                         'Radiologo' => 'radiologiaeimagen/escritorio.php',
                         'Tecnico' => 'radiologiaeimagen/escritorio.php',
-                        'Medifarma Almacen' => 'medifarma_almacen/escritorio.php'
+                        'Medifarma Almacen' => 'medifarma_almacen/escritorio.php',
+                        'Aseo' => 'aseo/escritorio.php',
+                        'Estacionamiento' => 'estacionamiento/escritorio.php',
+                        'Farmacia' => 'farmacia/escritorio.php',
+                        'Administracion' => 'administracion/escritorio.php',
+                        'Optica' => 'optica/escritorio.php',
+                        'Odontologo' => 'odontologo/escritorio.php',
+                        'Servicios Generales' => 'recursos_humanos/servicios_generales_usr.php',
                     ];
 
                     if (isset($redirectPaths[$_SESSION['rol']])) {

@@ -41,16 +41,11 @@ try {
     $params = [];
     $types = [];
     
-    if ($fechaDesde) {
-        $query .= " AND fecha_ocurrencia >= :fechaDesde";
-        $params[':fechaDesde'] = $fechaDesde;
-        $types[':fechaDesde'] = PDO::PARAM_STR;
-    }
-    
-    if ($fechaHasta) {
-        $query .= " AND fecha_ocurrencia <= :fechaHasta";
-        $params[':fechaHasta'] = $fechaHasta;
-        $types[':fechaHasta'] = PDO::PARAM_STR;
+    if ($fechaDesde || $fechaHasta) {
+        $filtroFechas = medidata_diario_sql_filtro_rango_fechas($fechaDesde, $fechaHasta, '', '_exp');
+        $query .= $filtroFechas['sql'];
+        $params = array_merge($params, $filtroFechas['params']);
+        $types = array_merge($types, $filtroFechas['types']);
     }
     
     if ($numeroPartida) {

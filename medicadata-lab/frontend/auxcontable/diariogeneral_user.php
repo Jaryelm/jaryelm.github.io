@@ -7,12 +7,13 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
 
@@ -131,6 +132,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     <th>Neto</th>
                     <th>Turno</th>
                     <th>Usuario</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -199,13 +201,20 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     .partida-group-header {
         background-color: #e3f2fd !important;
         font-weight: bold;
-        border-top: 2px solid #035c67;
-        border-bottom: 2px solid #035c67;
+        border: 0 !important;
+        box-shadow: none !important;
     }
     
     .partida-group-header td {
         padding: 12px !important;
         background-color: #e3f2fd !important;
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+    }
+
+    #tablaDiarioGeneral tbody td,
+    #tablaDiarioGeneral thead th {
+        vertical-align: middle !important;
     }
     
     .balance-ok {
@@ -219,7 +228,314 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     #tablaDiarioGeneral tbody tr.partida-group-header:hover {
         background-color: #e3f2fd !important;
     }
+
+    /* Evita el "pantallazo blanco" de DataTables al procesar */
+    #tablaDiarioGeneral_wrapper {
+        position: relative;
+    }
+
+    #tablaDiarioGeneral_wrapper .dataTables_processing {
+        /* Mantener centrado (como admin.css) pero SIN capa blanca */
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        pointer-events: none !important;
+        z-index: 9998 !important;
+    }
+
+    #tablaDiarioGeneral_wrapper .dt-medidata-processing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        color: #035c67;
+    }
+
+    #tablaDiarioGeneral_wrapper .dt-medidata-processing p {
+        margin: 0;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .dt-acciones {
+        white-space: nowrap;
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    .dt-acciones .acciones-wrap {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .btn_ver_detalles {
+        background-color: #06adbf;
+        border: none;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 1.25;
+    }
+
+    .btn_ver_detalles:hover {
+        background-color: #049aad;
+    }
+
+    #diarioEditModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 14000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        justify-content: center;
+        align-items: center;
+    }
+
+    #diarioEditModal .modal-content {
+        width: 96%;
+        max-width: 480px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        padding: 0;
+        text-align: left;
+        position: relative;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+    }
+
+    #diarioEditModal .diario-edit-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 18px;
+        background: #035c67;
+        color: #fff;
+    }
+
+    #diarioEditModal .diario-edit-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    #diarioEditModal .diario-edit-header .close-btn {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        float: none;
+        padding: 0 4px;
+    }
+
+    #diarioEditModal .diario-edit-header .close-btn:hover {
+        color: #fff;
+    }
+
+    #diarioEditModal .diario-edit-form {
+        padding: 16px 18px 18px;
+    }
+
+    #diarioEditModal .diario-edit-section {
+        margin-bottom: 14px;
+    }
+
+    #diarioEditModal .diario-edit-section-title {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #035c67;
+    }
+
+    #diarioEditModal .diario-edit-readonly {
+        padding: 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+    }
+
+    #diarioEditModal .diario-edit-form .form-group {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 6px !important;
+        grid-gap: 6px !important;
+        margin: 0 0 12px 0 !important;
+    }
+
+    #diarioEditModal .diario-edit-form .form-group:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    #diarioEditModal .diario-edit-form label {
+        display: block;
+        width: 100%;
+        margin: 0;
+        font-size: 12px;
+        font-weight: 700;
+        color: #035c67;
+        text-align: left;
+        line-height: 1.25;
+    }
+
+    #diarioEditModal .diario-edit-form .filter-input {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #diarioEditModal .diario-edit-form input[type="text"],
+    #diarioEditModal .diario-edit-form input[type="date"],
+    #diarioEditModal .diario-edit-form textarea {
+        flex-grow: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        padding: 8px 10px !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+        background: #fff !important;
+        color: inherit !important;
+        min-height: 38px;
+        line-height: 1.2;
+    }
+
+    #diarioEditModal .diario-edit-form textarea {
+        min-height: 72px;
+        resize: vertical;
+    }
+
+    #diarioEditModal .diario-edit-form input:disabled {
+        background: #eef1f3 !important;
+        color: #495057;
+        cursor: not-allowed;
+    }
+
+    #diarioEditModal .diario-edit-checkbox {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        margin: 0 !important;
+        font-weight: 400 !important;
+        font-size: 13px !important;
+        color: #374151 !important;
+        cursor: pointer;
+    }
+
+    #diarioEditModal .diario-edit-checkbox input {
+        width: auto !important;
+        min-height: auto !important;
+        margin: 3px 0 0 !important;
+        flex-shrink: 0;
+    }
+
+    #diarioEditModal .diario-edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    #diarioEditModal .diario-edit-actions .btn-filter {
+        margin-top: 0;
+        min-height: auto;
+        padding: 6px 12px;
+        font-size: 13px;
+        line-height: 1.25;
+    }
 </style>
+
+<div id="diarioEditModal" class="modal">
+    <div class="modal-content">
+        <div class="diario-edit-header">
+            <h3>Editar partida</h3>
+            <span class="close-btn" onclick="cerrarModalEditarPartida()" title="Cerrar">&times;</span>
+        </div>
+        <form id="formEditarPartida" class="diario-edit-form">
+            <input type="hidden" id="editNumeroPartida" name="numero_partida">
+            <input type="hidden" id="editReferencia" name="referencia">
+            <input type="hidden" id="editTipoTransaccion" name="tipo_transaccion">
+
+            <div class="diario-edit-section diario-edit-readonly">
+                <p class="diario-edit-section-title">Datos de la partida</p>
+                <div class="form-group">
+                    <label for="editNumeroPartidaLabel">Partida</label>
+                    <input type="text" id="editNumeroPartidaLabel" class="filter-input" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editReferenciaLabel">Referencia</label>
+                    <input type="text" id="editReferenciaLabel" class="filter-input" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editTipoLabel">Tipo</label>
+                    <input type="text" id="editTipoLabel" class="filter-input" disabled>
+                </div>
+            </div>
+
+            <div class="diario-edit-section">
+                <p class="diario-edit-section-title">Corrección</p>
+                <div class="form-group">
+                    <label for="editFechaOcurrencia">Nueva fecha de ocurrencia</label>
+                    <input type="date" id="editFechaOcurrencia" name="fecha_ocurrencia" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="editMotivo">Motivo de corrección</label>
+                    <textarea id="editMotivo" name="motivo" rows="3" maxlength="255" required></textarea>
+                </div>
+                <div class="form-group" id="grupoSyncCompra" style="display:none;">
+                    <label class="diario-edit-checkbox" for="editSyncCompra">
+                        <input type="checkbox" id="editSyncCompra" name="sync_compra_fecha_emision" value="1">
+                        <span>Sincronizar también la fecha del documento en la compra (fecha de emisión).</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="diario-edit-actions">
+                <button type="button" class="btn-filter btn-reset" onclick="cerrarModalEditarPartida()">Cancelar</button>
+                <button type="submit" class="btn_ver_detalles">Guardar ajuste</button>
+            </div>
+        </form>
+    </div>
+</div>
 
         </main>
         <!-- MAIN -->
@@ -236,6 +552,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     
     <script src="../../backend/js/script.js"></script>
 
@@ -328,7 +645,18 @@ $(function () {
                 }
             },
             { data: 'turno' },
-            { data: 'usuario' }
+            { data: 'usuario' },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                className: 'dt-acciones',
+                render: function(data, type, row) {
+                    if (type !== 'display' && type !== 'filter') return '';
+                    if (!row.editable) return '—';
+                    return '<div class="acciones-wrap"><button type="button" class="btn_ver_detalles" data-partida="' + (row.numero_partida || '') + '" data-referencia="' + (row.referencia || '') + '" data-tipo="' + (row.tipo_transaccion || '') + '" data-fecha="' + (row.fecha_ocurrencia_iso || '') + '">Editar</button></div>';
+                }
+            }
         ],
         rowGroup: {
             dataSrc: 'numero_partida',
@@ -372,10 +700,10 @@ $(function () {
                     .append('<td class="text-right"><strong>L. ' + totalDebe.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
                     .append('<td class="text-right"><strong>L. ' + totalHaber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
                     .append('<td class="text-right"><strong>L. ' + diferencia.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</strong></td>')
-                    .append('<td colspan="2" class="' + balanceClass + '"><strong>' + balanceIcon + ' ' + balanceText + '</strong></td>');
+                    .append('<td colspan="3" class="' + balanceClass + '"><strong>' + balanceIcon + ' ' + balanceText + '</strong></td>');
             }
         },
-        order: [[0, 'desc'], [1, 'desc']], // Ordenar por número de partida y fecha de ocurrencia descendente
+        order: [[2, 'desc']], // Ordenar por fecha de registro descendente (más recientes primero)
         pageLength: 10,
         lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Todos"]],
         language: {
@@ -401,6 +729,75 @@ $(function () {
             $('.partida-group-header').css('font-weight', 'bold');
         }
     });
+
+    $('#tablaDiarioGeneral').on('click', '.btn_ver_detalles[data-partida]', function() {
+        abrirModalEditarPartida({
+            numero_partida: $(this).data('partida'),
+            referencia: $(this).data('referencia'),
+            tipo_transaccion: $(this).data('tipo'),
+            fecha_ocurrencia: $(this).data('fecha')
+        });
+    });
+
+    $('#formEditarPartida').on('submit', function(ev) {
+        ev.preventDefault();
+        guardarEdicionPartida();
+    });
+});
+
+function abrirModalEditarPartida(row) {
+    $('#editNumeroPartida').val(row.numero_partida || '');
+    $('#editReferencia').val(row.referencia || '');
+    $('#editTipoTransaccion').val(row.tipo_transaccion || '');
+    $('#editNumeroPartidaLabel').val(row.numero_partida || '');
+    $('#editReferenciaLabel').val(row.referencia || '');
+    $('#editTipoLabel').val(row.tipo_transaccion || '');
+    $('#editFechaOcurrencia').val((row.fecha_ocurrencia || '').slice(0, 10));
+    $('#editMotivo').val('');
+    $('#editSyncCompra').prop('checked', false);
+    if ((row.tipo_transaccion || '').toUpperCase() === 'COMPRA_PROVEEDOR') {
+        $('#grupoSyncCompra').show();
+    } else {
+        $('#grupoSyncCompra').hide();
+    }
+    $('#diarioEditModal').css('display', 'flex');
+}
+
+function cerrarModalEditarPartida() {
+    $('#diarioEditModal').hide();
+}
+
+function guardarEdicionPartida() {
+    var payload = $('#formEditarPartida').serialize();
+    $.ajax({
+        url: '../../backend/php/diario_actualizar_partida.php',
+        method: 'POST',
+        dataType: 'json',
+        data: payload,
+        success: function(resp) {
+            if (resp && resp.ok) {
+                Swal.fire('Actualizado', resp.message || 'Partida actualizada.', 'success');
+                cerrarModalEditarPartida();
+                tablaDiarioGeneral.ajax.reload(null, false);
+                return;
+            }
+            Swal.fire('Error', (resp && resp.message) ? resp.message : 'No se pudo actualizar la partida.', 'error');
+        },
+        error: function(xhr) {
+            var msg = 'No se pudo actualizar la partida.';
+            try {
+                var json = JSON.parse(xhr.responseText || '{}');
+                if (json.message) msg = json.message;
+            } catch (e) {}
+            Swal.fire('Error', msg, 'error');
+        }
+    });
+}
+
+document.addEventListener('click', function(ev) {
+    if (ev.target && ev.target.id === 'diarioEditModal') {
+        cerrarModalEditarPartida();
+    }
 });
 
 function aplicarFiltros() {

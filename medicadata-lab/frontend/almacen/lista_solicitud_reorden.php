@@ -7,7 +7,7 @@ require_once('../../backend/bd/Conexion.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,6 +15,7 @@ require_once('../../backend/bd/Conexion.php');
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
 </head>
 <body>
@@ -150,7 +151,7 @@ include_once '../almacen/menu.php';
                 const id = $(this).data('id');
                 const estado = $(this).data('estado');
 
-                swal({
+                Swal.fire({
                     title: "¿Estás seguro?",
                     text: `¿Deseas ${estado} esta solicitud?`,
                     icon: "warning",
@@ -166,15 +167,15 @@ include_once '../almacen/menu.php';
                             success: function (response) {
                                 const result = JSON.parse(response);
                                 if (result.success) {
-                                    swal(result.message, "", "success").then(() => {
+                                    Swal.fire(result.message, "", "success").then(() => {
                                         location.reload(); // Recargar la página para reflejar los cambios
                                     });
                                 } else {
-                                    swal("Error", result.message, "error");
+                                    Swal.fire("Error", result.message, "error");
                                 }
                             },
                             error: function () {
-                                swal("Error", "Ocurrió un error al procesar la solicitud.", "error");
+                                Swal.fire("Error", "Ocurrió un error al procesar la solicitud.", "error");
                             }
                         });
                     }
@@ -186,7 +187,7 @@ include_once '../almacen/menu.php';
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html>

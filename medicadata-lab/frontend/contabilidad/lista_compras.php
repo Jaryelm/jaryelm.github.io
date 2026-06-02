@@ -6,7 +6,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -14,6 +14,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <title>MEDIDATA</title>
 
@@ -262,7 +263,7 @@ window.verDetalles = function(idCompra) {
                     detallesHTML += `</tbody></table></div>`;
 
                     // Configuración del modal de SweetAlert con mayor ancho
-                    swal({
+                    Swal.fire({
                         title: "Detalles de la Compra",
                         content: $(detallesHTML)[0],
                         buttons: {
@@ -283,16 +284,16 @@ window.verDetalles = function(idCompra) {
                         "overflow-x": "auto" // Permitir scroll horizontal si es necesario
                     });
                 } else {
-                    swal("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
+                    Swal.fire("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
                 }
             } catch (e) {
                 console.error("Error al analizar la respuesta:", e);
-                swal("Error", "Hubo un problema al cargar los detalles.", "error");
+                Swal.fire("Error", "Hubo un problema al cargar los detalles.", "error");
             }
         },
         error: function(xhr, status, error) {
             console.error("Error de AJAX:", status, error);
-            swal("Error", "No se pudo cargar los detalles de la compra.", "error");
+            Swal.fire("Error", "No se pudo cargar los detalles de la compra.", "error");
         }
     });
 }
@@ -302,7 +303,7 @@ window.verDetalles = function(idCompra) {
     });
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

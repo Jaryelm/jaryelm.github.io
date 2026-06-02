@@ -7,7 +7,7 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -15,6 +15,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
 
 
@@ -64,18 +65,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera_nuevo.php')">Registrar Enfermeria</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera.php')">Enfermeria</button>
-<button class="button" onclick="cambiarColor(this, '#')">Registrar Administrativo</button>
-<button class="button" onclick="cambiarColor(this, '#')">Administrativo</button>
-<button class="button" onclick="cambiarColor(this, '#')">Registrar Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '#')">Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/nuevo.php')">Registrar Médicos</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Médicos</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/reclutamiento.php')">Reclutamiento</button>
-<button class="button" onclick="cambiarColor(this, '#')">Proceso de Entrevista</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/laboratorios_nuevo.php')">Registrar Área de Servicio</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/laboratiorios.php')">Äreas de Servicios</button>
+        <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo.php')">Registrar Enfermería</button>
+        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Enfermería</button>
 
 
           <div class="data">
@@ -218,7 +209,7 @@ window.onload = () => {
   }, 2000);
 };
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
  <?php include_once '../../backend/php/delete_nurse.php' ?>
 </body>
 </html>

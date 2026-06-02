@@ -1,12 +1,39 @@
 <?php
 require_once('../../backend/bd/Conexion.php');
 
-if (isset($_POST['add_to_cart'])) {
-    $user_id = $_POST['pdrus'];
-    $name = $_POST['name'];
-    $price = $_POST['prec'];
-    $quantity = $_POST['p_qty'];
-    $type = $_POST['type'];
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+function add_cart_flash_and_redirect(string $title, string $text, string $icon = 'info'): void
+{
+    $_SESSION['swal_flash'] = [
+        'title' => $title,
+        'text' => $text,
+        'icon' => $icon,
+    ];
+
+    header('Location: new_sale.php');
+    exit;
+}
+
+$requestData = $_POST;
+if (empty($requestData) && !empty($_GET)) {
+    // Compatibilidad: algunas tablas renderizadas terminan enviando por GET.
+    $requestData = $_GET;
+}
+
+$hasAddPayload = isset($requestData['prdt'], $requestData['pdrus'], $requestData['name'], $requestData['prec'], $requestData['p_qty'], $requestData['type']);
+if (isset($requestData['add_to_cart']) || $hasAddPayload) {
+    $user_id = (int) ($requestData['pdrus'] ?? 0);
+    $name = trim((string) ($requestData['name'] ?? ''));
+    $price = (float) ($requestData['prec'] ?? 0);
+    $quantity = (int) ($requestData['p_qty'] ?? 0);
+    $type = trim((string) ($requestData['type'] ?? ''));
+
+    if ($user_id <= 0 || $name === '' || $price < 0 || $quantity <= 0 || $type === '') {
+        add_cart_flash_and_redirect('Error!', 'No se pudo procesar el item. Verifica los datos del formulario.', 'error');
+    }
 
     // Determinar el tipo de item y asignar el ID correspondiente
     $idprcd = null;
@@ -16,13 +43,13 @@ if (isset($_POST['add_to_cart'])) {
 
     switch ($type) {
         case 'producto':
-            $idprcd = $_POST['prdt'];
+            $idprcd = $requestData['prdt'] ?? null;
             break;
         case 'servicio':
-            $id_servicio = $_POST['prdt'];
+            $id_servicio = $requestData['prdt'] ?? null;
             break;
         case 'producto_hospitalario':
-            $id_producto_hospitalario = $_POST['prdt'];
+            $id_producto_hospitalario = $requestData['prdt'] ?? null;
             // Obtener el código del producto hospitalario
             $stmt = $connect->prepare("SELECT codpro FROM almacen_hospitalario WHERE idprcd = ? LIMIT 1");
             $stmt->execute([$id_producto_hospitalario]);
@@ -36,11 +63,7 @@ if (isset($_POST['add_to_cart'])) {
     $check_cart->execute([$name, $user_id, $type]);
 
     if ($check_cart->rowCount() > 0) {
-        echo '<script type="text/javascript">
-        swal("Error!", "Ya está agregado ", "error").then(function() {
-            window.location = "new_sale.php";
-        });
-        </script>';
+        add_cart_flash_and_redirect('Error!', 'Ya está agregado', 'error');
     } else {
         try {
             // Insertar el producto o servicio en el carrito con su tipo y ID correspondiente
@@ -154,16 +177,10 @@ if (isset($_POST['add_to_cart'])) {
                     $mensaje_exito = "Servicio agregado. Se incluyó automáticamente PLACA DE RAYOS X.";
                 }
             }
-            
-            echo '<script type="text/javascript">
-            swal("¡Registrado!", "' . $mensaje_exito . '", "success").then(function() {
-                window.location = "new_sale.php";
-            });
-            </script>';
+
+            add_cart_flash_and_redirect('¡Registrado!', $mensaje_exito, 'success');
         } catch (PDOException $e) {
-            echo '<script type="text/javascript">
-            swal("Error!", "Error en la inserción: ' . $e->getMessage() . '", "error");
-            </script>';
+            add_cart_flash_and_redirect('Error!', 'Error en la inserción: ' . $e->getMessage(), 'error');
         }
     }
 }
