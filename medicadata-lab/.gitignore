@@ -1,9 +1,0 @@
-.qodo
-
-# Secretos locales — no versionar
-credenciales.txt
-.env
-.env.*
-
-# Memory IA
-GEMINI.md
