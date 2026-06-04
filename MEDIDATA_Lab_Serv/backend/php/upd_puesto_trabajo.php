@@ -12,8 +12,9 @@ $pdo = medidata_rrhh_json_require();
 
 $id = (int) ($_POST['id'] ?? 0);
 $id_positions = (int) ($_POST['id_position'] ?? 0);
-$department = trim((string) ($_POST['department'] ?? ''));
+$id_departament = (int) ($_POST['id_departament'] ?? 0);
 $immediate_boss = trim((string) ($_POST['immediate_boss'] ?? ''));
+
 $objective = trim((string) ($_POST['objective'] ?? ''));
 $main_functions = trim((string) ($_POST['main_functions'] ?? ''));
 $academic_requirements = trim((string) ($_POST['academic_requirements'] ?? ''));
@@ -25,6 +26,7 @@ $shift_type = trim((string) ($_POST['shift_type'] ?? ''));
 $salary_range = trim((string) ($_POST['salary_range'] ?? '')) ?: null;
 $special_conditions = trim((string) ($_POST['special_conditions'] ?? '')) ?: null;
 $suggested_psychometric_tests = trim((string) ($_POST['suggested_psychometric_tests'] ?? '')) ?: null;
+
 $updated_by = trim((string) ($_POST['updated_by'] ?? ($name ?? 'sistema')));
 
 if ($id <= 0) {
@@ -33,8 +35,9 @@ if ($id <= 0) {
 }
 
 try {
+    // Note: department column was removed from schema provided by user
     $sql = "UPDATE positions_details SET
-                id_positions = ?, department = ?, immediate_boss = ?, objective = ?,
+                id_positions = ?, id_departament = ?, immediate_boss = ?, objective = ?,
                 main_functions = ?, academic_requirements = ?, required_experience = ?,
                 technical_competencies = ?, soft_competencies = ?, schedule = ?,
                 shift_type = ?, salary_range = ?, special_conditions = ?,
@@ -43,11 +46,22 @@ try {
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
-        $id_positions, $department, $immediate_boss, $objective,
-        $main_functions, $academic_requirements, $required_experience,
-        $technical_competencies, $soft_competencies, $schedule,
-        $shift_type, $salary_range, $special_conditions,
-        $suggested_psychometric_tests, $updated_by, $id,
+        $id_positions,
+        $id_departament,
+        $immediate_boss,
+        $objective,
+        $main_functions,
+        $academic_requirements,
+        $required_experience,
+        $technical_competencies,
+        $soft_competencies,
+        $schedule,
+        $shift_type,
+        $salary_range,
+        $special_conditions,
+        $suggested_psychometric_tests,
+        $updated_by,
+        $id,
     ]);
 
     echo json_encode([
@@ -58,3 +72,4 @@ try {
     error_log('Error upd_puesto_trabajo: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
+?>

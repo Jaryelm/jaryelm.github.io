@@ -112,12 +112,18 @@ if ($is_edit && $pdoRrhh) {
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
-                                <label for="department">Departamento o Área <span style="color:red;">*</span></label>
-                                <input type="text" name="department" id="department" value="<?php echo $is_edit ? htmlspecialchars($edit_data['department']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <label for="id_departament">Departamento o Área <span style="color:red;">*</span></label>
+                                <select class="select2" name="id_departament" id="id_departament" required>
+                                    <?php if ($is_edit): ?>
+                                        <option value="<?php echo (int)$edit_data['id_departament']; ?>" selected>Cargando...</option>
+                                    <?php else: ?>
+                                        <option value="" disabled selected>Seleccione un departamento...</option>
+                                    <?php endif; ?>
+                                </select>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="immediate_boss">Jefe Inmediato <span style="color:red;">*</span></label>
-                                <input type="text" name="immediate_boss" id="immediate_boss" value="<?php echo $is_edit ? htmlspecialchars($edit_data['immediate_boss']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <input type="text" name="immediate_boss" id="immediate_boss" value="<?php echo $is_edit ? htmlspecialchars($edit_data['immediate_boss']) : ''; ?>" required readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9; cursor: not-allowed;">
                             </div>
                         </div>
 
@@ -198,6 +204,7 @@ if ($is_edit && $pdoRrhh) {
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/js/cat_departaments.js"></script>
 
 <script type="text/javascript">
 function medidataParseAjaxJson(xhr) {

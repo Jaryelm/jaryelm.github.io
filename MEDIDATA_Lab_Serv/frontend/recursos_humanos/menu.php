@@ -39,7 +39,10 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                     <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores_usr.php">LISTA COLABORADORES</a>
                 </li>
                 <li>
-                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>positions_usr.php">POSICIONES DE TRABAJO</a>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>positions_usr.php">LISTA POSICIONES</a>
+                </li>
+                <li>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>departamentos_usr.php">DEPARTAMENTOS</a>
                 </li>
                 <li>
                     <a href="#" class="new-submenu-link">PROCESO DE RECLUTAMIENTO</a>

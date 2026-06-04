@@ -256,3 +256,34 @@ CREATE TABLE IF NOT EXISTS `hiring_requirements` (
     deleted BOOL DEFAULT FALSE,
     CONSTRAINT `fk_hiringReq_candidates` FOREIGN KEY (`id_candidate`) REFERENCES `candidates` (id)
 );
+
+CREATE TABLE IF NOT EXISTS `departaments` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    departament_code VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(700) NOT NULL,
+    email VARCHAR(100) DEFAULT '',
+    phone VARCHAR(10),
+    status ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
+    observations VARCHAR(300),
+    created_by VARCHAR(100) NOT NULL,
+    updated_by VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP(),
+    CONSTRAINT `idx_departament_code` UNIQUE KEY (`departament_code`),
+    CONSTRAINT `idx_departament_name` UNIQUE KEY (`name`),
+    CONSTRAINT `idx_departament_email` UNIQUE KEY (`email`),
+    CONSTRAINT `idx_departament_phone` UNIQUE KEY (`phone`)
+);
+
+ALTER TABLE `departaments`
+ADD head_departament VARCHAR(100) NOT NULL BEFORE description;
+
+ALTER TABLE `positions_details`
+DROP COLUMN `departament`;
+
+ALTER TABLE `positions_details`
+ADD `id_departament` INT DEFAULT NULL AFTER id_positions;
+
+ALTER TABLE `positions_details`
+ADD CONSTRAINT `fk_positionsDetails_departaments` FOREIGN KEY (`id_departament`) REFERENCES `departaments` (id);

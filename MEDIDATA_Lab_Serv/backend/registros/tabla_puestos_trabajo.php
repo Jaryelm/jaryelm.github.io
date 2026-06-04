@@ -13,16 +13,18 @@ if (!$pdo) {
 try {
     $search = isset($_GET['search']) ? trim((string) $_GET['search']) : '';
 
-    $sql = "SELECT pd.id, p.name, pd.department, pd.immediate_boss, pd.objective,
+    $mainDb = dbname;
+    $sql = "SELECT pd.id, p.name, d.name as department, pd.immediate_boss, pd.objective,
                    pd.schedule, pd.deleted
             FROM positions_details pd
-            INNER JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
+            INNER JOIN $mainDb.positions p ON pd.id_positions = p.id
+            LEFT JOIN departaments d ON pd.id_departament = d.id
             WHERE pd.deleted IN (0, 1)";
 
     $params = [];
     if ($search !== '') {
         $sql .= " AND (
-            p.name LIKE :search1 OR pd.department LIKE :search2 OR
+            p.name LIKE :search1 OR d.name LIKE :search2 OR
             pd.immediate_boss LIKE :search3 OR pd.objective LIKE :search4
         )";
         $like = '%' . $search . '%';

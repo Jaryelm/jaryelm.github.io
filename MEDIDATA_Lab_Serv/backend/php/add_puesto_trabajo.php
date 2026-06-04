@@ -11,8 +11,9 @@ if (!isset($_POST['add_puesto'])) {
 $pdo = medidata_rrhh_json_require();
 
 $id_positions = (int) ($_POST['id_position'] ?? 0);
-$department = trim((string) ($_POST['department'] ?? ''));
+$id_departament = (int) ($_POST['id_departament'] ?? 0);
 $immediate_boss = trim((string) ($_POST['immediate_boss'] ?? ''));
+
 $objective = trim((string) ($_POST['objective'] ?? ''));
 $main_functions = trim((string) ($_POST['main_functions'] ?? ''));
 $academic_requirements = trim((string) ($_POST['academic_requirements'] ?? ''));
@@ -27,9 +28,14 @@ $shift_type = trim((string) ($_POST['shift_type'] ?? ''));
 $salary_range = trim((string) ($_POST['salary_range'] ?? '')) ?: null;
 $special_conditions = trim((string) ($_POST['special_conditions'] ?? '')) ?: null;
 $suggested_psychometric_tests = trim((string) ($_POST['suggested_psychometric_tests'] ?? '')) ?: null;
+
+// New fields from schema
+$required_docs_hiring = json_encode([]); // Default empty JSON array
+$status = 'Activo'; 
+
 $created_by = trim((string) ($_POST['created_by'] ?? ($name ?? 'sistema')));
 
-if ($id_positions <= 0 || $department === '' || $immediate_boss === '' || $objective === ''
+if ($id_positions <= 0 || $id_departament <= 0 || $immediate_boss === '' || $objective === ''
     || $main_functions === '' || $academic_requirements === '' || $required_experience === ''
     || $technical_competencies === '' || $soft_competencies === '' || $shift_type === '') {
     echo json_encode(['success' => false, 'message' => 'Complete todos los campos obligatorios.']);
@@ -38,20 +44,32 @@ if ($id_positions <= 0 || $department === '' || $immediate_boss === '' || $objec
 
 try {
     $sql = "INSERT INTO positions_details (
-                id_positions, department, immediate_boss, objective,
+                id_positions, id_departament, immediate_boss, objective,
                 main_functions, academic_requirements, required_experience,
                 technical_competencies, soft_competencies, schedule,
                 shift_type, salary_range, special_conditions,
-                suggested_psychometric_tests, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                suggested_psychometric_tests, required_docs_hiring, status, created_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
-        $id_positions, $department, $immediate_boss, $objective,
-        $main_functions, $academic_requirements, $required_experience,
-        $technical_competencies, $soft_competencies, $schedule,
-        $shift_type, $salary_range, $special_conditions,
-        $suggested_psychometric_tests, $created_by,
+        $id_positions,
+        $id_departament,
+        $immediate_boss,
+        $objective,
+        $main_functions,
+        $academic_requirements,
+        $required_experience,
+        $technical_competencies,
+        $soft_competencies,
+        $schedule,
+        $shift_type,
+        $salary_range,
+        $special_conditions,
+        $suggested_psychometric_tests,
+        $required_docs_hiring,
+        $status,
+        $created_by,
     ]);
 
     echo json_encode([
@@ -66,3 +84,4 @@ try {
     }
     echo json_encode(['success' => false, 'message' => 'Error: ' . $msg]);
 }
+?>
