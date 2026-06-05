@@ -47,14 +47,14 @@ include_once '../../backend/registros/session_check.php';
             <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
             <div class="rrhh-tab-nav">
-                <a href="lista_colaboradores.php" class="button tab-button active">Lista de Colaboradores</a>
-                <a href="lista_excolaboradores.php" class="button tab-button">Lista de Excolaboradores</a>
+                <a href="lista_colaboradores.php" class="button tab-button">Lista de Colaboradores</a>
+                <a href="lista_excolaboradores.php" class="button tab-button active">Lista de Excolaboradores</a>
             </div>
 
             <div class="data">
                 <div class="content-data">
                     <div class="table-title">
-                        <h1>Lista de Colaboradores</h1>
+                        <h1>Lista de Excolaboradores</h1>
                     </div>
                     
                     <div class="table-responsive" style="overflow-x:auto;">
@@ -115,7 +115,7 @@ include_once '../../backend/registros/session_check.php';
 
                         let counter = 1;
                         collaborators.forEach((collaborator) => {
-                            if (collaborator.Estado !== '1') return; // Solo activos
+                            if (collaborator.Estado !== '0') return; // Solo inactivos
 
                             const isChecked = (collaborator.Estado === '1') ? 'checked' : '';
                             const row = `

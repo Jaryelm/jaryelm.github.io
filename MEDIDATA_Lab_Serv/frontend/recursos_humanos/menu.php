@@ -49,18 +49,11 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                     <ul class="new-side-dropdown">
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>puestos_trabajo_usr.php">PUESTOS DE TRABAJO</a></li>
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>vacantes_trabajo_usr.php">VACANTES DE TRABAJO</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>reclutamiento_usr.php">SOLICITUDES DE EMPLEO</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>postulantes_usr.php">POSTULANTES</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>entrevista_usr.php">ENTREVISTAS</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>pruebas_psicometricas_usr.php">PRUEBAS PSICOMETRICAS</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>requisitos_contratacion_usr.php">REQUISITOS DE CONTRATACION</a></li>
                     </ul>
                 </li>
                 <li>
                     <a href="#" class="new-submenu-link">PERSONAL</a>
                     <ul class="new-side-dropdown">
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>reclutamiento_usr.php">POSTULANTES WEBSITE</a></li>
-                        <li><a href="#">PROCESO DE ENTREVISTAS</a></li>
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>relojbio_usr.php">RELOJ BIOMÉTRICO</a></li>
                     </ul>
                 </li>

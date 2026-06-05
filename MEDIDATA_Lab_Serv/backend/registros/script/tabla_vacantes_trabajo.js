@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return `
             <div class="card-header">
                 <h4 class="card-title">
-                    ${escapeHtml(d.vacant_name)}
+                    ${escapeHtml(d.position_name || 'Sin Título')}
                 </h4>
                 <span class="priority-badge priority-${groupKey.toLowerCase()}">
                     ${escapeHtml(d.priority)}
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card-body">
                 <div class="info-item">
                     <i class="fa fa-briefcase"></i>
-                    <strong>Puesto:</strong>&nbsp;<span>${escapeHtml(d.position_name || 'N/A')}</span>
+                    <strong>Categoría:</strong>&nbsp;<span>${escapeHtml(d.position_name || 'N/A')}</span>
                 </div>
                 <div class="info-item">
                     <i class="fa fa-users"></i>
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span>${formatDate(d.init_date)} - ${formatDate(d.end_date)}</span>
                 </div>
                 <div class="card-description">
-                    <strong>Motivo:</strong> ${escapeHtml(d.reason)}
+                    <strong>Descripción:</strong> ${escapeHtml(d.reason)}
                 </div>
             </div>
             <div class="card-footer">

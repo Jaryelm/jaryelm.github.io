@@ -203,13 +203,14 @@ if (!function_exists('medidata_rrhh_match_aplica_a_vacante')) {
 
         try {
             $placeholders = implode(',', array_fill(0, count($positionNames), '?'));
-            $sql = "SELECT v.id, v.vacant_name, v.priority, v.end_date, pt.name AS position_name
-                    FROM vacantes_trabajo v
-                    INNER JOIN puestos_trabajo pt ON v.id_position = pt.id
+            $sql = "SELECT v.id, v.priority, v.end_date, p.name AS position_name
+                    FROM vacant_positions v
+                    INNER JOIN positions_details pd ON v.id_position = pd.id
+                    INNER JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
                     WHERE v.deleted = 0
                       AND v.status = 'Abierta'
                       AND v.end_date >= CURDATE()
-                      AND pt.name IN ({$placeholders})
+                      AND p.name IN ({$placeholders})
                     ORDER BY
                         FIELD(v.priority, 'Urgente', 'Alta', 'Media', 'Baja'),
                         v.end_date ASC,
@@ -221,13 +222,14 @@ if (!function_exists('medidata_rrhh_match_aplica_a_vacante')) {
 
             if (!$vacantes && $result['match_type'] === 'fuzzy') {
                 $like = '%' . str_replace(' ', '%', $normalized) . '%';
-                $sqlLike = "SELECT v.id, v.vacant_name, v.priority, v.end_date, pt.name AS position_name
-                            FROM vacantes_trabajo v
-                            INNER JOIN puestos_trabajo pt ON v.id_position = pt.id
+                $sqlLike = "SELECT v.id, v.priority, v.end_date, p.name AS position_name
+                            FROM vacant_positions v
+                            INNER JOIN positions_details pd ON v.id_position = pd.id
+                            INNER JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
                             WHERE v.deleted = 0
                               AND v.status = 'Abierta'
                               AND v.end_date >= CURDATE()
-                              AND LOWER(REPLACE(pt.name, 'í', 'i')) LIKE ?
+                              AND LOWER(REPLACE(p.name, 'í', 'i')) LIKE ?
                             ORDER BY v.end_date ASC
                             LIMIT 5";
                 $stmtLike = $pdo->prepare($sqlLike);
@@ -241,8 +243,7 @@ if (!function_exists('medidata_rrhh_match_aplica_a_vacante')) {
             $result['vacantes'] = array_map(static function (array $row): array {
                 return [
                     'id' => (int) $row['id'],
-                    'vacant_name' => (string) $row['vacant_name'],
-                    'position_name' => (string) $row['position_name'],
+                    'position_name' => (string) ($row['position_name'] ?? 'Sin Título'),
                     'priority' => (string) ($row['priority'] ?? ''),
                     'end_date' => (string) ($row['end_date'] ?? ''),
                 ];
@@ -250,7 +251,7 @@ if (!function_exists('medidata_rrhh_match_aplica_a_vacante')) {
 
             if (count($vacantes) === 1) {
                 $result['suggested_vacante_id'] = (int) $vacantes[0]['id'];
-                $result['suggested_label'] = $vacantes[0]['vacant_name'] . ' (' . $vacantes[0]['position_name'] . ')';
+                $result['suggested_label'] = $vacantes[0]['position_name'];
             } elseif (count($vacantes) > 1) {
                 $result['match_type'] = 'ambiguous';
                 $result['suggested_label'] = count($vacantes) . ' vacantes abiertas — seleccione una';
@@ -272,11 +273,12 @@ if (!function_exists('medidata_rrhh_fetch_vacantes_abiertas')) {
             return [];
         }
         try {
-            $sql = "SELECT v.id, v.vacant_name, pt.name AS position_name, v.priority, v.end_date
-                    FROM vacantes_trabajo v
-                    INNER JOIN puestos_trabajo pt ON v.id_position = pt.id
+            $sql = "SELECT v.id, p.name AS position_name, v.priority, v.end_date
+                    FROM vacant_positions v
+                    INNER JOIN positions_details pd ON v.id_position = pd.id
+                    INNER JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
                     WHERE v.deleted = 0 AND v.status = 'Abierta' AND v.end_date >= CURDATE()
-                    ORDER BY pt.name ASC, v.vacant_name ASC";
+                    ORDER BY p.name ASC";
             return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         } catch (Throwable $e) {
             error_log('medidata_rrhh_fetch_vacantes_abiertas: ' . $e->getMessage());

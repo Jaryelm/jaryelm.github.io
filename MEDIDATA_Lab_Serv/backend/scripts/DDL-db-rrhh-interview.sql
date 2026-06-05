@@ -287,3 +287,10 @@ ADD `id_departament` INT DEFAULT NULL AFTER id_positions;
 
 ALTER TABLE `positions_details`
 ADD CONSTRAINT `fk_positionsDetails_departaments` FOREIGN KEY (`id_departament`) REFERENCES `departaments` (id);
+
+ALTER TABLE `vacant_positions`
+DROP COLUMN `vacant_name`;
+
+ALTER TABLE `vacant_positions`
+DROP COLUMN `publication_channel`;
+

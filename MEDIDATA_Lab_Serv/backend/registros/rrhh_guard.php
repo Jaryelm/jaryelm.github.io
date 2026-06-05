@@ -60,10 +60,12 @@ if (!function_exists('medidata_rrhh_vacantes_filtro')) {
             return [];
         }
         try {
-            $sql = "SELECT v.id, v.vacant_name AS name
-                    FROM vacantes_trabajo v
+            $sql = "SELECT v.id, p.name
+                    FROM vacant_positions v
+                    JOIN positions_details pd ON v.id_position = pd.id
+                    JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
                     WHERE v.deleted = 0
-                    ORDER BY v.vacant_name ASC";
+                    ORDER BY p.name ASC";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -86,10 +88,11 @@ if (!function_exists('medidata_rrhh_fetch_postulantes')) {
         }
 
         try {
-            $query = "SELECT p.*, v.vacant_name AS vacancy_name
+            $query = "SELECT p.*, p2.name AS vacancy_name
                       FROM postulantes p
-                      LEFT JOIN vacantes_trabajo v ON p.id_vacant_position = v.id
-                      LEFT JOIN puestos_trabajo pt ON v.id_position = pt.id
+                      LEFT JOIN vacant_positions v ON p.id_vacant_position = v.id
+                      LEFT JOIN positions_details pd ON v.id_position = pd.id
+                      LEFT JOIN medic9ue_medi_data.positions p2 ON pd.id_positions = p2.id
                       WHERE p.deleted = 0 AND ({$statusCondition})";
 
             if ($idVacante > 0) {

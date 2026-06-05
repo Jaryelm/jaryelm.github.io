@@ -12,7 +12,6 @@ $pdo = medidata_rrhh_json_require();
 
 $id = (int) ($_POST['id'] ?? 0);
 $id_position = (int) ($_POST['id_position'] ?? 0);
-$vacant_name = trim((string) ($_POST['vacant_name'] ?? ''));
 $requesting_department = trim((string) ($_POST['requesting_department'] ?? ''));
 $available_slots = (int) ($_POST['available_slots'] ?? 1);
 $reason = trim((string) ($_POST['reason'] ?? ''));
@@ -20,7 +19,6 @@ $priority = trim((string) ($_POST['priority'] ?? 'Media'));
 $rrhh_responsible = trim((string) ($_POST['rrhh_responsible'] ?? '')) ?: null;
 $requesting_boss = trim((string) ($_POST['requesting_boss'] ?? '')) ?: null;
 $internal_observations = trim((string) ($_POST['internal_observations'] ?? '')) ?: null;
-$publication_channel = trim((string) ($_POST['publication_channel'] ?? '')) ?: null;
 $benefits = trim((string) ($_POST['benefits'] ?? ''));
 $init_date = trim((string) ($_POST['init_date'] ?? ''));
 $end_date = trim((string) ($_POST['end_date'] ?? ''));
@@ -33,19 +31,19 @@ if ($id <= 0) {
 
 try {
     $sql = "UPDATE vacant_positions SET
-                id_position = ?, vacant_name = ?, requesting_department = ?,
+                id_position = ?, requesting_department = ?,
                 available_slots = ?, reason = ?, priority = ?,
                 rrhh_responsible = ?, requesting_boss = ?,
-                internal_observations = ?, publication_channel = ?,
+                internal_observations = ?, 
                 benefits = ?, init_date = ?, end_date = ?, updated_by = ?
             WHERE id = ?";
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
-        $id_position, $vacant_name, $requesting_department,
+        $id_position, $requesting_department,
         $available_slots, $reason, $priority, $rrhh_responsible,
         $requesting_boss, $internal_observations,
-        $publication_channel, $benefits, $init_date,
+        $benefits, $init_date,
         $end_date, $updated_by, $id,
     ]);
 

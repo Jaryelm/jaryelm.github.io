@@ -115,13 +115,18 @@ if ($is_edit && $pdoRrhh) {
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                            <div class="form-group" style="flex: 2;">
-                                <label for="vacant_name">Nombre de la Vacante <span style="color:red;">*</span></label>
-                                <input type="text" name="vacant_name" id="vacant_name" value="<?php echo $is_edit ? htmlspecialchars($edit_data['vacant_name']) : ''; ?>" required placeholder="Ej: Enfermera de Noche" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                            </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="available_slots">Plazas Disponibles <span style="color:red;">*</span></label>
                                 <input type="number" name="available_slots" id="available_slots" value="<?php echo $is_edit ? htmlspecialchars($edit_data['available_slots']) : '1'; ?>" min="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="priority">Prioridad <span style="color:red;">*</span></label>
+                                <select class="select2" name="priority" id="priority" required>
+                                    <option value="Baja" <?php echo ($is_edit && $edit_data['priority'] == 'Baja') ? 'selected' : ''; ?>>Baja</option>
+                                    <option value="Media" <?php echo ($is_edit && $edit_data['priority'] == 'Media') ? 'selected' : (!$is_edit ? 'selected' : ''); ?>>Media</option>
+                                    <option value="Alta" <?php echo ($is_edit && $edit_data['priority'] == 'Alta') ? 'selected' : ''; ?>>Alta</option>
+                                    <option value="Urgente" <?php echo ($is_edit && $edit_data['priority'] == 'Urgente') ? 'selected' : ''; ?>>Urgente</option>
+                                </select>
                             </div>
                         </div>
 
@@ -137,7 +142,7 @@ if ($is_edit && $pdoRrhh) {
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="reason">Motivo de la Vacante <span style="color:red;">*</span></label>
+                            <label for="reason">Descripción de la Vacante <span style="color:red;">*</span></label>
                             <textarea name="reason" id="reason" rows="2" placeholder="Ej: Renuncia, Nuevo Puesto, Expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['reason']) : ''; ?></textarea>
                         </div>
 
@@ -151,24 +156,8 @@ if ($is_edit && $pdoRrhh) {
                                 <input type="date" name="end_date" id="end_date" value="<?php echo $is_edit ? htmlspecialchars($edit_data['end_date']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label for="priority">Prioridad <span style="color:red;">*</span></label>
-                                <select class="select2" name="priority" id="priority" required>
-                                    <option value="Baja" <?php echo ($is_edit && $edit_data['priority'] == 'Baja') ? 'selected' : ''; ?>>Baja</option>
-                                    <option value="Media" <?php echo ($is_edit && $edit_data['priority'] == 'Media') ? 'selected' : (!$is_edit ? 'selected' : ''); ?>>Media</option>
-                                    <option value="Alta" <?php echo ($is_edit && $edit_data['priority'] == 'Alta') ? 'selected' : ''; ?>>Alta</option>
-                                    <option value="Urgente" <?php echo ($is_edit && $edit_data['priority'] == 'Urgente') ? 'selected' : ''; ?>>Urgente</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                            <div class="form-group" style="flex: 1;">
                                 <label for="rrhh_responsible">Responsable en RRHH</label>
                                 <input type="text" name="rrhh_responsible" id="rrhh_responsible" value="<?php echo $is_edit ? htmlspecialchars($edit_data['rrhh_responsible'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label for="publication_channel">Canal de Publicación</label>
-                                <input type="text" name="publication_channel" id="publication_channel" value="<?php echo $is_edit ? htmlspecialchars($edit_data['publication_channel'] ?? '') : ''; ?>" placeholder="Ej: LinkedIn, Computrabajo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
 

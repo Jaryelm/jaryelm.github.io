@@ -10,9 +10,8 @@ $vacantes = medidata_rrhh_fetch_vacantes_abiertas();
 $data = array_map(static function (array $row): array {
     return [
         'id' => (int) $row['id'],
-        'label' => ($row['vacant_name'] ?? '') . ' — ' . ($row['position_name'] ?? ''),
-        'vacant_name' => (string) ($row['vacant_name'] ?? ''),
-        'position_name' => (string) ($row['position_name'] ?? ''),
+        'label' => (string) ($row['position_name'] ?? 'Sin Título'),
+        'position_name' => (string) ($row['position_name'] ?? 'Sin Título'),
         'priority' => (string) ($row['priority'] ?? ''),
         'end_date' => (string) ($row['end_date'] ?? ''),
     ];

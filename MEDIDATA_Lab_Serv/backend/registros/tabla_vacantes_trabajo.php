@@ -13,9 +13,9 @@ if (!$pdo) {
 try {
     $search = isset($_GET['search']) ? trim((string) $_GET['search']) : '';
 
-    $sql = "SELECT vp.id, vp.vacant_name, vp.priority, vp.available_slots, vp.reason,
+    $sql = "SELECT vp.id, vp.priority, vp.available_slots, vp.reason,
                    vp.init_date, vp.end_date, vp.deleted,
-                   p.name AS position_name,
+                   COALESCE(p.name, 'Sin Título') AS position_name,
                    (SELECT COUNT(*) FROM candidates c
                     WHERE c.id_vacant_position = vp.id AND c.deleted = 0) AS total_applicants
             FROM vacant_positions vp
@@ -26,14 +26,13 @@ try {
     $params = [];
     if ($search !== '') {
         $sql .= " AND (
-            vp.vacant_name LIKE :search1 OR vp.reason LIKE :search2 OR
-            vp.requesting_department LIKE :search3 OR p.name LIKE :search4
+            vp.reason LIKE :search1 OR
+            vp.requesting_department LIKE :search2 OR p.name LIKE :search3
         )";
         $like = '%' . $search . '%';
         $params[':search1'] = $like;
         $params[':search2'] = $like;
         $params[':search3'] = $like;
-        $params[':search4'] = $like;
     }
 
     $sql .= ' ORDER BY FIELD(vp.priority, \'Urgente\', \'Alta\', \'Media\', \'Baja\'), vp.init_date DESC';
@@ -43,5 +42,5 @@ try {
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (Throwable $e) {
     error_log('tabla_vacantes_trabajo: ' . $e->getMessage());
-    echo json_encode(['error' => 'Error al cargar vacantes de trabajo']);
+    echo json_encode(['error' => 'Error al cargar vacantes de trabajo: ' . $e->getMessage()]);
 }

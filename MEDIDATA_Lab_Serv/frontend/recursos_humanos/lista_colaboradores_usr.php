@@ -46,22 +46,27 @@ include_once '../../backend/registros/session_check.php';
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
+            <div class="rrhh-tab-nav">
+                <a href="lista_colaboradores_usr.php" class="button tab-button active">Lista de Colaboradores</a>
+                <a href="lista_excolaboradores_usr.php" class="button tab-button">Lista de Excolaboradores</a>
+            </div>
+
             <div class="data">
                 <div class="content-data">
                     <div class="table-title">
                         <h1>Lista de Colaboradores</h1>
                     </div>
                     
-                    <div class="table-container">
-                        <table id="colaboradores_table" class="display nowrap" style="width:100%">
+                    <div class="table-responsive" style="overflow-x:auto;">
+                        <table id="colaboradores_table" class="responsive-table" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Cedula</th>
-                                    <th>Tipo Empleado</th>
-                                    <th>Sexo</th>
-                                    <th>Especialidad</th>
+                                    <th scope="col">N°</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Cedula</th>
+                                    <th scope="col">Tipo Empleado</th>
+                                    <th scope="col">Sexo</th>
+                                    <th scope="col">Especialidad</th>
                                 </tr>
                             </thead>
                             <tbody id="colaboradores_body">
@@ -96,27 +101,37 @@ include_once '../../backend/registros/session_check.php';
                             return;
                         }
 
+                        let counter = 1;
                         collaborators.forEach((collaborator) => {
+                            if (collaborator.Estado !== '1') return; // Solo activos
+
                             const row = `
                                 <tr>
-                                    <td>${collaborator.ID}</td>
-                                    <td>${collaborator.Nombre}</td>
-                                    <td>${collaborator.Cedula}</td>
-                                    <td>${collaborator.Tipo_Empleado}</td>
-                                    <td>${collaborator.Sexo}</td>
-                                    <td>${collaborator.Especialidad}</td>
+                                    <td data-title="N°">${counter++}</td>
+                                    <td data-title="Nombre">${collaborator.Nombre}</td>
+                                    <td data-title="Cedula">${collaborator.Cedula}</td>
+                                    <td data-title="Tipo Empleado">${collaborator.Tipo_Empleado}</td>
+                                    <td data-title="Sexo">${collaborator.Sexo}</td>
+                                    <td data-title="Especialidad">${collaborator.Especialidad}</td>
                                 </tr>
                             `;
                             tbody.append(row);
                         });
+
+                        function reEnumerateTable() {
+                            $('#colaboradores_body tr').each(function(index) {
+                                $(this).find('td:first').text(index + 1);
+                            });
+                        }
+
                         $('#colaboradores_table').DataTable({
                             destroy: true,
                             pageLength: 10,
                             dom: 'Bfrtip',
                             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                             order: [
-                                [0, 'desc']
-                            ], // Orden descendente en la columna de ID
+                                [0, 'asc']
+                            ], // Orden ascendente en la columna de N°
                             scrollX: true,
                             scrollCollapse: true,
                             language: {

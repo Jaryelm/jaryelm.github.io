@@ -30,10 +30,6 @@
                 </div>
 
                 <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <div class="form-group" style="flex: 2; min-width: 250px;">
-                        <label for="vacant_name_<?php echo $d->id; ?>">Nombre de la Vacante <span style="color:red;">*</span></label>
-                        <input type="text" name="vacant_name" id="vacant_name_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->vacant_name); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
-                    </div>
                     <div class="form-group" style="flex: 1; min-width: 150px;">
                         <label for="available_slots_<?php echo $d->id; ?>">Plazas Disponibles <span style="color:red;">*</span></label>
                         <input type="number" name="available_slots" id="available_slots_<?php echo $d->id; ?>" value="<?php echo $d->available_slots; ?>" min="1" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
@@ -52,7 +48,7 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="reason_<?php echo $d->id; ?>">Motivo de la Vacante <span style="color:red;">*</span></label>
+                    <label for="reason_<?php echo $d->id; ?>">Descripción de la Vacante <span style="color:red;">*</span></label>
                     <textarea name="reason" id="reason_<?php echo $d->id; ?>" rows="2" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;"><?php echo htmlspecialchars($d->reason); ?></textarea>
                 </div>
 
@@ -80,10 +76,6 @@
                     <div class="form-group" style="flex: 1; min-width: 250px;">
                         <label for="rrhh_responsible_<?php echo $d->id; ?>">Responsable en RRHH</label>
                         <input type="text" name="rrhh_responsible" id="rrhh_responsible_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->rrhh_responsible); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
-                    </div>
-                    <div class="form-group" style="flex: 1; min-width: 250px;">
-                        <label for="publication_channel_<?php echo $d->id; ?>">Canal de Publicación</label>
-                        <input type="text" name="publication_channel" id="publication_channel_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->publication_channel); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
                     </div>
                 </div>
 
