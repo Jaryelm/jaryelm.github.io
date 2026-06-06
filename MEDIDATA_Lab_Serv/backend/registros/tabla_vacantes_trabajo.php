@@ -16,11 +16,13 @@ try {
     $sql = "SELECT vp.id, vp.priority, vp.available_slots, vp.reason,
                    vp.init_date, vp.end_date, vp.deleted, s.name as schedule_name,
                    COALESCE(p.name, 'Sin Título') AS position_name,
+                   d.name AS department_name, pd.immediate_boss,
                    (SELECT COUNT(*) FROM candidates c
                     WHERE c.id_vacant_position = vp.id AND c.deleted = 0) AS total_applicants
             FROM vacant_positions vp
             LEFT JOIN positions_details pd ON vp.id_position = pd.id
             LEFT JOIN medic9ue_medi_data.positions p ON pd.id_positions = p.id
+            LEFT JOIN departaments d ON pd.id_departament = d.id
             LEFT JOIN schedules s ON vp.id_schedule = s.id
             WHERE vp.deleted IN (0, 1)";
 
@@ -28,7 +30,7 @@ try {
     if ($search !== '') {
         $sql .= " AND (
             vp.reason LIKE :search1 OR
-            vp.requesting_department LIKE :search2 OR p.name LIKE :search3
+            d.name LIKE :search2 OR p.name LIKE :search3
         )";
         $like = '%' . $search . '%';
         $params[':search1'] = $like;

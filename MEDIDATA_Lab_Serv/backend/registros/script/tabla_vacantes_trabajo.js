@@ -66,8 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="card-body">
                 <div class="info-item">
-                    <i class="fa fa-briefcase"></i>
-                    <strong>Categoría:</strong>&nbsp;<span>${escapeHtml(d.position_name || 'N/A')}</span>
+                    <i class="fa fa-building"></i>
+                    <strong>Depto:</strong>&nbsp;<span>${escapeHtml(d.department_name || 'N/A')}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fa fa-user-tie"></i>
+                    <strong>Jefe:</strong>&nbsp;<span>${escapeHtml(d.immediate_boss || 'N/A')}</span>
                 </div>
                 <div class="info-item">
                     <i class="fa fa-users"></i>

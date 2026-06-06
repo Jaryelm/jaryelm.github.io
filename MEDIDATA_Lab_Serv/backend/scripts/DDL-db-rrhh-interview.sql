@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `positions_details` (
     id INT PRIMARY KEY auto_increment,
     id_positions INT NOT NULL,
     department VARCHAR(200) NOT NULL,
-    immediate_boss VARCHAR(200) NOT NULL,
+    immediate_boss VARCHAR(100) NOT NULL,
     objective TEXT NOT NULL,
     main_functions TEXT NOT NULL,
     academic_requirements TEXT NOT NULL,

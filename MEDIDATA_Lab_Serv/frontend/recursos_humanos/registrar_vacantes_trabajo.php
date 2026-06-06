@@ -130,20 +130,20 @@ if ($is_edit && $pdoRrhh) {
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                            <div class="form-group" style="flex: 1;">
-                                <label for="requesting_department">Departamento Solicitante <span style="color:red;">*</span></label>
-                                <input type="text" name="requesting_department" id="requesting_department" value="<?php echo $is_edit ? htmlspecialchars($edit_data['requesting_department']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <div style="display: flex; gap: 20px; margin-bottom: 20px; background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                            <div style="flex: 1;">
+                                <label style="font-weight: bold; color: #2c3e50; font-size: 0.9rem;">Departamento Solicitante:</label>
+                                <div id="display_department" style="color: #555; margin-top: 5px; font-weight: 500;">- Seleccione un puesto -</div>
                             </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label for="requesting_boss">Jefe Solicitante</label>
-                                <input type="text" name="requesting_boss" id="requesting_boss" value="<?php echo $is_edit ? htmlspecialchars($edit_data['requesting_boss'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <div style="flex: 1;">
+                                <label style="font-weight: bold; color: #2c3e50; font-size: 0.9rem;">Jefe Inmediato:</label>
+                                <div id="display_boss" style="color: #555; margin-top: 5px; font-weight: 500;">- Seleccione un puesto -</div>
                             </div>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="reason">Descripción de la Vacante <span style="color:red;">*</span></label>
-                            <textarea name="reason" id="reason" rows="2" placeholder="Ej: Renuncia, Nuevo Puesto, Expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['reason']) : ''; ?></textarea>
+                            <textarea name="reason" id="reason" rows="2" placeholder="Ej: Se requiere personal adicional para el área por incremento de demanda o expansión..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['reason']) : ''; ?></textarea>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
@@ -222,6 +222,40 @@ function medidataParseAjaxJson(xhr) {
 }
 
 $(document).ready(function() {
+    function loadPositionDetails(id) {
+        if (!id) {
+            $('#display_department').text('- Seleccione un puesto -');
+            $('#display_boss').text('- Seleccione un puesto -');
+            return;
+        }
+        $.ajax({
+            url: '../../backend/registros/obtener_detalle_puesto.php',
+            type: 'GET',
+            data: { id: id },
+            success: function(response) {
+                if (response.success) {
+                    $('#display_department').text(response.data.department_name || 'N/A');
+                    $('#display_boss').text(response.data.immediate_boss || 'N/A');
+                } else {
+                    $('#display_department').text('No encontrado');
+                    $('#display_boss').text('No encontrado');
+                }
+            },
+            error: function() {
+                $('#display_department').text('Error al cargar');
+                $('#display_boss').text('Error al cargar');
+            }
+        });
+    }
+
+    $('#id_position').on('change', function() {
+        loadPositionDetails($(this).val());
+    });
+
+    <?php if ($is_edit): ?>
+    loadPositionDetails($('#id_position').val());
+    <?php endif; ?>
+
     $('#vacanteForm').on('submit', function(e) {
         e.preventDefault();
 
