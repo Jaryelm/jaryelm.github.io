@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span>Jefe: ${escapeHtml(d.immediate_boss)}</span>
                     </div>
                     <div class="info-item">
-                        <i class="fa fa-clock"></i>
-                        <span>${escapeHtml(d.schedule)}</span>
+                        <i class="fa fa-money-bill-wave"></i>
+                        <span>Nivel: ${escapeHtml(d.level_name)}</span>
                     </div>
                     <div class="card-description">
                         <strong>Objetivo:</strong> ${escapeHtml(d.objective)}

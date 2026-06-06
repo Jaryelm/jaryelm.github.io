@@ -174,6 +174,7 @@ if ($is_edit && $pdoRrhh) {
                             </div>
                         </div>
 
+
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="benefits">Beneficios (Generales / Adicionales al Puesto) <span style="color:red;">*</span></label>
                             <textarea name="benefits" id="benefits" rows="3" placeholder="Lista de beneficios ofrecidos para esta vacante..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['benefits']) : ''; ?></textarea>
@@ -204,6 +205,7 @@ if ($is_edit && $pdoRrhh) {
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/js/cat_schedules.js"></script>
 
 <script type="text/javascript">
 function medidataParseAjaxJson(xhr) {
@@ -224,40 +226,6 @@ $(document).ready(function() {
 
         if (!$('#id_position').val()) {
             Swal.fire('Campo requerido', 'Seleccione un puesto de trabajo detallado.', 'warning');
-            return;
-        }
-
-        var $btn = $('#btnGuardarVacante');
-        if ($btn.prop('disabled')) {
-            return;
-        }
-
-        $btn.prop('disabled', true).text('Guardando...');
-
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
-            dataType: 'text',
-            complete: function(xhr) {
-                $btn.prop('disabled', false).text(<?php echo json_encode($is_edit ? 'Actualizar Vacante' : 'Guardar Vacante', JSON_UNESCAPED_UNICODE); ?>);
-                var response = medidataParseAjaxJson(xhr);
-                if (response.success) {
-                    Swal.fire(<?php echo json_encode($is_edit ? '¡Actualizado!' : '¡Agregado!', JSON_UNESCAPED_UNICODE); ?>, response.message || 'Operación completada', 'success').then(function() {
-                        window.location = 'vacantes_trabajo_usr.php';
-                    });
-                } else {
-                    Swal.fire('Error', response.message || 'No se pudo guardar la vacante', 'error');
-                }
-            }
-        });
-    });
-});
-</script>
-
-</body>
-</html>
-querido', 'Seleccione un puesto de trabajo detallado.', 'warning');
             return;
         }
 

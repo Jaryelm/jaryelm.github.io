@@ -15,7 +15,7 @@ try {
 
     $mainDb = dbname;
     $sql = "SELECT pd.id, p.name, d.name as department, pd.immediate_boss, pd.objective,
-                   pd.schedule, pd.deleted, sl.level_name, sl.position_category,
+                   pd.deleted, sl.level_name, sl.position_category,
                    sl.min_salary, sl.max_salary
             FROM positions_details pd
             INNER JOIN $mainDb.positions p ON pd.id_positions = p.id

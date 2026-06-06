@@ -24,6 +24,14 @@ $id_salary_level = (int) ($_POST['id_salary_level'] ?? 0);
 $special_conditions = trim((string) ($_POST['special_conditions'] ?? '')) ?: null;
 $suggested_psychometric_tests = trim((string) ($_POST['suggested_psychometric_tests'] ?? '')) ?: null;
 
+// Handle File Upload
+$job_profile_file = null;
+$job_profile_mime_type = null;
+if (isset($_FILES['job_profile_file']) && $_FILES['job_profile_file']['error'] === UPLOAD_ERR_OK) {
+    $job_profile_file = file_get_contents($_FILES['job_profile_file']['tmp_name']);
+    $job_profile_mime_type = $_FILES['job_profile_file']['type'];
+}
+
 // New fields from schema
 $required_docs_hiring = json_encode([]); // Default empty JSON array
 $status = 'Activo'; 
@@ -43,8 +51,9 @@ try {
                 id_positions, id_departament, id_salary_level, immediate_boss, objective,
                 main_functions, academic_requirements, required_experience,
                 technical_competencies, soft_competencies, special_conditions,
-                suggested_psychometric_tests, required_docs_hiring, status, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                suggested_psychometric_tests, required_docs_hiring, status, created_by,
+                job_profile_file, job_profile_mime_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
@@ -63,6 +72,8 @@ try {
         $required_docs_hiring,
         $status,
         $created_by,
+        $job_profile_file,
+        $job_profile_mime_type
     ]);
 
     echo json_encode([

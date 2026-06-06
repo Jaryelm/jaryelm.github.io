@@ -45,6 +45,12 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                     <a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>departamentos_usr.php">DEPARTAMENTOS</a>
                 </li>
                 <li>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>niveles_salariales_usr.php">NIVELES SALARIALES</a>
+                </li>
+                <li>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>horarios_usr.php">HORARIOS LABORALES</a>
+                </li>
+                <li>
                     <a href="#" class="new-submenu-link">PROCESO DE RECLUTAMIENTO</a>
                     <ul class="new-side-dropdown">
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>puestos_trabajo_usr.php">PUESTOS DE TRABAJO</a></li>

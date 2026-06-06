@@ -33,16 +33,7 @@ if ($id <= 0 || $id_salary_level <= 0) {
 }
 
 try {
-    // Note: department column was removed from schema provided by user
-    $sql = "UPDATE positions_details SET
-                id_positions = ?, id_departament = ?, id_salary_level = ?, immediate_boss = ?, objective = ?,
-                main_functions = ?, academic_requirements = ?, required_experience = ?,
-                technical_competencies = ?, soft_competencies = ?,
-                special_conditions = ?, suggested_psychometric_tests = ?, updated_by = ?
-            WHERE id = ?";
-
-    $stmt = $pdo->prepare($sql);
-    $result = $stmt->execute([
+    $params = [
         $id_positions,
         $id_departament,
         $id_salary_level,
@@ -55,9 +46,28 @@ try {
         $soft_competencies,
         $special_conditions,
         $suggested_psychometric_tests,
-        $updated_by,
-        $id,
-    ]);
+        $updated_by
+    ];
+
+    $fileSql = "";
+    if (isset($_FILES['job_profile_file']) && $_FILES['job_profile_file']['error'] === UPLOAD_ERR_OK) {
+        $fileSql = ", job_profile_file = ?, job_profile_mime_type = ?";
+        $params[] = file_get_contents($_FILES['job_profile_file']['tmp_name']);
+        $params[] = $_FILES['job_profile_file']['type'];
+    }
+
+    $params[] = $id;
+
+    $sql = "UPDATE positions_details SET
+                id_positions = ?, id_departament = ?, id_salary_level = ?, immediate_boss = ?, objective = ?,
+                main_functions = ?, academic_requirements = ?, required_experience = ?,
+                technical_competencies = ?, soft_competencies = ?,
+                special_conditions = ?, suggested_psychometric_tests = ?, updated_by = ?
+                $fileSql
+            WHERE id = ?";
+
+    $stmt = $pdo->prepare($sql);
+    $result = $stmt->execute($params);
 
     echo json_encode([
         'success' => (bool) $result,

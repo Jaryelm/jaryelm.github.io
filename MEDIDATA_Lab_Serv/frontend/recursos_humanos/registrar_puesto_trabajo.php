@@ -173,6 +173,16 @@ if ($is_edit && $pdoRrhh) {
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="job_profile_file">Documento de Perfil de Puesto (Opcional, Máx 64KB)</label>
+                            <input type="file" name="job_profile_file" id="job_profile_file" accept=".pdf,.doc,.docx,.jpg,.png" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <?php if ($is_edit && !empty($edit_data['job_profile_file'])): ?>
+                                <p style="margin-top: 5px; font-size: 0.85rem; color: #27ae60;">
+                                    <i class='bx bx-file'></i> Documento actual guardado. Subir uno nuevo lo reemplazará.
+                                </p>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
                             <label for="special_conditions">Condiciones Especiales</label>
                             <textarea name="special_conditions" id="special_conditions" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"><?php echo $is_edit ? htmlspecialchars($edit_data['special_conditions'] ?? '') : ''; ?></textarea>
                         </div>
@@ -229,10 +239,14 @@ $(document).ready(function() {
 
         $btn.prop('disabled', true).text('Guardando...');
 
+        var formData = new FormData(this);
+
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
             dataType: 'text',
             complete: function(xhr) {
                 $btn.prop('disabled', false).text(<?php echo json_encode($is_edit ? 'Actualizar Puesto' : 'Guardar Puesto', JSON_UNESCAPED_UNICODE); ?>);
@@ -240,19 +254,6 @@ $(document).ready(function() {
                 if (response.success) {
                     Swal.fire(<?php echo json_encode($is_edit ? '¡Actualizado!' : '¡Agregado!', JSON_UNESCAPED_UNICODE); ?>, response.message || 'Operación completada', 'success').then(function() {
                         window.location = 'puestos_trabajo.php';
-                    });
-                } else {
-                    Swal.fire('Error', response.message || 'No se pudo guardar el puesto', 'error');
-                }
-            }
-        });
-    });
-});
-</script>
-
-</body>
-</html>
-ndow.location = 'puestos_trabajo.php';
                     });
                 } else {
                     Swal.fire('Error', response.message || 'No se pudo guardar el puesto', 'error');
