@@ -66,6 +66,7 @@ if ($pdoRrhh) {
                                     <th>Nivel</th>
                                     <th>Categoría</th>
                                     <th>Rango Salarial</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -75,14 +76,14 @@ if ($pdoRrhh) {
                                     <td><?php echo htmlspecialchars($d->level_name); ?></td>
                                     <td><?php echo htmlspecialchars($d->position_category); ?></td>
                                     <td>L. <?php echo number_format($d->min_salary, 2); ?> - L. <?php echo number_format($d->max_salary, 2); ?></td>
-                                    <td>
-                                        <div style="display:flex; gap:10px; justify-content:center; align-items:center;">
-                                            <a title="Editar" href="registrar_nivel_salarial_usr.php?id=<?php echo $d->id; ?>" class="fa fa-edit" style="color:#06adbf; background:none; border:none; cursor:pointer; font-size: 1.2rem; text-decoration:none;"></a>
-                                            <label class="switch">
-                                                <input type="checkbox" class="state-toggle" data-id="<?php echo $d->id; ?>" checked disabled title="Función solo administrativa">
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
+                                    <td style="text-align: center;">
+                                        <label class="switch">
+                                            <input type="checkbox" class="state-toggle" data-id="<?php echo $d->id; ?>" checked disabled title="Función solo administrativa">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <a title="Editar" href="registrar_nivel_salarial_usr.php?id=<?php echo $d->id; ?>" class="fa fa-edit" style="color:#06adbf; background:none; border:none; cursor:pointer; font-size: 1.2rem; text-decoration:none;"></a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

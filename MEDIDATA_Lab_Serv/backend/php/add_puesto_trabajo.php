@@ -10,7 +10,38 @@ if (!isset($_POST['add_puesto'])) {
 
 $pdo = medidata_rrhh_json_require();
 
-$id_positions = (int) ($_POST['id_position'] ?? 0);
+$id_position_raw = $_POST['id_position'] ?? '';
+$new_position_name = trim((string) ($_POST['new_position_name'] ?? ''));
+
+$id_positions = 0;
+
+if ($id_position_raw === 'NEW_POSITION') {
+    if (empty($new_position_name)) {
+        echo json_encode(['success' => false, 'message' => 'El nombre del nuevo puesto base es obligatorio.']);
+        exit;
+    }
+
+    try {
+        // Use global $connect for medic9ue_medi_data.positions
+        // Check if exists
+        $check = $connect->prepare("SELECT id FROM positions WHERE name = ?");
+        $check->execute([$new_position_name]);
+        if ($row = $check->fetch()) {
+            $id_positions = (int) $row['id'];
+        } else {
+            $sql_new = "INSERT INTO positions (name, created_by) VALUES (?, ?)";
+            $stmt_new = $connect->prepare($sql_new);
+            $stmt_new->execute([$new_position_name, trim((string) ($_POST['created_by'] ?? ($name ?? 'sistema')))]);
+            $id_positions = (int) $connect->lastInsertId();
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error al crear puesto base: ' . $e->getMessage()]);
+        exit;
+    }
+} else {
+    $id_positions = (int) $id_position_raw;
+}
+
 $id_departament = (int) ($_POST['id_departament'] ?? 0);
 $immediate_boss = trim((string) ($_POST['immediate_boss'] ?? ''));
 

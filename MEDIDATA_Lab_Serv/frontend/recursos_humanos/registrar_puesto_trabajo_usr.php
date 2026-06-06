@@ -102,12 +102,21 @@ if ($is_edit && $pdoRrhh) {
                                     }
                                 } catch (Exception $e) {}
                                 ?>
+                                <?php if (!$is_edit): ?>
+                                <option value="NEW_POSITION" style="font-weight: bold; color: #2980b9;">+ OTRO (CREAR NUEVO PUESTO)</option>
+                                <?php endif; ?>
                             </select>
-                            <?php if ($positionsCount === 0): ?>
+                            <?php if ($positionsCount === 0 && !$is_edit): ?>
                             <p style="color:#c0392b;margin-top:8px;font-size:0.9rem;">
-                                No hay posiciones base registradas. Cree una en <a href="positions_usr.php">Posiciones de Trabajo</a> antes de continuar.
+                                No hay posiciones base registradas. Seleccione "OTRO" para crear una nueva o vaya a <a href="positions_usr.php">Posiciones de Trabajo</a>.
                             </p>
                             <?php endif; ?>
+                        </div>
+
+                        <div id="new_position_container" class="form-group" style="margin-bottom: 15px; display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #2980b9;">
+                            <label for="new_position_name" style="color: #2980b9; font-weight: bold;">Nombre del Nuevo Puesto Base <span style="color:red;">*</span></label>
+                            <input type="text" name="new_position_name" id="new_position_name" placeholder="Ej: Especialista de TI, Gerente de Ventas..." style="width: 100%; padding: 10px; border: 1px solid #2980b9; border-radius: 4px;">
+                            <small style="color: #7f8c8d;">Este nombre se guardará en el catálogo general de posiciones.</small>
                         </div>
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
@@ -217,6 +226,16 @@ if ($is_edit && $pdoRrhh) {
 
 <script type="text/javascript">
 $(document).ready(function() {
+    $('#id_position').on('change', function() {
+        if ($(this).val() === 'NEW_POSITION') {
+            $('#new_position_container').slideDown();
+            $('#new_position_name').attr('required', true);
+        } else {
+            $('#new_position_container').slideUp();
+            $('#new_position_name').removeAttr('required').val('');
+        }
+    });
+
     $('#puestoForm').on('submit', function(e) {
         e.preventDefault();
         
