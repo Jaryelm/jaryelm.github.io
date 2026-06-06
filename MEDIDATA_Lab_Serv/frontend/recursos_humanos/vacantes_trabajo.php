@@ -129,6 +129,7 @@ include_once '../../backend/registros/session_check.php';
     <script src="../../backend/js/script.js"></script>
     <script src='../../backend/js/submenu.js'></script>
     <script src="../../backend/registros/script/botones_color.js"></script>
+    <script src="../../backend/js/cat_schedules.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/registros/script/tabla_vacantes_trabajo.js?v=20260528h"></script>
 

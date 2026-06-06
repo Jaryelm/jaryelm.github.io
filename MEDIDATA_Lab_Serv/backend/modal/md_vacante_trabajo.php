@@ -74,6 +74,12 @@
 
                 <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1; min-width: 250px;">
+                        <label for="id_schedule_v_<?php echo $d->id; ?>">Horario Laboral <span style="color:red;">*</span></label>
+                        <select name="id_schedule" id="id_schedule_v_<?php echo $d->id; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; margin: 5px 0;">
+                            <option value="<?php echo $d->id_schedule; ?>" selected>Cargando horario...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 250px;">
                         <label for="rrhh_responsible_<?php echo $d->id; ?>">Responsable en RRHH</label>
                         <input type="text" name="rrhh_responsible" id="rrhh_responsible_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->rrhh_responsible); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
                     </div>

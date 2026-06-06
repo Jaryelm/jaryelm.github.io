@@ -16,6 +16,7 @@ $requesting_department = trim((string) ($_POST['requesting_department'] ?? ''));
 $available_slots = (int) ($_POST['available_slots'] ?? 1);
 $reason = trim((string) ($_POST['reason'] ?? ''));
 $priority = trim((string) ($_POST['priority'] ?? 'Media'));
+$id_schedule = (int) ($_POST['id_schedule'] ?? 0);
 $rrhh_responsible = trim((string) ($_POST['rrhh_responsible'] ?? '')) ?: null;
 $requesting_boss = trim((string) ($_POST['requesting_boss'] ?? '')) ?: null;
 $internal_observations = trim((string) ($_POST['internal_observations'] ?? '')) ?: null;
@@ -24,28 +25,30 @@ $init_date = trim((string) ($_POST['init_date'] ?? ''));
 $end_date = trim((string) ($_POST['end_date'] ?? ''));
 $updated_by = trim((string) ($_POST['updated_by'] ?? ($name ?? 'sistema')));
 
-if ($id <= 0) {
-    echo json_encode(['success' => false, 'message' => 'ID de vacante no válido.']);
+if ($id <= 0 || $id_position <= 0 || $requesting_department === '' || $reason === ''
+    || $benefits === '' || $init_date === '' || $end_date === '' || $id_schedule <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Complete todos los campos obligatorios.']);
     exit;
 }
-
 try {
-    $sql = "UPDATE vacant_positions SET
-                id_position = ?, requesting_department = ?,
-                available_slots = ?, reason = ?, priority = ?,
-                rrhh_responsible = ?, requesting_boss = ?,
-                internal_observations = ?, 
-                benefits = ?, init_date = ?, end_date = ?, updated_by = ?
-            WHERE id = ?";
+    $sql = "UPDATE vacant_positions SET 
+                id_position = ?, id_schedule = ?, requesting_department = ?,
+                available_slots = ?, reason = ?, priority = ?, rrhh_responsible = ?,
+                requesting_boss = ?, internal_observations = ?,
+                benefits = ?, init_date = ?,
+                end_date = ?, updated_by = ?
+            WHERE id = ? AND deleted = 0";
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
-        $id_position, $requesting_department,
+        $id_position, $id_schedule, $requesting_department,
         $available_slots, $reason, $priority, $rrhh_responsible,
         $requesting_boss, $internal_observations,
         $benefits, $init_date,
-        $end_date, $updated_by, $id,
+        $end_date, $updated_by,
+        $id
     ]);
+
 
     echo json_encode([
         'success' => (bool) $result,

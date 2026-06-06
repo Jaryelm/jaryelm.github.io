@@ -15,6 +15,7 @@ $requesting_department = trim((string) ($_POST['requesting_department'] ?? ''));
 $available_slots = (int) ($_POST['available_slots'] ?? 1);
 $reason = trim((string) ($_POST['reason'] ?? ''));
 $priority = trim((string) ($_POST['priority'] ?? 'Media'));
+$id_schedule = (int) ($_POST['id_schedule'] ?? 0);
 $rrhh_responsible = trim((string) ($_POST['rrhh_responsible'] ?? '')) ?: null;
 $requesting_boss = trim((string) ($_POST['requesting_boss'] ?? '')) ?: null;
 $internal_observations = trim((string) ($_POST['internal_observations'] ?? '')) ?: null;
@@ -24,7 +25,7 @@ $end_date = trim((string) ($_POST['end_date'] ?? ''));
 $created_by = trim((string) ($_POST['created_by'] ?? ($name ?? 'sistema')));
 
 if ($id_position <= 0 || $requesting_department === '' || $reason === ''
-    || $benefits === '' || $init_date === '' || $end_date === '') {
+    || $benefits === '' || $init_date === '' || $end_date === '' || $id_schedule <= 0) {
     echo json_encode(['success' => false, 'message' => 'Complete todos los campos obligatorios.']);
     exit;
 }
@@ -45,16 +46,16 @@ if (!in_array($priority, $allowedPriority, true)) {
 
 try {
     $sql = "INSERT INTO vacant_positions (
-                id_position, requesting_department,
+                id_position, id_schedule, requesting_department,
                 available_slots, reason, priority, rrhh_responsible,
                 requesting_boss, internal_observations,
                 benefits, init_date,
                 end_date, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
-        $id_position, $requesting_department,
+        $id_position, $id_schedule, $requesting_department,
         $available_slots, $reason, $priority, $rrhh_responsible,
         $requesting_boss, $internal_observations,
         $benefits, $init_date,
@@ -73,3 +74,4 @@ try {
     }
     echo json_encode(['success' => false, 'message' => 'Error: ' . $msg]);
 }
+?>

@@ -82,8 +82,11 @@
                         <input type="text" name="shift_type" id="shift_type_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->shift_type); ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
                     </div>
                     <div class="form-group" style="flex: 1; min-width: 200px;">
-                        <label for="salary_range_<?php echo $d->id; ?>">Rango Salarial</label>
-                        <input type="text" name="salary_range" id="salary_range_<?php echo $d->id; ?>" value="<?php echo htmlspecialchars($d->salary_range); ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 5px 0;">
+                        <label for="id_salary_level_<?php echo $d->id; ?>">Nivel Salarial</label>
+                        <select name="id_salary_level" id="id_salary_level_<?php echo $d->id; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; margin: 5px 0;">
+                            <!-- Will be loaded by JS or pre-filled if possible -->
+                            <option value="<?php echo $d->id_salary_level; ?>" selected>Cargando nivel...</option>
+                        </select>
                     </div>
                 </div>
 

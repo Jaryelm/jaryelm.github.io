@@ -161,16 +161,14 @@ if ($is_edit && $pdoRrhh) {
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
-                                <label for="schedule">Horario</label>
-                                <input type="text" name="schedule" id="schedule" value="<?php echo $is_edit ? htmlspecialchars($edit_data['schedule']) : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label for="shift_type">Tipo de Jornada <span style="color:red;">*</span></label>
-                                <input type="text" name="shift_type" id="shift_type" value="<?php echo $is_edit ? htmlspecialchars($edit_data['shift_type']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label for="salary_range">Rango Salarial</label>
-                                <input type="text" name="salary_range" id="salary_range" value="<?php echo $is_edit ? htmlspecialchars($edit_data['salary_range'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                <label for="id_salary_level">Nivel Salarial <span style="color:red;">*</span></label>
+                                <select class="select2" name="id_salary_level" id="id_salary_level" required>
+                                    <?php if ($is_edit): ?>
+                                        <option value="<?php echo (int)($edit_data['id_salary_level'] ?? 0); ?>" selected>Cargando...</option>
+                                    <?php else: ?>
+                                        <option value="" disabled selected>Seleccione un nivel...</option>
+                                    <?php endif; ?>
+                                </select>
                             </div>
                         </div>
 
@@ -205,6 +203,7 @@ if ($is_edit && $pdoRrhh) {
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/cat_departaments.js"></script>
+<script src="../../backend/js/cat_salary_levels.js"></script>
 
 <script type="text/javascript">
 function medidataParseAjaxJson(xhr) {
@@ -241,6 +240,19 @@ $(document).ready(function() {
                 if (response.success) {
                     Swal.fire(<?php echo json_encode($is_edit ? '¡Actualizado!' : '¡Agregado!', JSON_UNESCAPED_UNICODE); ?>, response.message || 'Operación completada', 'success').then(function() {
                         window.location = 'puestos_trabajo.php';
+                    });
+                } else {
+                    Swal.fire('Error', response.message || 'No se pudo guardar el puesto', 'error');
+                }
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>
+ndow.location = 'puestos_trabajo.php';
                     });
                 } else {
                     Swal.fire('Error', response.message || 'No se pudo guardar el puesto', 'error');

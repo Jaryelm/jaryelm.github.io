@@ -89,6 +89,12 @@
                     <a href="../recursos/departamentos.php"><span>DEPARTAMENTOS</span></a>
                 </li>
                 <li>
+                    <a href="../recursos_humanos/niveles_salariales.php"><span>NIVELES SALARIALES</span></a>
+                </li>
+                <li>
+                    <a href="../recursos_humanos/horarios.php"><span>HORARIOS LABORALES</span></a>
+                </li>
+                <li>
                     <a href="#" class="new-submenu-link"><span>PROCESO DE RECLUTAMIENTO</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos_humanos/puestos_trabajo.php"><span>PUESTOS DE TRABAJO</span></a></li>

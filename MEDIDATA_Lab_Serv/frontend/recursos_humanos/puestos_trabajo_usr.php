@@ -72,6 +72,7 @@ include_once '../../backend/registros/session_check.php';
     <script src="../../backend/js/script.js"></script>
     <script src='../../backend/js/submenu.js'></script>
     <script src="../../backend/registros/script/botones_color.js"></script>
+    <script src="../../backend/js/cat_salary_levels.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/registros/script/tabla_puestos_trabajo.js"></script>
 

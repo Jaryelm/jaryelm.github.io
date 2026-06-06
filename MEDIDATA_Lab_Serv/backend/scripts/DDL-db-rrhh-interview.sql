@@ -294,3 +294,59 @@ DROP COLUMN `vacant_name`;
 ALTER TABLE `vacant_positions`
 DROP COLUMN `publication_channel`;
 
+-- Gestión de Horarios
+CREATE TABLE IF NOT EXISTS `schedules` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    updated_by VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP(),
+    deleted BOOL DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS `schedule_details` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_schedule INT NOT NULL,
+    day ENUM('Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do') NOT NULL,
+    entry_time TIME NOT NULL,
+    exit_time TIME NOT NULL,
+    CONSTRAINT `fk_scheduleDetails_schedules` FOREIGN KEY (id_schedule) REFERENCES `schedules`(id),
+    CONSTRAINT `uq_schedule_day` UNIQUE KEY (id_schedule, day)
+);
+
+-- Gestión de Niveles Salariales
+CREATE TABLE IF NOT EXISTS `salary_levels` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    level_name VARCHAR(100) NOT NULL,
+    position_category VARCHAR(100) NOT NULL,
+    min_salary DECIMAL(10,2) NOT NULL,
+    max_salary DECIMAL(10,2) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    updated_by VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP(),
+    deleted BOOL DEFAULT FALSE
+);
+
+-- Relaciones con tablas existentes
+ALTER TABLE `vacant_positions`
+ADD `id_schedule` INT DEFAULT NULL AFTER id_position;
+
+ALTER TABLE `vacant_positions`
+ADD CONSTRAINT `fk_vacantPositions_schedules` FOREIGN KEY (`id_schedule`) REFERENCES `schedules` (id);
+
+ALTER TABLE `positions_details`
+ADD `id_salary_level` INT DEFAULT NULL AFTER id_departament;
+
+ALTER TABLE `positions_details`
+ADD CONSTRAINT `fk_positionsDetails_salaryLevels` FOREIGN KEY (`id_salary_level`) REFERENCES `salary_levels` (id);
+
+ALTER TABLE `positions_details`
+DROP COLUMN `salary_range`;
+
+ALTER TABLE `positions_details`
+DROP COLUMN `schedule`;
+
+ALTER TABLE `positions_details`
+DROP COLUMN `shift_type`;

@@ -16,10 +16,11 @@ if (!$pdo) {
     $rrhh_error = 'Identificador de candidato no válido.';
 } else {
     try {
-        $sql = "SELECT p.*, v.vacant_name, pt.name AS position_name
-                FROM postulantes p
-                LEFT JOIN vacantes_trabajo v ON p.id_vacant_position = v.id
-                LEFT JOIN puestos_trabajo pt ON v.id_position = pt.id
+        $sql = "SELECT p.*, pt.name AS position_name
+                FROM candidates p
+                LEFT JOIN vacant_positions v ON p.id_vacant_position = v.id
+                LEFT JOIN positions_details pd ON v.id_position = pd.id
+                LEFT JOIN medic9ue_medi_data.positions pt ON pd.id_positions = pt.id
                 WHERE p.id = :id AND p.deleted = 0
                 LIMIT 1";
         $stmt = $pdo->prepare($sql);
@@ -29,7 +30,7 @@ if (!$pdo) {
         if (!$candidato) {
             $rrhh_error = 'Candidato no encontrado.';
         } else {
-            $vacanteNombre = $candidato->vacant_name ?? 'N/A';
+            $vacanteNombre = $candidato->position_name ?? 'N/A';
             $puestoNombre = $candidato->position_name ?? 'N/A';
         }
     } catch (Throwable $e) {

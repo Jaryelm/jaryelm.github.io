@@ -15,10 +15,12 @@ try {
 
     $mainDb = dbname;
     $sql = "SELECT pd.id, p.name, d.name as department, pd.immediate_boss, pd.objective,
-                   pd.schedule, pd.deleted
+                   pd.schedule, pd.deleted, sl.level_name, sl.position_category,
+                   sl.min_salary, sl.max_salary
             FROM positions_details pd
             INNER JOIN $mainDb.positions p ON pd.id_positions = p.id
             LEFT JOIN departaments d ON pd.id_departament = d.id
+            LEFT JOIN salary_levels sl ON pd.id_salary_level = sl.id
             WHERE pd.deleted IN (0, 1)";
 
     $params = [];

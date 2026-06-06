@@ -155,11 +155,25 @@ if ($is_edit && $pdoRrhh) {
                                 <label for="end_date">Fecha Tentativa de Cierre <span style="color:red;">*</span></label>
                                 <input type="date" name="end_date" id="end_date" value="<?php echo $is_edit ? htmlspecialchars($edit_data['end_date']) : ''; ?>" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="id_schedule">Horario Laboral <span style="color:red;">*</span></label>
+                                <select class="select2" name="id_schedule" id="id_schedule" required>
+                                    <?php if ($is_edit): ?>
+                                        <option value="<?php echo (int)($edit_data['id_schedule'] ?? 0); ?>" selected>Cargando...</option>
+                                    <?php else: ?>
+                                        <option value="" disabled selected>Seleccione un horario...</option>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="rrhh_responsible">Responsable en RRHH</label>
                                 <input type="text" name="rrhh_responsible" id="rrhh_responsible" value="<?php echo $is_edit ? htmlspecialchars($edit_data['rrhh_responsible'] ?? '') : ''; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                             </div>
                         </div>
+
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label for="benefits">Beneficios (Generales / Adicionales al Puesto) <span style="color:red;">*</span></label>
@@ -191,6 +205,8 @@ if ($is_edit && $pdoRrhh) {
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+
+<script src="../../backend/js/cat_schedules.js"></script>
 
 <script type="text/javascript">
 function medidataParseAjaxJson(xhr) {
