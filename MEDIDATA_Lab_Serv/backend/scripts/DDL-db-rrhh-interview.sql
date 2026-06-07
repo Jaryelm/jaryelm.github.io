@@ -354,3 +354,7 @@ DROP COLUMN `shift_type`;
 ALTER TABLE `positions_details`
 ADD `job_profile_file` TINYBLOB DEFAULT NULL,
 ADD `job_profile_mime_type` VARCHAR(100) DEFAULT NULL;
+
+ALTER TABLE `vacant_positions`
+DROP COLUMN requesting_department,
+DROP COLUMN requesting_boss;
