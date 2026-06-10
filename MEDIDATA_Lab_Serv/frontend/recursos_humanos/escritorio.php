@@ -43,6 +43,8 @@ try {
 
     <!-- FullCalendar -->
     <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
+    <!-- SweetAlert2 -->
+    <link href='../../backend/vendor/sweetalert2/sweetalert2.min.css' rel='stylesheet' />
     <style>
         #calendar { min-height: 500px; }
         .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -297,35 +299,63 @@ try {
                 }
 
                 if (event.type !== 'interview') {
-                    alert('Solo las entrevistas pueden ser reprogramadas mediante arrastre.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Acción no permitida',
+                        text: 'Solo las entrevistas pueden ser reprogramadas mediante arrastre.'
+                    });
                     revertFunc();
                     return;
                 }
 
-                if (!confirm('¿Desea reprogramar esta entrevista para el ' + event.start.format('DD/MM/YYYY HH:mm') + '?')) {
-                    revertFunc();
-                    return;
-                }
-
-                $.ajax({
-                    url: '../../backend/registros/rrhh_calendar_update.php',
-                    type: 'POST',
-                    data: {
-                        id: event.id,
-                        start: event.start.format(),
-                        type: event.type
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            updateNotifications();
-                        } else {
-                            alert('Error: ' + response.message);
-                            revertFunc();
-                        }
-                    },
-                    error: function() {
-                        alert('Error de conexión al servidor.');
+                Swal.fire({
+                    title: '¿Reprogramar entrevista?',
+                    text: 'Desea reprogramar esta entrevista para el ' + event.start.format('DD/MM/YYYY HH:mm') + '?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#035c67',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, reprogramar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '../../backend/registros/rrhh_calendar_update.php',
+                            type: 'POST',
+                            data: {
+                                id: event.id,
+                                start: event.start.format(),
+                                type: event.type
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Éxito',
+                                        text: response.message,
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                    updateNotifications();
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message
+                                    });
+                                    revertFunc();
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error de conexión',
+                                    text: 'No se pudo conectar al servidor.'
+                                });
+                                revertFunc();
+                            }
+                        });
+                    } else {
                         revertFunc();
                     }
                 });
@@ -538,19 +568,35 @@ try {
                                 type: 'custom'
                             }, true);
                             $('#addCustomEventModal').fadeOut();
-                            alert('Evento creado exitosamente.');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Evento creado',
+                                text: 'El evento se ha creado exitosamente.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
                         } else {
-                            alert('Error: ' + response.message);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
                         }
                     },
                     error: function() {
-                        alert('Error de conexión al servidor.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de conexión',
+                            text: 'No se pudo conectar al servidor.'
+                        });
                     }
                 });
             });
         });
     </script>
 
+    <!-- SweetAlert2 JS -->
+    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="../../backend/js/submenu.js"></script>
 </body>
