@@ -236,6 +236,16 @@ try {
                 editable: true,
                 eventLimit: true,
                 lazyFetching: false,
+                selectable: true,
+                selectHelper: true,
+                select: function(start, end) {
+                    $('#customEventStart').val(start.format('YYYY-MM-DDTHH:mm'));
+                    $('#customEventEnd').val(end.format('YYYY-MM-DDTHH:mm'));
+                    $('#customEventTitle').val('');
+                    $('#customEventColor').val('#035c67');
+                    $('#addCustomEventModal').fadeIn();
+                    $('#calendar').fullCalendar('unselect');
+                },
                 events: [
                   <?php foreach($events as $event): 
                     $startStr = $event['start'] ?? '';
@@ -355,6 +365,12 @@ try {
                     $('#modal-footer').append(`
                         <a href="vacantes_trabajo.php" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Gestionar Vacante</a>
                     `);
+                } else if (event.type === 'custom') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Tipo</th><td>Evento General</td></tr>
+                        <tr><th>Inicio</th><td>${event.start ? event.start.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
+                        <tr><th>Fin</th><td>${event.end ? event.end.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
+                    `);
                 }
                 
                 $('#eventModal').fadeIn();
@@ -443,6 +459,35 @@ try {
         </div>
     </div>
 
+    <!-- Modal para Nuevo Evento -->
+    <div id="addCustomEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close-custom close">&times;</span>
+            <h2 style="color: #035c67; margin-bottom: 15px;">Añadir Nuevo Evento</h2>
+            <form id="customEventForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Título del Evento:</label>
+                    <input type="text" id="customEventTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Inicio:</label>
+                    <input type="datetime-local" id="customEventStart" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Fin:</label>
+                    <input type="datetime-local" id="customEventEnd" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Color:</label>
+                    <input type="color" id="customEventColor" value="#035c67" style="width: 100%; height: 40px; padding: 0; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="text-align: right;">
+                    <button type="submit" class="button" style="background: #035c67; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Guardar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <style>
         .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
@@ -453,6 +498,58 @@ try {
         .close:hover { color: #000; }
         .rrhh-btn-inline:hover { opacity: 0.9; }
     </style>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.close-custom', function () {
+                $('#addCustomEventModal').fadeOut();
+            });
+
+            $(window).on('click', function(event) {
+                if (event.target == document.getElementById('addCustomEventModal')) {
+                    $('#addCustomEventModal').fadeOut();
+                }
+            });
+
+            $('#customEventForm').submit(function(e) {
+                e.preventDefault();
+                const title = $('#customEventTitle').val();
+                const start = $('#customEventStart').val();
+                const end = $('#customEventEnd').val();
+                const color = $('#customEventColor').val();
+
+                $.ajax({
+                    url: '../../backend/registros/add_rrhh_calendar_event.php',
+                    type: 'POST',
+                    data: {
+                        title: title,
+                        start: start,
+                        end: end,
+                        color: color
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#calendar').fullCalendar('renderEvent', {
+                                id: 'custom_' + response.id,
+                                title: title,
+                                start: start,
+                                end: end,
+                                color: color,
+                                type: 'custom'
+                            }, true);
+                            $('#addCustomEventModal').fadeOut();
+                            alert('Evento creado exitosamente.');
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error de conexión al servidor.');
+                    }
+                });
+            });
+        });
+    </script>
 
     <script src="../../backend/js/script.js"></script>
     <script src="../../backend/js/submenu.js"></script>

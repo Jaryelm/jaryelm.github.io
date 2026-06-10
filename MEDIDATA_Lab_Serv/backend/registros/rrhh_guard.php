@@ -194,6 +194,24 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 $vac['end'] = $d;
                 $events[] = $vac;
             }
+
+            // 3. Eventos Personalizados
+            $stmtCustom = $pdo->prepare("
+                SELECT
+                    id,
+                    title,
+                    start_datetime AS start,
+                    end_datetime AS end,
+                    color,
+                    'custom' AS type
+                FROM rrhh_custom_events
+                WHERE deleted = 0
+            ");
+            $stmtCustom->execute();
+            $customs = $stmtCustom->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($customs as &$c) {
+                $events[] = $c;
+            }
         } catch (Throwable $e) {
             error_log('medidata_rrhh_fetch_eventos_calendario: ' . $e->getMessage());
         }
