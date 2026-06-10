@@ -88,18 +88,19 @@ if (!function_exists('medidata_rrhh_fetch_postulantes')) {
         }
 
         try {
-            $query = "SELECT p.*, p2.name AS vacancy_name
-                      FROM postulantes p
-                      LEFT JOIN vacant_positions v ON p.id_vacant_position = v.id
+            $mainDb = defined('dbname') ? dbname : 'medic9ue_medi_data';
+            $query = "SELECT c.*, p2.name AS vacancy_name
+                      FROM candidates c
+                      LEFT JOIN vacant_positions v ON c.id_vacant_position = v.id
                       LEFT JOIN positions_details pd ON v.id_position = pd.id
-                      LEFT JOIN medic9ue_medi_data.positions p2 ON pd.id_positions = p2.id
-                      WHERE p.deleted = 0 AND ({$statusCondition})";
+                      LEFT JOIN $mainDb.positions p2 ON pd.id_positions = p2.id
+                      WHERE c.deleted = 0 AND ({$statusCondition})";
 
             if ($idVacante > 0) {
-                $query .= ' AND p.id_vacant_position = :id_vacante';
+                $query .= ' AND c.id_vacant_position = :id_vacante';
             }
 
-            $query .= ' ORDER BY p.id DESC';
+            $query .= ' ORDER BY c.id DESC';
 
             $stmt = $pdo->prepare($query);
             if ($idVacante > 0) {
@@ -123,52 +124,76 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
         }
 
         $events = [];
+        $mainDb = defined('dbname') ? dbname : 'medic9ue_medi_data';
 
         try {
+            // 1. Entrevistas Programadas
             $stmtInterviews = $pdo->prepare("
                 SELECT
                     i.id,
-                    CONCAT('Entrevista: ', p.fullname) AS title,
-                    CONCAT(i.date_interview, ' ', i.time_interview) AS start,
-                    DATE_ADD(CONCAT(i.date_interview, ' ', i.time_interview), INTERVAL 1 HOUR) AS end,
+                    CONCAT('Entrevista: ', c.fullname) AS title,
+                    i.date_interview AS raw_start_date,
+                    i.time_interview AS raw_start_time,
                     CASE
                         WHEN i.status = 'Programada' THEN '#035c67'
                         WHEN i.status = 'En Proceso' THEN '#06adbf'
                         WHEN i.status = 'Terminada' THEN '#81D43A'
                         ELSE '#8D8D8D'
                     END AS color,
-                    p.fullname AS candidate_name,
-                    p.dni AS candidate_dni,
-                    p.email AS candidate_email,
-                    p.phonenumber AS candidate_phone,
+                    c.id AS candidate_id,
+                    c.fullname AS candidate_name,
+                    c.dni AS candidate_dni,
+                    c.email AS candidate_email,
+                    c.phonenumber AS candidate_phone,
                     i.status AS interview_status,
                     pt.name AS position_name,
                     'interview' AS type
                 FROM interviews i
-                INNER JOIN postulantes p ON i.id_candidate = p.id
-                LEFT JOIN vacantes_trabajo v ON p.id_vacant_position = v.id
-                LEFT JOIN puestos_trabajo pt ON v.id_position = pt.id
+                INNER JOIN candidates c ON i.id_candidate = c.id
+                LEFT JOIN vacant_positions vp ON c.id_vacant_position = vp.id
+                LEFT JOIN positions_details pd ON vp.id_position = pd.id
+                LEFT JOIN $mainDb.positions pt ON pd.id_positions = pt.id
                 WHERE i.deleted = 0
             ");
             $stmtInterviews->execute();
-            $events = array_merge($events, $stmtInterviews->fetchAll(PDO::FETCH_ASSOC));
+            $interviews = $stmtInterviews->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($interviews as &$inv) {
+                $d = trim((string)$inv['raw_start_date']);
+                $t = trim((string)$inv['raw_start_time']);
+                if ($d === '' || strpos($d, '0000-00-00') !== false) {
+                    $d = date('Y-m-d');
+                }
+                $inv['start'] = $t === '' ? $d : "$d $t";
+                $inv['end'] = date('Y-m-d H:i:s', strtotime($inv['start']) + 3600); // +1 hora
+                $events[] = $inv;
+            }
 
+            // 2. Cierres de Vacantes
             $stmtVacantes = $pdo->prepare("
                 SELECT
-                    v.id,
+                    vp.id,
                     CONCAT('Cierre Vacante: ', pt.name) AS title,
-                    v.end_date AS start,
-                    v.end_date AS end,
+                    vp.end_date AS raw_end_date,
                     '#FC3B56' AS color,
                     pt.name AS position_name,
-                    v.benefits,
+                    vp.benefits,
                     'vacancy_end' AS type
-                FROM vacantes_trabajo v
-                JOIN puestos_trabajo pt ON v.id_position = pt.id
-                WHERE v.deleted = 0
+                FROM vacant_positions vp
+                JOIN positions_details pd ON vp.id_position = pd.id
+                JOIN $mainDb.positions pt ON pd.id_positions = pt.id
+                WHERE vp.deleted = 0
             ");
             $stmtVacantes->execute();
-            $events = array_merge($events, $stmtVacantes->fetchAll(PDO::FETCH_ASSOC));
+            $vacantes = $stmtVacantes->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($vacantes as &$vac) {
+                $d = trim((string)$vac['raw_end_date']);
+                if ($d === '' || strpos($d, '0000-00-00') !== false) {
+                    $d = date('Y-m-d');
+                }
+                $vac['start'] = $d;
+                $vac['end'] = $d;
+                $events[] = $vac;
+            }
         } catch (Throwable $e) {
             error_log('medidata_rrhh_fetch_eventos_calendario: ' . $e->getMessage());
         }
@@ -193,10 +218,10 @@ if (!function_exists('medidata_rrhh_fetch_conteos_dashboard')) {
 
         try {
             $conteos['vacantes_activas'] = (int) $pdo->query(
-                "SELECT COUNT(*) FROM vacantes_trabajo WHERE deleted = 0 AND end_date >= CURDATE()"
+                "SELECT COUNT(*) FROM vacant_positions WHERE deleted = 0 AND status = 'Abierta' AND end_date >= CURDATE()"
             )->fetchColumn();
             $conteos['postulantes'] = (int) $pdo->query(
-                "SELECT COUNT(*) FROM postulantes WHERE deleted = 0"
+                "SELECT COUNT(*) FROM candidates WHERE deleted = 0"
             )->fetchColumn();
             // Candidatos en etapa activa de entrevista (alineado con entrevista.php).
             $conteos['entrevistas_hoy'] = (int) $pdo->query(

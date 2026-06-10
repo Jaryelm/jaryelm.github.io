@@ -43,6 +43,17 @@ try {
 
     <!-- FullCalendar -->
     <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
+    <style>
+        #calendar { min-height: 500px; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
+        .details-table td { border: 1px solid #ddd; padding: 10px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .close:hover { color: #000; }
+        .rrhh-btn-inline:hover { opacity: 0.9; }
+    </style>
     <title>MEDIDATA</title>
 </head>
 
@@ -115,17 +126,62 @@ try {
                             
                             <div id="future-events">
                                 <h5>Próximas Entrevistas</h5>
-                                <div id="future-occupancy"></div>
+                                <div id="future-occupancy">
+                                    <?php
+                                    $now = new DateTime();
+                                    $futureCount = 0;
+                                    $interviews = array_filter($events, fn($e) => $e['type'] === 'interview' && new DateTime($e['start']) > $now);
+                                    usort($interviews, fn($a, $b) => strcmp($a['start'], $b['start']));
+                                    foreach ($interviews as $event) {
+                                        if ($futureCount >= 5) break;
+                                        echo '<div class="notification-item" style="border-left: 5px solid '.$event['color'].';">';
+                                        echo '<strong>'.htmlspecialchars($event['candidate_name'] ?? '').'</strong>';
+                                        echo '<p>'.date('d/m H:i', strtotime($event['start'])).' - '.htmlspecialchars($event['position_name'] ?? '').'</p>';
+                                        echo '</div>';
+                                        $futureCount++;
+                                    }
+                                    if ($futureCount === 0) echo '<p>No hay entrevistas próximas.</p>';
+                                    ?>
+                                </div>
                             </div>
 
                             <div id="vacancy-deadlines">
                                 <h5>Cierres de Vacantes</h5>
-                                <div id="vacancy-occupancy"></div>
+                                <div id="vacancy-occupancy">
+                                    <?php
+                                    $vacancyCount = 0;
+                                    $vacancies = array_filter($events, fn($e) => $e['type'] === 'vacancy_end' && date('Y-m-d', strtotime($e['start'])) >= date('Y-m-d'));
+                                    usort($vacancies, fn($a, $b) => strcmp($a['start'], $b['start']));
+                                    foreach ($vacancies as $event) {
+                                        if ($vacancyCount >= 3) break;
+                                        echo '<div class="notification-item" style="border-left: 5px solid #f44336;">';
+                                        echo '<strong>'.htmlspecialchars($event['position_name'] ?? '').'</strong>';
+                                        echo '<p>Cierra: '.date('d/m/Y', strtotime($event['start'])).'</p>';
+                                        echo '</div>';
+                                        $vacancyCount++;
+                                    }
+                                    if ($vacancyCount === 0) echo '<p>No hay cierres de vacantes próximos.</p>';
+                                    ?>
+                                </div>
                             </div>
                             
                             <div id="past-events">
                                 <h5>Actividad Reciente</h5>
-                                <div id="past-occupancy"></div>
+                                <div id="past-occupancy">
+                                    <?php
+                                    $pastCount = 0;
+                                    $pastEvents = array_filter($events, fn($e) => new DateTime($e['start']) < $now);
+                                    usort($pastEvents, fn($a, $b) => strcmp($b['start'], $a['start']));
+                                    foreach ($pastEvents as $event) {
+                                        if ($pastCount >= 3) break;
+                                        echo '<div class="notification-item" style="opacity: 0.7;">';
+                                        echo '<strong>'.htmlspecialchars($event['title'] ?? '').'</strong>';
+                                        echo '<p>'.date('d/m', strtotime($event['start'])).'</p>';
+                                        echo '</div>';
+                                        $pastCount++;
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,127 +191,25 @@ try {
         </main>
     </section>
 
-    <!-- Scripts -->
+    <!-- Scripts (Misma estructura que frontend/admin/escritorio.php) -->
     <script src="../../backend/js/jquery.min.js"></script>
+    <script src="../../backend/js/moment.min.js"></script>
 <?php include __DIR__ . '/_rrhh_select2_foot.php'; ?>
 
-    <script src="../../backend/vendor/datatables/jquery.dataTables.js"></script>
-    <script src="../../backend/vendor/datatables/dataTables.bootstrap4.js"></script>
-    <script src="../../backend/js/moment.min.js"></script>
+    <script src="../../backend/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../backend/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    
     <script src='../../backend/js/fullcalendar/fullcalendar.min.js'></script>
+    <script src='../../backend/js/fullcalendar/fullcalendar.js'></script>
     <script src='../../backend/js/fullcalendar/locale/es.js'></script>
     
     <script>
         $(document).ready(function () {
-            var events = <?php echo json_encode($events); ?>;
+            // Establecer idioma de moment explicitly
+            moment.locale('es');
 
-            $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,basicWeek,basicDay'
-                },
-                locale: 'es',
-                editable: false,
-                eventLimit: true,
-                events: events,
-                eventClick: function (event) {
-                    showEventDetails(event);
-                },
-                viewRender: function (view) {
-                    updateNotifications(view);
-                }
-            });
-
-            function showEventDetails(event) {
-                $('#modal-title').text(event.title);
-                
-                // Limpiar tabla
-                $('#event-details tbody').empty();
-
-                if (event.type === 'interview') {
-                    $('#event-details tbody').append(`
-                        <tr><th>Candidato</th><td>${event.candidate_name}</td></tr>
-                        <tr><th>DNI</th><td>${event.candidate_dni}</td></tr>
-                        <tr><th>Puesto</th><td>${event.position_name}</td></tr>
-                        <tr><th>Estado</th><td>${event.interview_status}</td></tr>
-                        <tr><th>Inicio</th><td>${moment(event.start).format('YYYY-MM-DD HH:mm')}</td></tr>
-                        <tr><th>Teléfono</th><td>${event.candidate_phone}</td></tr>
-                        <tr><th>Email</th><td>${event.candidate_email}</td></tr>
-                    `);
-                } else if (event.type === 'vacancy_end') {
-                    $('#event-details tbody').append(`
-                        <tr><th>Puesto</th><td>${event.position_name}</td></tr>
-                        <tr><th>Fecha Cierre</th><td>${moment(event.start).format('YYYY-MM-DD')}</td></tr>
-                        <tr><th>Beneficios</th><td>${event.benefits || 'N/A'}</td></tr>
-                        <tr><th>Tipo</th><td>Cierre de Vacante</td></tr>
-                    `);
-                }
-                
-                $('#eventModal').fadeIn();
-            }
-
-            function updateNotifications(view) {
-                const now = moment();
-                
-                // Próximas Entrevistas
-                const futureOccupancy = $('#future-occupancy');
-                futureOccupancy.empty();
-                let futureCount = 0;
-                events.filter(e => e.type === 'interview' && moment(e.start).isAfter(now))
-                      .sort((a,b) => moment(a.start) - moment(b.start))
-                      .forEach(event => {
-                    if (futureCount < 5) {
-                        futureOccupancy.append(`
-                            <div class="notification-item" style="border-left: 5px solid ${event.color};">
-                                <strong>${event.candidate_name}</strong>
-                                <p>${moment(event.start).format('DD/MM HH:mm')} - ${event.position_name}</p>
-                            </div>
-                        `);
-                        futureCount++;
-                    }
-                });
-                if (futureCount === 0) futureOccupancy.append('<p>No hay entrevistas próximas.</p>');
-
-                // Cierres de Vacantes
-                const vacancyOccupancy = $('#vacancy-occupancy');
-                vacancyOccupancy.empty();
-                let vacancyCount = 0;
-                events.filter(e => e.type === 'vacancy_end' && moment(e.start).isSameOrAfter(now, 'day'))
-                      .sort((a,b) => moment(a.start) - moment(b.start))
-                      .forEach(event => {
-                    if (vacancyCount < 3) {
-                        vacancyOccupancy.append(`
-                            <div class="notification-item" style="border-left: 5px solid #f44336;">
-                                <strong>${event.position_name}</strong>
-                                <p>Cierra: ${moment(event.start).format('DD/MM/YYYY')}</p>
-                            </div>
-                        `);
-                        vacancyCount++;
-                    }
-                });
-                if (vacancyCount === 0) vacancyOccupancy.append('<p>No hay cierres de vacantes próximos.</p>');
-
-                // Actividad Reciente (Pasados)
-                const pastOccupancy = $('#past-occupancy');
-                pastOccupancy.empty();
-                let pastCount = 0;
-                events.filter(e => moment(e.start).isBefore(now))
-                      .sort((a,b) => moment(b.start) - moment(a.start))
-                      .forEach(event => {
-                    if (pastCount < 3) {
-                        pastOccupancy.append(`
-                            <div class="notification-item" style="opacity: 0.7;">
-                                <strong>${event.title}</strong>
-                                <p>${moment(event.start).format('DD/MM')}</p>
-                            </div>
-                        `);
-                        pastCount++;
-                    }
-                });
-            }
-
-            $('.close').on('click', function () {
+            // Eventos de cierre de modal (Delegación)
+            $(document).on('click', '.close', function () {
                 $('#eventModal').fadeOut();
             });
 
@@ -264,6 +218,212 @@ try {
                     $('#eventModal').fadeOut();
                 }
             });
+
+            var date = new Date();
+            var yyyy = date.getFullYear().toString();
+            var mm = (date.getMonth() + 1).toString().padStart(2, '0');
+            var dd = date.getDate().toString().padStart(2, '0');
+
+            $('#calendar').fullCalendar({
+                header: {
+                    language: 'es', // Usado en versiones antiguas/configuraciones personalizadas
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,basicWeek,basicDay'
+                },
+                locale: 'es', // Estándar para FullCalendar 3.x
+                defaultDate: `${yyyy}-${mm}-${dd}`,
+                editable: true,
+                eventLimit: true,
+                lazyFetching: false,
+                events: [
+                  <?php foreach($events as $event): 
+                    $startStr = $event['start'] ?? '';
+                    $endStr = $event['end'] ?? '';
+                    
+                    // Asegurar que no pasen fechas en blanco o con ceros a JS
+                    if (empty($startStr) || strpos($startStr, '0000-00-00') !== false) {
+                        continue;
+                    }
+                  ?>
+                  {
+                      id: '<?php echo $event['id']; ?>',
+                      title: '<?php echo addslashes($event['title'] ?? ''); ?>',
+                      start: '<?php echo $startStr; ?>',
+                      end: '<?php echo $endStr; ?>',
+                      color: '<?php echo $event['color'] ?? ''; ?>',
+                      type: '<?php echo $event['type'] ?? ''; ?>',
+                      candidate_id: '<?php echo $event['candidate_id'] ?? ""; ?>',
+                      candidate_name: '<?php echo addslashes($event['candidate_name'] ?? ""); ?>',
+                      candidate_dni: '<?php echo $event['candidate_dni'] ?? ""; ?>',
+                      position_name: '<?php echo addslashes($event['position_name'] ?? ""); ?>',
+                      interview_status: '<?php echo $event['interview_status'] ?? ""; ?>',
+                      candidate_phone: '<?php echo $event['candidate_phone'] ?? ""; ?>',
+                      candidate_email: '<?php echo addslashes($event['candidate_email'] ?? ""); ?>',
+                      benefits: '<?php echo addslashes($event['benefits'] ?? ""); ?>'
+                  },
+                  <?php endforeach; ?>
+                ],
+                eventClick: function (event) {
+                    showEventDetails(event);
+                },
+                eventDrop: function(event, delta, revertFunc) {
+                    updateEventDate(event, revertFunc);
+                },
+                eventAfterAllRender: function() {
+                    updateNotifications();
+                }
+            });
+
+            // Forzar resize para evitar contenedor colapsado
+            setTimeout(function() {
+                $(window).trigger('resize');
+            }, 500);
+
+            function updateEventDate(event, revertFunc) {
+                if (!event || !event.start) {
+                    revertFunc();
+                    return;
+                }
+
+                if (event.type !== 'interview') {
+                    alert('Solo las entrevistas pueden ser reprogramadas mediante arrastre.');
+                    revertFunc();
+                    return;
+                }
+
+                if (!confirm('¿Desea reprogramar esta entrevista para el ' + event.start.format('DD/MM/YYYY HH:mm') + '?')) {
+                    revertFunc();
+                    return;
+                }
+
+                $.ajax({
+                    url: '../../backend/registros/rrhh_calendar_update.php',
+                    type: 'POST',
+                    data: {
+                        id: event.id,
+                        start: event.start.format(),
+                        type: event.type
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            updateNotifications();
+                        } else {
+                            alert('Error: ' + response.message);
+                            revertFunc();
+                        }
+                    },
+                    error: function() {
+                        alert('Error de conexión al servidor.');
+                        revertFunc();
+                    }
+                });
+            }
+
+            function showEventDetails(event) {
+                if (!event || !event.start) return;
+
+                $('#modal-title').text(event.title || 'Detalles');
+                $('#event-details tbody').empty();
+                $('#modal-footer').empty();
+
+                const formattedStart = event.start.format('YYYY-MM-DD HH:mm');
+
+                if (event.type === 'interview') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Candidato</th><td>${event.candidate_name || ''}</td></tr>
+                        <tr><th>DNI</th><td>${event.candidate_dni || ''}</td></tr>
+                        <tr><th>Puesto</th><td>${event.position_name || ''}</td></tr>
+                        <tr><th>Estado</th><td>${event.interview_status || ''}</td></tr>
+                        <tr><th>Inicio</th><td>${formattedStart}</td></tr>
+                        <tr><th>Teléfono</th><td>${event.candidate_phone || ''}</td></tr>
+                        <tr><th>Email</th><td>${event.candidate_email || ''}</td></tr>
+                    `);
+
+                    $('#modal-footer').append(`
+                        <a href="detalle_postulante.php?id=${event.candidate_id}" class="button rrhh-btn-inline" style="background: #035c67; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Ver Perfil Candidato</a>
+                    `);
+                } else if (event.type === 'vacancy_end') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Puesto</th><td>${event.position_name || ''}</td></tr>
+                        <tr><th>Fecha Cierre</th><td>${event.start.format('YYYY-MM-DD')}</td></tr>
+                        <tr><th>Beneficios</th><td>${event.benefits || 'N/A'}</td></tr>
+                        <tr><th>Tipo</th><td>Cierre de Vacante</td></tr>
+                    `);
+
+                    $('#modal-footer').append(`
+                        <a href="vacantes_trabajo.php" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Gestionar Vacante</a>
+                    `);
+                }
+                
+                $('#eventModal').fadeIn();
+            }
+
+            function updateNotifications() {
+                try {
+                    const now = moment();
+                    const calendar = $('#calendar');
+                    if (!calendar.length || typeof calendar.fullCalendar !== 'function') return;
+
+                    const events = calendar.fullCalendar('clientEvents');
+                    
+                    const futureOccupancy = $('#future-occupancy');
+                    futureOccupancy.empty();
+                    let futureCount = 0;
+                    events.filter(e => e && e.start && e.type === 'interview' && moment(e.start).isAfter(now))
+                          .sort((a,b) => moment(a.start) - moment(b.start))
+                          .forEach(event => {
+                        if (futureCount < 5) {
+                            futureOccupancy.append(`
+                                <div class="notification-item" style="border-left: 5px solid ${event.color || '#888'};">
+                                    <strong>${event.candidate_name || 'N/A'}</strong>
+                                    <p>${moment(event.start).format('DD/MM HH:mm')} - ${event.position_name || ''}</p>
+                                </div>
+                            `);
+                            futureCount++;
+                        }
+                    });
+                    if (futureCount === 0) futureOccupancy.append('<p>No hay entrevistas próximas.</p>');
+
+                    const vacancyOccupancy = $('#vacancy-occupancy');
+                    vacancyOccupancy.empty();
+                    let vacancyCount = 0;
+                    events.filter(e => e && e.start && e.type === 'vacancy_end' && moment(e.start).isSameOrAfter(now, 'day'))
+                          .sort((a,b) => moment(a.start) - moment(b.start))
+                          .forEach(event => {
+                        if (vacancyCount < 3) {
+                            vacancyOccupancy.append(`
+                                <div class="notification-item" style="border-left: 5px solid #f44336;">
+                                    <strong>${event.position_name || 'N/A'}</strong>
+                                    <p>Cierra: ${moment(event.start).format('DD/MM/YYYY')}</p>
+                                </div>
+                            `);
+                            vacancyCount++;
+                        }
+                    });
+                    if (vacancyCount === 0) vacancyOccupancy.append('<p>No hay cierres de vacantes próximos.</p>');
+
+                    const pastOccupancy = $('#past-occupancy');
+                    pastOccupancy.empty();
+                    let pastCount = 0;
+                    events.filter(e => e && e.start && moment(e.start).isBefore(now))
+                          .sort((a,b) => moment(b.start) - moment(a.start))
+                          .forEach(event => {
+                        if (pastCount < 3) {
+                            pastOccupancy.append(`
+                                <div class="notification-item" style="opacity: 0.7;">
+                                    <strong>${event.title || 'N/A'}</strong>
+                                    <p>${moment(event.start).format('DD/MM')}</p>
+                                </div>
+                            `);
+                            pastCount++;
+                        }
+                    });
+                } catch (err) {
+                    console.error("Error en updateNotifications:", err);
+                }
+            }
         });
     </script>
 
@@ -277,17 +437,21 @@ try {
                     <!-- Dinámico -->
                 </tbody>
             </table>
+            <div id="modal-footer" style="margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                <!-- Dinámico -->
+            </div>
         </div>
     </div>
 
     <style>
         .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 30%; }
+        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
         .details-table td { border: 1px solid #ddd; padding: 10px; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
         .modal-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
         .close:hover { color: #000; }
+        .rrhh-btn-inline:hover { opacity: 0.9; }
     </style>
 
     <script src="../../backend/js/script.js"></script>

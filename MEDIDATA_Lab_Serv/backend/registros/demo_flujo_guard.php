@@ -96,13 +96,15 @@ if (!function_exists('medidata_demo_flujo_candidatos')) {
             return [];
         }
         try {
+            $mainDb = defined('dbname') ? dbname : 'medic9ue_medi_data';
             $stmt = $pdo->query(
-                "SELECT p.*, v.vacant_name, pt.name AS position_name
-                 FROM postulantes p
-                 LEFT JOIN vacantes_trabajo v ON p.id_vacant_position = v.id
-                 LEFT JOIN puestos_trabajo pt ON v.id_position = pt.id
-                 WHERE p.deleted = 0 AND p.fullname LIKE '[DEMO]%'
-                 ORDER BY p.id ASC"
+                "SELECT c.*, p.name AS position_name
+                 FROM candidates c
+                 LEFT JOIN vacant_positions v ON c.id_vacant_position = v.id
+                 LEFT JOIN positions_details pd ON v.id_position = pd.id
+                 LEFT JOIN $mainDb.positions p ON pd.id_positions = p.id
+                 WHERE c.deleted = 0 AND c.fullname LIKE '[DEMO]%'
+                 ORDER BY c.id ASC"
             );
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (Throwable $e) {
@@ -125,7 +127,7 @@ if (!function_exists('medidata_demo_flujo_vacante_id')) {
         }
         try {
             $stmt = $pdo->prepare(
-                "SELECT id FROM vacantes_trabajo WHERE vacant_name LIKE ? AND deleted = 0 LIMIT 1"
+                "SELECT id FROM vacant_positions WHERE reason LIKE ? AND deleted = 0 LIMIT 1"
             );
             $stmt->execute(['%[DEMO]%']);
             return (int) $stmt->fetchColumn();
