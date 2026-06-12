@@ -228,12 +228,12 @@ try {
 
             $('#calendar').fullCalendar({
                 header: {
-                    language: 'es', // Usado en versiones antiguas/configuraciones personalizadas
+                    language: 'es',
                     left: 'prev,next today',
                     center: 'title',
                     right: 'month,basicWeek,basicDay'
                 },
-                locale: 'es', // Estándar para FullCalendar 3.x
+                locale: 'es',
                 defaultDate: `${yyyy}-${mm}-${dd}`,
                 editable: true,
                 eventLimit: true,
@@ -241,10 +241,12 @@ try {
                 selectable: true,
                 selectHelper: true,
                 select: function(start, end) {
+                    $('#customEventId').val('');
+                    $('#customEventTitle').val('');
                     $('#customEventStart').val(start.format('YYYY-MM-DDTHH:mm'));
                     $('#customEventEnd').val(end.format('YYYY-MM-DDTHH:mm'));
-                    $('#customEventTitle').val('');
                     $('#customEventColor').val('#035c67');
+                    $('#customEventModalTitle').text('Añadir Nuevo Evento');
                     $('#addCustomEventModal').fadeIn();
                     $('#calendar').fullCalendar('unselect');
                 },
@@ -252,11 +254,7 @@ try {
                   <?php foreach($events as $event): 
                     $startStr = $event['start'] ?? '';
                     $endStr = $event['end'] ?? '';
-                    
-                    // Asegurar que no pasen fechas en blanco o con ceros a JS
-                    if (empty($startStr) || strpos($startStr, '0000-00-00') !== false) {
-                        continue;
-                    }
+                    if (empty($startStr) || strpos($startStr, '0000-00-00') !== false) continue;
                   ?>
                   {
                       id: '<?php echo $event['id']; ?>',
@@ -287,30 +285,23 @@ try {
                 }
             });
 
-            // Forzar resize para evitar contenedor colapsado
             setTimeout(function() {
                 $(window).trigger('resize');
             }, 500);
 
             function updateEventDate(event, revertFunc) {
-                if (!event || !event.start) {
-                    revertFunc();
-                    return;
+                if (!event || !event.start) { revertFunc(); return; }
+                if (event.type !== 'interview' && event.type !== 'custom') {
+                    Swal.fire({ icon: 'warning', title: 'Acción no permitida', text: 'Este tipo de evento no puede ser reprogramado mediante arrastre.' });
+                    revertFunc(); return;
                 }
 
-                if (event.type !== 'interview') {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Acción no permitida',
-                        text: 'Solo las entrevistas pueden ser reprogramadas mediante arrastre.'
-                    });
-                    revertFunc();
-                    return;
-                }
+                const eventName = event.type === 'interview' ? 'entrevista' : 'evento';
+                const numericId = event.id.toString().split('_').pop();
 
                 Swal.fire({
-                    title: '¿Reprogramar entrevista?',
-                    text: 'Desea reprogramar esta entrevista para el ' + event.start.format('DD/MM/YYYY HH:mm') + '?',
+                    title: '¿Reprogramar ' + eventName + '?',
+                    text: 'Desea reprogramar este ' + eventName + ' para el ' + event.start.format('DD/MM/YYYY HH:mm') + '?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#035c67',
@@ -322,36 +313,18 @@ try {
                         $.ajax({
                             url: '../../backend/registros/rrhh_calendar_update.php',
                             type: 'POST',
-                            data: {
-                                id: event.id,
-                                start: event.start.format(),
-                                type: event.type
-                            },
+                            data: { id: numericId, start: event.start.format(), type: event.type },
                             success: function(response) {
                                 if (response.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Éxito',
-                                        text: response.message,
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    });
+                                    Swal.fire({ icon: 'success', title: 'Éxito', text: response.message, timer: 2000, showConfirmButton: false });
                                     updateNotifications();
                                 } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: response.message
-                                    });
+                                    Swal.fire({ icon: 'error', title: 'Error', text: response.message });
                                     revertFunc();
                                 }
                             },
                             error: function() {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error de conexión',
-                                    text: 'No se pudo conectar al servidor.'
-                                });
+                                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar al servidor.' });
                                 revertFunc();
                             }
                         });
@@ -382,7 +355,8 @@ try {
                     `);
 
                     $('#modal-footer').append(`
-                        <a href="detalle_postulante.php?id=${event.candidate_id}" class="button rrhh-btn-inline" style="background: #035c67; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Ver Perfil Candidato</a>
+                        <button onclick="deleteEvent('${event.id}', 'interview')" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Cancelar Entrevista</button>
+                        <a href="detalle_postulante_usr.php?id=${event.candidate_id}" class="button rrhh-btn-inline" style="background: #035c67; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Ver Perfil Candidato</a>
                     `);
                 } else if (event.type === 'vacancy_end') {
                     $('#event-details tbody').append(`
@@ -393,7 +367,7 @@ try {
                     `);
 
                     $('#modal-footer').append(`
-                        <a href="vacantes_trabajo.php" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Gestionar Vacante</a>
+                        <a href="vacantes_trabajo_usr.php" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Gestionar Vacante</a>
                     `);
                 } else if (event.type === 'custom') {
                     $('#event-details tbody').append(`
@@ -401,10 +375,51 @@ try {
                         <tr><th>Inicio</th><td>${event.start ? event.start.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
                         <tr><th>Fin</th><td>${event.end ? event.end.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
                     `);
+
+                    const eventData = { id: event.id, title: event.title, start: event.start, end: event.end, color: event.color };
+
+                    $('#modal-footer').append(`
+                        <button onclick="deleteEvent('${event.id}', 'custom')" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Eliminar</button>
+                        <button onclick='editCustomEvent(${JSON.stringify(eventData)})' class="button rrhh-btn-inline" style="background: #06adbf; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Editar</button>
+                    `);
                 }
                 
                 $('#eventModal').fadeIn();
             }
+
+            window.deleteEvent = function(prefixedId, type) {
+                const title = type === 'interview' ? '¿Cancelar entrevista?' : '¿Eliminar evento?';
+                const text = type === 'interview' ? 'Esta acción quitará la entrevista de la agenda.' : 'El evento será eliminado permanentemente.';
+                const numericId = prefixedId.toString().split('_').pop();
+
+                Swal.fire({
+                    title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#FC3B56', cancelButtonColor: '#888', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'No, mantener'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post('../../backend/registros/delete_rrhh_calendar_event.php', { id: numericId, type: type }, function(response) {
+                            if (response.success) {
+                                $('#calendar').fullCalendar('removeEvents', prefixedId);
+                                $('#eventModal').fadeOut();
+                                Swal.fire('Eliminado', response.message, 'success');
+                                updateNotifications();
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        }, 'json');
+                    }
+                });
+            };
+
+            window.editCustomEvent = function(event) {
+                $('#eventModal').fadeOut();
+                $('#customEventId').val(event.id); 
+                $('#customEventTitle').val(event.title);
+                $('#customEventStart').val(moment(event.start).format('YYYY-MM-DDTHH:mm'));
+                $('#customEventEnd').val(moment(event.end).format('YYYY-MM-DDTHH:mm'));
+                $('#customEventColor').val(event.color);
+                $('#customEventModalTitle').text('Editar Evento');
+                $('#addCustomEventModal').fadeIn();
+            };
 
             function updateNotifications() {
                 try {
@@ -466,35 +481,87 @@ try {
                             pastCount++;
                         }
                     });
-                } catch (err) {
-                    console.error("Error en updateNotifications:", err);
-                }
+                } catch (err) { console.error("Error en updateNotifications:", err); }
             }
+            window.updateNotifications = updateNotifications;
+
+            $('#customEventForm').submit(function(e) {
+                e.preventDefault();
+                const prefixedId = $('#customEventId').val();
+                const title = $('#customEventTitle').val();
+                const start = $('#customEventStart').val();
+                const end = $('#customEventEnd').val();
+                const color = $('#customEventColor').val();
+
+                const isUpdate = prefixedId !== '';
+                const numericId = isUpdate ? prefixedId.toString().split('_').pop() : '';
+                const url = isUpdate 
+                    ? '../../backend/registros/upd_rrhh_calendar_event.php' 
+                    : '../../backend/registros/add_rrhh_calendar_event.php';
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { id: numericId, title: title, start: start, end: end, color: color },
+                    success: function(response) {
+                        if (response.success) {
+                            if (isUpdate) {
+                                const event = $('#calendar').fullCalendar('clientEvents', prefixedId)[0];
+                                if (event) {
+                                    event.title = title;
+                                    event.start = moment(start);
+                                    event.end = moment(end);
+                                    event.color = color;
+                                    $('#calendar').fullCalendar('updateEvent', event);
+                                }
+                            } else {
+                                $('#calendar').fullCalendar('renderEvent', {
+                                    id: 'custom_' + response.id,
+                                    title: title,
+                                    start: start,
+                                    end: end,
+                                    color: color,
+                                    type: 'custom'
+                                }, true);
+                            }
+                            
+                            $('#addCustomEventModal').fadeOut();
+                            Swal.fire({ icon: 'success', title: isUpdate ? 'Evento actualizado' : 'Evento creado', text: response.message, timer: 2000, showConfirmButton: false });
+                            updateNotifications();
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: response.message });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar al servidor.' });
+                    }
+                });
+            });
+
+            $(document).on('click', '.close-custom', function () { $('#addCustomEventModal').fadeOut(); });
+            $(window).on('click', function(event) { if (event.target == document.getElementById('addCustomEventModal')) { $('#addCustomEventModal').fadeOut(); } });
         });
     </script>
 
-    <!-- Modal -->
+    <!-- Modal Detalles -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2 id="modal-title" style="color: #035c67; margin-bottom: 15px;">Detalles</h2>
             <table id="event-details" class="details-table">
-                <tbody>
-                    <!-- Dinámico -->
-                </tbody>
+                <tbody></tbody>
             </table>
-            <div id="modal-footer" style="margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-                <!-- Dinámico -->
-            </div>
+            <div id="modal-footer" style="margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;"></div>
         </div>
     </div>
 
-    <!-- Modal para Nuevo Evento -->
+    <!-- Modal Formulario -->
     <div id="addCustomEventModal" class="modal">
         <div class="modal-content">
             <span class="close-custom close">&times;</span>
-            <h2 style="color: #035c67; margin-bottom: 15px;">Añadir Nuevo Evento</h2>
+            <h2 id="customEventModalTitle" style="color: #035c67; margin-bottom: 15px;">Añadir Nuevo Evento</h2>
             <form id="customEventForm">
+                <input type="hidden" id="customEventId" value="">
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label>Título del Evento:</label>
                     <input type="text" id="customEventTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
@@ -517,83 +584,6 @@ try {
             </form>
         </div>
     </div>
-
-    <style>
-        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
-        .details-table td { border: 1px solid #ddd; padding: 10px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
-        .modal-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
-        .close:hover { color: #000; }
-        .rrhh-btn-inline:hover { opacity: 0.9; }
-    </style>
-
-    <script>
-        $(document).ready(function() {
-            $(document).on('click', '.close-custom', function () {
-                $('#addCustomEventModal').fadeOut();
-            });
-
-            $(window).on('click', function(event) {
-                if (event.target == document.getElementById('addCustomEventModal')) {
-                    $('#addCustomEventModal').fadeOut();
-                }
-            });
-
-            $('#customEventForm').submit(function(e) {
-                e.preventDefault();
-                const title = $('#customEventTitle').val();
-                const start = $('#customEventStart').val();
-                const end = $('#customEventEnd').val();
-                const color = $('#customEventColor').val();
-
-                $.ajax({
-                    url: '../../backend/registros/add_rrhh_calendar_event.php',
-                    type: 'POST',
-                    data: {
-                        title: title,
-                        start: start,
-                        end: end,
-                        color: color
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#calendar').fullCalendar('renderEvent', {
-                                id: 'custom_' + response.id,
-                                title: title,
-                                start: start,
-                                end: end,
-                                color: color,
-                                type: 'custom'
-                            }, true);
-                            $('#addCustomEventModal').fadeOut();
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Evento creado',
-                                text: 'El evento se ha creado exitosamente.',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error de conexión',
-                            text: 'No se pudo conectar al servidor.'
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 
     <!-- SweetAlert2 JS -->
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>

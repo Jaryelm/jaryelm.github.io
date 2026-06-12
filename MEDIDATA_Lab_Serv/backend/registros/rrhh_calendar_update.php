@@ -14,25 +14,38 @@ $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 $start = isset($_POST['start']) ? trim((string) $_POST['start']) : '';
 $type = isset($_POST['type']) ? trim((string) $_POST['type']) : '';
 
-if ($id <= 0 || $start === '' || $type !== 'interview') {
-    echo json_encode(['success' => false, 'message' => 'Datos insuficientes o tipo de evento no editable.']);
+if ($id <= 0 || $start === '' || $type === '') {
+    echo json_encode(['success' => false, 'message' => 'Datos insuficientes.']);
     exit;
 }
 
 try {
     // Formato FullCalendar/Moment suele venir como ISO 8601: YYYY-MM-DDTHH:mm:ss
     $dt = new DateTime($start);
-    $date = $dt->format('Y-m-d');
-    $time = $dt->format('H:i:s');
+    $formattedStart = $dt->format('Y-m-d H:i:s');
 
-    $sql = "UPDATE interviews SET date_interview = ?, time_interview = ?, updated_by = ? WHERE id = ? AND deleted = 0";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$date, $time, $_SESSION['name'] ?? 'Sistema', $id]);
+    if ($type === 'interview') {
+        $date = $dt->format('Y-m-d');
+        $time = $dt->format('H:i:s');
+        $sql = "UPDATE interviews SET date_interview = ?, time_interview = ?, updated_by = ? WHERE id = ? AND deleted = 0";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$date, $time, $_SESSION['name'] ?? 'Sistema', $id]);
+    } elseif ($type === 'custom') {
+        // Para eventos personalizados, actualizamos solo el inicio. 
+        // Nota: FullCalendar mantiene la duración si no se cambia el fin, pero aquí actualizamos solo start_datetime.
+        // Si queremos ser precisos con la duración, necesitaríamos recibir también el 'end' de FullCalendar.
+        $sql = "UPDATE rrhh_custom_events SET start_datetime = ? WHERE id = ? AND deleted = 0";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$formattedStart, $id]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Tipo de evento no editable.']);
+        exit;
+    }
 
     if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => true, 'message' => 'Entrevista reprogramada correctamente.']);
+        echo json_encode(['success' => true, 'message' => 'Evento reprogramado correctamente.']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'No se realizaron cambios o la entrevista no existe.']);
+        echo json_encode(['success' => false, 'message' => 'No se realizaron cambios o el registro no existe.']);
     }
 } catch (Throwable $e) {
     error_log('rrhh_calendar_update: ' . $e->getMessage());

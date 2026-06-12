@@ -158,6 +158,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
             $stmtInterviews->execute();
             $interviews = $stmtInterviews->fetchAll(PDO::FETCH_ASSOC);
             foreach ($interviews as &$inv) {
+                $inv['id'] = 'interview_' . $inv['id']; // Unique ID
                 $d = trim((string)$inv['raw_start_date']);
                 $t = trim((string)$inv['raw_start_time']);
                 if ($d === '' || strpos($d, '0000-00-00') !== false) {
@@ -186,6 +187,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
             $stmtVacantes->execute();
             $vacantes = $stmtVacantes->fetchAll(PDO::FETCH_ASSOC);
             foreach ($vacantes as &$vac) {
+                $vac['id'] = 'vacancy_' . $vac['id']; // Unique ID
                 $d = trim((string)$vac['raw_end_date']);
                 if ($d === '' || strpos($d, '0000-00-00') !== false) {
                     $d = date('Y-m-d');
@@ -210,6 +212,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
             $stmtCustom->execute();
             $customs = $stmtCustom->fetchAll(PDO::FETCH_ASSOC);
             foreach ($customs as &$c) {
+                $c['id'] = 'custom_' . $c['id']; // Unique ID
                 $events[] = $c;
             }
         } catch (Throwable $e) {
