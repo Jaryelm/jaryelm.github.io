@@ -130,7 +130,7 @@ try {
                                     <?php
                                     $now = new DateTime();
                                     $futureCount = 0;
-                                    $interviews = array_filter($events, fn($e) => $e['type'] === 'interview' && new DateTime($e['start']) > $now);
+                                    $interviews = array_filter($events, fn($e) => isset($e['type']) && $e['type'] === 'interview' && new DateTime($e['start']) > $now);
                                     usort($interviews, fn($a, $b) => strcmp($a['start'], $b['start']));
                                     foreach ($interviews as $event) {
                                         if ($futureCount >= 5) break;
@@ -224,13 +224,17 @@ try {
             var mm = (date.getMonth() + 1).toString().padStart(2, '0');
             var dd = date.getDate().toString().padStart(2, '0');
 
+            // DEBUG: Ver en consola todos los eventos devueltos por rrhh_guard
+            console.log("Raw Events from DB:", <?php echo json_encode($events); ?>);
+
             $('#calendar').fullCalendar({
                 header: {
                     language: 'es',
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'month,basicWeek,basicDay'
+                    right: 'month,agendaWeek,agendaDay'
                 },
+                defaultView: 'agendaWeek',
                 locale: 'es',
                 defaultDate: `${yyyy}-${mm}-${dd}`,
                 editable: true,
@@ -238,12 +242,29 @@ try {
                 lazyFetching: false,
                 selectable: true,
                 selectHelper: true,
+                displayEventTime: true,
+                displayEventEnd: true,
+                timeFormat: 'H:mm',
+                showNonCurrentDates: false, // Hides days from previous/next months
                 select: function(start, end) {
                     $('#customEventId').val('');
                     $('#customEventTitle').val('');
-                    $('#customEventStart').val(start.format('YYYY-MM-DDTHH:mm'));
-                    $('#customEventEnd').val(end.format('YYYY-MM-DDTHH:mm'));
+                    
+                    $('#customEventStartDate').val(start.format('YYYY-MM-DD'));
+                    $('#customEventStartTime').val('');
+                    
+                    // The user requested to leave end date empty by default
+                    $('#customEventEndDate').val('');
+                    $('#customEventEndTime').val('');
+                    
                     $('#customEventColor').val('#035c67');
+                    $('#customEventType').val('').trigger('change');
+                    $('#customEventDescription').val('');
+                    
+                    // Disable "all day" switch by default
+                    $('#customEventAllDay').prop('checked', false).trigger('change');
+                    $('#customEventPublic').prop('checked', false);
+                    
                     $('#customEventModalTitle').text('Añadir Nuevo Evento');
                     $('#addCustomEventModal').fadeIn();
                     $('#calendar').fullCalendar('unselect');
@@ -255,20 +276,21 @@ try {
                     if (empty($startStr) || strpos($startStr, '0000-00-00') !== false) continue;
                   ?>
                   {
-                      id: '<?php echo $event['id']; ?>',
-                      title: '<?php echo addslashes($event['title'] ?? ''); ?>',
-                      start: '<?php echo $startStr; ?>',
-                      end: '<?php echo $endStr; ?>',
-                      color: '<?php echo $event['color'] ?? ''; ?>',
-                      type: '<?php echo $event['type'] ?? ''; ?>',
-                      candidate_id: '<?php echo $event['candidate_id'] ?? ""; ?>',
-                      candidate_name: '<?php echo addslashes($event['candidate_name'] ?? ""); ?>',
-                      candidate_dni: '<?php echo $event['candidate_dni'] ?? ""; ?>',
-                      position_name: '<?php echo addslashes($event['position_name'] ?? ""); ?>',
-                      interview_status: '<?php echo $event['interview_status'] ?? ""; ?>',
-                      candidate_phone: '<?php echo $event['candidate_phone'] ?? ""; ?>',
-                      candidate_email: '<?php echo addslashes($event['candidate_email'] ?? ""); ?>',
-                      benefits: '<?php echo addslashes($event['benefits'] ?? ""); ?>'
+                      id: <?php echo json_encode((string)$event['id']); ?>,
+                      title: <?php echo json_encode((string)($event['title'] ?? '')); ?>,
+                      start: <?php echo json_encode((string)$startStr); ?>,
+                      end: <?php echo json_encode((string)$endStr); ?>,
+                      color: <?php echo json_encode((string)($event['color'] ?? '')); ?>,
+                      type: <?php echo json_encode((string)($event['type'] ?? '')); ?>,
+                      allDay: <?php echo !empty($event['allDay']) ? 'true' : 'false'; ?>,
+                      candidate_id: <?php echo json_encode((string)($event['candidate_id'] ?? '')); ?>,
+                      candidate_name: <?php echo json_encode((string)($event['candidate_name'] ?? '')); ?>,
+                      candidate_dni: <?php echo json_encode((string)($event['candidate_dni'] ?? '')); ?>,
+                      position_name: <?php echo json_encode((string)($event['position_name'] ?? '')); ?>,
+                      interview_status: <?php echo json_encode((string)($event['interview_status'] ?? '')); ?>,
+                      candidate_phone: <?php echo json_encode((string)($event['candidate_phone'] ?? '')); ?>,
+                      candidate_email: <?php echo json_encode((string)($event['candidate_email'] ?? '')); ?>,
+                      benefits: <?php echo json_encode((string)($event['benefits'] ?? '')); ?>
                   },
                   <?php endforeach; ?>
                 ],
@@ -406,6 +428,15 @@ try {
                     $('#modal-footer').append(`
                         <button onclick="deleteEvent('${event.id}', 'custom')" class="button rrhh-btn-inline rrhh-btn-danger">Eliminar</button>
                         <button onclick='editCustomEvent(${JSON.stringify(eventData)})' class="button rrhh-btn-inline rrhh-btn-info">Editar</button>
+                    `);
+                } else if (event.type === 'birthday') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Tipo</th><td>Cumpleaños de Personal</td></tr>
+                        <tr><th>Fecha</th><td>${event.start.format('YYYY-MM-DD')}</td></tr>
+                    `);
+
+                    $('#modal-footer').append(`
+                        <button class="button rrhh-btn-inline rrhh-btn-primary close">Cerrar</button>
                     `);
                 }
                 

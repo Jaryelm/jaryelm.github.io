@@ -225,7 +225,51 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 $c['allDay'] = (bool)$c['all_day'];
                 $events[] = $c;
             }
+
+            // 4. Cumpleaños de Staff (Solo año vigente)
+            $currentYear = date('Y');
+            $stmtBirthdays = $pdo->prepare("
+                SELECT 
+                    CONCAT(IFNULL(nodoc, ''), ' ', IFNULL(apdoc, '')) AS FullName,
+                    'DOCTOR' AS Ocupation,
+                    MONTH(nacd) AS m,
+                    DAY(nacd) AS d
+                FROM $mainDb.doctor
+                WHERE nacd IS NOT NULL
+                UNION ALL
+                SELECT 
+                    CONCAT(IFNULL(nomnur, ''), ' ', IFNULL(apenur, '')) AS FullName,
+                    'ENFERMERO(A)' AS Ocupation,
+                    MONTH(nacinur) AS m,
+                    DAY(nacinur) AS d
+                FROM $mainDb.nurse
+                WHERE nacinur IS NOT NULL
+            ");
+            $stmtBirthdays->execute();
+            $birthdays = $stmtBirthdays->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($birthdays as $b) {
+                if (empty($b['m']) || empty($b['d'])) continue; // Saltamos si el mes o dia es inválido
+
+                $month = str_pad($b['m'], 2, '0', STR_PAD_LEFT);
+                $day = str_pad($b['d'], 2, '0', STR_PAD_LEFT);
+                $eventDate = $currentYear . '-' . $month . '-' . $day;
+
+                $events[] = [
+                    'id' => 'birthday_' . md5($b['FullName'] . $b['Ocupation']),
+                    'title' => '🎉 Cumpleaños: ' . trim($b['FullName']) . ' (' . $b['Ocupation'] . ')',
+                    'start' => $eventDate,
+                    'color' => '#FC3B56', // Red/Pink typically used for birthdays
+                    'allDay' => true,
+                    'type' => 'birthday'
+                ];
+            }
         } catch (Throwable $e) {
+            $events[] = [
+                'id' => 'error_db_log',
+                'title' => 'ERROR DB: ' . $e->getMessage(), 
+                'start' => date('Y-m-d'), 
+                'type' => 'error'
+            ];
             error_log('medidata_rrhh_fetch_eventos_calendario: ' . $e->getMessage());
         }
 
