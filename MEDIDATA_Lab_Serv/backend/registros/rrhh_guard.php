@@ -264,12 +264,6 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 ];
             }
         } catch (Throwable $e) {
-            $events[] = [
-                'id' => 'error_db_log',
-                'title' => 'ERROR DB: ' . $e->getMessage(), 
-                'start' => date('Y-m-d'), 
-                'type' => 'error'
-            ];
             error_log('medidata_rrhh_fetch_eventos_calendario: ' . $e->getMessage());
         }
 

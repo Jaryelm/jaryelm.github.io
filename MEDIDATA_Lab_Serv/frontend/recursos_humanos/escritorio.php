@@ -224,9 +224,6 @@ try {
             var mm = (date.getMonth() + 1).toString().padStart(2, '0');
             var dd = date.getDate().toString().padStart(2, '0');
 
-            // DEBUG: Ver en consola todos los eventos devueltos por rrhh_guard
-            console.log("Raw Events from DB:", <?php echo json_encode($events); ?>);
-
             $('#calendar').fullCalendar({
                 header: {
                     language: 'es',
