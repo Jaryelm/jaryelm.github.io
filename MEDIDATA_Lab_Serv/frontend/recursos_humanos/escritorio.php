@@ -23,6 +23,14 @@ try {
 } catch (Throwable $e) {
     error_log('escritorio colaboradores: ' . $e->getMessage());
 }
+
+$eventTypes = [];
+try {
+    $pdoRRHH = medidata_rrhh_pdo();
+    if ($pdoRRHH) {
+        $eventTypes = $pdoRRHH->query("SELECT id, name FROM rrhh_calendar_event_types")->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch(Throwable $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,17 +53,7 @@ try {
     <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
     <!-- SweetAlert2 -->
     <link href='../../backend/vendor/sweetalert2/sweetalert2.min.css' rel='stylesheet' />
-    <style>
-        #calendar { min-height: 500px; }
-        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
-        .details-table td { border: 1px solid #ddd; padding: 10px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
-        .modal-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
-        .close:hover { color: #000; }
-        .rrhh-btn-inline:hover { opacity: 0.9; }
-    </style>
+    <link href='../../backend/vendor/sweetalert2/sweetalert2.min.css' rel='stylesheet' />
     <title>MEDIDATA</title>
 </head>
 
@@ -136,7 +134,7 @@ try {
                                     usort($interviews, fn($a, $b) => strcmp($a['start'], $b['start']));
                                     foreach ($interviews as $event) {
                                         if ($futureCount >= 5) break;
-                                        echo '<div class="notification-item" style="border-left: 5px solid '.$event['color'].';">';
+                                        echo '<div class="notification-item" style="border-left: 5px solid '.htmlspecialchars($event['color'] ?? '').';">';
                                         echo '<strong>'.htmlspecialchars($event['candidate_name'] ?? '').'</strong>';
                                         echo '<p>'.date('d/m H:i', strtotime($event['start'])).' - '.htmlspecialchars($event['position_name'] ?? '').'</p>';
                                         echo '</div>';
@@ -156,7 +154,7 @@ try {
                                     usort($vacancies, fn($a, $b) => strcmp($a['start'], $b['start']));
                                     foreach ($vacancies as $event) {
                                         if ($vacancyCount >= 3) break;
-                                        echo '<div class="notification-item" style="border-left: 5px solid #f44336;">';
+                                        echo '<div class="notification-item border-danger">';
                                         echo '<strong>'.htmlspecialchars($event['position_name'] ?? '').'</strong>';
                                         echo '<p>Cierra: '.date('d/m/Y', strtotime($event['start'])).'</p>';
                                         echo '</div>';
@@ -176,7 +174,7 @@ try {
                                     usort($pastEvents, fn($a, $b) => strcmp($b['start'], $a['start']));
                                     foreach ($pastEvents as $event) {
                                         if ($pastCount >= 3) break;
-                                        echo '<div class="notification-item" style="opacity: 0.7;">';
+                                        echo '<div class="notification-item opacity-70">';
                                         echo '<strong>'.htmlspecialchars($event['title'] ?? '').'</strong>';
                                         echo '<p>'.date('d/m', strtotime($event['start'])).'</p>';
                                         echo '</div>';
@@ -355,8 +353,8 @@ try {
                     `);
 
                     $('#modal-footer').append(`
-                        <button onclick="deleteEvent('${event.id}', 'interview')" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Cancelar Entrevista</button>
-                        <a href="detalle_postulante_usr.php?id=${event.candidate_id}" class="button rrhh-btn-inline" style="background: #035c67; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Ver Perfil Candidato</a>
+                        <button onclick="deleteEvent('${event.id}', 'interview')" class="button rrhh-btn-inline rrhh-btn-danger">Cancelar Entrevista</button>
+                        <a href="detalle_postulante_usr.php?id=${event.candidate_id}" class="button rrhh-btn-inline rrhh-btn-primary">Ver Perfil Candidato</a>
                     `);
                 } else if (event.type === 'vacancy_end') {
                     $('#event-details tbody').append(`
@@ -367,20 +365,47 @@ try {
                     `);
 
                     $('#modal-footer').append(`
-                        <a href="vacantes_trabajo_usr.php" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">Gestionar Vacante</a>
+                        <a href="vacantes_trabajo_usr.php" class="button rrhh-btn-inline rrhh-btn-danger">Gestionar Vacante</a>
                     `);
                 } else if (event.type === 'custom') {
+                    const isAllDay = event.allDay;
+                    const formatStr = isAllDay ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm';
+                    
+                    let endStr = '';
+                    if (event.end) {
+                        if (isAllDay) {
+                            // Si es todo el día, FullCalendar le suma 1 día al final, lo restamos para mostrarlo
+                            endStr = moment(event.end).subtract(1, 'days').format(formatStr);
+                        } else {
+                            endStr = event.end.format(formatStr);
+                        }
+                    }
+
                     $('#event-details tbody').append(`
-                        <tr><th>Tipo</th><td>Evento General</td></tr>
-                        <tr><th>Inicio</th><td>${event.start ? event.start.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
-                        <tr><th>Fin</th><td>${event.end ? event.end.format('YYYY-MM-DD HH:mm') : ''}</td></tr>
+                        <tr><th>Tipo</th><td>${event.event_type_name || 'Evento General'}</td></tr>
+                        <tr><th>Inicio</th><td>${event.start ? event.start.format(formatStr) : ''}</td></tr>
+                        <tr><th>Fin</th><td>${endStr}</td></tr>
+                        ${event.description ? `<tr><th>Descripción</th><td>${event.description}</td></tr>` : ''}
+                        <tr><th>Todo el día</th><td>${isAllDay ? 'Sí' : 'No'}</td></tr>
+                        <tr><th>Visibilidad</th><td>${event.is_public == 1 ? 'Público' : 'Privado'}</td></tr>
                     `);
 
-                    const eventData = { id: event.id, title: event.title, start: event.start, end: event.end, color: event.color };
+                    const eventData = { 
+                        id: event.id, 
+                        raw_id: event.raw_id,
+                        title: event.title, 
+                        start: event.start, 
+                        end: event.end, 
+                        color: event.color,
+                        id_event_type: event.id_event_type,
+                        description: event.description,
+                        allDay: event.allDay,
+                        is_public: event.is_public
+                    };
 
                     $('#modal-footer').append(`
-                        <button onclick="deleteEvent('${event.id}', 'custom')" class="button rrhh-btn-inline" style="background: #FC3B56; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Eliminar</button>
-                        <button onclick='editCustomEvent(${JSON.stringify(eventData)})' class="button rrhh-btn-inline" style="background: #06adbf; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Editar</button>
+                        <button onclick="deleteEvent('${event.id}', 'custom')" class="button rrhh-btn-inline rrhh-btn-danger">Eliminar</button>
+                        <button onclick='editCustomEvent(${JSON.stringify(eventData)})' class="button rrhh-btn-inline rrhh-btn-info">Editar</button>
                     `);
                 }
                 
@@ -412,11 +437,21 @@ try {
 
             window.editCustomEvent = function(event) {
                 $('#eventModal').fadeOut();
-                $('#customEventId').val(event.id); 
+                $('#customEventId').val(event.raw_id || event.id); 
                 $('#customEventTitle').val(event.title);
-                $('#customEventStart').val(moment(event.start).format('YYYY-MM-DDTHH:mm'));
-                $('#customEventEnd').val(moment(event.end).format('YYYY-MM-DDTHH:mm'));
+                
+                $('#customEventStartDate').val(event.start ? moment(event.start).format('YYYY-MM-DD') : '');
+                $('#customEventStartTime').val(event.start && event.start.format('HH:mm') !== '00:00' ? moment(event.start).format('HH:mm') : '');
+                
+                const endToUse = event.end ? moment(event.end) : moment(event.start);
+                $('#customEventEndDate').val(endToUse.format('YYYY-MM-DD'));
+                $('#customEventEndTime').val(event.end && endToUse.format('HH:mm') !== '00:00' ? endToUse.format('HH:mm') : '');
+                
                 $('#customEventColor').val(event.color);
+                $('#customEventType').val(event.id_event_type || '').trigger('change');
+                $('#customEventDescription').val(event.description || '');
+                $('#customEventAllDay').prop('checked', event.allDay || false).trigger('change');
+                $('#customEventPublic').prop('checked', event.is_public == 1);
                 $('#customEventModalTitle').text('Editar Evento');
                 $('#addCustomEventModal').fadeIn();
             };
@@ -455,7 +490,7 @@ try {
                           .forEach(event => {
                         if (vacancyCount < 3) {
                             vacancyOccupancy.append(`
-                                <div class="notification-item" style="border-left: 5px solid #f44336;">
+                                <div class="notification-item border-danger">
                                     <strong>${event.position_name || 'N/A'}</strong>
                                     <p>Cierra: ${moment(event.start).format('DD/MM/YYYY')}</p>
                                 </div>
@@ -473,7 +508,7 @@ try {
                           .forEach(event => {
                         if (pastCount < 3) {
                             pastOccupancy.append(`
-                                <div class="notification-item" style="opacity: 0.7;">
+                                <div class="notification-item opacity-70">
                                     <strong>${event.title || 'N/A'}</strong>
                                     <p>${moment(event.start).format('DD/MM')}</p>
                                 </div>
@@ -489,9 +524,15 @@ try {
                 e.preventDefault();
                 const prefixedId = $('#customEventId').val();
                 const title = $('#customEventTitle').val();
-                const start = $('#customEventStart').val();
-                const end = $('#customEventEnd').val();
+                const start_date = $('#customEventStartDate').val();
+                const start_time = $('#customEventStartTime').val();
+                const end_date = $('#customEventEndDate').val();
+                const end_time = $('#customEventEndTime').val();
                 const color = $('#customEventColor').val();
+                const eventType = $('#customEventType').val();
+                const description = $('#customEventDescription').val();
+                const allDay = $('#customEventAllDay').is(':checked');
+                const isPublic = $('#customEventPublic').is(':checked');
 
                 const isUpdate = prefixedId !== '';
                 const numericId = isUpdate ? prefixedId.toString().split('_').pop() : '';
@@ -502,27 +543,26 @@ try {
                 $.ajax({
                     url: url,
                     type: 'POST',
-                    data: { id: numericId, title: title, start: start, end: end, color: color },
+                    data: { 
+                        id: numericId, 
+                        title: title, 
+                        start_date: start_date, 
+                        start_time: start_time,
+                        end_date: end_date,
+                        end_time: end_time,
+                        color: color,
+                        id_event_type: eventType,
+                        description: description,
+                        all_day: allDay,
+                        is_public: isPublic
+                    },
                     success: function(response) {
                         if (response.success) {
                             if (isUpdate) {
-                                const event = $('#calendar').fullCalendar('clientEvents', prefixedId)[0];
-                                if (event) {
-                                    event.title = title;
-                                    event.start = moment(start);
-                                    event.end = moment(end);
-                                    event.color = color;
-                                    $('#calendar').fullCalendar('updateEvent', event);
-                                }
+                                // Reloading events is safer when changing all_day, but we can update it
+                                $('#calendar').fullCalendar('refetchEvents');
                             } else {
-                                $('#calendar').fullCalendar('renderEvent', {
-                                    id: 'custom_' + response.id,
-                                    title: title,
-                                    start: start,
-                                    end: end,
-                                    color: color,
-                                    type: 'custom'
-                                }, true);
+                                $('#calendar').fullCalendar('refetchEvents');
                             }
                             
                             $('#addCustomEventModal').fadeOut();
@@ -540,46 +580,89 @@ try {
 
             $(document).on('click', '.close-custom', function () { $('#addCustomEventModal').fadeOut(); });
             $(window).on('click', function(event) { if (event.target == document.getElementById('addCustomEventModal')) { $('#addCustomEventModal').fadeOut(); } });
+            
+            // All-day checkbox logic
+            $('#customEventAllDay').change(function() {
+                const isAllDay = $(this).is(':checked');
+                if (isAllDay) {
+                    $('#customEventStartTime, #customEventEndTime').hide().val('');
+                } else {
+                    $('#customEventStartTime, #customEventEndTime').show();
+                }
+            });
         });
     </script>
 
     <!-- Modal Detalles -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modal-title" style="color: #035c67; margin-bottom: 15px;">Detalles</h2>
+    <div id="eventModal" class="modal-custom">
+        <div class="modal-custom-content">
+            <span class="close-custom modal-custom-close close">&times;</span>
+            <h2 id="modal-title" class="modal-custom-title">Detalles</h2>
             <table id="event-details" class="details-table">
                 <tbody></tbody>
             </table>
-            <div id="modal-footer" style="margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;"></div>
+            <div id="modal-footer" class="modal-custom-footer"></div>
         </div>
     </div>
 
     <!-- Modal Formulario -->
-    <div id="addCustomEventModal" class="modal">
-        <div class="modal-content">
-            <span class="close-custom close">&times;</span>
-            <h2 id="customEventModalTitle" style="color: #035c67; margin-bottom: 15px;">Añadir Nuevo Evento</h2>
+    <div id="addCustomEventModal" class="modal-custom">
+        <div class="modal-custom-content">
+            <span class="close-custom modal-custom-close close">&times;</span>
+            <h2 id="customEventModalTitle" class="modal-custom-title">Añadir Nuevo Evento</h2>
             <form id="customEventForm">
                 <input type="hidden" id="customEventId" value="">
-                <div class="form-group" style="margin-bottom: 15px;">
+                <div class="rrhh-form-group">
                     <label>Título del Evento:</label>
-                    <input type="text" id="customEventTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" id="customEventTitle" required class="rrhh-form-input">
                 </div>
-                <div class="form-group" style="margin-bottom: 15px;">
+                <div class="rrhh-form-group">
+                    <label>Tipo de Evento:</label>
+                    <select id="customEventType" class="rrhh-form-input select2">
+                        <option value="">-- Seleccionar --</option>
+                        <?php foreach($eventTypes as $et): ?>
+                            <option value="<?= $et['id'] ?>"><?= htmlspecialchars($et['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="rrhh-form-group">
+                    <label>Descripción (Opcional):</label>
+                    <textarea id="customEventDescription" class="rrhh-form-input" rows="2"></textarea>
+                </div>
+                <div class="rrhh-form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label>Todo el día:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="customEventAllDay">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="rrhh-form-group">
                     <label>Inicio:</label>
-                    <input type="datetime-local" id="customEventStart" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" id="customEventStartDate" required class="rrhh-form-input">
+                        <input type="time" id="customEventStartTime" class="rrhh-form-input">
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 15px;">
+                <div class="rrhh-form-group">
                     <label>Fin:</label>
-                    <input type="datetime-local" id="customEventEnd" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" id="customEventEndDate" required class="rrhh-form-input">
+                        <input type="time" id="customEventEndTime" class="rrhh-form-input">
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label>Color:</label>
-                    <input type="color" id="customEventColor" value="#035c67" style="width: 100%; height: 40px; padding: 0; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="rrhh-form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label>Hacer Público:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="customEventPublic">
+                        <span class="slider round"></span>
+                    </label>
                 </div>
-                <div style="text-align: right;">
-                    <button type="submit" class="button" style="background: #035c67; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Guardar Evento</button>
+                <div class="rrhh-form-group">
+                    <label>Color (Etiqueta):</label>
+                    <input type="color" id="customEventColor" value="#035c67" class="rrhh-form-color">
+                </div>
+                <div class="rrhh-text-right">
+                    <button type="submit" class="button rrhh-btn-inline rrhh-btn-primary">Guardar Evento</button>
                 </div>
             </form>
         </div>

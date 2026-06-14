@@ -127,6 +127,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
         $mainDb = defined('dbname') ? dbname : 'medic9ue_medi_data';
 
         try {
+            $userId = $_SESSION['id'] ?? 0;
             // 1. Entrevistas Programadas
             $stmtInterviews = $pdo->prepare("
                 SELECT
@@ -153,9 +154,9 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 LEFT JOIN vacant_positions vp ON c.id_vacant_position = vp.id
                 LEFT JOIN positions_details pd ON vp.id_position = pd.id
                 LEFT JOIN $mainDb.positions pt ON pd.id_positions = pt.id
-                WHERE i.deleted = 0
+                WHERE i.deleted = 0 AND (i.id_interviewer = ? OR i.id_interviewer IS NULL)
             ");
-            $stmtInterviews->execute();
+            $stmtInterviews->execute([$userId]);
             $interviews = $stmtInterviews->fetchAll(PDO::FETCH_ASSOC);
             foreach ($interviews as &$inv) {
                 $inv['id'] = 'interview_' . $inv['id']; // Unique ID
@@ -200,19 +201,28 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
             // 3. Eventos Personalizados
             $stmtCustom = $pdo->prepare("
                 SELECT
-                    id,
-                    title,
-                    start_datetime AS start,
-                    end_datetime AS end,
-                    color,
+                    e.id,
+                    e.title,
+                    CONCAT(e.start_date, IF(e.start_time IS NOT NULL, CONCAT(' ', e.start_time), '')) AS start,
+                    CONCAT(e.end_date, IF(e.end_time IS NOT NULL, CONCAT(' ', e.end_time), '')) AS end,
+                    e.start_date, e.start_time, e.end_date, e.end_time,
+                    e.color,
+                    e.id_event_type,
+                    e.description,
+                    e.all_day,
+                    e.is_public,
+                    t.name AS event_type_name,
                     'custom' AS type
-                FROM rrhh_custom_events
-                WHERE deleted = 0
+                FROM rrhh_custom_events e
+                LEFT JOIN rrhh_calendar_event_types t ON e.id_event_type = t.id
+                WHERE e.deleted = 0 AND (e.id_user = ? OR e.is_public = 1)
             ");
-            $stmtCustom->execute();
+            $stmtCustom->execute([$userId]);
             $customs = $stmtCustom->fetchAll(PDO::FETCH_ASSOC);
             foreach ($customs as &$c) {
+                $c['raw_id'] = $c['id'];
                 $c['id'] = 'custom_' . $c['id']; // Unique ID
+                $c['allDay'] = (bool)$c['all_day'];
                 $events[] = $c;
             }
         } catch (Throwable $e) {

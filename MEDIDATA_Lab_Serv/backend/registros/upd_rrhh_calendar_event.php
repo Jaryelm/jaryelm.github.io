@@ -12,23 +12,45 @@ if (!$pdo) {
 
 $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 $title = isset($_POST['title']) ? trim((string) $_POST['title']) : '';
-$start = isset($_POST['start']) ? trim((string) $_POST['start']) : '';
-$end = isset($_POST['end']) ? trim((string) $_POST['end']) : '';
+$start_date = isset($_POST['start_date']) ? trim((string) $_POST['start_date']) : '';
+$start_time = isset($_POST['start_time']) && trim($_POST['start_time']) !== '' ? trim($_POST['start_time']) : null;
+$end_date = isset($_POST['end_date']) ? trim((string) $_POST['end_date']) : '';
+$end_time = isset($_POST['end_time']) && trim($_POST['end_time']) !== '' ? trim($_POST['end_time']) : null;
 $color = isset($_POST['color']) ? trim((string) $_POST['color']) : '#035c67';
 
-if ($id <= 0 || $title === '' || $start === '' || $end === '') {
+// New fields
+$id_event_type = isset($_POST['id_event_type']) && (int)$_POST['id_event_type'] > 0 ? (int)$_POST['id_event_type'] : null;
+$description = isset($_POST['description']) ? trim((string) $_POST['description']) : null;
+$all_day = isset($_POST['all_day']) && $_POST['all_day'] === 'true' ? 1 : 0;
+$is_public = isset($_POST['is_public']) && $_POST['is_public'] === 'true' ? 1 : 0;
+
+if ($id <= 0 || $title === '' || $start_date === '' || $end_date === '') {
     echo json_encode(['success' => false, 'message' => 'ID, título y fechas son requeridos.']);
     exit;
 }
 
+if ($all_day) {
+    $endDt = new DateTime($end_date);
+    $endDt->modify('+1 day');
+    $end_date = $endDt->format('Y-m-d');
+    $start_time = null;
+    $end_time = null;
+}
+
 try {
-    $sql = "UPDATE rrhh_custom_events SET title = ?, start_datetime = ?, end_datetime = ?, color = ? WHERE id = ? AND deleted = 0";
+    $sql = "UPDATE rrhh_custom_events SET title = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?, color = ?, id_event_type = ?, description = ?, all_day = ?, is_public = ? WHERE id = ? AND deleted = 0";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $title,
-        date('Y-m-d H:i:s', strtotime($start)),
-        date('Y-m-d H:i:s', strtotime($end)),
+        $start_date,
+        $start_time,
+        $end_date,
+        $end_time,
         $color,
+        $id_event_type,
+        $description,
+        $all_day,
+        $is_public,
         $id
     ]);
 

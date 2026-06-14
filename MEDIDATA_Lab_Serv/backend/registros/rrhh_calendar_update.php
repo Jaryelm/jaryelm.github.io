@@ -31,12 +31,13 @@ try {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$date, $time, $_SESSION['name'] ?? 'Sistema', $id]);
     } elseif ($type === 'custom') {
+        $date = $dt->format('Y-m-d');
+        $time = $dt->format('H:i:s');
         // Para eventos personalizados, actualizamos solo el inicio. 
-        // Nota: FullCalendar mantiene la duración si no se cambia el fin, pero aquí actualizamos solo start_datetime.
-        // Si queremos ser precisos con la duración, necesitaríamos recibir también el 'end' de FullCalendar.
-        $sql = "UPDATE rrhh_custom_events SET start_datetime = ? WHERE id = ? AND deleted = 0";
+        // Nota: FullCalendar mantiene la duración si no se cambia el fin, pero aquí actualizamos solo start_date y start_time.
+        $sql = "UPDATE rrhh_custom_events SET start_date = ?, start_time = ? WHERE id = ? AND deleted = 0";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$formattedStart, $id]);
+        $stmt->execute([$date, $time, $id]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Tipo de evento no editable.']);
         exit;
