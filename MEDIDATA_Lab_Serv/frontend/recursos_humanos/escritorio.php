@@ -469,7 +469,7 @@ try {
                 $('#customEventTitle').val(event.title);
                 
                 $('#customEventStartDate').val(event.start ? moment(event.start).format('YYYY-MM-DD') : '');
-                $('#customEventStartTime').val(event.start && event.start.format('HH:mm') !== '00:00' ? moment(event.start).format('HH:mm') : '');
+                $('#customEventStartTime').val(event.start && moment(event.start).format('HH:mm') !== '00:00' ? moment(event.start).format('HH:mm') : '');
                 
                 const endToUse = event.end ? moment(event.end) : moment(event.start);
                 $('#customEventEndDate').val(endToUse.format('YYYY-MM-DD'));
