@@ -69,6 +69,7 @@ try {
         <nav>
             <i class='bx bx-menu toggle-sidebar'></i>
             <form action="#"><div class="form-group"></div></form>
+            <?php include_once './notifications.php'; ?>
             <span class="divider"></span>
             <?php include_once './perfil.php'; ?>
         </nav>
