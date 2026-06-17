@@ -41,14 +41,14 @@ medidata_staff_ensure_tables($connect);
 
         <div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal Administrativo Activo</h3></div>
+                <div class="head"><h3>Ex Personal Administrativo (Inactivos)</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
                     $sentencia = $connect->prepare("
                         SELECT sa.*, p.name AS position_name 
                         FROM staff_administrative sa 
                         LEFT JOIN positions p ON sa.id_cargo = p.id 
-                        WHERE sa.state = '1' 
+                        WHERE sa.state = '0' 
                         ORDER BY sa.idadm DESC
                     ");
                     $sentencia->execute();
@@ -92,7 +92,7 @@ medidata_staff_ensure_tables($connect);
                     <?php else: ?>
                     <div class="alert">
                         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                        <strong>Sin datos</strong> No hay colaboradores administrativos registrados.
+                        <strong>Sin datos</strong> No hay ex colaboradores administrativos registrados.
                     </div>
                     <?php endif; ?>
                 </div>

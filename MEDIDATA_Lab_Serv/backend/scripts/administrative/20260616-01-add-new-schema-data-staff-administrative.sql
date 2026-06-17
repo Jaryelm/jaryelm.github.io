@@ -18,4 +18,12 @@ ADD COLUMN `correo_institucional` VARCHAR(100) NULL COMMENT 'Correo instituciona
 ADD COLUMN `num_locker` VARCHAR(20) NULL COMMENT 'Número de locker asignado',
 ADD COLUMN `id_biometrico` INT NULL COMMENT 'ID del reloj biométrico',
 ADD COLUMN `url_contrato` VARCHAR(255) NULL COMMENT 'Ruta del documento de contrato firmado',
+ADD COLUMN `url_solicitud` VARCHAR(255) NULL COMMENT 'Ruta de solicitud de empleo',
+ADD COLUMN `url_psicometricas` VARCHAR(255) NULL COMMENT 'Ruta de pruebas psicométricas',
 ADD COLUMN `id_candidate_rrhh` INT NULL COMMENT 'Enlace con módulo RRHH (tabla candidates para documentos)';
+
+-- Cambiar a MEDIUMBLOB según requerimiento (TINYBLOB es máx 255 bytes, por lo que se usa MEDIUMBLOB para PDFs)
+ALTER TABLE `staff_administrative`
+MODIFY COLUMN `url_contrato` MEDIUMBLOB NULL COMMENT 'Documento de contrato (BLOB)',
+MODIFY COLUMN `url_solicitud` MEDIUMBLOB NULL COMMENT 'Solicitud de empleo (BLOB)',
+MODIFY COLUMN `url_psicometricas` MEDIUMBLOB NULL COMMENT 'Pruebas psicométricas (BLOB)';

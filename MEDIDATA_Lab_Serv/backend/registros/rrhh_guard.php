@@ -244,6 +244,14 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                     DAY(nacinur) AS d
                 FROM $mainDb.nurse
                 WHERE nacinur IS NOT NULL
+                UNION ALL
+                SELECT 
+                    CONCAT(IFNULL(nomadm, ''), ' ', IFNULL(apeadm, '')) AS FullName,
+                    'ADMINISTRATIVO' AS Ocupation,
+                    MONTH(nacadm) AS m,
+                    DAY(nacadm) AS d
+                FROM $mainDb.staff_administrative
+                WHERE nacadm IS NOT NULL AND state = '1'
             ");
             $stmtBirthdays->execute();
             $birthdays = $stmtBirthdays->fetchAll(PDO::FETCH_ASSOC);

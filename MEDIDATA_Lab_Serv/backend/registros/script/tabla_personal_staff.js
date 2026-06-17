@@ -13,7 +13,18 @@
                 data: { id: id, state: state },
                 dataType: 'json',
                 success: function (response) {
-                    if (!response.success) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'Estado actualizado correctamente',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        $(self).closest('tr').fadeOut(400, function() {
+                            $(this).remove();
+                        });
+                    } else {
                         self.checked = !self.checked;
                         Swal.fire('Error', response.message, 'error');
                     }

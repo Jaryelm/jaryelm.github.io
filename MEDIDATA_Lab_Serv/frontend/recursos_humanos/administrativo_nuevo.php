@@ -41,7 +41,8 @@ try {
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Administrativo</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_ex.php')">Ex Administrativos</button>
         <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo.php')">Registrar Administrativo</button>
 
         <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
