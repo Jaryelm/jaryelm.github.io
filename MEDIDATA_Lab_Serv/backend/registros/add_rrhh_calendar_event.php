@@ -42,7 +42,7 @@ if ($title === '' || $start_date === '' || $end_date === '') {
     exit;
 }
 
-medidata_rrhh_ensure_recurrence_columns($pdo);
+
 
 // FullCalendar all-day logic: add 1 day to end date to ensure it covers the day visually
 if ($all_day) {

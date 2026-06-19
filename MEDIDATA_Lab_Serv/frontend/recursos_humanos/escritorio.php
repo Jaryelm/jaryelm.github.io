@@ -415,6 +415,9 @@ try {
                 eventDrop: function(event, delta, revertFunc) {
                     updateEventDate(event, revertFunc);
                 },
+                eventResize: function(event, delta, revertFunc) {
+                    updateEventDate(event, revertFunc);
+                },
                 eventAfterAllRender: function() {
                     updateNotifications();
                 }
@@ -716,7 +719,12 @@ try {
                         $.ajax({
                             url: '../../backend/registros/rrhh_calendar_update.php',
                             type: 'POST',
-                            data: { id: numericId, start: event.start.format(), type: event.type },
+                            data: { 
+                                id: numericId, 
+                                start: event.start.format(), 
+                                end: event.end ? event.end.format() : '',
+                                type: event.type 
+                            },
                             success: function(response) {
                                 if (response.success) {
                                     Swal.fire({ icon: 'success', title: 'Éxito', text: response.message, timer: 2000, showConfirmButton: false });
