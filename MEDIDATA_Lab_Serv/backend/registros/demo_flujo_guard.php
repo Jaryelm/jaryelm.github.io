@@ -96,13 +96,13 @@ if (!function_exists('medidata_demo_flujo_candidatos')) {
             return [];
         }
         try {
-            $mainDb = defined('dbname') ? (string) dbname : 'medic9ue_medi_data';
+            $mainDb = defined('dbname') ? dbname : 'medic9ue_medi_data';
             $stmt = $pdo->query(
                 "SELECT c.*, p.name AS position_name
                  FROM candidates c
                  LEFT JOIN vacant_positions v ON c.id_vacant_position = v.id
                  LEFT JOIN positions_details pd ON v.id_position = pd.id
-                 LEFT JOIN {$mainDb}.positions p ON pd.id_positions = p.id
+                 LEFT JOIN $mainDb.positions p ON pd.id_positions = p.id
                  WHERE c.deleted = 0 AND c.fullname LIKE '[DEMO]%'
                  ORDER BY c.id ASC"
             );

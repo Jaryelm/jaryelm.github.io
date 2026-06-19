@@ -35,16 +35,22 @@ medidata_staff_ensure_tables($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_ex.php')">Ex Administrativos</button>
         <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo.php')">Registrar Administrativo</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Administrativo</button>
-
 
         <div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal Administrativo</h3></div>
+                <div class="head"><h3>Personal Administrativo Activo</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare('SELECT * FROM staff_administrative ORDER BY idadm DESC');
+                    $sentencia = $connect->prepare("
+                        SELECT sa.*, p.name AS position_name 
+                        FROM staff_administrative sa 
+                        LEFT JOIN positions p ON sa.id_cargo = p.id 
+                        WHERE sa.state = '1' 
+                        ORDER BY sa.idadm DESC
+                    ");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
@@ -66,7 +72,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
                                 <td><?php echo htmlspecialchars($d->nomadm . ' ' . $d->apeadm); ?></td>
-                                <td><?php echo htmlspecialchars($d->cargo ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($d->position_name ?? $d->cargo ?? '—'); ?></td>
                                 <td><?php echo htmlspecialchars($d->sexadm); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacadm); ?></td>
                                 <td>

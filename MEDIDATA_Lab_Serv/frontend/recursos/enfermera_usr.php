@@ -58,11 +58,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 ?>
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
-
         <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo_usr.php')">Registrar Enfermería</button>
         <button class="button" onclick="cambiarColor(this, 'enfermera_usr.php')">Enfermería</button>
-
-
           <div class="data">
                 <div class="content-data">
                     <div class="head">
@@ -72,8 +69,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
+                       
 $sentencia = $connect->prepare("SELECT * FROM nurse ORDER BY idnur DESC;");
- $sentencia->execute();
+$sentencia->execute();
 $data =  array();
 if($sentencia){
   while($r = $sentencia->fetchObject()){
@@ -101,8 +99,8 @@ if($sentencia){
                         <td data-title="Grupo"><?php echo $d->nacinur ?></td>
                         </td>
                         <td>
-                            <a title="Actualizar" href="../recursos/enfermera_editar.php?id=<?php echo $d->idnur ?>" class="fa fa-pencil tooltip"></a>
-        
+                            <a title="Actualizar" href="../recursos/enfermera_editar.php?id=<?php echo $d->idnur ?>" class="fa fa-pencil tooltip"></a>                           
+                            <a title="Historial médico" href="../pacientes/otros_anexos.php?id=<?php echo $d->idpa ?>" class="fa fa-stethoscope"></a>        
                         </td>
                     </tr>
                     <?php endforeach; ?>
