@@ -5,8 +5,9 @@ $(function(){
         var currentValue = $select.val(); // Preservar si ya tiene valor (ej: modo edición)
         
         $select.html(respuesta);
+        $select.trigger("change.select2");
         
-        if (currentValue) {
+        if (currentValue && currentValue != "0") {
             $select.val(currentValue).trigger('change');
         }
         

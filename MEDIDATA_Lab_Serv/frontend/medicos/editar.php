@@ -17,6 +17,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
 
 
 
+    <?php include __DIR__ . '/../recursos_humanos/_rrhh_select2_head.php'; ?>
     <title>MEDIDATA</title>
 </head>
 <body>
@@ -281,7 +282,8 @@ try {
         <!-- MAIN -->
     </section>
     <script src="../../backend/js/jquery.min.js"></script>
-    <script src="../../backend/js/script.js"></script>
+    <?php include __DIR__ . '/../recursos_humanos/_rrhh_select2_foot.php'; ?>
+<script src="../../backend/js/script.js"></script>
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <?php include_once '../../backend/php/upd_doctor.php' ?>
     <script src="../../backend/registros/script/tabla_medicos.js"></script>

@@ -1,7 +1,19 @@
 <?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
+require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
+
+$depto_map = [];
+$pdoRrhh = medidata_rrhh_pdo();
+if ($pdoRrhh) {
+    try {
+        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
+        while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
+            $depto_map[$row['id']] = $row['name'];
+        }
+    } catch (Exception $e) {}
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,7 +57,7 @@ medidata_staff_ensure_tables($connect);
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
                     $sentencia = $connect->prepare("
-                        SELECT sa.*, p.name AS position_name 
+                        SELECT sa.*, p.name AS position_name
                         FROM staff_administrative sa 
                         LEFT JOIN positions p ON sa.id_cargo = p.id 
                         WHERE sa.state = '1' 
@@ -58,23 +70,74 @@ medidata_staff_ensure_tables($connect);
                     <table id="example" class="responsive-table">
                         <thead>
                             <tr>
+                                <th>TIPO DE EMPLEADO</th>
+                                <th>N°</th>
                                 <th>DNI</th>
-                                <th>Colaborador</th>
-                                <th>Cargo</th>
-                                <th>Sexo</th>
-                                <th>Fecha Nacimiento</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
+                                <th>APELLIDOS</th>
+                                <th>NOMBRES</th>
+                                <th>SEXO</th>
+                                <th>AREA</th>
+                                <th>SALARIO</th>
+                                <th>N°CUENTA</th>
+                                <th>FECHA DE INGRESO</th>
+                                <th>CONTACTO</th>
+                                <th>CORREO PERSONAL / INSTITUCIONAL</th>
+                                <th>FECHA DE NACIMIENTO</th>
+                                <th>MARCAJE</th>
+                                <th>LOKER</th>
+                                <th>CONTRATO</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($data as $d): ?>
                             <tr>
-                                <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
-                                <td><?php echo htmlspecialchars($d->nomadm . ' ' . $d->apeadm); ?></td>
-                                <td><?php echo htmlspecialchars($d->position_name ?? $d->cargo ?? '—'); ?></td>
-                                <td><?php echo htmlspecialchars($d->sexadm); ?></td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="tipo_empleado" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;">
+                                        <option value="Permanente" <?php echo (($d->tipo_empleado ?? '') == 'Permanente') ? 'selected' : ''; ?>>Permanente</option>
+                                        <option value="Temporal" <?php echo (($d->tipo_empleado ?? '') == 'Temporal') ? 'selected' : ''; ?>>Temporal</option>
+                                        <option value="Tiempo parcial" <?php echo (($d->tipo_empleado ?? '') == 'Tiempo parcial') ? 'selected' : ''; ?>>Tiempo parcial</option>
+                                    </select>
+                                </td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_empleado" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
+                                <th scope="row" class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="numide" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->numide); ?></th>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="apeadm" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->apeadm); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="nomadm" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->nomadm); ?></td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="sexadm" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;">
+                                        <option value="Masculino" <?php echo ($d->sexadm == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
+                                        <option value="Femenino" <?php echo ($d->sexadm == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_departamento" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
+                                        <option value="">—</option>
+                                        <?php foreach ($depto_map as $id_dept => $name_dept): ?>
+                                            <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="salario" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="cuenta_bac" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="fecha_ingreso" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="telefono" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars(($d->correo_personal ?? '—') . ' / ' . ($d->correo_institucional ?? '—')); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacadm); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_biometrico" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_locker" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
+                                <td>
+                                    <?php if (!empty($d->url_contrato)): ?>
+                                        <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->idadm; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
+                                    <?php else: ?>
+                                        <span class="badge-warning" style="padding:4px;">N/D</span>
+                                    <?php endif; ?>
+                                    <br>
+                                    <label class="badge-primary" style="padding:4px; cursor:pointer; display:inline-block; margin-top:4px;" onclick="document.getElementById('upload_contrato_<?php echo $d->idadm; ?>').click();">
+                                        <i class="bx bx-upload"></i> Subir
+                                    </label>
+                                    <input type="file" id="upload_contrato_<?php echo $d->idadm; ?>" style="display:none;" accept=".pdf,.jpg,.png" onchange="uploadContract(this, <?php echo $d->idadm; ?>, 'staff_administrative', 'idadm')">
+                                </td>
                                 <td>
                                     <label class="switch">
                                         <input type="checkbox" class="staff-state-toggle" data-id="<?php echo (int) $d->idadm; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
@@ -106,6 +169,137 @@ medidata_staff_ensure_tables($connect);
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+<script>
+$(document).ready(function() {
+    $('.editable-cell').on('blur', function() {
+        var $cell = $(this);
+        var id = $cell.data('id');
+        var field = $cell.data('field');
+        var table = $cell.data('table');
+        var idcol = $cell.data('idcol');
+        var value = $cell.text().trim();
+        
+        if (value === '—' || value === '-') {
+            value = '';
+        }
+        
+        $.ajax({
+            url: '../../backend/php/update_inline_staff.php',
+            method: 'POST',
+            data: {
+                id: id,
+                field: field,
+                value: value,
+                table: table,
+                id_col: idcol
+            },
+            success: function(response) {
+                try {
+                    var res = JSON.parse(response);
+                    if(res.status == 'success') {
+                        $cell.css('background-color', '#d4edda');
+                        setTimeout(function() { $cell.css('background-color', '#f9f9f9'); }, 1000);
+                    } else {
+                        Swal.fire('Error', res.message, 'error');
+                    }
+                } catch(e) {
+                    console.error("Error parseando JSON:", response);
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'No se pudo conectar al servidor', 'error');
+            }
+        });
+    });
+    
+    
+    $('.inline-select').on('change', function() {
+        var $select = $(this);
+        var id = $select.data('id');
+        var field = $select.data('field');
+        var table = $select.data('table');
+        var idcol = $select.data('idcol');
+        var value = $select.val();
+        
+        $.ajax({
+            url: '../../backend/php/update_inline_staff.php',
+            method: 'POST',
+            data: {
+                id: id,
+                field: field,
+                value: value,
+                table: table,
+                id_col: idcol
+            },
+            success: function(response) {
+                try {
+                    var res = JSON.parse(response);
+                    if(res.status == 'success') {
+                        $select.css('background-color', '#d4edda');
+                        setTimeout(function() { $select.css('background-color', '#f9f9f9'); }, 1000);
+                    } else {
+                        Swal.fire('Error', res.message, 'error');
+                    }
+                } catch(e) {}
+            },
+            error: function() {
+                Swal.fire('Error', 'No se pudo conectar al servidor', 'error');
+            }
+        });
+    });
+
+    $('.editable-cell').on('keypress', function(e) {
+        if(e.which == 13) {
+            e.preventDefault();
+            $(this).blur();
+        }
+    });
+});
+
+function uploadContract(inputElement, id, table, idcol) {
+    if (!inputElement.files || inputElement.files.length === 0) return;
+    var file = inputElement.files[0];
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('id', id);
+    formData.append('table', table);
+    formData.append('idcol', idcol);
+    
+    // Mostramos un alert de carga
+    Swal.fire({
+        title: 'Subiendo contrato...',
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    $.ajax({
+        url: '../../backend/php/upload_inline_contract.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            try {
+                var res = JSON.parse(response);
+                if (res.status == 'success') {
+                    Swal.fire('Éxito', 'Contrato subido correctamente', 'success').then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', res.message, 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Respuesta no válida del servidor', 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', 'Fallo al conectar con el servidor', 'error');
+        }
+    });
+}
+</script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

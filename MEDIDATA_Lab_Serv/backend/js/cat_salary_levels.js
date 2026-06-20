@@ -4,7 +4,8 @@ $(function(){
         $.post('../../frontend/funciones/cat_salary_levels.php').done(function(respuesta) {
             var currentValue = $selectElement.val();
             $selectElement.html(respuesta);
-            if (currentValue) {
+        $selectElement.trigger("change.select2");
+            if (currentValue && currentValue != "0") {
                 $selectElement.val(currentValue).trigger('change');
             }
             if ($selectElement.hasClass('select2-hidden-accessible')) {
