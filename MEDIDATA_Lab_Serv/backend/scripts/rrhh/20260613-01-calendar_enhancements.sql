@@ -20,12 +20,14 @@ INSERT IGNORE INTO rrhh_calendar_event_types (id, name, default_color) VALUES
 
 -- 2. Alter rrhh_custom_events to add new fields
 -- Note: IGNORE if already executed previously
+/*
 ALTER TABLE rrhh_custom_events 
-    ADD COLUMN id_event_type INT NULL AFTER id,
-    ADD COLUMN description TEXT NULL AFTER title,
-    ADD COLUMN all_day TINYINT(1) DEFAULT 0 AFTER end_datetime,
-    ADD COLUMN id_user INT NULL AFTER all_day,
-    ADD COLUMN is_public TINYINT(1) DEFAULT 0 AFTER id_user;
+    ADD COLUMN id_event_type INT NULL,
+    ADD COLUMN description TEXT NULL,
+    ADD COLUMN all_day TINYINT(1) DEFAULT 0,
+    ADD COLUMN id_user INT NULL,
+    ADD COLUMN is_public TINYINT(1) DEFAULT 0;
+*/
 
 -- Add Foreign Key for event type
 ALTER TABLE rrhh_custom_events 

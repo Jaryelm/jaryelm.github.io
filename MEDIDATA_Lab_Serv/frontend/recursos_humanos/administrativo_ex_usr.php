@@ -35,15 +35,16 @@ medidata_staff_ensure_tables($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_usr.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex_usr.php')">Ex Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo_usr.php')">Registrar Servicios Generales</button>
-<div class="data">
+        <button class="button" onclick="cambiarColor(this, 'administrativo_usr.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_ex_usr.php')">Ex Administrativos</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo_usr.php')">Registrar Administrativo</button>
+
+        <div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal de Servicios Generales Activo</h3></div>
+                <div class="head"><h3>Ex Personal Administrativo (Inactivos)</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '1' ORDER BY idsg DESC");
+                    $sentencia = $connect->prepare("SELECT * FROM staff_administrative WHERE state = '0' ORDER BY idadm DESC");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
@@ -53,7 +54,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th>DNI</th>
                                 <th>Colaborador</th>
-                                <th>Área</th>
+                                <th>Cargo</th>
                                 <th>Sexo</th>
                                 <th>Fecha Nacimiento</th>
                                 <th>Estado</th>
@@ -64,19 +65,19 @@ medidata_staff_ensure_tables($connect);
                             <?php foreach ($data as $d): ?>
                             <tr>
                                 <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
-                                <td><?php echo htmlspecialchars($d->nomsg . ' ' . $d->apesg); ?></td>
-                                <td><?php echo htmlspecialchars($d->area ?? '—'); ?></td>
-                                <td><?php echo htmlspecialchars($d->sexsg); ?></td>
-                                <td><?php echo htmlspecialchars($d->nacsg); ?></td>
+                                <td><?php echo htmlspecialchars($d->nomadm . ' ' . $d->apeadm); ?></td>
+                                <td><?php echo htmlspecialchars($d->cargo ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($d->sexadm); ?></td>
+                                <td><?php echo htmlspecialchars($d->nacadm); ?></td>
                                 <td>
                                     <label class="switch">
-                                        <input type="checkbox" class="staff-sg-state-toggle" data-id="<?php echo (int) $d->idsg; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
+                                        <input type="checkbox" class="staff-state-toggle" data-id="<?php echo (int) $d->idadm; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
                                         <span class="slider"></span>
                                     </label>
                                 </td>
                                 <td>
-                                    <a title="Actualizar" href="servicios_generales_editar_usr.php?id=<?php echo (int) $d->idsg; ?>" class="fa fa-pencil tooltip"></a>
-                                    <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-sg" data-id="<?php echo (int) $d->idsg; ?>"></a>
+                                    <a title="Actualizar" href="administrativo_editar_usr.php?id=<?php echo (int) $d->idadm; ?>" class="fa fa-pencil tooltip"></a>
+                                    <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-staff" data-id="<?php echo (int) $d->idadm; ?>"></a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -85,7 +86,7 @@ medidata_staff_ensure_tables($connect);
                     <?php else: ?>
                     <div class="alert">
                         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                        <strong>Sin datos</strong> No hay colaboradores de servicios generales registrados.
+                        <strong>Sin datos</strong> No hay colaboradores administrativos registrados.
                     </div>
                     <?php endif; ?>
                 </div>
@@ -107,14 +108,14 @@ medidata_staff_ensure_tables($connect);
 <script src="../../backend/js/buttonshtml5.js"></script>
 <script src="../../backend/js/buttonsprint.js"></script>
 <script>
-window.MEDIDATA_STAFF_SG = {
-    toggleSelector: '.staff-sg-state-toggle',
-    deleteSelector: '.btn-delete-sg',
-    toggleUrl: '../../backend/php/toggle_general_services_state.php',
-    deleteUrl: '../../backend/php/delete_general_services.php',
-    idParam: 'idsg',
-    deleteTitle: '¿Eliminar colaborador de servicios generales?',
-    deleteFn: 'deleteGeneralServices'
+window.MEDIDATA_STAFF_ADMIN = {
+    toggleSelector: '.staff-state-toggle',
+    deleteSelector: '.btn-delete-staff',
+    toggleUrl: '../../backend/php/toggle_administrative_state.php',
+    deleteUrl: '../../backend/php/delete_administrative.php',
+    idParam: 'idadm',
+    deleteTitle: '¿Eliminar colaborador administrativo?',
+    deleteFn: 'deleteAdministrative'
 };
 $(document).ready(function () {
     if ($('#example').length) {

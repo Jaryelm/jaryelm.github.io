@@ -25,7 +25,7 @@ include_once '../../backend/registros/session_check.php';
 <body>
     
 <?php
-include_once '../admin/menu.php';
+include_once '../recursos_humanos/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -42,7 +42,7 @@ include_once '../admin/menu.php';
            
             <span class="divider"></span>
             <?php
-include_once '../admin/perfil.php';
+include_once '../recursos_humanos/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>
@@ -65,17 +65,17 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<?php $medicos_nav_rrhh = false; include __DIR__ . '/_botones_medicos.php'; ?>
+<?php $medicos_nav_rrhh = true; include __DIR__ . '/_botones_medicos.php'; ?>
 
           <div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Personal Médico Activo</h3>
+                        <h3>Ex Personal Médico (Inactivos)</h3>
                        
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
-$sentencia = $connect->prepare("SELECT * FROM doctor WHERE state = '1' ORDER BY idodc DESC;");
+$sentencia = $connect->prepare("SELECT * FROM doctor WHERE state = '0' ORDER BY idodc DESC;");
  $sentencia->execute();
 $data =  array();
 if($sentencia){

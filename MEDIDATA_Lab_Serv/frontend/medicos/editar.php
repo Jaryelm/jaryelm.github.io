@@ -1,5 +1,8 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+require_once '../../backend/php/staff_colaborador_bootstrap.php';
+medidata_staff_ensure_tables($connect);
+$staffUsers = medidata_staff_fetch_users_for_select($connect);
 // incuir el archivo de sesion login
 ?>
 <!DOCTYPE html>
@@ -76,53 +79,197 @@ if($sentencia){
   }
 }
    ?>
-   <?php if(count($data)>0):?>
+   <?php
+// Consultar lista de cargos (positions) de la base de datos principal
+$cargos = [];
+try {
+    $stmt_p = $connect->prepare("SELECT id, name FROM positions ORDER BY name ASC");
+    $stmt_p->execute();
+    $cargos = $stmt_p->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {}
+?>
+<?php if(count($data)>0):?>
         <?php foreach($data as $d):?>
 
-<form action="" enctype="multipart/form-data" method="POST" autocomplete="off">
-    <div class="containerss">
-        <h1>Actualizar Médico</h1>
-        <br>
-        <hr>
+<form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <input type="hidden" name="return_page" value="mostrar.php">
+            <div class="containerss">
+                <h1>Actualizar médico</h1>
+                <input type="hidden" name="midp" value="<?php echo (int) $d->idodc; ?>">
+                <hr>
+                
+                <label><b>N° de Empleado (Institucional)</b></label>
+                <input type="text" name="num_empleado" value="<?php echo htmlspecialchars($d->num_empleado ?? ''); ?>" placeholder="ejm: EMP-001">
 
-        <label for="especialidad"><b>Especialidad del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" id="especialidad" name="doces" required placeholder="Ingrese la especialidad" value="<?php echo $d->nomesp; ?>">
-        
-        <input type="hidden" name="midp" value="<?php echo $d->idodc; ?>">
+                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
+                <input type="text" name="docce" maxlength="14" value="<?php echo htmlspecialchars($d->ceddoc); ?>" required>
+                
+                <label><b>Nombres</b></label><span class="badge-warning">*</span>
+                <input type="text" name="docna" value="<?php echo htmlspecialchars($d->nodoc); ?>" required>
+                
+                <label><b>Apellidos</b></label><span class="badge-warning">*</span>
+                <input type="text" name="docap" value="<?php echo htmlspecialchars($d->apdoc); ?>" required>
+                
+                <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
+                <input type="date" name="docda" value="<?php echo htmlspecialchars($d->nacd); ?>" required>
+                
+                <label><b>Género</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="docge" required>
+                    <option value="Masculino" <?php echo $d->sexd === 'Masculino' ? 'selected' : ''; ?>>Masculino</option>
+                    <option value="Femenino" <?php echo $d->sexd === 'Femenino' ? 'selected' : ''; ?>>Femenino</option>
+                </select>
 
-        <label for="dni"><b>DNI del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" maxlength="15" name="docce" value="<?php echo $d->ceddoc; ?>" required>
+                <hr>
+                <h3>Información Laboral</h3>
+                
+                <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
+                    <option value="Permanente" <?php echo ($d->tipo_empleado ?? '') === 'Permanente' ? 'selected' : ''; ?>>Permanente</option>
+                    <option value="Temporal" <?php echo ($d->tipo_empleado ?? '') === 'Temporal' ? 'selected' : ''; ?>>Temporal</option>
+                    <option value="Tiempo parcial" <?php echo ($d->tipo_empleado ?? '') === 'Tiempo parcial' ? 'selected' : ''; ?>>Tiempo parcial</option>
+                </select>
 
-        <label for="nombre"><b>Nombre del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" name="docna" value="<?php echo $d->nodoc; ?>" required>
+                <div id="duracion_contrato_div" style="display:<?php echo in_array($d->tipo_empleado ?? '', ['Temporal', 'Tiempo parcial']) ? 'block' : 'none'; ?>; margin-top:10px;">
+                    <label><b>Duración de Contrato</b></label>
+                    <input type="text" name="duracion_contrato" value="<?php echo htmlspecialchars($d->duracion_contrato ?? ''); ?>" placeholder="Ej: 6 meses">
+                </div>
 
-        <label for="apellido"><b>Apellido del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" name="docap" value="<?php echo $d->apdoc; ?>" required>
+                <label><b>Fecha de Ingreso</b></label>
+                <input type="date" name="fecha_ingreso" value="<?php echo htmlspecialchars($d->fecha_ingreso ?? ''); ?>">
 
-        <label for="direccion"><b>Dirección del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" name="docdi" value="<?php echo $d->direcd; ?>" required>
+                <label><b>Departamento</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_departamento" id="id_departament" required>
+                    <option value="<?php echo (int)($d->id_departamento ?? 0); ?>" selected>Cargando...</option>
+                </select>
 
-        <label for="correo"><b>Correo electrónico del médico</b></label><span class="badge-warning">*</span>
-        <input type="email" name="doccorr" value="<?php echo $d->corr; ?>" required>
+                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_cargo" required>
+                    <option value="" disabled>Seleccione...</option>
+                    <?php foreach ($cargos as $cargo): ?>
+                        <option value="<?php echo $cargo['id']; ?>" <?php echo ($d->id_cargo ?? 0) == $cargo['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cargo['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-        <label for="genero"><b>Género del médico</b></label><span class="badge-warning">*</span>
-<select required name="docge" id="gep">
-    <option value="Masculino" <?php if ($d->sexd == 'Masculino') echo 'selected'; ?>>Masculino</option>
-    <option value="Femenino" <?php if ($d->sexd == 'Femenino') echo 'selected'; ?>>Femenino</option>
-</select>
+                <label><b>Horario</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_horario" id="id_schedule" required>
+                    <option value="<?php echo (int)($d->id_horario ?? 0); ?>" selected>Cargando...</option>
+                </select>
 
-        <label for="telefono"><b>Teléfono del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" maxlength="13" name="docte" value="<?php echo $d->phd; ?>" required>
+                <label><b>Nivel Salarial</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_salary_level" id="id_salary_level" required>
+                    <option value="<?php echo (int)($d->id_salary_level ?? 0); ?>" selected>Cargando...</option>
+                </select>
 
-        <label for="nacimiento"><b>Nacimiento del médico</b></label><span class="badge-warning">*</span>
-        <input type="date" name="docda" value="<?php echo $d->nacd; ?>" required>
+                <label><b>Salario Base</b></label>
+                <input type="number" step="0.01" name="salario" value="<?php echo htmlspecialchars($d->salario ?? ''); ?>" placeholder="Ej: 15000.00">
 
-        <hr>
-        <button type="submit" name="upd_doctors" class="registerbtn">Guardar</button>
-        <button type="button" class="registerbtn btn-delete-doctor" style="background:#c0392b;margin-top:10px;"
-            data-id="<?php echo (int) $d->idodc; ?>" data-redirect="mostrar.php">Eliminar médico</button>
-    </div>
-</form>
+                <label><b>N° Cuenta de BAC</b></label>
+                <input type="text" name="cuenta_bac" value="<?php echo htmlspecialchars($d->cuenta_bac ?? ''); ?>" placeholder="Número de cuenta de banco BAC">
+
+                <hr>
+                <h3>Información de Contacto y Accesos</h3>
+
+                <label><b>Teléfono Celular</b></label>
+                <input type="text" name="telefono" value="<?php echo htmlspecialchars($d->telefono ?? ''); ?>" placeholder="Ej: 99887766">
+
+                <label><b>Correo Personal</b></label>
+                <input type="email" name="correo_personal" value="<?php echo htmlspecialchars($d->correo_personal ?? ''); ?>" placeholder="Correo electrónico personal">
+
+                <label><b>Correo Institucional</b></label>
+                <input type="email" name="correo_institucional" value="<?php echo htmlspecialchars($d->correo_institucional ?? ''); ?>" placeholder="Correo electrónico de Medicasa">
+
+                <label><b>N° de Locker Asignado</b></label>
+                <input type="text" name="num_locker" value="<?php echo htmlspecialchars($d->num_locker ?? ''); ?>" placeholder="Ej: L-10">
+
+                <label><b>ID Empleado (Reloj Biométrico)</b></label>
+                <input type="number" name="id_biometrico" value="<?php echo htmlspecialchars($d->id_biometrico ?? ''); ?>" placeholder="Ej: 123">
+
+                <label><b>Usuario del Sistema (Opcional)</b></label>
+                <?php
+                $staffUserFieldName = 'docid_user';
+                $staffSelectedUserId = isset($d->id_user) ? (int) $d->id_user : 0;
+                include '../recursos_humanos/_staff_user_select.php';
+                ?>
+                
+                <hr>
+                <h3>Documentos (Opcionales)</h3>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Subir un documento nuevo reemplazará al anterior.</p>
+                
+                <?php
+                function _showDocLink($label, $url) {
+                    if (!empty($url)) {
+                        echo '<p style="margin-top:0; margin-bottom:10px; font-size:0.85rem;"><a href="'.htmlspecialchars($url).'" target="_blank"><i class="bx bx-link-external"></i> Ver '.$label.' actual</a></p>';
+                    }
+                }
+                ?>
+
+                <label>Solicitud de empleo (Ya guardada)</label>
+                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                <?php if ($d->has_solicitud): ?>
+                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idodc; ?>&doc=solicitud" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver solicitud actual</a>
+                <?php endif; ?>
+                <br><br>
+                
+                <label>Pruebas Psicométricas (Ya guardadas)</label>
+                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                <?php if ($d->has_psicometricas): ?>
+                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idodc; ?>&doc=psicometricas" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver pruebas actuales</a>
+                <?php endif; ?>
+                <br><br>
+
+                <label>Copia de partida de nacimiento de hijos</label>
+                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('partida', $rrhh_docs['birth_cert_children'] ?? null); ?>
+                
+                <label>Foto (Para su Carnet)</label>
+                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
+                <?php _showDocLink('foto', $rrhh_docs['photo_id_card'] ?? null); ?>
+                
+                <label>Documento de identidad (revés y derecho)</label>
+                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('documento de identidad', $rrhh_docs['id_document'] ?? null); ?>
+                
+                <label>Copia de recibo (agua, luz, teléfono)</label>
+                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('recibo', $rrhh_docs['utility_bill'] ?? null); ?>
+                
+                <label>Antecedentes Penales</label>
+                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('antecedentes penales', $rrhh_docs['criminal_record'] ?? null); ?>
+                
+                <label>Antecedentes Policiales</label>
+                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('antecedentes policiales', $rrhh_docs['police_record'] ?? null); ?>
+                
+                <label>2 Referencias personales</label>
+                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <?php _showDocLink('referencias personales', $rrhh_docs['personal_references'] ?? null); ?>
+                
+                <label>2 Referencias profesionales</label>
+                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <?php _showDocLink('referencias profesionales', $rrhh_docs['professional_references'] ?? null); ?>
+                
+                <label>Diplomas o títulos recibidos</label>
+                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <?php _showDocLink('diplomas', $rrhh_docs['diplomas'] ?? null); ?>
+                
+                <label>Croquis de vivienda</label>
+                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <?php _showDocLink('croquis', $rrhh_docs['home_sketch'] ?? null); ?>
+                
+                <label><b>Contrato Firmado (Ya guardado)</b></label>
+                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="padding:10px; border:1px solid #2980b9;">
+                <?php if ($d->has_contrato): ?>
+                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idodc; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver contrato actual</a>
+                <?php endif; ?>
+                <br><br>
+
+                <hr>
+                <button type="submit" name="upd_doctors" class="registerbtn">Guardar Cambios</button>
+                <button type="button" class="registerbtn btn-delete-staff" style="background:#c0392b;margin-top:10px;"
+                    data-id="<?php echo (int) $d->idodc; ?>">Eliminar colaborador</button>
+            </div>
+        </form>
 
 <?php endforeach; ?>
   
@@ -142,6 +289,9 @@ if($sentencia){
     <script src="../../backend/registros/script/botones_color.js"></script>
 
    
+<script src="../../backend/js/cat_departaments.js"></script>
+<script src="../../backend/js/cat_salary_levels.js"></script>
+<script src="../../backend/js/cat_schedules.js"></script>
 </body>
 </html>
 

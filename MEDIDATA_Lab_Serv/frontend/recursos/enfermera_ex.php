@@ -65,17 +65,19 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<?php $medicos_nav_rrhh = false; include __DIR__ . '/_botones_medicos.php'; ?>
-
-          <div class="data">
+        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'enfermera_ex.php')">Ex Enfermería</button>
+        <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo.php')">Registrar Enfermería</button>
+<div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Personal Médico Activo</h3>
-                       
+                        <h3>Ex Enfermería (Inactivos)</h3>
+                      
+
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
-$sentencia = $connect->prepare("SELECT * FROM doctor WHERE state = '1' ORDER BY idodc DESC;");
+$sentencia = $connect->prepare("SELECT * FROM nurse WHERE state = '0' ORDER BY idnur DESC;");
  $sentencia->execute();
 $data =  array();
 if($sentencia){
@@ -89,13 +91,9 @@ if($sentencia){
             <thead>
                 <tr>
                     <th scope="col">DNI</th>
-                    <th scope="col">Doctor/a</th>
-                    <th scope="col">Fecha Nacimiento</th>
-                    <th scope="col">Fecha de Registro</th>
-                    <th scope="col">Especialidad</th>
+                    <th scope="col">Enfermera(o)</th>
                     <th scope="col">Sexo</th>
-                    <th scope="col">Teléfono</th>
-                    <th scope="col">Correo</th>
+                    <th scope="col">Fecha de Nacimiento</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -103,26 +101,19 @@ if($sentencia){
             <tbody>
                 <?php foreach($data as $d):?>
                     <tr>
-                        <th scope="row"><?php echo $d->ceddoc ?></th>
-                        <td data-title="Doctor"><?php echo $d->nodoc ?>&nbsp;<?php echo $d->apdoc ?></td>
-                        <td data-title="Fecha Nacimiento"><?php echo $d->nacd ?></td>
-                        <td data-title="Fecha Registro"><?php echo $d->fere ?></td>
-                        <td data-title="Especialidad"><?php echo $d->nomesp ?></td>
-                        <td data-title="Sexo"><?php echo $d->sexd ?></td>
-                        <td data-title="Teléfono"><?php echo $d->phd ?></td>
-                        <td data-title="Correo"><?php echo $d->corr ?></td>
-
+                        <th scope="row"><?php echo $d->numide ?></th>
+                        <td data-title="Paciente"><?php echo $d->nomnur ?>&nbsp;<?php echo $d->apenur ?></td>
+                        <td data-title="Sexo"><?php echo $d->sexnur ?></td>
+                        <td data-title="Grupo"><?php echo $d->nacinur ?></td>
                         <td data-title="Estado">
-    
-                        <label class="switch">
-                          <input type="checkbox" class="doctor-state-toggle" data-id="<?php echo (int) $d->idodc; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
-                          <span class="slider"></span>
-                        </label>
+                            <label class="switch">
+                                <input type="checkbox" class="nurse-state-toggle" data-id="<?php echo (int) $d->idnur; ?>" <?php echo (isset($d->state) ? $d->state : '1') == '1' ? 'checked' : ''; ?>/>
+                                <span class="slider"></span>
+                            </label>
                         </td>
-
                         <td>
-                            <a title="Actualizar" href="../medicos/editar.php?id=<?php echo $d->idodc ?>" class="fa fa-pencil tooltip"></a>
-                            <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-doctor" data-id="<?php echo (int) $d->idodc; ?>"></a>
+                            <a title="Actualizar" href="../recursos/enfermera_editar.php?id=<?php echo $d->idnur ?>" class="fa fa-pencil tooltip"></a>
+                            <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-nurse" data-id="<?php echo (int) $d->idnur; ?>"></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -142,15 +133,29 @@ if($sentencia){
         </main>
         <!-- MAIN -->
     </section>
+    
+    <!-- NAVBAR -->
     <script src="../../backend/js/jquery.min.js"></script>
-    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    
     <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/registros/script/tabla_medicos.js"></script>
+
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
 
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
+    <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+    <script>
+    window.MEDIDATA_STAFF_NURSE = {
+        toggleSelector: '.nurse-state-toggle',
+        deleteSelector: '.btn-delete-nurse',
+        toggleUrl: '../../backend/php/toggle_nurse_state.php',
+        deleteUrl: '../../backend/php/delete_nurse.php',
+        idParam: 'idnur',
+        deleteTitle: '¿Eliminar enfermero(a)?',
+        deleteFn: 'deleteNurse'
+    };
+    </script>
     
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>
@@ -185,7 +190,50 @@ $(document).ready(function() {
 });
 </script>
 
- 
+ <script type="text/javascript">
+    let popUp = document.getElementById("cookiePopup");
+    let acceptCookieBtn = document.getElementById("acceptCookie");
+//When user clicks the accept button
+if (acceptCookieBtn) {
+  acceptCookieBtn.addEventListener("click", () => {
+    //Create date object
+    let d = new Date();
+    //Increment the current time by 1 minute (cookie will expire after 1 minute)
+    d.setMinutes(2 + d.getMinutes());
+    //Create Cookie withname = myCookieName, value = thisIsMyCookie and expiry time=1 minute
+    document.cookie = "myCookieName=thisIsMyCookie; expires = " + d + ";";
+    //Hide the popup
+    if (popUp) {
+      popUp.classList.add("hide");
+      popUp.classList.remove("shows");
+    }
+  });
+}
+//Check if cookie is already present
+const checkCookie = () => {
+  if (!popUp) return;
+  //Read the cookie and split on "="
+  let input = document.cookie.split("=");
+  //Check for our cookie
+  if (input[0] == "myCookieName") {
+    //Hide the popup
+    popUp.classList.add("hide");
+    popUp.classList.remove("shows");
+  } else {
+    //Show the popup
+    popUp.classList.add("shows");
+    popUp.classList.remove("hide");
+  }
+};
+//Check if cookie exists when page loads
+window.onload = () => {
+  setTimeout(() => {
+    checkCookie();
+  }, 2000);
+};
+    </script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+ <?php include_once '../../backend/php/delete_nurse.php' ?>
 </body>
 </html>
 

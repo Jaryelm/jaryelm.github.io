@@ -1,5 +1,5 @@
 <?php
-if (!isset($_POST['add_doctor'])) {
+if (!isset($_POST['upd_staff_general_services'])) {
     return;
 }
 
@@ -8,12 +8,13 @@ require_once __DIR__ . '/../registros/rrhh_guard.php';
 
 medidata_staff_ensure_tables($connect);
 
-$numide = strtoupper(trim((string) ($_POST['dociden'] ?? '')));
-$nomadm = strtoupper(trim((string) ($_POST['docnam'] ?? '')));
-$apeadm = strtoupper(trim((string) ($_POST['docape'] ?? '')));
-$nacadm = trim((string) ($_POST['docdat'] ?? ''));
-$sexadm = trim((string) ($_POST['docge'] ?? ''));
-$idUser = medidata_staff_parse_id_user($_POST['docid_user'] ?? null);
+$idsg = (int) ($_POST['sgidp'] ?? 0);
+$numide = strtoupper(trim((string) ($_POST['sgiden'] ?? '')));
+$nomsg = strtoupper(trim((string) ($_POST['sgnam'] ?? '')));
+$apesg = strtoupper(trim((string) ($_POST['sgape'] ?? '')));
+$nacsg = trim((string) ($_POST['sgdat'] ?? ''));
+$sexsg = trim((string) ($_POST['sgge'] ?? ''));
+$idUser = medidata_staff_parse_id_user($_POST['sgid_user'] ?? null);
 
 // Nuevos campos
 $num_empleado = trim((string) ($_POST['num_empleado'] ?? ''));
@@ -32,32 +33,24 @@ $correo_institucional = trim((string) ($_POST['correo_institucional'] ?? ''));
 $num_locker = trim((string) ($_POST['num_locker'] ?? ''));
 $id_biometrico = (int) ($_POST['id_biometrico'] ?? 0);
 
-if ($numide === '' || $nomadm === '') {
-    echo '<script>Swal.fire("Campos requeridos", "Complete identificación y nombre.", "warning");</script>';
-    return;
-}
-
 try {
+    if ($idsg <= 0) {
+        throw new RuntimeException('Identificador no válido.');
+    }
+
     if ($idUser !== null) {
-        $linked = medidata_staff_id_user_linked($connect, $idUser, 'doctor');
+        $linked = medidata_staff_id_user_linked($connect, $idUser, 'staff_general_services', $idsg);
         if ($linked !== null) {
-            echo '<script>Swal.fire("Usuario en uso", "Ese usuario ya está vinculado como colaborador de ' . $linked['label'] . '.", "warning");</script>';
-            return;
+            throw new RuntimeException('Ese usuario ya está vinculado como colaborador de ' . $linked['label'] . '.');
         }
     }
 
-    $check = $connect->prepare('SELECT COUNT(*) FROM doctor WHERE numide = :numide');
-    $check->execute([':numide' => $numide]);
-    if ((int) $check->fetchColumn() > 0) {
-        echo '<script>Swal.fire("Duplicado", "Ya existe un colaborador con esa identificación.", "warning");</script>';
-        return;
-    }
-
-    // Autogenerar num_empleado si está vacío
-    if ($num_empleado === '') {
-        $stmtC = $connect->query("SELECT COUNT(*) FROM doctor");
-        $c = $stmtC->fetchColumn() + 1;
-        $num_empleado = 'EMP-' . str_pad($c, 3, '0', STR_PAD_LEFT);
+    // Obtener información actual
+    $stmtCurrent = $connect->prepare("SELECT numide, id_candidate_rrhh FROM staff_general_services WHERE idsg = ? LIMIT 1");
+    $stmtCurrent->execute([$idsg]);
+    $currentRecord = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+    if (!$currentRecord) {
+        throw new RuntimeException('El colaborador no existe.');
     }
 
     $url_contrato = null;
@@ -76,37 +69,49 @@ try {
 
     // --- INTEGRACIÓN CON MÓDULO RRHH ---
     $pdoRrhh = medidata_rrhh_pdo();
-    $id_candidate_rrhh = null;
+    $id_candidate_rrhh = $currentRecord['id_candidate_rrhh'];
 
     if ($pdoRrhh) {
-        // Buscar candidato existente
-        $stmtC = $pdoRrhh->prepare("SELECT id FROM candidates WHERE dni = :dni LIMIT 1");
-        $stmtC->execute([':dni' => $numide]);
-        $id_candidate_rrhh = $stmtC->fetchColumn();
-
+        // Si no tiene candidato_rrhh, intentar encontrarlo por DNI o crearlo
         if (!$id_candidate_rrhh) {
-            // Obtener cualquier vacante como dummy para cumplir la llave foránea
-            $stmtV = $pdoRrhh->query("SELECT id FROM vacant_positions LIMIT 1");
-            $id_vacant = $stmtV->fetchColumn() ?: 1;
+            $stmtC = $pdoRrhh->prepare("SELECT id FROM candidates WHERE dni = :dni LIMIT 1");
+            $stmtC->execute([':dni' => $numide]);
+            $id_candidate_rrhh = $stmtC->fetchColumn();
 
-            $stmtInsC = $pdoRrhh->prepare("
-                INSERT INTO candidates (id_vacant_position, fullname, dni, birthdate, phonenumber, email, direction, status, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, 'N/D', 'Contratado', ?)
-            ");
-            $stmtInsC->execute([
-                $id_vacant,
-                $nomadm . ' ' . $apeadm,
+            if (!$id_candidate_rrhh) {
+                // Obtener vacante dummy
+                $stmtV = $pdoRrhh->query("SELECT id FROM vacant_positions LIMIT 1");
+                $id_vacant = $stmtV->fetchColumn() ?: 1;
+
+                $stmtInsC = $pdoRrhh->prepare("
+                    INSERT INTO candidates (id_vacant_position, fullname, dni, birthdate, phonenumber, email, direction, status, created_by)
+                    VALUES (?, ?, ?, ?, ?, ?, 'N/D', 'Contratado', ?)
+                ");
+                $stmtInsC->execute([
+                    $id_vacant,
+                    $nomsg . ' ' . $apesg,
+                    $numide,
+                    $nacsg !== '' ? $nacsg : null,
+                    $telefono,
+                    $correo_personal,
+                    $_SESSION['name'] ?? 'System'
+                ]);
+                $id_candidate_rrhh = $pdoRrhh->lastInsertId();
+            }
+        } else {
+            // Actualizar el nombre y datos básicos del candidato en RRHH
+            $stmtUpdC = $pdoRrhh->prepare("UPDATE candidates SET fullname = ?, dni = ?, birthdate = ?, phonenumber = ?, email = ? WHERE id = ?");
+            $stmtUpdC->execute([
+                $nomsg . ' ' . $apesg,
                 $numide,
-                $nacadm !== '' ? $nacadm : null,
+                $nacsg !== '' ? $nacsg : null,
                 $telefono,
                 $correo_personal,
-                $_SESSION['name'] ?? 'System'
+                $id_candidate_rrhh
             ]);
-            $id_candidate_rrhh = $pdoRrhh->lastInsertId();
         }
 
         // Subida de requisitos de contratación
-        // Usamos la tabla hiring_requirements para guardar la ruta del archivo
         $uploadDir = __DIR__ . '/../../uploads/staff/';
         if (!is_dir($uploadDir)) {
             @mkdir($uploadDir, 0777, true);
@@ -139,7 +144,6 @@ try {
         }
 
         if (!empty($hr_updates)) {
-            // Asegurar que el registro de requisitos exista
             $stmtHR = $pdoRrhh->prepare("SELECT id FROM hiring_requirements WHERE id_candidate = ?");
             $stmtHR->execute([$id_candidate_rrhh]);
             if (!$stmtHR->fetchColumn()) {
@@ -152,31 +156,25 @@ try {
         }
     }
 
-    // Insertar en la BD principal
-    // (Asegúrate de haber añadido doc_solicitud y doc_psicometricas si se requieren)
-    $stmt = $connect->prepare('
-        INSERT INTO doctor (
-            id_user, numide, nomdoc, apedoc, nacdoc, sexdoc, state,
-            num_empleado, tipo_empleado, duracion_contrato, fecha_ingreso,
-            id_departamento, id_cargo, id_horario, id_salary_level, salario,
-            cuenta_bac, telefono, correo_personal, correo_institucional,
-            num_locker, id_biometrico, url_contrato, url_solicitud, url_psicometricas, id_candidate_rrhh
-        ) VALUES (
-            :id_user, :numide, :nomadm, :apeadm, :nacadm, :sexadm, \'1\',
-            :num_empleado, :tipo_empleado, :duracion_contrato, :fecha_ingreso,
-            :id_departamento, :id_cargo, :id_horario, :id_salary_level, :salario,
-            :cuenta_bac, :telefono, :correo_personal, :correo_institucional,
-            :num_locker, :id_biometrico, :url_contrato, :url_solicitud, :url_psicometricas, :id_candidate_rrhh
-        )
-    ');
+    // Actualizar en la BD principal
+    $updates = [
+        'id_user = :id_user', 'numide = :numide', 'nomsg = :nomsg', 'apesg = :apesg',
+        'nacsg = :nacsg', 'sexsg = :sexsg', 'num_empleado = :num_empleado',
+        'tipo_empleado = :tipo_empleado', 'duracion_contrato = :duracion_contrato',
+        'fecha_ingreso = :fecha_ingreso', 'id_departamento = :id_departamento',
+        'id_cargo = :id_cargo', 'id_horario = :id_horario', 'id_salary_level = :id_salary_level',
+        'salario = :salario', 'cuenta_bac = :cuenta_bac', 'telefono = :telefono',
+        'correo_personal = :correo_personal', 'correo_institucional = :correo_institucional',
+        'num_locker = :num_locker', 'id_biometrico = :id_biometrico'
+    ];
     
-    $ok = $stmt->execute([
+    $params = [
         ':id_user' => $idUser,
         ':numide' => $numide,
-        ':nomadm' => $nomadm,
-        ':apeadm' => $apeadm,
-        ':nacadm' => $nacadm,
-        ':sexadm' => $sexadm,
+        ':nomsg' => $nomsg,
+        ':apesg' => $apesg,
+        ':nacsg' => $nacsg,
+        ':sexsg' => $sexsg,
         ':num_empleado' => $num_empleado,
         ':tipo_empleado' => $tipo_empleado,
         ':duracion_contrato' => $duracion_contrato,
@@ -192,19 +190,40 @@ try {
         ':correo_institucional' => $correo_institucional,
         ':num_locker' => $num_locker,
         ':id_biometrico' => $id_biometrico > 0 ? $id_biometrico : null,
-        ':url_contrato' => $url_contrato,
-        ':url_solicitud' => $url_solicitud,
-        ':url_psicometricas' => $url_psicometricas,
-        ':id_candidate_rrhh' => $id_candidate_rrhh
-    ]);
+        ':idsg' => $idsg
+    ];
+
+    if ($id_candidate_rrhh) {
+        $updates[] = 'id_candidate_rrhh = :id_candidate_rrhh';
+        $params[':id_candidate_rrhh'] = $id_candidate_rrhh;
+    }
+    if ($url_contrato) {
+        $updates[] = 'url_contrato = :url_contrato';
+        $params[':url_contrato'] = $url_contrato;
+    }
+    if ($url_solicitud) {
+        $updates[] = 'url_solicitud = :url_solicitud';
+        $params[':url_solicitud'] = $url_solicitud;
+    }
+    if ($url_psicometricas) {
+        $updates[] = 'url_psicometricas = :url_psicometricas';
+        $params[':url_psicometricas'] = $url_psicometricas;
+    }
+
+    $sql = 'UPDATE staff_general_services SET ' . implode(', ', $updates) . ' WHERE idsg = :idsg LIMIT 1';
+    
+    $stmt = $connect->prepare($sql);
+    $ok = $stmt->execute($params);
 
     if ($ok) {
-        $returnPage = medidata_staff_return_page($_POST, 'mostrar.php');
-        echo '<script>Swal.fire("Agregado", "Médico registrado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
+        $returnPage = medidata_staff_return_page($_POST, 'administrativo.php');
+        echo '<script>Swal.fire("Actualizado", "Colaborador actualizado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
     } else {
-        echo '<script>Swal.fire("Error", "No se pudo registrar el colaborador", "error");</script>';
+        echo '<script>Swal.fire("Error", "No se pudo actualizar", "error");</script>';
     }
+    exit;
 } catch (Throwable $e) {
-    error_log('add_doctor: ' . $e->getMessage());
+    error_log('upd_staff_general_services: ' . $e->getMessage());
     echo '<script>Swal.fire("Error", ' . json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE) . ', "error");</script>';
+    exit;
 }

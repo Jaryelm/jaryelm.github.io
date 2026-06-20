@@ -70,12 +70,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
           <div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Personal Médico Activo</h3>
+                        <h3>Ex Personal Médico (Inactivos)</h3>
                        
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
-$sentencia = $connect->prepare("SELECT * FROM doctor WHERE state = '1' ORDER BY idodc DESC;");
+$sentencia = $connect->prepare("SELECT * FROM doctor WHERE state = '0' ORDER BY idodc DESC;");
  $sentencia->execute();
 $data =  array();
 if($sentencia){

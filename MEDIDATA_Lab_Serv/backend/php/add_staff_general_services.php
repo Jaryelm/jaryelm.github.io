@@ -1,5 +1,5 @@
 <?php
-if (!isset($_POST['add_doctor'])) {
+if (!isset($_POST['add_staff_general_services'])) {
     return;
 }
 
@@ -8,12 +8,12 @@ require_once __DIR__ . '/../registros/rrhh_guard.php';
 
 medidata_staff_ensure_tables($connect);
 
-$numide = strtoupper(trim((string) ($_POST['dociden'] ?? '')));
-$nomadm = strtoupper(trim((string) ($_POST['docnam'] ?? '')));
-$apeadm = strtoupper(trim((string) ($_POST['docape'] ?? '')));
-$nacadm = trim((string) ($_POST['docdat'] ?? ''));
-$sexadm = trim((string) ($_POST['docge'] ?? ''));
-$idUser = medidata_staff_parse_id_user($_POST['docid_user'] ?? null);
+$numide = strtoupper(trim((string) ($_POST['sgiden'] ?? '')));
+$nomadm = strtoupper(trim((string) ($_POST['sgnam'] ?? '')));
+$apeadm = strtoupper(trim((string) ($_POST['sgape'] ?? '')));
+$nacadm = trim((string) ($_POST['sgdat'] ?? ''));
+$sexadm = trim((string) ($_POST['sgge'] ?? ''));
+$idUser = medidata_staff_parse_id_user($_POST['sgid_user'] ?? null);
 
 // Nuevos campos
 $num_empleado = trim((string) ($_POST['num_empleado'] ?? ''));
@@ -39,14 +39,14 @@ if ($numide === '' || $nomadm === '') {
 
 try {
     if ($idUser !== null) {
-        $linked = medidata_staff_id_user_linked($connect, $idUser, 'doctor');
+        $linked = medidata_staff_id_user_linked($connect, $idUser, 'staff_general_services');
         if ($linked !== null) {
             echo '<script>Swal.fire("Usuario en uso", "Ese usuario ya está vinculado como colaborador de ' . $linked['label'] . '.", "warning");</script>';
             return;
         }
     }
 
-    $check = $connect->prepare('SELECT COUNT(*) FROM doctor WHERE numide = :numide');
+    $check = $connect->prepare('SELECT COUNT(*) FROM staff_general_services WHERE numide = :numide');
     $check->execute([':numide' => $numide]);
     if ((int) $check->fetchColumn() > 0) {
         echo '<script>Swal.fire("Duplicado", "Ya existe un colaborador con esa identificación.", "warning");</script>';
@@ -55,7 +55,7 @@ try {
 
     // Autogenerar num_empleado si está vacío
     if ($num_empleado === '') {
-        $stmtC = $connect->query("SELECT COUNT(*) FROM doctor");
+        $stmtC = $connect->query("SELECT COUNT(*) FROM staff_general_services");
         $c = $stmtC->fetchColumn() + 1;
         $num_empleado = 'EMP-' . str_pad($c, 3, '0', STR_PAD_LEFT);
     }
@@ -155,8 +155,8 @@ try {
     // Insertar en la BD principal
     // (Asegúrate de haber añadido doc_solicitud y doc_psicometricas si se requieren)
     $stmt = $connect->prepare('
-        INSERT INTO doctor (
-            id_user, numide, nomdoc, apedoc, nacdoc, sexdoc, state,
+        INSERT INTO staff_general_services (
+            id_user, numide, nomsg, apesg, nacsg, sexsg, state,
             num_empleado, tipo_empleado, duracion_contrato, fecha_ingreso,
             id_departamento, id_cargo, id_horario, id_salary_level, salario,
             cuenta_bac, telefono, correo_personal, correo_institucional,
@@ -199,12 +199,12 @@ try {
     ]);
 
     if ($ok) {
-        $returnPage = medidata_staff_return_page($_POST, 'mostrar.php');
-        echo '<script>Swal.fire("Agregado", "Médico registrado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
+        $returnPage = medidata_staff_return_page($_POST, 'servicios_generales.php');
+        echo '<script>Swal.fire("Agregado", "Colaborador de servicios generales registrado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
     } else {
         echo '<script>Swal.fire("Error", "No se pudo registrar el colaborador", "error");</script>';
     }
 } catch (Throwable $e) {
-    error_log('add_doctor: ' . $e->getMessage());
+    error_log('add_staff_general_services: ' . $e->getMessage());
     echo '<script>Swal.fire("Error", ' . json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE) . ', "error");</script>';
 }

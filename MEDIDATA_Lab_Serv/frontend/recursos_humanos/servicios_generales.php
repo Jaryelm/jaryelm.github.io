@@ -35,15 +35,15 @@ medidata_staff_ensure_tables($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex.php')">Ex Servicios Generales</button>
         <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo.php')">Registrar Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Servicios Generales</button>
-
-        <div class="data">
+<div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal de Servicios Generales</h3></div>
+                <div class="head"><h3>Personal de Servicios Generales Activo</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare('SELECT * FROM staff_general_services ORDER BY idsg DESC');
+                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '1' ORDER BY idsg DESC");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>

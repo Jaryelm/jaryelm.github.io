@@ -3,7 +3,7 @@
 $dbLocal = [
     'host' => 'localhost',
     'user' => 'root',
-    'pass' => '',
+    'pass' => 'hpk7pdwM4',
     'name' => 'medic9ue_medi_data',
 ];
 

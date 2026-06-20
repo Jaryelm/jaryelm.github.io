@@ -65,20 +65,19 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
+        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'enfermera_ex.php')">Ex Enfermería</button>
         <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo.php')">Registrar Enfermería</button>
-        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Enfermería</button>
-
-
-          <div class="data">
+<div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Enfermeros(as)</h3>
+                        <h3>Enfermería Activa</h3>
                       
 
                     </div>
                    <div class="table-responsive" style="overflow-x:auto;">
                        <?php 
-$sentencia = $connect->prepare("SELECT * FROM nurse ORDER BY idnur DESC;");
+$sentencia = $connect->prepare("SELECT * FROM nurse WHERE state = '1' ORDER BY idnur DESC;");
  $sentencia->execute();
 $data =  array();
 if($sentencia){
@@ -95,6 +94,7 @@ if($sentencia){
                     <th scope="col">Enfermera(o)</th>
                     <th scope="col">Sexo</th>
                     <th scope="col">Fecha de Nacimiento</th>
+                    <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -105,10 +105,15 @@ if($sentencia){
                         <td data-title="Paciente"><?php echo $d->nomnur ?>&nbsp;<?php echo $d->apenur ?></td>
                         <td data-title="Sexo"><?php echo $d->sexnur ?></td>
                         <td data-title="Grupo"><?php echo $d->nacinur ?></td>
+                        <td data-title="Estado">
+                            <label class="switch">
+                                <input type="checkbox" class="nurse-state-toggle" data-id="<?php echo (int) $d->idnur; ?>" <?php echo (isset($d->state) ? $d->state : '1') == '1' ? 'checked' : ''; ?>/>
+                                <span class="slider"></span>
+                            </label>
                         </td>
                         <td>
                             <a title="Actualizar" href="../recursos/enfermera_editar.php?id=<?php echo $d->idnur ?>" class="fa fa-pencil tooltip"></a>
-        
+                            <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-nurse" data-id="<?php echo (int) $d->idnur; ?>"></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -139,6 +144,18 @@ if($sentencia){
 
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
+    <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+    <script>
+    window.MEDIDATA_STAFF_NURSE = {
+        toggleSelector: '.nurse-state-toggle',
+        deleteSelector: '.btn-delete-nurse',
+        toggleUrl: '../../backend/php/toggle_nurse_state.php',
+        deleteUrl: '../../backend/php/delete_nurse.php',
+        idParam: 'idnur',
+        deleteTitle: '¿Eliminar enfermero(a)?',
+        deleteFn: 'deleteNurse'
+    };
+    </script>
     
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

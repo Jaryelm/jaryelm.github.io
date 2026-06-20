@@ -21,13 +21,13 @@ medidata_staff_ensure_tables($connect);
     <title>MEDIDATA</title>
 </head>
 <body>
-<?php include_once './menu.php'; ?>
+<?php include_once '../admin/menu.php'; ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
         <form action="#"><div class="form-group"></div></form>
         <span class="divider"></span>
-        <?php include_once './perfil.php'; ?>
+        <?php include_once '../admin/perfil.php'; ?>
     </nav>
     <main>
         <?php
@@ -35,15 +35,15 @@ medidata_staff_ensure_tables($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_usr.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex_usr.php')">Ex Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo_usr.php')">Registrar Servicios Generales</button>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex.php')">Ex Servicios Generales</button>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo.php')">Registrar Servicios Generales</button>
 <div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal de Servicios Generales Activo</h3></div>
+                <div class="head"><h3>Ex Personal de Servicios Generales (Inactivos)</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '1' ORDER BY idsg DESC");
+                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '0' ORDER BY idsg DESC");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
@@ -75,7 +75,7 @@ medidata_staff_ensure_tables($connect);
                                     </label>
                                 </td>
                                 <td>
-                                    <a title="Actualizar" href="servicios_generales_editar_usr.php?id=<?php echo (int) $d->idsg; ?>" class="fa fa-pencil tooltip"></a>
+                                    <a title="Actualizar" href="servicios_generales_editar.php?id=<?php echo (int) $d->idsg; ?>" class="fa fa-pencil tooltip"></a>
                                     <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-sg" data-id="<?php echo (int) $d->idsg; ?>"></a>
                                 </td>
                             </tr>

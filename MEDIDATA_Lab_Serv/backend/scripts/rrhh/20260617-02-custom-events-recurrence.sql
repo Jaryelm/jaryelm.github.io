@@ -16,7 +16,7 @@
 USE `medic9ue_medi_rrhh_interviews`;
 
 ALTER TABLE `rrhh_custom_events`
-    ADD COLUMN IF NOT EXISTS `recurrence` VARCHAR(20) NOT NULL DEFAULT 'none' AFTER `is_public`;
+    ADD COLUMN `recurrence` VARCHAR(20) NOT NULL DEFAULT 'none' AFTER `is_public`;
 
 ALTER TABLE `rrhh_custom_events`
-    ADD COLUMN IF NOT EXISTS `recurrence_until` DATE NULL DEFAULT NULL AFTER `recurrence`;
+    ADD COLUMN `recurrence_until` DATE NULL DEFAULT NULL AFTER `recurrence`;

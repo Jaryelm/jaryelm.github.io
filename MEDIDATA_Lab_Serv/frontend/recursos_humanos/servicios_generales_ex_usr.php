@@ -40,10 +40,10 @@ medidata_staff_ensure_tables($connect);
         <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo_usr.php')">Registrar Servicios Generales</button>
 <div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal de Servicios Generales Activo</h3></div>
+                <div class="head"><h3>Ex Personal de Servicios Generales (Inactivos)</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '1' ORDER BY idsg DESC");
+                    $sentencia = $connect->prepare("SELECT * FROM staff_general_services WHERE state = '0' ORDER BY idsg DESC");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
