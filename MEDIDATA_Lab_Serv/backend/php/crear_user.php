@@ -41,6 +41,11 @@ if (!function_exists('medidata_ensure_users_cedula_sexo')) {
             if (!$sex) {
                 $connect->exec("ALTER TABLE users ADD COLUMN sexo VARCHAR(20) NULL DEFAULT NULL");
             }
+            $uid = $connect->query("SHOW COLUMNS FROM users LIKE 'uid_biometrico'")->fetch(PDO::FETCH_ASSOC);
+            if (!$uid) {
+                $connect->exec("ALTER TABLE users ADD COLUMN uid_biometrico VARCHAR(50) NULL DEFAULT NULL");
+                $connect->exec("ALTER TABLE users ADD UNIQUE KEY uq_users_uid_biometrico (uid_biometrico)");
+            }
         } catch (Throwable $e) {
             error_log('medidata_ensure_users_cedula_sexo: ' . $e->getMessage());
         }

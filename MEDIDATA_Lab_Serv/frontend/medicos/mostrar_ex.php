@@ -151,6 +151,7 @@ if($sentencia){
 
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
     
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

@@ -19,28 +19,8 @@ if (isset($_GET['eliminar']) && is_numeric($_GET['eliminar'])) {
         } else {
             $_SESSION['errorMsg'] = $result['message'];
         }
-    try {
-        if ($idUsuario === (int) ($_SESSION['id'] ?? 0)) {
-            $_SESSION['errorMsg'] = 'No puedes eliminar tu propia cuenta.';
-        } else {
-            $stmtCheck = $connect->prepare('SELECT username FROM users WHERE id = ?');
-            $stmtCheck->execute([$idUsuario]);
-            $usuario = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-
-            if ($usuario) {
-                $stmtDelete = $connect->prepare('DELETE FROM users WHERE id = ?');
-                if ($stmtDelete->execute([$idUsuario])) {
-                    $_SESSION['successMsg'] = "Usuario '{$usuario['username']}' eliminado correctamente.";
-                } else {
-                    $_SESSION['errorMsg'] = 'Error al eliminar el usuario.';
-                }
-            } else {
-                $_SESSION['errorMsg'] = 'Usuario no encontrado.';
-            }
-        }
-    } catch (Exception $e) {
-        $_SESSION['errorMsg'] = 'Error: ' . $e->getMessage();
     }
+
     session_write_close();
     header('Location: mostrar.php', true, 303);
     exit;

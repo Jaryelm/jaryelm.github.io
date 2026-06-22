@@ -106,6 +106,7 @@ medidata_staff_ensure_tables($connect);
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

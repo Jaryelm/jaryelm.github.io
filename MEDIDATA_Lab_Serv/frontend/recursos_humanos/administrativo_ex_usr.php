@@ -44,7 +44,13 @@ medidata_staff_ensure_tables($connect);
                 <div class="head"><h3>Ex Personal Administrativo (Inactivos)</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare("SELECT * FROM staff_administrative WHERE state = '0' ORDER BY idadm DESC");
+                    $sentencia = $connect->prepare("
+                        SELECT sa.*, p.name AS position_name 
+                        FROM staff_administrative sa 
+                        LEFT JOIN positions p ON sa.id_cargo = p.id 
+                        WHERE sa.state = '0' 
+                        ORDER BY sa.idadm DESC
+                    ");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
@@ -66,7 +72,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
                                 <td><?php echo htmlspecialchars($d->nomadm . ' ' . $d->apeadm); ?></td>
-                                <td><?php echo htmlspecialchars($d->cargo ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($d->position_name ?? $d->cargo ?? '—'); ?></td>
                                 <td><?php echo htmlspecialchars($d->sexadm); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacadm); ?></td>
                                 <td>
@@ -86,7 +92,7 @@ medidata_staff_ensure_tables($connect);
                     <?php else: ?>
                     <div class="alert">
                         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                        <strong>Sin datos</strong> No hay colaboradores administrativos registrados.
+                        <strong>Sin datos</strong> No hay ex colaboradores administrativos registrados.
                     </div>
                     <?php endif; ?>
                 </div>
@@ -100,6 +106,7 @@ medidata_staff_ensure_tables($connect);
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

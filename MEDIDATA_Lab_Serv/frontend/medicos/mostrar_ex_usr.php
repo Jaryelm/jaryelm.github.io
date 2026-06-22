@@ -25,7 +25,7 @@ include_once '../../backend/registros/session_check.php';
 <body>
     
 <?php
-include_once '../recursos_humanos/menu.php';
+include_once '../admin/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -42,7 +42,7 @@ include_once '../recursos_humanos/menu.php';
            
             <span class="divider"></span>
             <?php
-include_once '../recursos_humanos/perfil.php';
+include_once '../admin/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>
@@ -65,7 +65,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<?php $medicos_nav_rrhh = true; include __DIR__ . '/_botones_medicos.php'; ?>
+<?php $medicos_nav_rrhh = false; include __DIR__ . '/_botones_medicos.php'; ?>
 
           <div class="data">
                 <div class="content-data">
@@ -151,6 +151,7 @@ if($sentencia){
 
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
     
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>
