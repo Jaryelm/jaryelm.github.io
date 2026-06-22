@@ -127,3 +127,54 @@ function uploadContract(inputElement, id, table, idcol) {
         }
     });
 }
+
+function deleteContract(id, table, idcol) {
+    Swal.fire({
+        title: '¿Eliminar contrato?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Eliminando...',
+                allowOutsideClick: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '../../backend/php/upload_inline_contract.php',
+                type: 'POST',
+                data: {
+                    action: 'delete',
+                    id: id,
+                    table: table,
+                    idcol: idcol
+                },
+                success: function(response) {
+                    try {
+                        var res = JSON.parse(response);
+                        if (res.status == 'success') {
+                            Swal.fire('Eliminado', 'Contrato eliminado correctamente', 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    } catch(e) {
+                        Swal.fire('Error', 'Respuesta no válida del servidor', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Fallo al conectar con el servidor', 'error');
+                }
+            });
+        }
+    });
+}

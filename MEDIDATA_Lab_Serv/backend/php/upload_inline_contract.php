@@ -20,6 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $action = $_POST['action'] ?? 'upload';
+
+    if ($action === 'delete') {
+        if ($id <= 0) {
+            echo json_encode(['status' => 'error', 'message' => 'ID incorrecto']);
+            exit;
+        }
+        try {
+            $sql = "UPDATE {$table} SET url_contrato = NULL WHERE {$id_col} = :id";
+            $stmt = $connect->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            echo json_encode(['status' => 'success', 'message' => 'Contrato eliminado']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => 'Error al eliminar']);
+        }
+        exit;
+    }
+
     if ($id <= 0 || !isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
         echo json_encode(['status' => 'error', 'message' => 'Archivo inválido o ID incorrecto']);
         exit;

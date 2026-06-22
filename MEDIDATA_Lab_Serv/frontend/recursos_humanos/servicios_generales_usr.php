@@ -141,6 +141,7 @@ if ($pdoRrhh) {
                                 <td>
                                     <?php if (!empty($d->url_contrato)): ?>
                                         <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->idsg; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
+                                            <a href="#" onclick="deleteContract(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none; margin-left:4px;" title="Eliminar contrato"><i class="bx bx-trash"></i></a>
                                     <?php else: ?>
                                         <span class="badge-warning" style="padding:4px;">N/D</span>
                                     <?php endif; ?>
