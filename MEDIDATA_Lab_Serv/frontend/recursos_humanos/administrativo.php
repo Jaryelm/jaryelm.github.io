@@ -5,12 +5,17 @@ require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
 
 $depto_map = [];
+$salary_level_map = [];
 $pdoRrhh = medidata_rrhh_pdo();
 if ($pdoRrhh) {
     try {
         $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
         while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
             $depto_map[$row['id']] = $row['name'];
+        }
+        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
+        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
+            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
         }
     } catch (Exception $e) {}
 }
@@ -77,6 +82,7 @@ if ($pdoRrhh) {
                                 <th>NOMBRES</th>
                                 <th>SEXO</th>
                                 <th>AREA</th>
+                                <th>NIVEL SALARIAL</th>
                                 <th>SALARIO</th>
                                 <th>N°CUENTA</th>
                                 <th>FECHA DE INGRESO</th>
@@ -115,6 +121,14 @@ if ($pdoRrhh) {
                                         <option value="">—</option>
                                         <?php foreach ($depto_map as $id_dept => $name_dept): ?>
                                             <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_salary_level" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
+                                        <option value="">—</option>
+                                        <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
+                                            <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -169,137 +183,7 @@ if ($pdoRrhh) {
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
-<script>
-$(document).ready(function() {
-    $('.editable-cell').on('blur', function() {
-        var $cell = $(this);
-        var id = $cell.data('id');
-        var field = $cell.data('field');
-        var table = $cell.data('table');
-        var idcol = $cell.data('idcol');
-        var value = $cell.text().trim();
-        
-        if (value === '—' || value === '-') {
-            value = '';
-        }
-        
-        $.ajax({
-            url: '../../backend/php/update_inline_staff.php',
-            method: 'POST',
-            data: {
-                id: id,
-                field: field,
-                value: value,
-                table: table,
-                id_col: idcol
-            },
-            success: function(response) {
-                try {
-                    var res = JSON.parse(response);
-                    if(res.status == 'success') {
-                        $cell.css('background-color', '#d4edda');
-                        setTimeout(function() { $cell.css('background-color', '#f9f9f9'); }, 1000);
-                    } else {
-                        Swal.fire('Error', res.message, 'error');
-                    }
-                } catch(e) {
-                    console.error("Error parseando JSON:", response);
-                }
-            },
-            error: function() {
-                Swal.fire('Error', 'No se pudo conectar al servidor', 'error');
-            }
-        });
-    });
-    
-    
-    $('.inline-select').on('change', function() {
-        var $select = $(this);
-        var id = $select.data('id');
-        var field = $select.data('field');
-        var table = $select.data('table');
-        var idcol = $select.data('idcol');
-        var value = $select.val();
-        
-        $.ajax({
-            url: '../../backend/php/update_inline_staff.php',
-            method: 'POST',
-            data: {
-                id: id,
-                field: field,
-                value: value,
-                table: table,
-                id_col: idcol
-            },
-            success: function(response) {
-                try {
-                    var res = JSON.parse(response);
-                    if(res.status == 'success') {
-                        $select.css('background-color', '#d4edda');
-                        setTimeout(function() { $select.css('background-color', '#f9f9f9'); }, 1000);
-                    } else {
-                        Swal.fire('Error', res.message, 'error');
-                    }
-                } catch(e) {}
-            },
-            error: function() {
-                Swal.fire('Error', 'No se pudo conectar al servidor', 'error');
-            }
-        });
-    });
-
-    $('.editable-cell').on('keypress', function(e) {
-        if(e.which == 13) {
-            e.preventDefault();
-            $(this).blur();
-        }
-    });
-});
-
-function uploadContract(inputElement, id, table, idcol) {
-    if (!inputElement.files || inputElement.files.length === 0) return;
-    var file = inputElement.files[0];
-    var formData = new FormData();
-    formData.append('file', file);
-    formData.append('id', id);
-    formData.append('table', table);
-    formData.append('idcol', idcol);
-    
-    // Mostramos un alert de carga
-    Swal.fire({
-        title: 'Subiendo contrato...',
-        allowOutsideClick: false,
-        onBeforeOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    $.ajax({
-        url: '../../backend/php/upload_inline_contract.php',
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            try {
-                var res = JSON.parse(response);
-                if (res.status == 'success') {
-                    Swal.fire('Éxito', 'Contrato subido correctamente', 'success').then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire('Error', res.message, 'error');
-                }
-            } catch(e) {
-                Swal.fire('Error', 'Respuesta no válida del servidor', 'error');
-            }
-        },
-        error: function() {
-            Swal.fire('Error', 'Fallo al conectar con el servidor', 'error');
-        }
-    });
-}
-</script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

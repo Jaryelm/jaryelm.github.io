@@ -4,12 +4,17 @@ require_once '../../backend/registros/rrhh_guard.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
 $depto_map = [];
+$salary_level_map = [];
 $pdoRrhh = medidata_rrhh_pdo();
 if ($pdoRrhh) {
     try {
         $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
         while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
             $depto_map[$row['id']] = $row['name'];
+        }
+        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
+        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
+            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
         }
     } catch (Exception $e) {}
 }
@@ -75,6 +80,7 @@ if ($pdoRrhh) {
                                 <th>NOMBRES</th>
                                 <th>SEXO</th>
                                 <th>AREA</th>
+                                <th>NIVEL SALARIAL</th>
                                 <th>SALARIO</th>
                                 <th>N°CUENTA</th>
                                 <th>FECHA DE INGRESO</th>
@@ -113,6 +119,14 @@ if ($pdoRrhh) {
                                         <option value="">—</option>
                                         <?php foreach ($depto_map as $id_dept => $name_dept): ?>
                                             <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idsg; ?>" data-field="id_salary_level" data-table="staff_general_services" data-idcol="idsg" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
+                                        <option value="">—</option>
+                                        <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
+                                            <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -167,6 +181,7 @@ if ($pdoRrhh) {
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

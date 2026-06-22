@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id_biometrico', 'num_locker', 
         'num_empleado', 'numide', 'nomadm', 'apeadm', 
         'salario', 'cuenta_bac', 'telefono', 'fecha_ingreso',
-        'tipo_empleado', 'sexadm', 'id_departamento',
+        'tipo_empleado', 'sexadm', 'id_departamento', 'id_salary_level',
         // Nurse fields
         'nomnur', 'apenur', 'sexnur',
         // Doctor fields
