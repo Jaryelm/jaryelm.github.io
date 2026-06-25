@@ -22,14 +22,14 @@ include_once '../../backend/registros/session_check.php';
 </head>
 <body>
     
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once './menu.php'; ?>
 
     <section id="content">
         <nav>
             <i class='bx bx-menu toggle-sidebar' ></i>
             <form action="#"><div class="form-group"></div></form>
             <span class="divider"></span>
-            <?php include_once '../admin/perfil.php'; ?>
+            <?php include_once './perfil.php'; ?>
         </nav>
 
         <main>
@@ -40,14 +40,14 @@ include_once '../../backend/registros/session_check.php';
 
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
-        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo.php')">Listar Vacantes de Trabajo</button>
-        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_inactivas.php')">Lista Vacantes de Trabajo (Inactivas)</button>
-        <button class="button" onclick="cambiarColor(this, 'registrar_vacantes_trabajo.php')">Registrar Vacante de Trabajo</button>
+        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_usr.php')">Listar Vacantes de Trabajo</button>
+        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_inactivas_usr.php')">Lista Vacantes de Trabajo (Inactivas)</button>
+        <button class="button" onclick="cambiarColor(this, 'registrar_vacantes_trabajo_usr.php')">Registrar Vacante de Trabajo</button>
 
         <div class="data">
             <div class="content-data">
                 <div class="head" style="margin-bottom: 20px;">
-                    <h3>Gestión de Vacantes de Trabajo</h3>
+                    <h3>Gestión de Vacantes de Trabajo (Inactivas)</h3>
                 </div>
 
                 <!-- Integrated Search Bar -->
@@ -132,7 +132,8 @@ include_once '../../backend/registros/session_check.php';
     <script src="../../backend/registros/script/botones_color.js"></script>
     <script src="../../backend/js/cat_schedules.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <script src="../../backend/registros/script/tabla_vacantes_trabajo.js?v=20260608a"></script>
+    <script>window.isVacantesInactivas = true;</script>
+    <script src="../../backend/registros/script/tabla_vacantes_trabajo.js?v=20260608b"></script>
 
     <script type="text/javascript">
     function toggleSection(id) {

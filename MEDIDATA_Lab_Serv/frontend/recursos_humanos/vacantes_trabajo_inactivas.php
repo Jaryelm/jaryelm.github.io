@@ -47,7 +47,7 @@ include_once '../../backend/registros/session_check.php';
         <div class="data">
             <div class="content-data">
                 <div class="head" style="margin-bottom: 20px;">
-                    <h3>Gestión de Vacantes de Trabajo</h3>
+                    <h3>Gestión de Vacantes de Trabajo (Inactivas)</h3>
                 </div>
 
                 <!-- Integrated Search Bar -->
@@ -132,7 +132,8 @@ include_once '../../backend/registros/session_check.php';
     <script src="../../backend/registros/script/botones_color.js"></script>
     <script src="../../backend/js/cat_schedules.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <script src="../../backend/registros/script/tabla_vacantes_trabajo.js?v=20260608a"></script>
+    <script>window.isVacantesInactivas = true;</script>
+    <script src="../../backend/registros/script/tabla_vacantes_trabajo.js?v=20260608b"></script>
 
     <script type="text/javascript">
     function toggleSection(id) {

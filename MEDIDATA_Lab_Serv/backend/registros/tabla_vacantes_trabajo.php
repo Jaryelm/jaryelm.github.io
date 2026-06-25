@@ -15,19 +15,37 @@ global $connect;
 
 try {
     $search = isset($_GET['search']) ? trim((string) $_GET['search']) : '';
+    $inactivas = isset($_GET['inactivas']) && $_GET['inactivas'] == '1' ? 1 : 0;
 
-    $sql = "SELECT vp.id, vp.priority, vp.available_slots, vp.reason,
-                   vp.init_date, vp.end_date, vp.deleted, vp.status,
-                   pd.id_positions,
-                   COALESCE(NULLIF(TRIM(d.name), ''), NULLIF(TRIM(pd.department), ''), '—') AS department_name,
-                   pd.immediate_boss,
-                   (SELECT COUNT(*) FROM candidates c
-                    WHERE c.id_vacant_position = vp.id AND c.deleted = 0) AS total_applicants
-            FROM vacant_positions vp
-            LEFT JOIN positions_details pd ON vp.id_position = pd.id
-            LEFT JOIN departaments d ON pd.id_departament = d.id
-            WHERE vp.deleted IN (0, 1)
-            ORDER BY FIELD(vp.priority, 'Urgente', 'Alta', 'Media', 'Baja'), vp.init_date DESC";
+    $sql = "SELECT 
+	vp.id, 
+	vp.priority, 
+    vp.available_slots, 
+    vp.reason,
+    vp.init_date,
+    vp.end_date,
+    vp.deleted, 
+    vp.status,
+    pd.id_positions,
+    COALESCE(NULLIF(TRIM(d.name), ''), '—') AS department_name,
+    pd.immediate_boss,
+    (
+		SELECT 
+			COUNT(*) 
+		FROM candidates c 
+        WHERE c.id_vacant_position = vp.id 
+			AND 
+            c.deleted = 0
+	) AS total_applicants
+FROM vacant_positions vp
+    LEFT JOIN 
+		positions_details pd 
+			ON vp.id_position = pd.id
+	LEFT JOIN 
+		departaments d 
+			ON pd.id_departament = d.id
+WHERE vp.deleted = $inactivas
+ORDER BY FIELD(vp.priority, 'Urgente', 'Alta', 'Media', 'Baja'), vp.init_date DESC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -76,5 +94,5 @@ try {
     echo json_encode($result);
 } catch (Throwable $e) {
     error_log('tabla_vacantes_trabajo: ' . $e->getMessage());
-    echo json_encode(['error' => 'Error al cargar vacantes de trabajo']);
+    echo json_encode(['error' => 'Error al cargar vacantes de trabajo', 'explicit' => $e->getMessage()]);
 }

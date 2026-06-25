@@ -14,7 +14,7 @@ $id_position = (int) ($_POST['id_position'] ?? 0);
 $available_slots = (int) ($_POST['available_slots'] ?? 1);
 $reason = trim((string) ($_POST['reason'] ?? ''));
 $priority = trim((string) ($_POST['priority'] ?? 'Media'));
-$id_schedule = (int) ($_POST['id_schedule'] ?? 0);
+$id_schedule = !empty($_POST['id_schedule']) ? (int)$_POST['id_schedule'] : null;
 $rrhh_responsible = trim((string) ($_POST['rrhh_responsible'] ?? '')) ?: null;
 $internal_observations = trim((string) ($_POST['internal_observations'] ?? '')) ?: null;
 $benefits = trim((string) ($_POST['benefits'] ?? ''));
@@ -23,7 +23,7 @@ $end_date = trim((string) ($_POST['end_date'] ?? ''));
 $created_by = trim((string) ($_POST['created_by'] ?? ($name ?? 'sistema')));
 
 if ($id_position <= 0 || $reason === ''
-    || $benefits === '' || $init_date === '' || $end_date === '' || $id_schedule <= 0) {
+    || $benefits === '' || $init_date === '' || $end_date === '') {
     echo json_encode(['success' => false, 'message' => 'Complete todos los campos obligatorios.']);
     exit;
 }
