@@ -41,6 +41,7 @@ include_once '../../backend/registros/session_check.php';
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
         <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo.php')">Listar Vacantes de Trabajo</button>
+        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_inactivas.php')">Lista Vacantes de Trabajo (Inactivas)</button>
         <button class="button" onclick="cambiarColor(this, 'registrar_vacantes_trabajo.php')">Registrar Vacante de Trabajo</button>
 
         <div class="data">

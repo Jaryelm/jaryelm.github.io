@@ -1,6 +1,17 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+require_once '../../backend/php/staff_colaborador_bootstrap.php';
+medidata_staff_ensure_tables($connect);
+$staffUsers = medidata_staff_fetch_users_for_select($connect);
+
 // incuir el archivo de sesion login
+// Consultar lista de cargos (positions) de la base de datos principal
+$cargos = [];
+try {
+    $stmt_p = $connect->prepare("SELECT id, name FROM positions ORDER BY name ASC");
+    $stmt_p->execute();
+    $cargos = $stmt_p->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -67,61 +78,154 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
            <!-- multistep form -->
 
 
-<form action="" enctype="multipart/form-data" method="POST" autocomplete="off" onsubmit="return validacion()">
-    <div class="containerss">
-        <h1>Nuevo médico</h1>
-        <div class="alert-danger">
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            <strong>Importante!</strong> Es importante rellenar los campos con &nbsp;<span class="badge-warning">*</span>
-        </div>
-        <hr>
+<form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <input type="hidden" name="return_page" value="mostrar_usr.php">
+            <div class="containerss">
+                <h1>Nuevo médico</h1>
+                <div class="alert-danger">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    <strong>Importante:</strong> Complete los campos marcados con <span class="badge-warning">*</span>
+                </div>
+                <hr>
+                <label><b>N° de Empleado (Institucional)</b></label>
+                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automático)">
 
-        <label for="especialidad"><b>Especialidad del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" id="especialidad" name="espm" required placeholder="Ingrese la especialidad">
+                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
+                <input type="text" name="dociden" maxlength="14" placeholder="ejm: 0801199012345" required>
+                
+                <label><b>Nombres</b></label><span class="badge-warning">*</span>
+                <input type="text" name="docnam" placeholder="ejm: Juan Raúl" required>
+                
+                <label><b>Apellidos</b></label><span class="badge-warning">*</span>
+                <input type="text" name="docape" placeholder="ejm: Ramírez Requena" required>
+                
+                <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
+                <input type="date" name="docdat" required>
+                
+                <label><b>Género</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="docge" required>
+                    <option value="">Seleccione</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </select>
 
-        <label for="dni"><b>DNI del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" placeholder="ejm: 13 Dígitos" name="cem" maxlength="13" required>
+                <hr>
+                <h3>Información Laboral</h3>
+                
+                <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
+                    <option value="Permanente">Permanente</option>
+                    <option value="Temporal">Temporal</option>
+                    <option value="Tiempo parcial">Tiempo parcial</option>
+                </select>
 
-        <label for="nombre"><b>Nombre del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" placeholder="ejm: Juan Raul" name="named" required>
+                <div id="duracion_contrato_div" style="display:none; margin-top:10px;">
+                    <label><b>Duración de Contrato</b></label>
+                    <input type="text" name="duracion_contrato" placeholder="Ej: 6 meses">
+                </div>
 
-        <label for="apellido"><b>Apellido del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" placeholder="ejm: Ramirez Requena" name="apeme" required>
+                <label><b>Fecha de Ingreso</b></label><span class="badge-warning">*</span>
+                <input type="date" name="fecha_ingreso" required>
 
-        <label for="direccion"><b>Dirección del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" placeholder="ejm: Comayagüela, Tegucigalpa Honduras" name="dime" required>
+                <label><b>Departamento</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_departamento" id="id_departament" required>
+                    <option value="" disabled selected>Seleccione...</option>
+                </select>
 
-        <label for="correo"><b>Correo electrónico del médico</b></label><span class="badge-warning">*</span>
-        <input type="email" placeholder="ejm: moises.castillo@medicasa.hn" name="corr" required>
+                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_cargo" required>
+                    <option value="" disabled selected>Seleccione...</option>
+                    <?php foreach ($cargos as $cargo): ?>
+                        <option value="<?php echo $cargo['id']; ?>"><?php echo htmlspecialchars($cargo['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-        <label for="genero"><b>Género del médico</b></label><span class="badge-warning">*</span>
-        <select required name="geme" id="gep">
-            <option>Seleccione</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-        </select>
+                <label><b>Horario</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_horario" id="id_schedule" required>
+                    <option value="" disabled selected>Seleccione...</option>
+                </select>
 
-        <label for="telefono"><b>Teléfono del médico</b></label><span class="badge-warning">*</span>
-        <input type="text" maxlength="13" placeholder="ejm: +51 999 888 111" name="telme" required>
+                <label><b>Nivel Salarial</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="id_salary_level" id="id_salary_level" required>
+                    <option value="" disabled selected>Seleccione...</option>
+                </select>
 
-        <label for="nacimiento"><b>Fecha de nacimiento del médico</b></label><span class="badge-warning">*</span>
-        <input type="date" name="cumme" required>
+                <label><b>Salario Base</b></label>
+                <input type="number" step="0.01" name="salario" placeholder="Ej: 15000.00">
 
-        <!-- Comisiona -->
-        <label><b>Comisiona</b></label><span class="badge-warning">*</span>
-        <div style="margin-bottom: 15px;">
-            <label style="margin-right: 15px;">
-                <input type="radio" name="comisiona" value="SI" required> Sí
-            </label>
-            <label>
-                <input type="radio" name="comisiona" value="NO" required> No
-            </label>
-        </div>
+                <label><b>N° Cuenta de BAC</b></label>
+                <input type="text" name="cuenta_bac" placeholder="Número de cuenta de banco BAC">
 
-        <hr>
-        <button type="submit" name="add_doctor" class="registerbtn">Guardar</button>
-    </div>
-</form>
+                <hr>
+                <h3>Información de Contacto y Accesos</h3>
+
+                <label><b>Teléfono Celular</b></label>
+                <input type="text" name="telefono" placeholder="Ej: 99887766">
+
+                <label><b>Correo Personal</b></label>
+                <input type="email" name="correo_personal" placeholder="Correo electrónico personal">
+
+                <label><b>Correo Institucional</b></label>
+                <input type="email" name="correo_institucional" placeholder="Correo electrónico de Medicasa">
+
+                <label><b>N° de Locker Asignado</b></label>
+                <input type="text" name="num_locker" placeholder="Ej: L-10">
+
+                <label><b>ID Empleado (Reloj Biométrico)</b></label>
+                <input type="number" name="id_biometrico" placeholder="Ej: 123">
+
+                <label><b>Usuario del Sistema (Opcional)</b></label>
+                <?php
+                $staffUserFieldName = 'docid_user';
+                $staffSelectedUserId = 0;
+                include '../recursos_humanos/_staff_user_select.php';
+                ?>
+                
+                <hr>
+                <h3>Documentos (Opcionales)</h3>
+                
+                <label>Solicitud de empleo</label>
+                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                
+                <label>Pruebas Psicométricas</label>
+                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                
+                <label>Copia de partida de nacimiento de hijos</label>
+                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label>Foto (Para su Carnet)</label>
+                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
+                
+                <label>Documento de identidad (revés y derecho)</label>
+                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label>Copia de recibo (agua, luz, teléfono)</label>
+                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label>Antecedentes Penales</label>
+                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label>Antecedentes Policiales</label>
+                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label>2 Referencias personales</label>
+                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                
+                <label>2 Referencias profesionales</label>
+                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                
+                <label>Diplomas o títulos recibidos</label>
+                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
+                
+                <label>Croquis de vivienda</label>
+                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" style="padding:10px;">
+                
+                <label><b>Contrato Firmado</b></label>
+                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="padding:10px; border:1px solid #2980b9;">
+                <hr>
+                <button type="submit" name="add_doctor" class="registerbtn">Guardar</button>
+            </div>
+        </form>
 
         </main>
         <!-- MAIN -->
@@ -139,6 +243,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         });
     </script>
    
+<script src="../../backend/js/cat_departaments.js"></script>
+<script src="../../backend/js/cat_salary_levels.js"></script>
+<script src="../../backend/js/cat_schedules.js"></script>
 </body>
 </html>
 

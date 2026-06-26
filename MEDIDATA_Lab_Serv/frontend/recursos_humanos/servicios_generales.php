@@ -1,7 +1,23 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+require_once '../../backend/registros/rrhh_guard.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
+$depto_map = [];
+$salary_level_map = [];
+$pdoRrhh = medidata_rrhh_pdo();
+if ($pdoRrhh) {
+    try {
+        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
+        while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
+            $depto_map[$row['id']] = $row['name'];
+        }
+        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
+        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
+            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
+        }
+    } catch (Exception $e) {}
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -35,15 +51,21 @@ medidata_staff_ensure_tables($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex.php')">Ex Servicios Generales</button>
         <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo.php')">Registrar Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Servicios Generales</button>
-
-        <div class="data">
+<div class="data">
             <div class="content-data">
-                <div class="head"><h3>Personal de Servicios Generales</h3></div>
+                <div class="head"><h3>Personal de Servicios Generales Activo</h3></div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
-                    $sentencia = $connect->prepare('SELECT * FROM staff_general_services ORDER BY idsg DESC');
+                    $sentencia = $connect->prepare("
+                        SELECT sa.*, p.name AS position_name 
+                        FROM staff_general_services sa 
+                        LEFT JOIN positions p ON sa.id_cargo = p.id 
+                        WHERE sa.state = '1' 
+                        ORDER BY sa.idsg DESC
+                    ");
                     $sentencia->execute();
                     $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                     ?>
@@ -51,32 +73,93 @@ medidata_staff_ensure_tables($connect);
                     <table id="example" class="responsive-table">
                         <thead>
                             <tr>
+                                <th>TIPO DE EMPLEADO</th>
+                                <th>N°</th>
                                 <th>DNI</th>
-                                <th>Colaborador</th>
-                                <th>Área</th>
-                                <th>Sexo</th>
-                                <th>Fecha Nacimiento</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
+                                <th>APELLIDOS</th>
+                                <th>NOMBRES</th>
+                                <th>SEXO</th>
+                                <th>AREA</th>
+                                <th>NIVEL SALARIAL</th>
+                                <th>SALARIO</th>
+                                <th>N°CUENTA</th>
+                                <th>FECHA DE INGRESO</th>
+                                <th>CONTACTO</th>
+                                <th>CORREO PERSONAL / INSTITUCIONAL</th>
+                                <th>FECHA DE NACIMIENTO</th>
+                                <th>MARCAJE</th>
+                                <th>LOKER</th>
+                                <th>CONTRATO</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($data as $d): ?>
                             <tr>
-                                <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
-                                <td><?php echo htmlspecialchars($d->nomsg . ' ' . $d->apesg); ?></td>
-                                <td><?php echo htmlspecialchars($d->area ?? '—'); ?></td>
-                                <td><?php echo htmlspecialchars($d->sexsg); ?></td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idsg; ?>" data-field="tipo_empleado" data-table="staff_general_services" data-idcol="idsg" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;">
+                                        <option value="Permanente" <?php echo (($d->tipo_empleado ?? '') == 'Permanente') ? 'selected' : ''; ?>>Permanente</option>
+                                        <option value="Temporal" <?php echo (($d->tipo_empleado ?? '') == 'Temporal') ? 'selected' : ''; ?>>Temporal</option>
+                                        <option value="Tiempo parcial" <?php echo (($d->tipo_empleado ?? '') == 'Tiempo parcial') ? 'selected' : ''; ?>>Tiempo parcial</option>
+                                    </select>
+                                </td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="num_empleado" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
+                                <th scope="row" class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="numide" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->numide); ?></th>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="apesg" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->apesg); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="nomsg" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->nomsg); ?></td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idsg; ?>" data-field="sexsg" data-table="staff_general_services" data-idcol="idsg" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;">
+                                        <option value="Masculino" <?php echo ($d->sexsg == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
+                                        <option value="Femenino" <?php echo ($d->sexsg == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idsg; ?>" data-field="id_departamento" data-table="staff_general_services" data-idcol="idsg" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
+                                        <option value="">—</option>
+                                        <?php foreach ($depto_map as $id_dept => $name_dept): ?>
+                                            <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="inline-select" data-id="<?php echo (int) $d->idsg; ?>" data-field="id_salary_level" data-table="staff_general_services" data-idcol="idsg" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
+                                        <option value="">—</option>
+                                        <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
+                                            <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="salario" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="cuenta_bac" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="fecha_ingreso" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="telefono" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars(($d->correo_personal ?? '—') . ' / ' . ($d->correo_institucional ?? '—')); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacsg); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="id_biometrico" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idsg; ?>" data-field="num_locker" data-table="staff_general_services" data-idcol="idsg" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
+                                <td>
+                                    <?php if (!empty($d->url_contrato)): ?>
+                                        <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->idsg; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
+                                            <a href="#" onclick="deleteContract(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none; margin-left:4px;" title="Eliminar contrato"><i class="bx bx-trash"></i></a>
+                                    <?php else: ?>
+                                        <span class="badge-warning" style="padding:4px;">N/D</span>
+                                    <?php endif; ?>
+                                    <br>
+                                    <label class="badge-primary" style="padding:4px; cursor:pointer; display:inline-block; margin-top:4px;" onclick="document.getElementById('upload_contrato_<?php echo $d->idsg; ?>').click();">
+                                        <i class="bx bx-upload"></i> Subir
+                                    </label>
+                                    <input type="file" id="upload_contrato_<?php echo $d->idsg; ?>" style="display:none;" accept=".pdf,.jpg,.png" onchange="uploadContract(this, <?php echo $d->idsg; ?>, 'staff_general_services', 'idsg')">
+                                </td>
                                 <td>
                                     <label class="switch">
-                                        <input type="checkbox" class="staff-sg-state-toggle" data-id="<?php echo (int) $d->idsg; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
+                                        <input type="checkbox" class="staff-state-toggle" data-id="<?php echo (int) $d->idsg; ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
                                         <span class="slider"></span>
                                     </label>
                                 </td>
                                 <td>
                                     <a title="Actualizar" href="servicios_generales_editar.php?id=<?php echo (int) $d->idsg; ?>" class="fa fa-pencil tooltip"></a>
-                                    <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-sg" data-id="<?php echo (int) $d->idsg; ?>"></a>
+                                    <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-staff" data-id="<?php echo (int) $d->idsg; ?>"></a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -99,6 +182,7 @@ medidata_staff_ensure_tables($connect);
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/registros/script/tabla_personal_staff.js"></script>
+<script src="../../backend/registros/script/inline_editing.js"></script>
 <script src="../../backend/js/datatable.js"></script>
 <script src="../../backend/js/datatablebuttons.js"></script>
 <script src="../../backend/js/jszip.js"></script>

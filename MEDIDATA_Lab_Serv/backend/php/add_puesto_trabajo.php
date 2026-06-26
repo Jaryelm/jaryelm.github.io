@@ -1,4 +1,4 @@
-<?php
+    <?php
 include_once '../registros/session_check.php';
 require_once __DIR__ . '/../registros/rrhh_guard.php';
 header('Content-Type: application/json; charset=utf-8');

@@ -241,8 +241,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<p>No se encontraron vacantes con los criterios de búsqueda.</p>';
         }
 
+        const isInactivas = window.isVacantesInactivas ? '1' : '0';
         const url = '../../backend/registros/tabla_vacantes_trabajo.php' +
-            (searchTerm ? '?search=' + encodeURIComponent(searchTerm) : '');
+            '?inactivas=' + isInactivas +
+            (searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '');
 
         fetch(url, { credentials: 'same-origin' })
             .then(function (response) {

@@ -64,6 +64,7 @@ if ($is_edit && $pdoRrhh) {
         <?php endif; ?>
 
         <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_usr.php')">Listar Vacantes de Trabajo</button>
+        <button class="button" onclick="cambiarColor(this, 'vacantes_trabajo_inactivas_usr.php')">Lista Vacantes de Trabajo (Inactivas)</button>
         <button class="button" onclick="cambiarColor(this, 'registrar_vacantes_trabajo_usr.php')">Registrar Vacante de Trabajo</button>
 
         <div class="data">
@@ -159,8 +160,8 @@ if ($is_edit && $pdoRrhh) {
 
                         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex: 1;">
-                                <label for="id_schedule">Horario Laboral <span style="color:red;">*</span></label>
-                                <select class="select2" name="id_schedule" id="id_schedule" required>
+                                <label for="id_schedule">Horario Laboral </label>
+                                <select class="select2" name="id_schedule" id="id_schedule">
                                     <?php if ($is_edit): ?>
                                         <option value="<?php echo (int)($edit_data['id_schedule'] ?? 0); ?>" selected>Cargando...</option>
                                     <?php else: ?>

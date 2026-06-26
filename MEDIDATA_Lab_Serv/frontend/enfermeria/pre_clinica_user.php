@@ -51,12 +51,12 @@ include_once '../../backend/registros/session_check.php';
                     <div class="head">
                         <div>
                             <h3>Pre-Clínica</h3>
-            <p class="subtitle">Selección de paciente para triaje y signos vitales</p>
+                            <p class="subtitle">Selección de paciente para triaje y signos vitales</p>
                         </div>
                     </div>
                     <hr class="preclinica-section-divider">
 
-                <form id="form-pre-clinica">
+                    <form id="form-pre-clinica">
                     <div class="head"><h3>Paciente</h3></div>
                     <div class="selection-group">
                         <div id="wrapper_patient_combined" class="form-group">
@@ -65,7 +65,7 @@ include_once '../../backend/registros/session_check.php';
                             <select name="paciente_sel" id="preclinic_patient_select">
                                 <option value="">&nbsp;</option>
                             </select>
-                        </div>
+                            </div>
                         </div>
                     </div>
 
@@ -74,8 +74,8 @@ include_once '../../backend/registros/session_check.php';
                             Consultar
                         </button>
                     </div>
-                </form>
-            </div>
+                    </form>
+                </div>
 
             <div id="vitals_display_area">
                 <div class="preclinica-vitals-stack">
@@ -92,7 +92,6 @@ include_once '../../backend/registros/session_check.php';
                                 <label for="stature_cm">Talla (CM)</label>
                                 <input type="number" step="0.01" id="stature_cm" class="form-control" placeholder="Ej: 175" required>
                             </div>
-                            
                             <div class="form-group">
                                 <label>Presión Arterial (mmHg)</label>
                                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -101,7 +100,6 @@ include_once '../../backend/registros/session_check.php';
                                     <input type="number" id="bp_dia" class="form-control" placeholder="80" required style="width: 45%;">
                                 </div>
                             </div>
-                            
                             <div class="form-group">
                                 <label>Frec. Cardíaca (lpm)</label>
                                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -158,8 +156,8 @@ include_once '../../backend/registros/session_check.php';
                         <hr class="preclinica-section-divider">
                         <div class="table-responsive sv-dt-expediente-wrap">
                             <table id="table_vitals_historial" class="display table-striped preclinica-dt" style="width:100%">
-                            <thead>
-                                <tr>
+                                <thead>
+                                    <tr>
                                         <th>FECHA</th>
                                         <th>HORA</th>
                                         <th>REALIZADO POR</th>
@@ -174,12 +172,12 @@ include_once '../../backend/registros/session_check.php';
                                         <th>TEMP (°C / °F)</th>
                                         <th>GLUCOSA (mg/dL / mmol/L)</th>
                                         <th>ACCIONES</th>
-                                </tr>
-                            </thead>
+                                    </tr>
+                                </thead>
                                 <tbody id="vitals-historial-body">
                                     <tr class="sv-dt-placeholder-row"><td colspan="14" style="text-align:center;">Seleccione un paciente y pulse consultar</td></tr>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -208,7 +206,7 @@ include_once '../../backend/registros/session_check.php';
     
     <!-- Select2 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
+    
     <script>
         $(document).ready(function() {
             const PRECLINICA_API = '../../backend/registros/';
@@ -219,7 +217,7 @@ include_once '../../backend/registros/session_check.php';
             const select2Opts = {
                 placeholder: 'Seleccionar paciente',
                 allowClear: false,
-                    width: '100%'
+                width: '100%'
             };
 
             function preclinicParsePatientValue(raw) {

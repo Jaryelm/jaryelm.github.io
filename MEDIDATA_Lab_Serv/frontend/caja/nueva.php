@@ -20,7 +20,7 @@ include_once '../../backend/registros/session_check.php';
 <body>
 
 <?php
-include_once '../caja/menu.php';
+include_once '../facturacion/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -37,8 +37,8 @@ include_once '../caja/menu.php';
             
            
             <span class="divider"></span>
-<?php
-include_once '../caja/perfil.php';
+            <?php
+include_once '../facturacion/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>

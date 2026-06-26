@@ -33,10 +33,10 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_usr.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, 'administrativo_ex_usr.php')">Ex Administrativos</button>
         <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo_usr.php')">Registrar Administrativo</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_usr.php')">Administrativo</button>
-
-        <form action="" method="POST" autocomplete="off">
+<form action="" method="POST" autocomplete="off">
                 <input type="hidden" name="return_page" value="administrativo_usr.php">
             <div class="containerss">
                 <h1>Nuevo colaborador administrativo</h1>
@@ -53,8 +53,6 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <input type="text" name="admape" placeholder="ejm: Ramírez Requena" required>
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
                 <input type="date" name="admdat" required>
-                <label><b>Fecha de ingreso</b></label><span class="badge-warning">*</span>
-                <input type="date" name="admingreso" required>
                 <label><b>Género</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="admge" required>
                     <option value="">Seleccione</option>

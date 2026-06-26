@@ -42,7 +42,7 @@ if ($id <= 0 || $title === '' || $start_date === '' || $end_date === '') {
     exit;
 }
 
-medidata_rrhh_ensure_recurrence_columns($pdo);
+
 
 if ($all_day) {
     $endDt = new DateTime($end_date);

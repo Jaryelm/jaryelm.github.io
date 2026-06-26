@@ -44,6 +44,8 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="<?php echo medidata_asset('/backend/vendor/boxicons/css/boxicons.min.css'); ?>" rel="stylesheet">
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
+
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
@@ -385,7 +387,6 @@ $totalPendientesRequisiciones = $connect->query("
 require_once __DIR__ . '/../../backend/php/biometric_marcas_db.php';
 $biometricDash = medidata_biometric_fetch_dash_stats($connect, null, $hoyInicio, $hoyFin);
 $biometricMarcasHoy = (int) ($biometricDash['hoy'] ?? 0);
-
 ?>
 
 
@@ -1405,6 +1406,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- NAVBAR -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="<?php echo medidata_asset('/backend/vendor/apexcharts/apexcharts.min.js'); ?>"></script>
+    <script src="/backend/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../../backend/js/script.js"></script>
 
     <!-- Data Tables -->

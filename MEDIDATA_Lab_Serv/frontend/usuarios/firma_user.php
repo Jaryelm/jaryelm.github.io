@@ -7,7 +7,11 @@ include_once '../../backend/registros/session_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<<< HEAD:MEDIDATA_Lab_Serv/frontend/usuarios/firma_user.php
     <link href='../../backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
+========
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
+>>>>>>>> chore/rrhh-interviews:MEDIDATA_Lab_Serv/uploads/frontend/almacen_hospitalario/firma_user.php
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
@@ -18,7 +22,7 @@ include_once '../../backend/registros/session_check.php';
 <body>
     
 <?php
-include_once '../admin/menu.php';
+include_once '../almacen/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -35,7 +39,7 @@ include_once '../admin/menu.php';
            
             <span class="divider"></span>
             <?php
-include_once '../admin/perfil.php';
+include_once '../almacen/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>
@@ -508,7 +512,11 @@ table.responsive-table td {
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
+<<<<<<<< HEAD:MEDIDATA_Lab_Serv/frontend/usuarios/firma_user.php
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+========
+    <script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
+>>>>>>>> chore/rrhh-interviews:MEDIDATA_Lab_Serv/uploads/frontend/almacen_hospitalario/firma_user.php
 
 </body>
 </html>

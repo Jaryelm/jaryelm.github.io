@@ -293,10 +293,7 @@ $(document).ready(function() {
             return;
         }
 
-        if (!medidataValidarPuestoForm()) {
-            return;
-        }
-
+        if (!medidataValidarPuestoForm()) return;
         $btn.prop('disabled', true).text('Guardando...');
 
         var formData = new FormData(this);
