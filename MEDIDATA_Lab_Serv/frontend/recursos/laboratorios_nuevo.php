@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 // incuir el archivo de sesion login
 ?>
@@ -55,7 +55,7 @@ include_once '../admin/perfil.php';
 $hora_actual = date('H'); // Obtiene la hora en formato de 24 horas (0-23)
 
 if ($hora_actual >= 6 && $hora_actual < 12) {
-    $saludo = "Buenos Días";
+    $saludo = "Buenos DÃ­as";
 } elseif ($hora_actual >= 12 && $hora_actual < 18) {
     $saludo = "Buenas Tardes";
 } else {
@@ -65,22 +65,22 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera_nuevo.php')">Registrar Enfermeria</button>
+<button class="button" onclick="cambiarColor(this, '../recursos/../recursos_humanos/agregar_colaborador.php')">Registrar Enfermeria</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/enfermera.php')">Enfermeria</button>
 <button class="button" onclick="cambiarColor(this, '#')">Registrar Administrativo</button>
 <button class="button" onclick="cambiarColor(this, '#')">Administrativo</button>
 <button class="button" onclick="cambiarColor(this, '#')">Registrar Mantenimiento</button>
 <button class="button" onclick="cambiarColor(this, '#')">Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/nuevo.php')">Registrar Médicos</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Médicos</button>
+<button class="button" onclick="cambiarColor(this, '../recursos_humanos/agregar_colaborador.php')">Registrar MÃ©dicos</button>
+<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">MÃ©dicos</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/reclutamiento.php')">Reclutamiento</button>
 <button class="button" onclick="cambiarColor(this, '#')">Proceso de Entrevista</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/laboratorios_nuevo.php')">Registrar Área de Servicio</button>
-<button class="button" onclick="cambiarColor(this, '../recursos/laboratiorios.php')">Äreas de Servicios</button>
+<button class="button" onclick="cambiarColor(this, '../recursos/laboratorios_nuevo.php')">Registrar Ãrea de Servicio</button>
+<button class="button" onclick="cambiarColor(this, '../recursos/laboratiorios.php')">Ã„reas de Servicios</button>
            
 <form action="" enctype="multipart/form-data" method="POST"  autocomplete="off" onsubmit="return validacion()">
   <div class="containerss">
-    <h1>NUEVA ÁREA DE SERVICIO</h1>
+    <h1>NUEVA ÃREA DE SERVICIO</h1>
    
     <div class="alert-danger">
   <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
@@ -89,7 +89,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <hr>
 
     <label for="email"><b>Nombre</b></label><span class="badge-warning">*</span>
-    <input type="text" placeholder="ejm: Radiología e Imagen" name="labname" required>
+    <input type="text" placeholder="ejm: RadiologÃ­a e Imagen" name="labname" required>
 
    
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
@@ -32,12 +32,17 @@ medidata_staff_ensure_tables($connect);
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_ex.php')">Ex Administrativos</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo.php')">Registrar Administrativo</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="administrativo.php" class="button tab-button <?php echo ($current_page == 'administrativo.php' || $current_page == 'administrativo_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="administrativo_ex.php" class="button tab-button <?php echo ($current_page == 'administrativo_ex.php' || $current_page == 'administrativo_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 
         <div class="data">
             <div class="content-data">
@@ -72,7 +77,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
                                 <td><?php echo htmlspecialchars($d->nomadm . ' ' . $d->apeadm); ?></td>
-                                <td><?php echo htmlspecialchars($d->position_name ?? $d->cargo ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($d->position_name ?? $d->cargo ?? 'â€”'); ?></td>
                                 <td><?php echo htmlspecialchars($d->sexadm); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacadm); ?></td>
                                 <td>
@@ -121,7 +126,7 @@ window.MEDIDATA_STAFF_ADMIN = {
     toggleUrl: '../../backend/php/toggle_administrative_state.php',
     deleteUrl: '../../backend/php/delete_administrative.php',
     idParam: 'idadm',
-    deleteTitle: '¿Eliminar colaborador administrativo?',
+    deleteTitle: 'Â¿Eliminar colaborador administrativo?',
     deleteFn: 'deleteAdministrative'
 };
 $(document).ready(function () {
@@ -138,7 +143,7 @@ $(document).ready(function () {
                 sInfoEmpty: 'Mostrando 0 a 0 de 0 registros',
                 sInfoFiltered: '(filtrado de _MAX_ registros totales)',
                 sSearch: 'Buscar:',
-                oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+                oPaginate: { sFirst: 'Primero', sLast: 'Ãšltimo', sNext: 'Siguiente', sPrevious: 'Anterior' }
             }
         });
     }
@@ -148,3 +153,4 @@ $(document).ready(function () {
 <script src="../../backend/registros/script/botones_color.js"></script>
 </body>
 </html>
+

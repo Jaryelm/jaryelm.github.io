@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
@@ -35,12 +35,17 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_usr.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_ex_usr.php')">Ex Administrativos</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo_usr.php')">Registrar Administrativo</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="administrativo.php" class="button tab-button <?php echo ($current_page == 'administrativo.php' || $current_page == 'administrativo_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="administrativo_ex.php" class="button tab-button <?php echo ($current_page == 'administrativo_ex.php' || $current_page == 'administrativo_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 <?php if (count($data) > 0): foreach ($data as $d): ?>
         <form action="" method="POST" autocomplete="off">
                 <input type="hidden" name="return_page" value="administrativo_usr.php">
@@ -48,7 +53,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <h1>Actualizar colaborador administrativo</h1>
                 <input type="hidden" name="admidp" value="<?php echo (int) $d->idadm; ?>">
                 <hr>
-                <label><b>N° de identificación</b></label><span class="badge-warning">*</span>
+                <label><b>NÂ° de identificaciÃ³n</b></label><span class="badge-warning">*</span>
                 <input type="text" name="admiden" maxlength="14" value="<?php echo htmlspecialchars($d->numide); ?>" required>
                 <label><b>Nombre</b></label><span class="badge-warning">*</span>
                 <input type="text" name="admnam" value="<?php echo htmlspecialchars($d->nomadm); ?>" required>
@@ -56,12 +61,12 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <input type="text" name="admape" value="<?php echo htmlspecialchars($d->apeadm); ?>" required>
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
                 <input type="date" name="admdat" value="<?php echo htmlspecialchars($d->nacadm); ?>" required>
-                <label><b>Género</b></label><span class="badge-warning">*</span>
+                <label><b>GÃ©nero</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="admge" required>
                     <option value="Masculino" <?php echo $d->sexadm === 'Masculino' ? 'selected' : ''; ?>>Masculino</option>
                     <option value="Femenino" <?php echo $d->sexadm === 'Femenino' ? 'selected' : ''; ?>>Femenino</option>
                 </select>
-                <label><b>Cargo / Área administrativa</b></label>
+                <label><b>Cargo / Ãrea administrativa</b></label>
                 <input type="text" name="admcargo" value="<?php echo htmlspecialchars($d->cargo ?? ''); ?>">
                 <?php
                 $staffUserFieldName = 'admid_user';
@@ -92,7 +97,7 @@ window.MEDIDATA_STAFF_ADMIN = {
     toggleUrl: '../../backend/php/toggle_administrative_state.php',
     deleteUrl: '../../backend/php/delete_administrative.php',
     idParam: 'idadm',
-    deleteTitle: '¿Eliminar colaborador administrativo?',
+    deleteTitle: 'Â¿Eliminar colaborador administrativo?',
     deleteFn: 'deleteAdministrative'
 };
 </script>
@@ -101,3 +106,4 @@ window.MEDIDATA_STAFF_ADMIN = {
 <script src="../../backend/registros/script/botones_color.js"></script>
 </body>
 </html>
+

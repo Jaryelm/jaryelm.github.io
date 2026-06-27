@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
@@ -35,12 +35,17 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex.php')">Ex Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo.php')">Registrar Servicios Generales</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="servicios_generales.php" class="button tab-button <?php echo ($current_page == 'servicios_generales.php' || $current_page == 'servicios_generales_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="servicios_generales_ex.php" class="button tab-button <?php echo ($current_page == 'servicios_generales_ex.php' || $current_page == 'servicios_generales_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 <?php if (count($data) > 0): foreach ($data as $d): ?>
         <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="return_page" value="servicios_generales.php">
@@ -49,10 +54,10 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <input type="hidden" name="sgidp" value="<?php echo (int) $d->idsg; ?>">
                 <hr>
                 
-                <label><b>N° de Empleado (Institucional)</b></label>
+                <label><b>NÂ° de Empleado (Institucional)</b></label>
                 <input type="text" name="num_empleado" value="<?php echo htmlspecialchars($d->num_empleado ?? ''); ?>" placeholder="ejm: EMP-001">
 
-                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
+                <label><b>NÂ° de identificaciÃ³n (DNI)</b></label><span class="badge-warning">*</span>
                 <input type="text" name="sgiden" maxlength="14" value="<?php echo htmlspecialchars($d->numide); ?>" required>
                 
                 <label><b>Nombres</b></label><span class="badge-warning">*</span>
@@ -64,14 +69,14 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
                 <input type="date" name="sgdat" value="<?php echo htmlspecialchars($d->nacsg); ?>" required>
                 
-                <label><b>Género</b></label><span class="badge-warning">*</span>
+                <label><b>GÃ©nero</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="sgge" required>
                     <option value="Masculino" <?php echo $d->sexsg === 'Masculino' ? 'selected' : ''; ?>>Masculino</option>
                     <option value="Femenino" <?php echo $d->sexsg === 'Femenino' ? 'selected' : ''; ?>>Femenino</option>
                 </select>
 
                 <hr>
-                <h3>Información Laboral</h3>
+                <h3>InformaciÃ³n Laboral</h3>
                 
                 <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
@@ -81,7 +86,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 </select>
 
                 <div id="duracion_contrato_div" style="display:<?php echo in_array($d->tipo_empleado ?? '', ['Temporal', 'Tiempo parcial']) ? 'block' : 'none'; ?>; margin-top:10px;">
-                    <label><b>Duración de Contrato</b></label>
+                    <label><b>DuraciÃ³n de Contrato</b></label>
                     <input type="text" name="duracion_contrato" value="<?php echo htmlspecialchars($d->duracion_contrato ?? ''); ?>" placeholder="Ej: 6 meses">
                 </div>
 
@@ -93,7 +98,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                     <option value="<?php echo (int)($d->id_departamento ?? 0); ?>" selected>Cargando...</option>
                 </select>
 
-                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
+                <label><b>Cargo / PosiciÃ³n</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="id_cargo" required>
                     <option value="" disabled>Seleccione...</option>
                     <?php foreach ($cargos as $cargo): ?>
@@ -114,25 +119,25 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <label><b>Salario Base</b></label>
                 <input type="number" step="0.01" name="salario" value="<?php echo htmlspecialchars($d->salario ?? ''); ?>" placeholder="Ej: 15000.00">
 
-                <label><b>N° Cuenta de BAC</b></label>
-                <input type="text" name="cuenta_bac" value="<?php echo htmlspecialchars($d->cuenta_bac ?? ''); ?>" placeholder="Número de cuenta de banco BAC">
+                <label><b>NÂ° Cuenta de BAC</b></label>
+                <input type="text" name="cuenta_bac" value="<?php echo htmlspecialchars($d->cuenta_bac ?? ''); ?>" placeholder="NÃºmero de cuenta de banco BAC">
 
                 <hr>
-                <h3>Información de Contacto y Accesos</h3>
+                <h3>InformaciÃ³n de Contacto y Accesos</h3>
 
-                <label><b>Teléfono Celular</b></label>
+                <label><b>TelÃ©fono Celular</b></label>
                 <input type="text" name="telefono" value="<?php echo htmlspecialchars($d->telefono ?? ''); ?>" placeholder="Ej: 99887766">
 
                 <label><b>Correo Personal</b></label>
-                <input type="email" name="correo_personal" value="<?php echo htmlspecialchars($d->correo_personal ?? ''); ?>" placeholder="Correo electrónico personal">
+                <input type="email" name="correo_personal" value="<?php echo htmlspecialchars($d->correo_personal ?? ''); ?>" placeholder="Correo electrÃ³nico personal">
 
                 <label><b>Correo Institucional</b></label>
-                <input type="email" name="correo_institucional" value="<?php echo htmlspecialchars($d->correo_institucional ?? ''); ?>" placeholder="Correo electrónico de Medicasa">
+                <input type="email" name="correo_institucional" value="<?php echo htmlspecialchars($d->correo_institucional ?? ''); ?>" placeholder="Correo electrÃ³nico de Medicasa">
 
-                <label><b>N° de Locker Asignado</b></label>
+                <label><b>NÂ° de Locker Asignado</b></label>
                 <input type="text" name="num_locker" value="<?php echo htmlspecialchars($d->num_locker ?? ''); ?>" placeholder="Ej: L-10">
 
-                <label><b>ID Empleado (Reloj Biométrico)</b></label>
+                <label><b>ID Empleado (Reloj BiomÃ©trico)</b></label>
                 <input type="number" name="id_biometrico" value="<?php echo htmlspecialchars($d->id_biometrico ?? ''); ?>" placeholder="Ej: 123">
 
                 <label><b>Usuario del Sistema (Opcional)</b></label>
@@ -144,7 +149,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 
                 <hr>
                 <h3>Documentos (Opcionales)</h3>
-                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Subir un documento nuevo reemplazará al anterior.</p>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Subir un documento nuevo reemplazarÃ¡ al anterior.</p>
                 
                 <?php
                 function _showDocLink($label, $url) {
@@ -161,7 +166,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <?php endif; ?>
                 <br><br>
                 
-                <label>Pruebas Psicométricas (Ya guardadas)</label>
+                <label>Pruebas PsicomÃ©tricas (Ya guardadas)</label>
                 <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
                 <?php if ($d->has_psicometricas): ?>
                     <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idsg; ?>&doc=psicometricas" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver pruebas actuales</a>
@@ -176,11 +181,11 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
                 <?php _showDocLink('foto', $rrhh_docs['photo_id_card'] ?? null); ?>
                 
-                <label>Documento de identidad (revés y derecho)</label>
+                <label>Documento de identidad (revÃ©s y derecho)</label>
                 <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
                 <?php _showDocLink('documento de identidad', $rrhh_docs['id_document'] ?? null); ?>
                 
-                <label>Copia de recibo (agua, luz, teléfono)</label>
+                <label>Copia de recibo (agua, luz, telÃ©fono)</label>
                 <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
                 <?php _showDocLink('recibo', $rrhh_docs['utility_bill'] ?? null); ?>
                 
@@ -200,7 +205,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
                 <?php _showDocLink('referencias profesionales', $rrhh_docs['professional_references'] ?? null); ?>
                 
-                <label>Diplomas o títulos recibidos</label>
+                <label>Diplomas o tÃ­tulos recibidos</label>
                 <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
                 <?php _showDocLink('diplomas', $rrhh_docs['diplomas'] ?? null); ?>
                 
@@ -239,7 +244,7 @@ window.MEDIDATA_STAFF_SG = {
     toggleUrl: '../../backend/php/toggle_general_services_state.php',
     deleteUrl: '../../backend/php/delete_general_services.php',
     idParam: 'idsg',
-    deleteTitle: '¿Eliminar colaborador de servicios generales?',
+    deleteTitle: 'Â¿Eliminar colaborador de servicios generales?',
     deleteFn: 'deleteGeneralServices'
 };
 </script>
@@ -251,3 +256,4 @@ window.MEDIDATA_STAFF_SG = {
 <script src="../../backend/js/cat_schedules.js"></script>
 </body>
 </html>
+

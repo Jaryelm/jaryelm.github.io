@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 ?>
 <!DOCTYPE html>
@@ -42,7 +42,7 @@ include_once '../admin/perfil.php';
         <?php
         $hora_actual = date('H');
         if ($hora_actual >= 6 && $hora_actual < 12) {
-            $saludo = "Buenos Días";
+            $saludo = "Buenos DÃ­as";
         } elseif ($hora_actual >= 12 && $hora_actual < 18) {
             $saludo = "Buenas Tardes";
         } else {
@@ -75,11 +75,11 @@ if($sentencia){
          <table id="example" class="responsive-table">
             <thead>
                 <tr>
-                    <th scope="col">Código</th>
+                    <th scope="col">CÃ³digo</th>
                     <th scope="col">Departamento</th>
                     <th scope="col">Jefe</th>
                     <th scope="col">Correo</th>
-                    <th scope="col">Teléfono</th>
+                    <th scope="col">TelÃ©fono</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -109,7 +109,7 @@ if($sentencia){
   
     <div class="alert">
       <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-      <strong>¡Aviso!</strong> No hay datos registrados.
+      <strong>Â¡Aviso!</strong> No hay datos registrados.
     </div>
     <?php endif; ?>
                     </div>
@@ -149,7 +149,7 @@ $(document).ready(function() {
             "sSearch": "Buscar:",
             "oPaginate": {
                 "sFirst": "Primero",
-                "sLast": "Último",
+                "sLast": "Ãšltimo",
                 "sNext": "Siguiente",
                 "sPrevious": "Anterior"
             }
@@ -172,7 +172,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                Swal.fire('Error', 'Ocurrió un error al cambiar el estado', 'error');
+                Swal.fire('Error', 'OcurriÃ³ un error al cambiar el estado', 'error');
                 window.location.reload();
             }
         });

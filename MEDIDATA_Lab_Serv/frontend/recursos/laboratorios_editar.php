@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 // incuir el archivo de sesion login
 ?>
@@ -55,7 +55,7 @@ include_once '../admin/perfil.php';
 $hora_actual = date('H'); // Obtiene la hora en formato de 24 horas (0-23)
 
 if ($hora_actual >= 6 && $hora_actual < 12) {
-    $saludo = "Buenos Días";
+    $saludo = "Buenos DÃ­as";
 } elseif ($hora_actual >= 12 && $hora_actual < 18) {
     $saludo = "Buenas Tardes";
 } else {
@@ -65,14 +65,14 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<button class="button" onclick="cambiarColor(this, '../recursos/enfermera_nuevo.php')">Registrar Personal de Enfermeria</button>
+<button class="button" onclick="cambiarColor(this, '../recursos/../recursos_humanos/agregar_colaborador.php')">Registrar Personal de Enfermeria</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/enfermera.php')">Personal de Enfermeria</button>
 <button class="button" onclick="cambiarColor(this, '#')">Registrar Personal Administrativo</button>
 <button class="button" onclick="cambiarColor(this, '#')">Personal Administrativo</button>
 <button class="button" onclick="cambiarColor(this, '#')">Registrar Personal de Mantenimiento</button>
 <button class="button" onclick="cambiarColor(this, '#')">Personal de Mantenimiento</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/nuevo.php')">Registrar Personal Médico</button>
-<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Personal Médico</button>
+<button class="button" onclick="cambiarColor(this, '../recursos_humanos/agregar_colaborador.php')">Registrar Personal MÃ©dico</button>
+<button class="button" onclick="cambiarColor(this, '../medicos/mostrar.php')">Personal MÃ©dico</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/reclutamiento.php')">Reclutamiento</button>
 <button class="button" onclick="cambiarColor(this, '#')">Proceso de Entrevista</button>
 <button class="button" onclick="cambiarColor(this, '../recursos/laboratorios_nuevo.php')">Registro de Laboratirio</button>

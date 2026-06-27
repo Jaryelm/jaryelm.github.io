@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 // incuir el archivo de sesion login
 ?>
@@ -41,10 +41,10 @@ include_once '../../backend/registros/session_check.php';
             </ul>
         </li>
         <li>
-            <a href="#" class="new-submenu-link">Gestión de Pagos</a>
+            <a href="#" class="new-submenu-link">GestiÃ³n de Pagos</a>
             <ul class="new-side-dropdown">
                 <li><a href="../../../frontend/contabilidad/chequera/emitir_cheque.php">Emitir Cheques</a></li>
-                <li><a href="../../../frontend/contabilidad/chequera/conciliacion_bancaria.php">Conciliación Bancaria</a></li>
+                <li><a href="../../../frontend/contabilidad/chequera/conciliacion_bancaria.php">ConciliaciÃ³n Bancaria</a></li>
                 <li><a href="../../../frontend/contabilidad/chequera/recibir_pagos.php">Recibir Pagos</a></li>
                 <li><a href="#">Preparar Deposito Bancario</a></li>
                 <li><a href="#">Transacciones Capturadas</a></li>
@@ -54,7 +54,7 @@ include_once '../../backend/registros/session_check.php';
         <li>
             <a href="#" class="new-submenu-link">Ventas</a>
             <ul class="new-side-dropdown">
-                <li><a href="#">Información de Ventas</a></li>
+                <li><a href="#">InformaciÃ³n de Ventas</a></li>
                 <li><a href="#">Cotizaciones Ordenes Facturas</a></li>
                 <li><a href="#">Registros de Ventas</a></li>
                 <li><a href="#">Devoluciones</a></li>
@@ -74,7 +74,7 @@ include_once '../../backend/registros/session_check.php';
             <a href="#" class="new-submenu-link">Compras</a>
             <ul class="new-side-dropdown">
                 <li><a href="../../../frontend/contabilidad/compras/nuevacompra.php">Nueva Compra</a></li>
-                <li><a href="#">Información de Compras</a></li>
+                <li><a href="#">InformaciÃ³n de Compras</a></li>
                 <li><a href="#">Cotizaciones Ordenes Compras</a></li>
                 <li><a href="#">Registro de Compras</a></li>
                 <li><a href="#">Devoluciones</a></li>
@@ -92,7 +92,7 @@ include_once '../../backend/registros/session_check.php';
         <li>
             <a href="#" class="new-submenu-link">Directorio de Proveedores</a>
             <ul class="new-side-dropdown">
-                <li><a href="../../../frontend/contabilidad/directorio/tabla_directorio.php">Tabla Directorio Médico</a></li>
+                <li><a href="../../../frontend/contabilidad/directorio/tabla_directorio.php">Tabla Directorio MÃ©dico</a></li>
                 <li><a href="../../../frontend/contabilidad/directorio/tabla_directorio_comercial.php">Tabla Directorio Comercial</a></li>
             </ul>
         </li>
@@ -124,13 +124,13 @@ include_once '../../backend/registros/session_check.php';
             <li>
                 <a href="#"><i class='bx bxs-spray-can icon' ></i>CRM Marketing<i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
-                    <li><a href="../../#">Cumpleaños</a></li>
+                    <li><a href="../../#">CumpleaÃ±os</a></li>
 
                 </ul>
             </li>
 
             <li>
-                <a href="#"><i class='bx bxs-user icon' ></i>Gestión de Pacientes <i class='bx bx-chevron-right icon-right' ></i></a>
+                <a href="#"><i class='bx bxs-user icon' ></i>GestiÃ³n de Pacientes <i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
                     <li><a href="../../pacientes/mostrar.php" >Registro de Pacientes</a></li>
                     <li><a href="../../pacientes/pagos.php">#</a></li>
@@ -146,7 +146,7 @@ include_once '../../backend/registros/session_check.php';
         </li>
 
         <li>
-                <a href="#"><i class='bx bxs-user icon' ></i>Gestión de Médica<i class='bx bx-chevron-right icon-right' ></i></a>
+                <a href="#"><i class='bx bxs-user icon' ></i>GestiÃ³n de MÃ©dica<i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
                     <li><a href="../../../pacientes/#" >#</a></li>
                     <li><a href="../../../pacientes/#">#</a></li>
@@ -162,7 +162,7 @@ include_once '../../backend/registros/session_check.php';
         <li>
             <a href="#"><i class='bx bxs-diamond icon' ></i> Ventas<i class='bx bx-chevron-right icon-right' ></i></a>
             <ul class="side-dropdown">
-                <li><a href="../../actividades/new_sale.php">Facturación</a></li>
+                <li><a href="../../actividades/new_sale.php">FacturaciÃ³n</a></li>
                 <li><a href="../../actividades/#">Cotizaciones</a></li>
                 <li><a href="../../actividades/#">Estados de cuenta</a></li>
                 <li><a href="../../actividades/venta.php">Resumen de Ventas</a></li>
@@ -172,7 +172,7 @@ include_once '../../backend/registros/session_check.php';
         <li>
                 <a href="#"><i class='bx bxs-briefcase icon' ></i> Usuarios <i class='bx bx-chevron-right icon-right' ></i></a>
                 <ul class="side-dropdown">
-                    <li><a href="../../medicos/nuevo.php">Nuevo Médico</a></li>
+                    <li><a href="../../recursos_humanos/agregar_colaborador.php">Nuevo MÃ©dico</a></li>
                     <li><a href="../../medicos/mostrar.php">Lista de Medicos</a></li>
                     <li><a href="../../frontend/contabilidad/directorio/formulario_directorio.php">Formulario Proveedores</a></li>
                 </ul>
@@ -214,7 +214,7 @@ include_once '../admin/perfil.php';
 $hora_actual = date('H'); // Obtiene la hora en formato de 24 horas (0-23)
 
 if ($hora_actual >= 6 && $hora_actual < 12) {
-    $saludo = "Buenos Días";
+    $saludo = "Buenos DÃ­as";
 } elseif ($hora_actual >= 12 && $hora_actual < 18) {
     $saludo = "Buenas Tardes";
 } else {
@@ -225,7 +225,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
 <button class="button" onclick="location.href='enfermera.php'">Personal de Enfermeria</button>
-<button class="button" onclick="location.href='enfermera_nuevo.php'">Registrar Personal de Enfermeria</button>
+<button class="button" onclick="location.href='../recursos_humanos/agregar_colaborador.php'">Registrar Personal de Enfermeria</button>
 <button class="button" onclick="location.href='#'">Personal Administrativo</button>
 <button class="button" onclick="location.href='#'">Registrar Personal Administrativo</button>
 <button class="button" onclick="location.href='laboratiorios.php'">Laboratorios</button>
@@ -250,12 +250,12 @@ if($sentencia){
 
 <form action="" enctype="multipart/form-data" method="POST"  autocomplete="off" onsubmit="return validacion()">
   <div class="containerss">
-    <h1>Información de la enfermera(o)</h1>
+    <h1>InformaciÃ³n de la enfermera(o)</h1>
    
    
     <hr>
 
-    <label for="email"><b>N° de identificación de la  enfermera(o)</b></label><span class="badge-warning">*</span>
+    <label for="email"><b>NÂ° de identificaciÃ³n de la  enfermera(o)</b></label><span class="badge-warning">*</span>
     <input type="text" placeholder="ejm: 09741478" value="<?php echo $d->numide; ?>" readonly name="nuriden" maxlength="14" required>
 
     <label for="psw"><b>Nombre de la enfermera(o)</b></label><span class="badge-warning">*</span>
@@ -267,7 +267,7 @@ if($sentencia){
     <label for="psw"><b>Fecha de nacimiento de la enfermera(o)</b></label><span class="badge-warning">*</span>
     <input type="date" name="nurdat" value="<?php echo $d->nacinur; ?>" readonly required>
 
-    <label for="psw"><b>Género de la enfermera(o)</b></label><span class="badge-warning">*</span>
+    <label for="psw"><b>GÃ©nero de la enfermera(o)</b></label><span class="badge-warning">*</span>
     <select class="select2" required name="nurge" id="gep">
         <option><?php echo $d->sexnur; ?></option>
 

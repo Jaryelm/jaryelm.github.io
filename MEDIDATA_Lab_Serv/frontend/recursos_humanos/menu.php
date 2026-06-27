@@ -69,10 +69,7 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                 <li>
                     <a href="#" class="new-submenu-link">COLABORADORES</a>
                     <ul class="new-side-dropdown">
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>enfermera_nuevo_usr.php">REGISTRAR ENFERMERÍA</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>administrativo_nuevo_usr.php">REGISTRAR ADMINISTRATIVO</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>servicios_generales_nuevo_usr.php">REGISTRAR SERVICIOS GENERALES</a></li>
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_MEDICOS_BASE); ?>nuevo_usr.php">REGISTRAR MÉDICO</a></li>
+                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>agregar_colaborador.php">REGISTRAR COLABORADOR</a></li>
                     </ul>
                 </li>
             </ul>

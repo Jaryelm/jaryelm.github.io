@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 require_once '../../backend/registros/rrhh_guard.php';
@@ -49,12 +49,17 @@ if ($pdoRrhh) {
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'administrativo.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_ex.php')">Ex Administrativos</button>
-        <button class="button" onclick="cambiarColor(this, 'administrativo_nuevo.php')">Registrar Administrativo</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="administrativo.php" class="button tab-button <?php echo ($current_page == 'administrativo.php' || $current_page == 'administrativo_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="administrativo_ex.php" class="button tab-button <?php echo ($current_page == 'administrativo_ex.php' || $current_page == 'administrativo_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 
         <div class="data">
             <div class="content-data">
@@ -76,7 +81,7 @@ if ($pdoRrhh) {
                         <thead>
                             <tr>
                                 <th>TIPO DE EMPLEADO</th>
-                                <th>N°</th>
+                                <th>NÂ°</th>
                                 <th>DNI</th>
                                 <th>APELLIDOS</th>
                                 <th>NOMBRES</th>
@@ -84,7 +89,7 @@ if ($pdoRrhh) {
                                 <th>AREA</th>
                                 <th>NIVEL SALARIAL</th>
                                 <th>SALARIO</th>
-                                <th>N°CUENTA</th>
+                                <th>NÂ°CUENTA</th>
                                 <th>FECHA DE INGRESO</th>
                                 <th>CONTACTO</th>
                                 <th>CORREO PERSONAL / INSTITUCIONAL</th>
@@ -106,7 +111,7 @@ if ($pdoRrhh) {
                                         <option value="Tiempo parcial" <?php echo (($d->tipo_empleado ?? '') == 'Tiempo parcial') ? 'selected' : ''; ?>>Tiempo parcial</option>
                                     </select>
                                 </td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_empleado" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_empleado" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_empleado ?? 'â€”'); ?></td>
                                 <th scope="row" class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="numide" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->numide); ?></th>
                                 <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="apeadm" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->apeadm); ?></td>
                                 <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="nomadm" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->nomadm); ?></td>
@@ -118,7 +123,7 @@ if ($pdoRrhh) {
                                 </td>
                                 <td>
                                     <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_departamento" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
-                                        <option value="">—</option>
+                                        <option value="">â€”</option>
                                         <?php foreach ($depto_map as $id_dept => $name_dept): ?>
                                             <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
                                         <?php endforeach; ?>
@@ -126,20 +131,20 @@ if ($pdoRrhh) {
                                 </td>
                                 <td>
                                     <select class="inline-select" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_salary_level" data-table="staff_administrative" data-idcol="idadm" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;">
-                                        <option value="">—</option>
+                                        <option value="">â€”</option>
                                         <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
                                             <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
                                 <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="salario" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="cuenta_bac" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="fecha_ingreso" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="telefono" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
-                                <td><?php echo htmlspecialchars(($d->correo_personal ?? '—') . ' / ' . ($d->correo_institucional ?? '—')); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="cuenta_bac" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->cuenta_bac ?? 'â€”'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="fecha_ingreso" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? 'â€”'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="telefono" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->telefono ?? 'â€”'); ?></td>
+                                <td><?php echo htmlspecialchars(($d->correo_personal ?? 'â€”') . ' / ' . ($d->correo_institucional ?? 'â€”')); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacadm); ?></td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_biometrico" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
-                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_locker" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="id_biometrico" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->id_biometrico ?? 'â€”'); ?></td>
+                                <td class="editable-cell" data-id="<?php echo (int) $d->idadm; ?>" data-field="num_locker" data-table="staff_administrative" data-idcol="idadm" contenteditable="true" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Haz clic para editar"><?php echo htmlspecialchars($d->num_locker ?? 'â€”'); ?></td>
                                 <td>
                                     <?php if (!empty($d->url_contrato)): ?>
                                         <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->idadm; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
@@ -199,7 +204,7 @@ window.MEDIDATA_STAFF_ADMIN = {
     toggleUrl: '../../backend/php/toggle_administrative_state.php',
     deleteUrl: '../../backend/php/delete_administrative.php',
     idParam: 'idadm',
-    deleteTitle: '¿Eliminar colaborador administrativo?',
+    deleteTitle: 'Â¿Eliminar colaborador administrativo?',
     deleteFn: 'deleteAdministrative'
 };
 $(document).ready(function () {
@@ -216,7 +221,7 @@ $(document).ready(function () {
                 sInfoEmpty: 'Mostrando 0 a 0 de 0 registros',
                 sInfoFiltered: '(filtrado de _MAX_ registros totales)',
                 sSearch: 'Buscar:',
-                oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+                oPaginate: { sFirst: 'Primero', sLast: 'Ãšltimo', sNext: 'Siguiente', sPrevious: 'Anterior' }
             }
         });
     }
@@ -226,3 +231,4 @@ $(document).ready(function () {
 <script src="../../backend/registros/script/botones_color.js"></script>
 </body>
 </html>
+

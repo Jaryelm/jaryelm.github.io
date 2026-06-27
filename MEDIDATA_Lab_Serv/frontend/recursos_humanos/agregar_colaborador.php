@@ -1,11 +1,10 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
+
 $staffUsers = medidata_staff_fetch_users_for_select($connect);
 
-// incuir el archivo de sesion login
-// Consultar lista de cargos (positions) de la base de datos principal
 $cargos = [];
 try {
     $stmt_p = $connect->prepare("SELECT id, name FROM positions ORDER BY name ASC");
@@ -20,97 +19,83 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/cards.css">
+    <?php include __DIR__ . '/_rrhh_select2_head.php'; ?>
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-
-    <!-- Include CSS de Select2 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
-    <title>MEDIDATA</title>
+    <title>MEDIDATA - Agregar Colaborador</title>
 </head>
 <body>
-
-<?php
-include_once '../admin/menu.php';
-// incuir el archivo menu principal
-?>
-
-    <!-- NAVBAR -->
-    <section id="content">
-
-        <!-- NAVBAR -->
-        <nav>
-            <i class='bx bx-menu toggle-sidebar' ></i>
-            <form action="#">
-                <div class="form-group">
-                </div>
-            </form>
-            
-           
-            <span class="divider"></span>
-            <?php
-include_once '../admin/perfil.php';
-// incuir el archivo menu principal
-?>
-        </nav>
-        <!-- NAVBAR -->
-
-        <!-- MAIN -->
-
-        <main>
+<?php include_once '../admin/menu.php'; ?>
+<section id="content">
+    <nav>
+        <i class='bx bx-menu toggle-sidebar'></i>
+        <form action="#"><div class="form-group"></div></form>
+        <span class="divider"></span>
+        <?php include_once '../admin/perfil.php'; ?>
+    </nav>
+    <main>
         <?php
-// Obtener la hora actual
-$hora_actual = date('H'); // Obtiene la hora en formato de 24 horas (0-23)
+        $hora = (int) date('H');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        ?>
+        <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        
+        <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
+            <a href="lista_colaboradores.php?area=medico" class="button tab-button">MÃ©dicos</a>
+            <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">EnfermerÃ­a</a>
+            <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
+            <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
+            <a href="lista_excolaboradores.php" class="button tab-button">Excolaboradores</a>
+            <a href="agregar_colaborador.php" class="button tab-button active" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+        </div>
 
-if ($hora_actual >= 6 && $hora_actual < 12) {
-    $saludo = "Buenos Días";
-} elseif ($hora_actual >= 12 && $hora_actual < 18) {
-    $saludo = "Buenas Tardes";
-} else {
-    $saludo = "Buenas Noches";
-}
-?>
-
-<h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
-
-<?php $medicos_nav_rrhh = false; include __DIR__ . '/_botones_medicos.php'; ?>
-           
-           <!-- multistep form -->
-
-
-<form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
-                <input type="hidden" name="return_page" value="mostrar.php">
+        <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
+            <input type="hidden" name="return_page" value="lista_colaboradores.php">
             <div class="containerss">
-                <h1>Nuevo médico</h1>
+                <h1>Nuevo Colaborador</h1>
                 <div class="alert-danger">
                     <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
                     <strong>Importante:</strong> Complete los campos marcados con <span class="badge-warning">*</span>
                 </div>
                 <hr>
-                <label><b>N° de Empleado (Institucional)</b></label>
-                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automático)">
+                
+                <label><b>Ãrea o Tipo de Colaborador</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="area_colaborador" required>
+                    <option value="">Seleccione un Ã¡rea...</option>
+                    <option value="doctor">MÃ©dico</option>
+                    <option value="nurse">EnfermerÃ­a</option>
+                    <option value="staff_administrative">Administrativo</option>
+                    <option value="staff_general_services">Servicios Generales</option>
+                </select>
 
-                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
-                <input type="text" name="dociden" maxlength="14" placeholder="ejm: 0801199012345" required>
+                <hr>
+
+                <label><b>NÂ° de Empleado (Institucional)</b></label>
+                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automÃ¡tico)">
+
+                <label><b>NÂ° de identificaciÃ³n (DNI)</b></label><span class="badge-warning">*</span>
+                <input type="text" name="identificacion" maxlength="14" placeholder="ejm: 0801199012345" required>
                 
                 <label><b>Nombres</b></label><span class="badge-warning">*</span>
-                <input type="text" name="docnam" placeholder="ejm: Juan Raúl" required>
+                <input type="text" name="nombres" placeholder="ejm: Juan RaÃºl" required>
                 
                 <label><b>Apellidos</b></label><span class="badge-warning">*</span>
-                <input type="text" name="docape" placeholder="ejm: Ramírez Requena" required>
+                <input type="text" name="apellidos" placeholder="ejm: RamÃ­rez Requena" required>
                 
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
-                <input type="date" name="docdat" required>
+                <input type="date" name="fecha_nacimiento" required>
                 
-                <label><b>Género</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="docge" required>
+                <label><b>GÃ©nero</b></label><span class="badge-warning">*</span>
+                <select class="select2" name="genero" required>
                     <option value="">Seleccione</option>
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                 </select>
 
                 <hr>
-                <h3>Información Laboral</h3>
+                <h3>InformaciÃ³n Laboral</h3>
                 
                 <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
@@ -120,7 +105,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 </select>
 
                 <div id="duracion_contrato_div" style="display:none; margin-top:10px;">
-                    <label><b>Duración de Contrato</b></label>
+                    <label><b>DuraciÃ³n de Contrato</b></label>
                     <input type="text" name="duracion_contrato" placeholder="Ej: 6 meses">
                 </div>
 
@@ -132,7 +117,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     <option value="" disabled selected>Seleccione...</option>
                 </select>
 
-                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
+                <label><b>Cargo / PosiciÃ³n</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="id_cargo" required>
                     <option value="" disabled selected>Seleccione...</option>
                     <?php foreach ($cargos as $cargo): ?>
@@ -153,32 +138,32 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <label><b>Salario Base</b></label>
                 <input type="number" step="0.01" name="salario" placeholder="Ej: 15000.00">
 
-                <label><b>N° Cuenta de BAC</b></label>
-                <input type="text" name="cuenta_bac" placeholder="Número de cuenta de banco BAC">
+                <label><b>NÂ° Cuenta de BAC</b></label>
+                <input type="text" name="cuenta_bac" placeholder="NÃºmero de cuenta de banco BAC">
 
                 <hr>
-                <h3>Información de Contacto y Accesos</h3>
+                <h3>InformaciÃ³n de Contacto y Accesos</h3>
 
-                <label><b>Teléfono Celular</b></label>
+                <label><b>TelÃ©fono Celular</b></label>
                 <input type="text" name="telefono" placeholder="Ej: 99887766">
 
                 <label><b>Correo Personal</b></label>
-                <input type="email" name="correo_personal" placeholder="Correo electrónico personal">
+                <input type="email" name="correo_personal" placeholder="Correo electrÃ³nico personal">
 
                 <label><b>Correo Institucional</b></label>
-                <input type="email" name="correo_institucional" placeholder="Correo electrónico de Medicasa">
+                <input type="email" name="correo_institucional" placeholder="Correo electrÃ³nico de Medicasa">
 
-                <label><b>N° de Locker Asignado</b></label>
+                <label><b>NÂ° de Locker Asignado</b></label>
                 <input type="text" name="num_locker" placeholder="Ej: L-10">
 
-                <label><b>ID Empleado (Reloj Biométrico)</b></label>
+                <label><b>ID Empleado (Reloj BiomÃ©trico)</b></label>
                 <input type="number" name="id_biometrico" placeholder="Ej: 123">
 
                 <label><b>Usuario del Sistema (Opcional)</b></label>
                 <?php
-                $staffUserFieldName = 'docid_user';
+                $staffUserFieldName = 'id_user';
                 $staffSelectedUserId = 0;
-                include '../recursos_humanos/_staff_user_select.php';
+                include '_staff_user_select.php';
                 ?>
                 
                 <hr>
@@ -187,7 +172,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <label>Solicitud de empleo</label>
                 <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
                 
-                <label>Pruebas Psicométricas</label>
+                <label>Pruebas PsicomÃ©tricas</label>
                 <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
                 
                 <label>Copia de partida de nacimiento de hijos</label>
@@ -196,10 +181,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <label>Foto (Para su Carnet)</label>
                 <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
                 
-                <label>Documento de identidad (revés y derecho)</label>
+                <label>Documento de identidad (revÃ©s y derecho)</label>
                 <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
                 
-                <label>Copia de recibo (agua, luz, teléfono)</label>
+                <label>Copia de recibo (agua, luz, telÃ©fono)</label>
                 <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
                 
                 <label>Antecedentes Penales</label>
@@ -214,7 +199,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <label>2 Referencias profesionales</label>
                 <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
                 
-                <label>Diplomas o títulos recibidos</label>
+                <label>Diplomas o tÃ­tulos recibidos</label>
                 <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
                 
                 <label>Croquis de vivienda</label>
@@ -223,30 +208,21 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <label><b>Contrato Firmado</b></label>
                 <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="padding:10px; border:1px solid #2980b9;">
                 <hr>
-                <button type="submit" name="add_doctor" class="registerbtn">Guardar</button>
+                <button type="submit" name="add_colaborador" class="registerbtn">Guardar</button>
             </div>
         </form>
-
-        </main>
-        <!-- MAIN -->
-    </section>
-    <script src="../../backend/js/jquery.min.js"></script>
-    <script src="../../backend/js/script.js"></script>
-    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <?php include_once '../../backend/php/add_doctor.php' ?>
-    <script src='../../backend/js/submenu.js'></script>
-    <script src="../../backend/registros/script/botones_color.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2();
-        });
-    </script>
-   
+    </main>
+</section>
+<script src="../../backend/js/jquery.min.js"></script>
+<?php include __DIR__ . '/_rrhh_select2_foot.php'; ?>
+<script src="../../backend/js/script.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<?php include_once '../../backend/php/add_colaborador.php'; ?>
+<script src='../../backend/js/submenu.js'></script>
+<script src="../../backend/registros/script/botones_color.js"></script>
 <script src="../../backend/js/cat_departaments.js"></script>
 <script src="../../backend/js/cat_salary_levels.js"></script>
 <script src="../../backend/js/cat_schedules.js"></script>
 </body>
 </html>
-
 

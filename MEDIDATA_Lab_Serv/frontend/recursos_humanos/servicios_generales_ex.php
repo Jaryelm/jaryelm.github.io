@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
@@ -32,12 +32,17 @@ medidata_staff_ensure_tables($connect);
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_ex.php')">Ex Servicios Generales</button>
-        <button class="button" onclick="cambiarColor(this, 'servicios_generales_nuevo.php')">Registrar Servicios Generales</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="servicios_generales.php" class="button tab-button <?php echo ($current_page == 'servicios_generales.php' || $current_page == 'servicios_generales_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="servicios_generales_ex.php" class="button tab-button <?php echo ($current_page == 'servicios_generales_ex.php' || $current_page == 'servicios_generales_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 <div class="data">
             <div class="content-data">
                 <div class="head"><h3>Ex Personal de Servicios Generales (Inactivos)</h3></div>
@@ -53,7 +58,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th>DNI</th>
                                 <th>Colaborador</th>
-                                <th>Área</th>
+                                <th>Ãrea</th>
                                 <th>Sexo</th>
                                 <th>Fecha Nacimiento</th>
                                 <th>Estado</th>
@@ -65,7 +70,7 @@ medidata_staff_ensure_tables($connect);
                             <tr>
                                 <th scope="row"><?php echo htmlspecialchars($d->numide); ?></th>
                                 <td><?php echo htmlspecialchars($d->nomsg . ' ' . $d->apesg); ?></td>
-                                <td><?php echo htmlspecialchars($d->area ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($d->area ?? 'â€”'); ?></td>
                                 <td><?php echo htmlspecialchars($d->sexsg); ?></td>
                                 <td><?php echo htmlspecialchars($d->nacsg); ?></td>
                                 <td>
@@ -114,7 +119,7 @@ window.MEDIDATA_STAFF_SG = {
     toggleUrl: '../../backend/php/toggle_general_services_state.php',
     deleteUrl: '../../backend/php/delete_general_services.php',
     idParam: 'idsg',
-    deleteTitle: '¿Eliminar colaborador de servicios generales?',
+    deleteTitle: 'Â¿Eliminar colaborador de servicios generales?',
     deleteFn: 'deleteGeneralServices'
 };
 $(document).ready(function () {
@@ -131,7 +136,7 @@ $(document).ready(function () {
                 sInfoEmpty: 'Mostrando 0 a 0 de 0 registros',
                 sInfoFiltered: '(filtrado de _MAX_ registros totales)',
                 sSearch: 'Buscar:',
-                oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+                oPaginate: { sFirst: 'Primero', sLast: 'Ãšltimo', sNext: 'Siguiente', sPrevious: 'Anterior' }
             }
         });
     }
@@ -141,3 +146,4 @@ $(document).ready(function () {
 <script src="../../backend/registros/script/botones_color.js"></script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 // incuir el archivo de sesion login
 ?>
@@ -55,7 +55,7 @@ include_once '../admin/perfil.php';
 $hora_actual = date('H'); // Obtiene la hora en formato de 24 horas (0-23)
 
 if ($hora_actual >= 6 && $hora_actual < 12) {
-    $saludo = "Buenos Días";
+    $saludo = "Buenos DÃ­as";
 } elseif ($hora_actual >= 12 && $hora_actual < 18) {
     $saludo = "Buenas Tardes";
 } else {
@@ -65,13 +65,18 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'enfermera_ex.php')">Ex Enfermería</button>
-        <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo.php')">Registrar Enfermería</button>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+<div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="enfermera.php" class="button tab-button <?php echo ($current_page == 'enfermera.php' || $current_page == 'enfermera_usr.php') ? 'active' : ''; ?>">Personal Activo</a>
+    <a href="enfermera_ex.php" class="button tab-button <?php echo ($current_page == 'enfermera_ex.php' || $current_page == 'enfermera_ex_usr.php') ? 'active' : ''; ?>">Ex Colaboradores</a>
+    <a href="../recursos_humanos/agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+</div>
 <div class="data">
                 <div class="content-data">
                     <div class="head">
-                        <h3>Ex Enfermería (Inactivos)</h3>
+                        <h3>Ex EnfermerÃ­a (Inactivos)</h3>
                       
 
                     </div>
@@ -152,7 +157,7 @@ if($sentencia){
         toggleUrl: '../../backend/php/toggle_nurse_state.php',
         deleteUrl: '../../backend/php/delete_nurse.php',
         idParam: 'idnur',
-        deleteTitle: '¿Eliminar enfermero(a)?',
+        deleteTitle: 'Â¿Eliminar enfermero(a)?',
         deleteFn: 'deleteNurse'
     };
     </script>
@@ -168,7 +173,7 @@ if($sentencia){
     <script type="text/javascript">
 $(document).ready(function() {
     $('#example').DataTable({
-        pageLength: 10, // Establece explícitamente 10 registros por página
+        pageLength: 10, // Establece explÃ­citamente 10 registros por pÃ¡gina
         dom: 'Bfrtip',
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
         language: {
@@ -181,7 +186,7 @@ $(document).ready(function() {
             "sSearch": "Buscar:",
             "oPaginate": {
                 "sFirst": "Primero",
-                "sLast": "Último",
+                "sLast": "Ãšltimo",
                 "sNext": "Siguiente",
                 "sPrevious": "Anterior"
             }
@@ -236,5 +241,6 @@ window.onload = () => {
  <?php include_once '../../backend/php/delete_nurse.php' ?>
 </body>
 </html>
+
 
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once '../../backend/registros/session_check.php';
 ?>
 <!DOCTYPE html>
@@ -39,7 +39,7 @@ include_once '../admin/perfil.php';
         <?php
         $hora_actual = date('H');
         if ($hora_actual >= 6 && $hora_actual < 12) {
-            $saludo = "Buenos Días";
+            $saludo = "Buenos DÃ­as";
         } elseif ($hora_actual >= 12 && $hora_actual < 18) {
             $saludo = "Buenas Tardes";
         } else {
@@ -62,7 +62,7 @@ include_once '../admin/perfil.php';
     </div>
     <hr>
 
-    <label for="dep_code"><b>Código Departamento</b></label><span class="badge-warning">*</span>
+    <label for="dep_code"><b>CÃ³digo Departamento</b></label><span class="badge-warning">*</span>
     <input type="text" placeholder="ejm: RRHH-001" name="dep_code" required>
 
     <label for="dep_name"><b>Nombre Departamento</b></label><span class="badge-warning">*</span>
@@ -71,13 +71,13 @@ include_once '../admin/perfil.php';
     <label for="dep_head"><b>Jefe Departamento</b></label><span class="badge-warning">*</span>
     <input type="text" placeholder="Nombre completo" name="dep_head" required>
 
-    <label for="dep_description"><b>Descripción</b></label><span class="badge-warning">*</span>
-    <textarea name="dep_description" placeholder="Gestión del personal y procesos administrativos" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;" rows="3" required></textarea>
+    <label for="dep_description"><b>DescripciÃ³n</b></label><span class="badge-warning">*</span>
+    <textarea name="dep_description" placeholder="GestiÃ³n del personal y procesos administrativos" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;" rows="3" required></textarea>
 
     <label for="dep_email"><b>Correo Departamento</b></label>
     <input type="email" placeholder="rrhh@medicasa.hn" name="dep_email">
 
-    <label for="dep_phone"><b>Teléfono Departamento</b></label>
+    <label for="dep_phone"><b>TelÃ©fono Departamento</b></label>
     <input type="text" placeholder="2234-1001" name="dep_phone" maxlength="10">
 
     <label for="dep_status"><b>Estado</b></label><span class="badge-warning">*</span>
