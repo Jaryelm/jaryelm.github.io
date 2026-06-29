@@ -1,4 +1,4 @@
-﻿<!-- SIDEBAR -->
+<!-- SIDEBAR -->
 <section id="sidebar">
     <a href="../admin/escritorio.php" class="brand"><i class='bx bxs-home home'></i><span>MEDIDATA</span></a>
     <ul class="side-menu">
@@ -25,6 +25,7 @@
                         <li><a href="../../frontend/contabilidad/tabla_cheque.php"><span>CHEQUES REGISTRADOS</span></a></li>
                         <li><a href="../../frontend/contabilidad/conciliacion_bancaria.php"><span>CONCILIACIÓN BANCARIA</span></a></li>
                         <li><a href="../../frontend/contabilidad/recibir_pagos.php"><span>RECIBIR PAGOS</span></a></li>
+                        <li><a href="../../frontend/contabilidad/cuentas_por_pagar.php"><span>CUENTAS POR PAGAR</span></a></li>
                         <li><a href="#"><span>DEPOSITO BANCARIO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio.php"><span>DIRECTORIO MÉDICO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio_comercial.php"><span>DIRECTORIO COMERCIAL</span></a></li>

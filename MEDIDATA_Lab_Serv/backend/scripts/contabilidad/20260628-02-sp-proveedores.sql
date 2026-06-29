@@ -148,16 +148,33 @@ CREATE PROCEDURE sp_rep_compras_encabezado(
 BEGIN
     SELECT 
         CP.id_compra,
-        CP.dato_fac           AS NumeroFactura,
-        CP.fecha_emision,
         PC.nombre_empresa     AS Proveedor,
-        CP.total              AS Total_Compra,
-        CP.fech_vence         AS Fecha_Vencimiento
+        CP.fecha_emision      AS Fecha,
+        CP.dato_fac           AS NumeroFactura,
+        CP.fech_vence         AS Fecha_Vencimiento,
+        CP.total              AS ValorFactura,
+        COALESCE(Pagos.TotalSaldado, 0) AS TotalSaldado,
+        CASE 
+            WHEN (CP.total - COALESCE(Pagos.TotalSaldado, 0)) <= 0 THEN 'Pagado'
+            ELSE 'Pendiente'
+        END                   AS Estado
     FROM 
         compras CP
     INNER JOIN 
         proveedor_comercial PC 
             ON CP.prov_datos = PC.nombre_empresa
+    LEFT JOIN (
+        SELECT 
+            referencia, 
+            SUM(haber) AS TotalSaldado
+        FROM 
+            diario_general_transacciones
+        WHERE 
+            tipo_transaccion = 'COMPRA_PROVEEDOR'
+        GROUP BY 
+            referencia
+    ) AS Pagos 
+        ON Pagos.referencia = CONCAT('COMP-', CP.id_compra)
     WHERE 
         CP.fecha_emision >= p_fecha_inicio 
         AND CP.fecha_emision <= p_fecha_fin
@@ -176,12 +193,17 @@ CREATE PROCEDURE sp_rep_honorarios_encabezado(
 BEGIN
     SELECT 
         hm.id                         AS IdHonorario,
-        CONCAT(d.nodoc, ' ', d.apdoc) AS ProveedorMedico,
-        hm.id_factura                 AS OrdenID,
-        o.placed_on                   AS FechaOrden,
-        hm.monto_honorario            AS Total_Honorario,
-        hm.estado_pago                AS EstadoPago,
-        hm.fecha_pago                 AS FechaPago
+        CONCAT(d.nodoc, ' ', d.apdoc) AS Proveedor,
+        o.placed_on                   AS Fecha,
+        o.invoice_number              AS NumeroFactura,
+        o.nomcl                       AS NombrePaciente,
+        o.method                      AS Estudio,
+        hm.monto_honorario            AS ValorFactura,
+        CASE 
+            WHEN hm.estado_pago = 'PAGADO' THEN hm.monto_honorario 
+            ELSE 0 
+        END                           AS TotalSaldado,
+        hm.estado_pago                AS Estado
     FROM 
         honorarios_medicos hm
     INNER JOIN 

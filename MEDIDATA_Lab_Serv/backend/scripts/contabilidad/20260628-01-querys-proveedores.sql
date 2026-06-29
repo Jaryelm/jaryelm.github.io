@@ -115,16 +115,31 @@ WHERE
 -- =================================================================================================
 SELECT 
     CP.id_compra,
+    CP.fecha_emision      AS Fecha,
     CP.dato_fac           AS NumeroFactura,
-    CP.fecha_emision,
-    PC.nombre_empresa     AS Proveedor,
-    CP.total              AS Total_Compra,
-    CP.fech_vence         AS Fecha_Vencimiento
+    CP.fech_vence         AS Fecha_Vencimiento,
+    CP.total              AS ValorFactura,
+    CASE 
+        WHEN (CP.total - COALESCE(Pagos.TotalSaldado, 0)) <= 0 THEN 'Pagado'
+        ELSE 'Pendiente'
+    END                   AS Estado
 FROM 
     compras CP
 INNER JOIN 
     proveedor_comercial PC 
         ON CP.prov_datos = PC.nombre_empresa
+LEFT JOIN (
+    SELECT 
+        referencia, 
+        SUM(haber) AS TotalSaldado
+    FROM 
+        diario_general_transacciones
+    WHERE 
+        tipo_transaccion = 'COMPRA_PROVEEDOR'
+    GROUP BY 
+        referencia
+) AS Pagos 
+    ON Pagos.referencia = CONCAT('COMP-', CP.id_compra)
 WHERE 
     CP.fecha_emision >= '2025-04-01' 
     AND CP.fecha_emision < '2025-05-01'
@@ -137,12 +152,12 @@ ORDER BY
 -- =================================================================================================
 SELECT 
     hm.id                         AS IdHonorario,
-    CONCAT(d.nodoc, ' ', d.apdoc) AS ProveedorMedico,
-    hm.id_factura                 AS OrdenID,
-    o.placed_on                   AS FechaOrden,
-    hm.monto_honorario            AS Total_Honorario,
-    hm.estado_pago                AS EstadoPago,
-    hm.fecha_pago                 AS FechaPago
+    o.placed_on                   AS Fecha,
+    o.invoice_number              AS NumeroFactura,
+    o.nomcl                       AS NombrePaciente,
+    o.method                      AS Estudio,
+    hm.monto_honorario            AS ValorFactura,
+    hm.estado_pago                AS Estado
 FROM 
     honorarios_medicos hm
 INNER JOIN 

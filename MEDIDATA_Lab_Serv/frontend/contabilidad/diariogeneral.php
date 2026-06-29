@@ -235,29 +235,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         vertical-align: middle !important;
     }
 
-    .dt-acciones .acciones-wrap {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        width: 100%;
-    }
 
-    .btn_ver_detalles {
-        background-color: #06adbf;
-        border: none;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 13px;
-        line-height: 1.25;
-    }
 
-    .btn_ver_detalles:hover {
-        background-color: #049aad;
-    }
 
     /* Evita el "pantallazo blanco" de DataTables al procesar */
     #tablaDiarioGeneral_wrapper {

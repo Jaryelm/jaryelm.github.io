@@ -3924,16 +3924,18 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 .btn_ver_detalles {
-  background-color: #035c67;
-  color: white;
+  background-color: #06adbf;
+  color: #fff;
   border: none;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 13px;
+  line-height: 1.25;
   transition: background-color 0.3s ease;
 }
 .btn_ver_detalles:hover {
-  background-color: #06adbf;
+  background-color: #049aad;
 }
 .modal-pdf {
   display: none;
@@ -4670,3 +4672,14 @@ main .containerss .demo-flujo-step-num {
 .notification-item.border-danger {
   border-left: 5px solid #f44336;
 }
+
+/* MEDIDATA Standard Actions Wrap */
+.acciones-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
+
