@@ -24,6 +24,7 @@ html {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+	scrollbar-gutter: stable;
 }
 
 body {
@@ -31,6 +32,129 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+}
+
+body.swal2-shown {
+	padding-right: 0 !important;
+}
+
+.diario-details-modal.modal {
+	display: none;
+	position: fixed;
+	z-index: 12000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+}
+
+.diario-details-modal .modal-content {
+	background-color: #fefefe;
+	border: 1px solid #888;
+	padding: 20px;
+	width: 80%;
+	max-width: 1400px;
+	max-height: 90%;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.diario-details-modal .modal-content > .close-btn {
+	float: right;
+}
+
+.diario-details-modal .modal-content h2 {
+	margin: 0 0 10px 0;
+	padding-right: 36px;
+	font-size: 1.25rem;
+	color: #111;
+	font-weight: bold;
+}
+
+.diario-details-modal .modal-content .table-container {
+	max-height: 60vh;
+	overflow-y: auto;
+	overflow-x: auto;
+	margin-top: 10px;
+	flex-grow: 1;
+	box-shadow: none;
+	border-radius: 0;
+	padding: 0;
+	background: transparent;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.diario-details-modal .responsive-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	margin-bottom: 0;
+}
+
+.diario-details-modal .responsive-table thead {
+	position: static;
+	clip: auto;
+	height: auto;
+	width: auto;
+	overflow: visible;
+	padding: 0;
+	border: 0;
+}
+
+.diario-details-modal .responsive-table thead tr,
+.diario-details-modal .responsive-table tbody tr {
+	display: table-row;
+	margin: 0;
+	border: none;
+}
+
+.diario-details-modal .responsive-table th,
+.diario-details-modal .responsive-table td {
+	display: table-cell;
+	padding: 10px;
+	border: 1px solid #ddd;
+	white-space: normal;
+}
+
+.diario-details-modal .responsive-table thead th {
+	background-color: #1e2c4b;
+	border: 1px solid #1e2c4b;
+	color: #fff;
+	font-weight: normal;
+	text-align: center;
+}
+
+.diario-details-modal .responsive-table thead th:first-of-type {
+	text-align: left;
+}
+
+.diario-details-modal .responsive-table tbody tr:nth-of-type(even) {
+	background-color: rgba(94, 93, 82, 0.1);
+}
+
+.diario-details-modal .responsive-table tbody td {
+	text-align: center;
+}
+
+.diario-details-modal .close-btn {
+	color: #aaa;
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
+	line-height: 1;
+}
+
+.diario-details-modal .close-btn:hover,
+.diario-details-modal .close-btn:focus {
+	color: #000;
 }
 
 a {
@@ -3969,18 +4093,24 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 .btn_ver_detalles {
-  background-color: #06adbf;
-  color: #fff;
+  background-color: #035c67;
+  color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 13px;
-  line-height: 1.25;
   transition: background-color 0.3s ease;
 }
 .btn_ver_detalles:hover {
-  background-color: #049aad;
+  background-color: #06adbf;
+}
+.acciones-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
 }
 .modal-pdf {
   display: none;
@@ -4708,16 +4838,6 @@ main .containerss .demo-flujo-step-num {
 .rrhh-calendar-layout .notification-item.border-danger,
 .notification-item.border-danger {
   border-left: 5px solid #f44336;
-}
-
-/* MEDIDATA Standard Actions Wrap */
-.acciones-wrap {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
 }
 
 /* ===========================================================

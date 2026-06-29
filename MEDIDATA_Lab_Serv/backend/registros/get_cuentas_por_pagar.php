@@ -90,7 +90,9 @@ try {
                 $totalSaldado = (float)($r['TotalSaldado'] ?? 0);
                 $saldoNeto = $valorFactura - $totalSaldado;
                 
-                $btnPagar = '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial" data-saldo="' . $saldoNeto . '">Pagar</button>';
+                $btnPagar = ($saldoNeto > 0.005)
+                    ? '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial" data-saldo="' . $saldoNeto . '">Pagar</button>'
+                    : '';
                 $btnPartidas = '<button type="button" class="btn_ver_detalles btn_ver_partidas" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial">Ver Partidas</button>';
                 
                 $detalles[] = [
@@ -156,7 +158,9 @@ try {
                 $totalSaldado = (float)($r['TotalSaldado'] ?? 0);
                 $saldoNeto = $valorFactura - $totalSaldado;
                 
-                $btnPagar = '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico" data-saldo="' . $saldoNeto . '">Pagar</button>';
+                $btnPagar = ($saldoNeto > 0.005)
+                    ? '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico" data-saldo="' . $saldoNeto . '">Pagar</button>'
+                    : '';
                 $btnPartidas = '<button type="button" class="btn_ver_detalles btn_ver_partidas" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico">Historial Pagos</button>';
                 
                 $detalles[] = [

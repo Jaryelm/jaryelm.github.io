@@ -14,6 +14,10 @@ function medidata_etiqueta_tipo_transaccion(?string $codigo): string
             return 'Cierre de venta';
         case 'REVERSION_ANULACION':
             return 'Reversión / anulación';
+        case 'PAGO_PROVEEDOR':
+            return 'Pago a proveedor';
+        case 'PAGO_HONORARIO_MEDICO':
+            return 'Pago a honorario médico';
         default:
             return $c !== '' ? $c : 'Otro / sin clasificar';
     }

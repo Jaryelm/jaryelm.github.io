@@ -23,13 +23,16 @@ BEGIN
         proveedor_comercial PC 
             ON CP.prov_datos = PC.nombre_empresa
     LEFT JOIN (
+        -- Lo "saldado" = pagos reales = SUMA de DEBE sobre la cuenta por pagar 210200107.
+        -- La partida de la compra registra la deuda como HABER en 210200107 (no es un pago);
+        -- los pagos posteriores la reducen con DEBE en esa misma cuenta.
         SELECT 
             referencia, 
-            SUM(haber) AS TotalSaldado
+            SUM(debe) AS TotalSaldado
         FROM 
             diario_general_transacciones
         WHERE 
-            tipo_transaccion = 'COMPRA_PROVEEDOR'
+            cuenta = '210200107'
         GROUP BY 
             referencia
     ) AS Pagos 
@@ -94,13 +97,16 @@ BEGIN
         proveedor_comercial PC 
             ON CP.prov_datos = PC.nombre_empresa
     LEFT JOIN (
+        -- Lo "saldado" = pagos reales = SUMA de DEBE sobre la cuenta por pagar 210200107.
+        -- La partida de la compra registra la deuda como HABER en 210200107 (no es un pago);
+        -- los pagos posteriores la reducen con DEBE en esa misma cuenta.
         SELECT 
             referencia, 
-            SUM(haber) AS TotalSaldado
+            SUM(debe) AS TotalSaldado
         FROM 
             diario_general_transacciones
         WHERE 
-            tipo_transaccion = 'COMPRA_PROVEEDOR'
+            cuenta = '210200107'
         GROUP BY 
             referencia
     ) AS Pagos 
@@ -164,13 +170,16 @@ BEGIN
         proveedor_comercial PC 
             ON CP.prov_datos = PC.nombre_empresa
     LEFT JOIN (
+        -- Lo "saldado" = pagos reales = SUMA de DEBE sobre la cuenta por pagar 210200107.
+        -- La partida de la compra registra la deuda como HABER en 210200107 (no es un pago);
+        -- los pagos posteriores la reducen con DEBE en esa misma cuenta.
         SELECT 
             referencia, 
-            SUM(haber) AS TotalSaldado
+            SUM(debe) AS TotalSaldado
         FROM 
             diario_general_transacciones
         WHERE 
-            tipo_transaccion = 'COMPRA_PROVEEDOR'
+            cuenta = '210200107'
         GROUP BY 
             referencia
     ) AS Pagos 
@@ -235,7 +244,7 @@ BEGIN
         CP.total                 AS Total_Compra,
         DGT.numero_partida       AS PartidaPago,
         DGT.fecha_ocurrencia     AS FechaPago,
-        DGT.haber                AS MontoAbonado,
+        DGT.debe                 AS MontoAbonado,
         DGT.descripcion          AS DescripcionPago
     FROM 
         compras CP
@@ -245,7 +254,8 @@ BEGIN
     INNER JOIN 
         diario_general_transacciones DGT 
             ON DGT.referencia = CONCAT('COMP-', CP.id_compra)
-            AND DGT.tipo_transaccion = 'COMPRA_PROVEEDOR'
+            AND DGT.cuenta = '210200107'
+            AND DGT.debe > 0
     WHERE 
         CP.fecha_emision >= p_fecha_inicio 
         AND CP.fecha_emision <= p_fecha_fin
