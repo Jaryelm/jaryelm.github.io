@@ -85,7 +85,7 @@ try {
 
     $searchWhere = "";
     if (!empty($searchValue)) {
-        $searchWhere = " AND (numero_partida LIKE :search OR referencia LIKE :search OR descripcion LIKE :search OR usuario LIKE :search)";
+        $searchWhere = " AND CONCAT_WS(' ', numero_partida, referencia, descripcion, usuario) LIKE :search";
         $params[':search'] = '%' . $searchValue . '%';
         $types[':search'] = PDO::PARAM_STR;
     }

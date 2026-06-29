@@ -16,12 +16,16 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
+
+
+
+
     <title>MEDIDATA</title>
 </head>
 <body>
     
 <?php
-include_once '../admin/menu.php';
+include_once '../auxcontable/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -38,7 +42,7 @@ include_once '../admin/menu.php';
            
             <span class="divider"></span>
             <?php
-include_once '../admin/perfil.php';
+include_once '../auxcontable/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>
@@ -61,10 +65,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<button class="button" onclick="cambiarColor(this, 'catalogo.php')">Catálogo de Cuentas</button>
-<button class="button" onclick="cambiarColor(this, 'diariogeneral.php')">Diario General</button>
-<button class="button" onclick="cambiarColor(this, 'partida_manual.php')">Partida Manual</button>
-<button class="button" onclick="cambiarColor(this, 'transacciones.php')">Transacciones Capturadas</button>
+<button class="button" onclick="cambiarColor(this, 'catalogo_user.php')">Catálogo de Cuentas</button>
+<button class="button" onclick="cambiarColor(this, 'diariogeneral_user.php')">Diario General</button>
+<button class="button" onclick="cambiarColor(this, 'partida_manual_user.php')">Partida Manual</button>
+<button class="button" onclick="cambiarColor(this, 'transacciones_user.php')">Transacciones Capturadas</button>
 
 <br>
             
@@ -272,6 +276,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         color: #fff;
         font-weight: 600;
     }
+
     .dt-acciones {
         white-space: nowrap;
         text-align: center;

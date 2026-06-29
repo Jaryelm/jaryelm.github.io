@@ -5,9 +5,10 @@
  */
 $medicos_nav_rrhh = !empty($medicos_nav_rrhh);
 if ($medicos_nav_rrhh) {
+    // RRHH: la navegación regresa al tablero unificado (pestañas), no a vistas separadas.
     $urlNuevo = 'nuevo_usr.php';
-    $urlLista = 'mostrar_usr.php';
-    $urlListaEx = 'mostrar_ex_usr.php';
+    $urlLista = '../recursos_humanos/lista_colaboradores_usr.php';
+    $urlListaEx = '../recursos_humanos/lista_excolaboradores_usr.php';
 } else {
     $urlNuevo = '../medicos/nuevo.php';
     $urlLista = '../medicos/mostrar.php';

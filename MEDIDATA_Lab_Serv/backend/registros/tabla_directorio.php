@@ -10,21 +10,7 @@ try {
             $sql = "SELECT * FROM proveedor_data ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
         } else {
             $sql = "SELECT * FROM proveedor_data 
-                    WHERE nombre_proveedor LIKE :search 
-                    OR especialidad LIKE :search 
-                    OR identidad LIKE :search 
-                    OR colegiado LIKE :search 
-                    OR rtn LIKE :search 
-                    OR celular LIKE :search 
-                    OR correo LIKE :search
-                    OR cuenta_bac LIKE :search
-                    OR cuenta_si LIKE :search
-                    OR cuenta_no LIKE :search
-                    OR tipo_cuenta LIKE :search
-                    OR constancia_pagos LIKE :search
-                    OR solicitud_constancia LIKE :search
-                    OR constancia_vigente LIKE :search
-                    OR fecha_registro LIKE :search
+                    WHERE CONCAT_WS(' ', nombre_proveedor, especialidad, identidad, colegiado, rtn, celular, correo, cuenta_bac, cuenta_si, cuenta_no, tipo_cuenta, constancia_pagos, solicitud_constancia, constancia_vigente, fecha_registro) LIKE :search
                     ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
         }
 

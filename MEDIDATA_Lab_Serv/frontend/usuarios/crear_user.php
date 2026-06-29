@@ -23,7 +23,7 @@ $crearUserAlertScripts = ob_get_clean();
 <body>
     
 <?php
-include_once '../admin/menu.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/menu.php' : '../admin/menu.php');
 // incuir el archivo menu principal
 ?>
 
@@ -38,7 +38,7 @@ include_once '../admin/menu.php';
         </form>
         <span class="divider"></span>
         <?php
-include_once '../admin/perfil.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/perfil.php' : '../admin/perfil.php');
 // incuir el archivo menu principal
 ?>
     </nav>
@@ -97,6 +97,7 @@ include_once '../admin/perfil.php';
                 <select name="rol" id="rol" class="select2" data-placeholder="Seleccione un rol..." required>
                     <option value="">Seleccione...</option>
                     <option value="Administrador">Administrador</option>
+                    <option value="IT">IT (Soporte / Sistemas)</option>
                     <option value="Caja">Caja</option>
                     <option value="Contabilidad">Contabilidad</option>
                     <option value="Auxiliar Contable">Auxiliar Contable</option>

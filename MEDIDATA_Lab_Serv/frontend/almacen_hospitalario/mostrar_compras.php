@@ -14,10 +14,22 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <title>MEDIDATA</title>
 
     <style>
+        /* Modal de detalle de compra (mismo enfoque que Diario General) */
+        .swal2-detalle-compra {
+            width: min(70rem, calc(100vw - 30px)) !important;
+        }
+
+        .swal2-detalle-compra-html {
+            text-align: left !important;
+            margin: 0 !important;
+            padding: 0.5rem 0 !important;
+        }
+
         /* Estilos para la tabla de compras */
         #compras_table {
             width: 100%;
@@ -231,7 +243,7 @@ window.verDetalles = function(idCompra) {
             console.log("Respuesta de obtener_detalle_compras.php:", data);
 
             try {
-                const detalles = JSON.parse(data);
+                const detalles = (typeof data === 'string') ? JSON.parse(data) : data;
                 if (detalles.length > 0) {
                     let detallesHTML = `
                         <div style="overflow-x:auto; max-width: 900px;">
@@ -273,38 +285,28 @@ window.verDetalles = function(idCompra) {
 
                     detallesHTML += `</tbody></table></div>`;
 
-                    // Configuración del modal de SweetAlert con mayor ancho
-                    swal({
+                    // Modal de SweetAlert2 (mismo enfoque que Diario General)
+                    Swal.fire({
                         title: "Detalles de la Compra",
-                        content: $(detallesHTML)[0],
-                        buttons: {
-                            confirm: {
-                                text: "Cerrar",
-                                value: true,
-                                visible: true,
-                                className: "btn_ver_detalles",
-                                closeModal: true
-                            }
+                        html: detallesHTML,
+                        width: "70rem",
+                        confirmButtonText: "Cerrar",
+                        customClass: {
+                            popup: 'swal2-detalle-compra',
+                            htmlContainer: 'swal2-detalle-compra-html'
                         }
                     });
-
-                    // Ajustar el ancho del modal usando CSS de SweetAlert
-                    $(".swal-modal").css({
-                        "width": "80%",  // Expandir al 80% del ancho de la pantalla
-                        "max-width": "900px", // Limitar el máximo a 900px para pantallas más grandes
-                        "overflow-x": "auto" // Permitir scroll horizontal si es necesario
-                    });
                 } else {
-                    swal("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
+                    Swal.fire("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
                 }
             } catch (e) {
                 console.error("Error al analizar la respuesta:", e);
-                swal("Error", "Hubo un problema al cargar los detalles.", "error");
+                Swal.fire("Error", "Hubo un problema al cargar los detalles.", "error");
             }
         },
         error: function(xhr, status, error) {
             console.error("Error de AJAX:", status, error);
-            swal("Error", "No se pudo cargar los detalles de la compra.", "error");
+            Swal.fire("Error", "No se pudo cargar los detalles de la compra.", "error");
         }
     });
 }
@@ -314,7 +316,7 @@ window.verDetalles = function(idCompra) {
     });
 </script>
 
-<script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

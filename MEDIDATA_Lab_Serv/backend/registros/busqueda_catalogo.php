@@ -14,7 +14,7 @@ try {
         } else {
             // Manejar la búsqueda
             $search = trim($_GET['search']);
-            $sql .= " WHERE tipo_cuenta LIKE :search OR cuenta LIKE :search OR nombre LIKE :search ORDER BY cuenta" . medidata_tablas_mysql_limit_clause();
+            $sql .= " WHERE CONCAT_WS(' ', tipo_cuenta, cuenta, nombre) LIKE :search ORDER BY cuenta" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $search_param = '%' . $search . '%';
             $stmt->bindParam(':search', $search_param, PDO::PARAM_STR);
