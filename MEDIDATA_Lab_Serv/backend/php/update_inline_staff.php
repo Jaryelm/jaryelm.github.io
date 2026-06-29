@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/staff_colaborador_bootstrap.php';
+require_once __DIR__ . '/users_rrhh_extra_lib.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,6 +15,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $value = trim($_POST['value'] ?? '');
     $table = trim($_POST['table'] ?? '');
     $id_col = trim($_POST['id_col'] ?? '');
+
+    // Cuentas tipo "Usuario": identidad en `users`, datos RRHH en `users_rrhh_extra`.
+    if ($table === 'users') {
+        if ($id <= 0) {
+            echo json_encode(['status' => 'error', 'message' => 'ID inválido']);
+            exit;
+        }
+        $finalValue = ($value === '' || $value === '—' || $value === '-') ? null : $value;
+        // El biométrico de usuarios vive en users.uid_biometrico.
+        if ($field === 'id_biometrico') {
+            $field = 'uid_biometrico';
+        }
+        try {
+            if (in_array($field, medidata_users_rrhh_extra_identity_fields(), true)) {
+                $stmt = $connect->prepare("UPDATE users SET {$field} = :val WHERE id = :id");
+                $stmt->bindValue(':val', $finalValue, $finalValue === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+                $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+                $stmt->execute();
+                echo json_encode(['status' => 'success', 'message' => 'Actualizado correctamente']);
+            } elseif (in_array($field, medidata_users_rrhh_extra_fields(), true)) {
+                $ok = medidata_users_rrhh_extra_save_field($connect, $id, $field, $finalValue);
+                echo json_encode($ok
+                    ? ['status' => 'success', 'message' => 'Actualizado correctamente']
+                    : ['status' => 'error', 'message' => 'No se pudo guardar']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Operación no permitida']);
+            }
+        } catch (PDOException $e) {
+            error_log('update_inline_staff.php (users): ' . $e->getMessage());
+            echo json_encode(['status' => 'error', 'message' => 'Error de base de datos']);
+        }
+        exit;
+    }
 
     // Allowlist de campos y tablas para seguridad
     $allowed_tables = ['staff_administrative', 'staff_general_services', 'nurse', 'doctor'];

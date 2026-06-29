@@ -67,15 +67,19 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-        <button class="button" onclick="cambiarColor(this, 'enfermera.php')">Personal Activo</button>
-        <button class="button" onclick="cambiarColor(this, 'enfermera_ex.php')">Ex Enfermería</button>
+        <button class="button" onclick="cambiarColor(this, '../recursos_humanos/lista_colaboradores.php')">Personal Activo</button>
+        <button class="button" onclick="cambiarColor(this, '../recursos_humanos/lista_excolaboradores.php')">Ex Enfermería</button>
         <button class="button" onclick="cambiarColor(this, 'enfermera_nuevo.php')">Registrar Enfermería</button>
 <!-- multistep form -->
 
 <?php 
- $id = $_GET['id'];
- $sentencia = $connect->prepare("SELECT * FROM nurse  WHERE idnur= '$id';");
- $sentencia->execute();
+ $id = (int) ($_GET['id'] ?? 0);
+ $sentencia = $connect->prepare("SELECT *,
+        (url_contrato IS NOT NULL AND url_contrato != '') AS has_contrato,
+        (url_solicitud IS NOT NULL AND url_solicitud != '') AS has_solicitud,
+        (url_psicometricas IS NOT NULL AND url_psicometricas != '') AS has_psicometricas
+    FROM nurse WHERE idnur = :id LIMIT 1");
+ $sentencia->execute([':id' => $id]);
 
 $data =  array();
 if($sentencia){

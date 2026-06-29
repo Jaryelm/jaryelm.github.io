@@ -9,10 +9,36 @@ if ($id <= 0 || !in_array($doc, ['contrato', 'solicitud', 'psicometricas'])) {
     die('Documento no válido.');
 }
 
+// Soporte para la lista unificada de colaboradores: permite consultar el
+// documento en la tabla correcta (administrativo / servicios generales /
+// enfermera / doctor). Por defecto usa staff_administrative para mantener
+// compatibilidad con administrativo.php que solo envia id + doc.
+$tablas_permitidas = [
+    'staff_administrative'   => 'idadm',
+    'staff_general_services' => 'idsg',
+    'nurse'                  => 'idnur',
+    'doctor'                 => 'idodc',
+];
+$table = $_GET['table'] ?? 'staff_administrative';
+
+// Cuentas tipo "Usuario": el contrato vive en users_rrhh_extra (solo 'contrato').
+if ($table === 'users') {
+    if ($doc !== 'contrato') {
+        die('Documento no válido.');
+    }
+    $table = 'users_rrhh_extra';
+    $id_col = 'id_user';
+} else {
+    if (!array_key_exists($table, $tablas_permitidas)) {
+        die('Origen no válido.');
+    }
+    $id_col = $tablas_permitidas[$table];
+}
+
 $column = 'url_' . $doc;
 
 try {
-    $stmt = $connect->prepare("SELECT $column FROM staff_administrative WHERE idadm = ? LIMIT 1");
+    $stmt = $connect->prepare("SELECT $column FROM {$table} WHERE {$id_col} = ? LIMIT 1");
     $stmt->execute([$id]);
     $blob = $stmt->fetchColumn();
 
