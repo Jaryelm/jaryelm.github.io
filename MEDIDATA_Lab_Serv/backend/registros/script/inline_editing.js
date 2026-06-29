@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('.editable-cell').on('blur', function() {
+    $(document).on('blur', '.editable-cell', function() {
         var $cell = $(this);
         var id = $cell.data('id');
         var field = $cell.data('field');
@@ -41,7 +41,7 @@ $(document).ready(function() {
     });
     
     
-    $('.inline-select').on('change', function() {
+    $(document).on('change', '.inline-select', function() {
         var $select = $(this);
         var id = $select.data('id');
         var field = $select.data('field');
@@ -76,7 +76,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.editable-cell').on('keypress', function(e) {
+    $(document).on('keypress', '.editable-cell', function(e) {
         if(e.which == 13) {
             e.preventDefault();
             $(this).blur();

@@ -68,6 +68,7 @@ if (isset($_POST['login'])) {
 
                     $redirectPaths = [
                         'Administrador' => 'admin/escritorio.php',
+                        'IT' => 'it/escritorio.php',
                         'Caja' => 'caja/escritorio.php',
                         'Contabilidad' => 'contabilidad/escritorio.php',
                         'Auxiliar Contable' => 'auxcontable/escritorio.php',

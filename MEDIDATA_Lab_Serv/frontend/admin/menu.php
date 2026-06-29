@@ -158,7 +158,7 @@
         <li>
             <a href="#"><i class='bx bxs-bulb icon'></i><span>CRM MARKETING</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
-                <li><a href="#"><span>CUMPLEAÑOS</span></a></li>
+                <li><a href="../crm_marketing/invitados_wifi.php"><span>INVITADOS WIFI</span></a></li>
             </ul>
         </li>
 

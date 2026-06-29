@@ -12,7 +12,6 @@ if (!$pdo) {
 
 $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 $start = isset($_POST['start']) ? trim((string) $_POST['start']) : '';
-$end = isset($_POST['end']) ? trim((string) $_POST['end']) : '';
 $type = isset($_POST['type']) ? trim((string) $_POST['type']) : '';
 
 if ($id <= 0 || $start === '' || $type === '') {
@@ -34,22 +33,11 @@ try {
     } elseif ($type === 'custom') {
         $date = $dt->format('Y-m-d');
         $time = $dt->format('H:i:s');
-        
-        $sql = "UPDATE rrhh_custom_events SET start_date = ?, start_time = ?";
-        $params = [$date, $time];
-        
-        if ($end !== '') {
-            $dtEnd = new DateTime($end);
-            $sql .= ", end_date = ?, end_time = ?";
-            $params[] = $dtEnd->format('Y-m-d');
-            $params[] = $dtEnd->format('H:i:s');
-        }
-        
-        $sql .= " WHERE id = ? AND deleted = 0";
-        $params[] = $id;
-
+        // Para eventos personalizados, actualizamos solo el inicio. 
+        // Nota: FullCalendar mantiene la duración si no se cambia el fin, pero aquí actualizamos solo start_date y start_time.
+        $sql = "UPDATE rrhh_custom_events SET start_date = ?, start_time = ? WHERE id = ? AND deleted = 0";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([$date, $time, $id]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Tipo de evento no editable.']);
         exit;

@@ -3,7 +3,7 @@ require_once('../../backend/bd/Conexion.php');
 header('Content-Type: application/json');
 date_default_timezone_set('America/Tegucigalpa');
 
-$logFile = "/home4/medic9ue/medidata.medicasa.hn/frontend/pacientes/error.log";
+$logFile = __DIR__ . "/error.log";
 error_log("🚀 Recibiendo datos...\n", 3, $logFile);
 error_log(print_r($_POST, true), 3, $logFile);
 

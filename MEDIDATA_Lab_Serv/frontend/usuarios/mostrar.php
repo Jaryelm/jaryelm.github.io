@@ -118,7 +118,7 @@ if (function_exists('session_write_close')) {
 <body>
     
 <?php
-include_once '../admin/menu.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/menu.php' : '../admin/menu.php');
 // incluir el archivo menu principal
 ?>
 
@@ -134,7 +134,7 @@ include_once '../admin/menu.php';
         
         <span class="divider"></span>
         <?php
-include_once '../admin/perfil.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/perfil.php' : '../admin/perfil.php');
 // incuir el archivo menu principal
 ?>
     </nav>
@@ -161,72 +161,28 @@ include_once '../admin/perfil.php';
     <button class="button" onclick="cambiarColor(this, '../usuarios/mostrar.php')">Lista de Usuarios</button>
 
 
-    <?php
-    $sentencia = $connect->prepare("SELECT * FROM users ORDER BY id DESC;");
-    $sentencia->execute();
-    $data = array();
-    if($sentencia){
-        while($r = $sentencia->fetchObject()){
-            $data[] = $r;
-        }
-    }
-    ?>
-
     <div class="data">
         <div class="content-data">
             <div class="head">
                 <h3>Usuarios Registrados</h3>
             </div>
             <div class="table-responsive" style="overflow-x:auto;">
-                <?php if(count($data) > 0): ?>
-                    <table id="example" class="responsive-table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Usuario</th>
-                                <th scope="col">Nombre Completo</th>
-                                <th scope="col">Cédula</th>
-                                <th scope="col">Sexo</th>
-                                <th scope="col">Correo Electrónico</th>
-                                <th scope="col">Rol</th>
-                                <th scope="col">Fecha Creación</th>
-                                <th scope="col">Ultima Actividad</th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach($data as $d): ?>
-                                <tr>
-                                    <td><?php echo $d->username; ?></td>
-                                    <td><?php echo $d->name; ?></td>
-                                    <td><?php echo htmlspecialchars((string)($d->cedula ?? '') !== '' ? $d->cedula : 'N/A'); ?></td>
-                                    <td><?php echo htmlspecialchars((string)($d->sexo ?? '') !== '' ? $d->sexo : 'N/A'); ?></td>
-                                    <td><?php echo $d->email; ?></td>
-                                    <td><?php echo $d->rol; ?></td>
-                                    <td><?php echo $d->created_at; ?></td>
-                                    <td><?php echo $d->last_activity; ?></td>
-                                    <td>
-                                        <a title="Editar Usuario" href="editar_user.php?id=<?php echo $d->id; ?>" class="btn-action btn-edit-perfil">
-                                            <i class="fas fa-user-edit"></i>
-                                        </a>
-                                        <a title="Cambiar Contraseña" href="password.php?id=<?php echo $d->id; ?>" class="btn-action btn-edit">
-                                            <i class="fas fa-key"></i>
-                                        </a>
-                                        <?php if ($d->id != $_SESSION['id']): ?>
-                                            <a title="Eliminar Usuario" href="javascript:void(0);" onclick="confirmarEliminacion(<?php echo $d->id; ?>, '<?php echo addslashes($d->username); ?>')" class="btn-action btn-delete">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table> 
-                <?php else: ?>
-                    <div class="alert">
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-                        <strong>Danger!</strong> No hay datos.
-                    </div>
-                <?php endif; ?>
+                <table id="example" class="responsive-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Nombre Completo</th>
+                            <th scope="col">Cédula</th>
+                            <th scope="col">Sexo</th>
+                            <th scope="col">Correo Electrónico</th>
+                            <th scope="col">Rol</th>
+                            <th scope="col">Fecha Creación</th>
+                            <th scope="col">Ultima Actividad</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -282,11 +238,53 @@ Swal.fire({
 <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script type="text/javascript">
+var MEDIDATA_CURRENT_USER_ID = <?php echo (int) ($_SESSION['id'] ?? 0); ?>;
+
+function esc(text) {
+    if (text === null || text === undefined || text === '') { return ''; }
+    return $('<div>').text(text).html();
+}
+
 $(document).ready(function() {
     $('#example').DataTable({
-        pageLength: 10, // Establece explícitamente 10 registros por página
+        processing: true,
+        serverSide: true,
+        scrollX: true,
+        pageLength: 10, // 10 registros por página (carga por página, no todo de golpe)
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
         dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        ajax: {
+            url: '../../backend/php/get_usuarios.php',
+            type: 'GET'
+        },
+        columns: [
+            { data: 'username', render: function (d) { return esc(d) || '—'; } },
+            { data: 'name', render: function (d) { return esc(d) || '—'; } },
+            { data: 'cedula', render: function (d) { return (d !== null && d !== undefined && String(d).trim() !== '') ? esc(d) : 'N/A'; } },
+            { data: 'sexo', render: function (d) { return (d !== null && d !== undefined && String(d).trim() !== '') ? esc(d) : 'N/A'; } },
+            { data: 'email', render: function (d) { return esc(d) || '—'; } },
+            { data: 'rol', render: function (d) { return esc(d) || '—'; } },
+            { data: 'created_at', render: function (d) { return esc(d) || '—'; } },
+            { data: 'last_activity', render: function (d) { return esc(d) || '—'; } },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (row) {
+                    var id = parseInt(row.id, 10);
+                    var html = ''
+                        + '<a title="Editar Usuario" href="editar_user.php?id=' + id + '" class="btn-action btn-edit-perfil"><i class="fas fa-user-edit"></i></a> '
+                        + '<a title="Cambiar Contraseña" href="password.php?id=' + id + '" class="btn-action btn-edit"><i class="fas fa-key"></i></a>';
+                    if (id !== MEDIDATA_CURRENT_USER_ID) {
+                        var u = String(row.username || '').replace(/'/g, "\\'");
+                        html += ' <a title="Eliminar Usuario" href="javascript:void(0);" onclick="confirmarEliminacion(' + id + ', \'' + esc(u) + '\')" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>';
+                    }
+                    return html;
+                }
+            }
+        ],
+        order: [[6, 'desc']], // Fecha de Creación, descendente
+        buttons: ['copy', 'csv', 'excel', 'print'],
         language: {
             "sProcessing": "Procesando...",
             "sLengthMenu": "Mostrar _MENU_ registros",
@@ -301,8 +299,7 @@ $(document).ready(function() {
                 "sNext": "Siguiente",
                 "sPrevious": "Anterior"
             }
-        },
-        order: [[6, 'desc']] // Ordenar por la columna de "Fecha de Creación" (índice 6) de forma descendente
+        }
     });
 });
 

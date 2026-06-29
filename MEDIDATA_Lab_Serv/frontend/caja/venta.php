@@ -28,7 +28,7 @@ include_once '../../backend/registros/session_check.php';
 <script>document.addEventListener('DOMContentLoaded',function(){var o=document.getElementById('page-loading-overlay');if(o)o.style.display='none';});</script>
 
 <?php
-include_once '../admin/menu.php';
+include_once '../caja/menu.php';
 // incuir el archivo menu principal
 ?>
 
@@ -45,8 +45,8 @@ include_once '../admin/menu.php';
             
            
             <span class="divider"></span>
-            <?php
-include_once '../admin/perfil.php';
+<?php
+include_once '../caja/perfil.php';
 // incuir el archivo menu principal
 ?>
         </nav>
@@ -69,12 +69,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-            <button class="button" onclick="cambiarColor(this, '../almacen/new_sale.php')">Nueva Venta</button>
-            <button class="button" onclick="cambiarColor(this, '../almacen/cart.php')">Pagar</button>
-            <button class="button" onclick="cambiarColor(this, '#')">Cotizaciones</button>
-            <button class="button" onclick="cambiarColor(this, '#')">Estados de Cuenta</button>
-            <button class="button" onclick="cambiarColor(this, '../almacen/venta.php')">Resumen de Ventas</button>
-            <button class="button" onclick="cambiarColor(this, '../citas/mostrar.php')">Resumen de Citas</button>
+                <button class="button" onclick="cambiarColor(this, '../caja/new_sale.php')">Nueva Venta</button>
+                <button class="button" onclick="cambiarColor(this, '../caja/cart.php')">Procesar Venta</button>
+                <button class="button" onclick="cambiarColor(this, '#')">Cotizaciones</button>
+                <button class="button" onclick="cambiarColor(this, '#')">Estados de Cuenta</button>
+                <button class="button" onclick="cambiarColor(this, '../caja/venta.php')">Resumen de Ventas</button>
+                <button class="button" onclick="cambiarColor(this, '../caja/mostrar.php')">Resumen de Citas</button>
 
             <div class="data">
                 <div class="content-data">
@@ -101,58 +101,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             <th scope="col">Detalles</th>
             <th scope="col">Estado</th>
             <th scope="col">Cobrado Por</th>
-            <th scope="col">Acciones</th>
+            <th scope="col" class="columna-acciones-caja" style="display: none;">Acciones</th>
         </tr>
     </thead>
-<<<<<<<< HEAD:MEDIDATA_Lab_Serv/frontend/caja/venta.php
     <tbody></tbody>
-========
-    <tbody>
-        <?php foreach ($data as $d): ?>
-            <tr>
-                <td data-title="N. Factura"><?php echo htmlspecialchars($d->invoice_number); ?></td>
-                <td data-title="Procesado Por"><?php echo htmlspecialchars($d->processed_by); ?></td>
-                <td data-title="Fecha"><?php echo htmlspecialchars($d->placed_on); ?></td>
-                <td data-title="Cliente"><?php echo htmlspecialchars($d->nomcl); ?></td>
-                <td data-title="Método"><?php echo htmlspecialchars($d->method); ?></td>
-                <td data-title="Precio Sin Descuento">LPS. <?php echo number_format($d->price_without_discount, 2); ?></td>
-                <td data-title="Total con Descuento">LPS. <?php echo number_format($d->total_price, 2); ?></td>
-                <td style="text-align: center;">
-                    <?php 
-                        if ($d->tipc === 'Boleta') {
-                            echo '<i class="bx bx-show" title="Ver Factura General" onclick="verPDF(\'../almacen/documento_general.php?id='.htmlspecialchars($d->idord).'\', \'Factura General\')" style="cursor: pointer; color: #06adbf; font-size: 24px; display: inline-block; vertical-align: middle;"></i>';
-                        }
-                    ?>
-                </td>
-                <td style="text-align: center;">
-                    <?php 
-                        if ($d->tipc === 'Boleta') {
-                            echo '<i class="bx bx-show" title="Ver Factura Desglosada" onclick="verPDF(\'../almacen/documento.php?id='.htmlspecialchars($d->idord).'\', \'Factura Desglosada\')" style="cursor: pointer; color: #06adbf; font-size: 24px; display: inline-block; vertical-align: middle;"></i>';
-                        }
-                    ?>
-                </td>
-                <td>
-                    <button class="btn_ver_detalles" onclick="viewDetails(<?php echo htmlspecialchars($d->idord); ?>)">Ver Detalles</button>
-                </td>
-                <td>
-<label class="status-switch">
-        <input 
-            type="checkbox" 
-            data-id="<?php echo htmlspecialchars($d->idord); ?>" 
-            data-current-status="<?php echo htmlspecialchars($d->invoice_status); ?>"
-            onchange="updateStatus(<?php echo htmlspecialchars($d->idord); ?>, this.checked ? 'Cobrada' : 'Pendiente')" 
-            <?php echo $d->invoice_status == 'Cobrada' ? 'checked' : ''; ?>>
-        <span class="status-slider"></span>
-    </label>
-</td>
-                <td data-title="Procesado Por"><?php echo htmlspecialchars($d->updated_by); ?></td>
-<td>
-    <button class="btn_devolucion" onclick="iniciarDevolucion(<?php echo htmlspecialchars($d->idord); ?>)">Devolución</button>
-</td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
->>>>>>>> chore/rrhh-interviews:MEDIDATA_Lab_Serv/uploads/frontend/almacen_hospitalario/venta.php
 </table>
 
 <script>
@@ -386,7 +338,7 @@ function viewDetails(orderId) {
 
                 row.innerHTML = `
                     <td>${item.codigo || 'N/A'}</td>
-                    <td>${item.impuesto || 'N/A'}</td>
+                    <td>${item.impuesto !== null && item.impuesto !== '' ? item.impuesto : 'N/A'}</td>
                     <td>${item.nombre || 'N/A'}</td>
                     <td>${item.cantidad || 0}</td>
                     <td>${formatCurrency(item.total_original)}</td>
@@ -1002,17 +954,16 @@ $(document).ready(function() {
 });
 </script>
 
-<<<<<<<< HEAD:MEDIDATA_Lab_Serv/frontend/caja/venta.php
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-========
-    <script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
->>>>>>>> chore/rrhh-interviews:MEDIDATA_Lab_Serv/uploads/frontend/almacen_hospitalario/venta.php
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
 
     <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>
+
+    <!-- Función Cierre de Caja -->
+    <script src='../../backend/registros/script/cierre_caja.js'></script>
 
 </body>
 </html>

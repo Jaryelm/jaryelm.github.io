@@ -171,7 +171,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 type: "POST",
                 data: { id_compra: idCompra },
                 success: function(data) {
-                    const detalles = JSON.parse(data);
+                    const detalles = (typeof data === 'string') ? JSON.parse(data) : data;
                     let detallesHTML = '<h3>Detalles de la Compra</h3><table border="1" style="width:100%; border-collapse: collapse;">';
                     detallesHTML += '<tr><th>Código</th><th>Cantidad</th><th>Unidad</th><th>Descripción</th><th>Precio Unitario</th><th>ISV</th><th>Subtotal</th><th>Total Item</th></tr>';
                     

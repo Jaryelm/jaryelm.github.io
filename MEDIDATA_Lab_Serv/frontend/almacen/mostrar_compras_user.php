@@ -19,6 +19,17 @@ include_once '../../backend/registros/session_check.php';
     <title>MEDIDATA</title>
 
     <style>
+        /* Modal de detalle de compra (mismo enfoque que Diario General) */
+        .swal2-detalle-compra {
+            width: min(70rem, calc(100vw - 30px)) !important;
+        }
+
+        .swal2-detalle-compra-html {
+            text-align: left !important;
+            margin: 0 !important;
+            padding: 0.5rem 0 !important;
+        }
+
         /* Estilos para la tabla de compras */
         #compras_table {
             width: 100%;
@@ -227,12 +238,12 @@ window.verDetalles = function(idCompra) {
             console.log("Respuesta de obtener_detalle_compras.php:", data);
 
             try {
-                const detalles = JSON.parse(data);
+                const detalles = (typeof data === 'string') ? JSON.parse(data) : data;
                 if (detalles.length > 0) {
                     let detallesHTML = `
                         <div style="overflow-x:auto; width:100%; max-width:100%; box-sizing:border-box;">
                             <h3>ID: ${idCompra}</h3>
-                            <table style="width:100%; min-width:1200px; border-collapse:collapse;">
+                            <table style="width:100%; border-collapse:collapse;">
                                 <thead>
                                     <tr>
                                         <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Cuenta</th>
@@ -269,31 +280,16 @@ window.verDetalles = function(idCompra) {
 
                     detallesHTML += `</tbody></table></div>`;
 
-                    // Configuración del modal de SweetAlert con mayor ancho
+                    // Modal de SweetAlert2 (html + ancho amplio para la tabla)
                     Swal.fire({
                         title: "Detalles de la Compra",
-                        content: $(detallesHTML)[0],
-                        buttons: {
-                            confirm: {
-                                text: "Cerrar",
-                                value: true,
-                                visible: true,
-                                className: "btn_ver_detalles",
-                                closeModal: true
-                            }
+                        html: detallesHTML,
+                        width: "70rem",
+                        confirmButtonText: "Cerrar",
+                        customClass: {
+                            popup: 'swal2-detalle-compra',
+                            htmlContainer: 'swal2-detalle-compra-html'
                         }
-                    });
-
-                    // Modal ancho: casi todo el viewport; la tabla usa el espacio disponible
-                    $(".swal-modal").css({
-                        width: "96vw",
-                        maxWidth: "1680px",
-                        boxSizing: "border-box"
-                    });
-                    $(".swal-content").css({
-                        maxWidth: "100%",
-                        overflowX: "auto",
-                        boxSizing: "border-box"
                     });
                 } else {
                     Swal.fire("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
