@@ -1,4 +1,4 @@
-<!-- SIDEBAR -->
+﻿<!-- SIDEBAR -->
 <section id="sidebar">
     <a href="../admin/escritorio.php" class="brand"><i class='bx bxs-home home'></i><span>MEDIDATA</span></a>
     <ul class="side-menu">

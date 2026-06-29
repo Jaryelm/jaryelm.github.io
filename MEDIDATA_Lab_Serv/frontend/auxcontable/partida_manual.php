@@ -37,6 +37,7 @@ include_once '../../backend/registros/session_check.php';
         <button class="button" onclick="cambiarColor(this, 'diariogeneral.php')">Diario General</button>
         <button class="button" onclick="cambiarColor(this, 'partida_manual.php')">Partida Manual</button>
         <button class="button" onclick="cambiarColor(this, 'transacciones.php')">Transacciones Capturadas</button>
+        <button class="button" onclick="cambiarColor(this, '../contabilidad/cuentas_por_pagar.php')">Cuentas por Pagar</button>
         <br>
 
         <div class="form-partida">

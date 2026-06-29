@@ -1,4 +1,4 @@
-<!-- SIDEBAR --> 
+﻿<!-- SIDEBAR --> 
 <section id="sidebar">
     <a href="../auxcontable/escritorio.php" class="brand"><i class='bx bxs-home home'></i>MEDIDATA</a>
         <ul class="side-menu">

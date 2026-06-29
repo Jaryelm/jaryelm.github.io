@@ -51,6 +51,7 @@ $retUrl = $returnTo ?: ($esAuxContable ? '../auxcontable/partida_manual_user.php
         <button class="button" onclick="cambiarColor(this, '<?php echo $esAuxContable ? '../auxcontable/diariogeneral_user.php' : ($esContabilidad ? 'diariogeneral_user.php' : 'diariogeneral.php'); ?>')">Diario General</button>
         <button class="button" onclick="cambiarColor(this, '<?php echo $esAuxContable ? '../auxcontable/partida_manual_user.php' : ($esContabilidad ? 'partida_manual_user.php' : 'partida_manual.php'); ?>')">Partida Manual</button>
         <button class="button" onclick="cambiarColor(this, '<?php echo $esAuxContable ? '../auxcontable/transacciones_user.php' : ($esContabilidad ? 'transacciones_user.php' : 'transacciones.php'); ?>')">Transacciones Capturadas</button>
+        <button class="button" onclick="cambiarColor(this, '<?php echo $esAuxContable ? '../contabilidad/cuentas_por_pagar_user.php' : ($esContabilidad ? 'cuentas_por_pagar_user.php' : 'cuentas_por_pagar.php'); ?>')">Cuentas por Pagar</button>
         <br>
 
         <div class="form-partida">

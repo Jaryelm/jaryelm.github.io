@@ -69,6 +69,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 <button class="button" onclick="cambiarColor(this, 'diariogeneral.php')">Diario General</button>
 <button class="button" onclick="cambiarColor(this, 'partida_manual.php')">Partida Manual</button>
 <button class="button" onclick="cambiarColor(this, 'transacciones.php')">Transacciones Capturadas</button>
+<button class="button" onclick="cambiarColor(this, 'cuentas_por_pagar.php')">Cuentas por Pagar</button>
 
 <br>
             
@@ -101,6 +102,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <option value="PARTIDA_MANUAL">Partida manual</option>
                 <option value="CIERRE_VENTA">Cierre de venta</option>
                 <option value="REVERSION_ANULACION">Reversión / anulación</option>
+                <option value="PAGO_PROVEEDOR">Pago a proveedor</option>
+                <option value="PAGO_HONORARIO_MEDICO">Pago a honorario médico</option>
             </select>
         </div>
         <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
@@ -235,8 +238,29 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         vertical-align: middle !important;
     }
 
+    .dt-acciones .acciones-wrap {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+    }
 
+    .btn_ver_detalles {
+        background-color: #06adbf;
+        border: none;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 1.25;
+    }
 
+    .btn_ver_detalles:hover {
+        background-color: #049aad;
+    }
 
     /* Evita el "pantallazo blanco" de DataTables al procesar */
     #tablaDiarioGeneral_wrapper {
@@ -287,7 +311,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     /* Modal detalle venta: mismos criterios que frontend/almacen/venta.php (evitar class "display" = conflict DataTables) */
-    #diarioDetailsModal.modal {
+    .diario-details-modal.modal {
         display: none;
         position: fixed;
         z-index: 12000;
@@ -301,7 +325,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         flex-direction: row;
     }
 
-    #diarioDetailsModal .modal-content {
+    .diario-details-modal .modal-content {
         background-color: #fefefe;
         border: 1px solid #888;
         padding: 20px;
@@ -315,11 +339,11 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         box-sizing: border-box;
     }
 
-    #diarioDetailsModal .modal-content > .close-btn {
+    .diario-details-modal .modal-content > .close-btn {
         float: right;
     }
 
-    #diarioDetailsModal .modal-content h2 {
+    .diario-details-modal .modal-content h2 {
         margin: 0 0 10px 0;
         padding-right: 36px;
         font-size: 1.25rem;
@@ -328,7 +352,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     /* Sobrescribe el .table-container del listado principal solo dentro del modal */
-    #diarioDetailsModal .modal-content .table-container {
+    .diario-details-modal .modal-content .table-container {
         max-height: 60vh;
         overflow-y: auto;
         overflow-x: auto;
@@ -342,14 +366,14 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         margin-right: 0;
     }
 
-    #diarioDetailsModal .responsive-table {
+    .diario-details-modal .responsive-table {
         width: 100%;
         border-collapse: collapse;
         text-align: left;
         margin-bottom: 0;
     }
 
-    #diarioDetailsModal .responsive-table thead {
+    .diario-details-modal .responsive-table thead {
         position: static;
         clip: auto;
         height: auto;
@@ -359,16 +383,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         border: 0;
     }
 
-    #diarioDetailsModal .responsive-table thead tr,
-    #diarioDetailsModal .responsive-table tbody tr {
+    .diario-details-modal .responsive-table thead tr,
+    .diario-details-modal .responsive-table tbody tr {
         display: table-row;
         margin: 0;
         border: none;
     }
 
     /* venta.php (final): .responsive-table th, .responsive-table td */
-    #diarioDetailsModal .responsive-table th,
-    #diarioDetailsModal .responsive-table td {
+    .diario-details-modal .responsive-table th,
+    .diario-details-modal .responsive-table td {
         display: table-cell;
         padding: 10px;
         border: 1px solid #ddd;
@@ -376,7 +400,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     /* admin.css: .responsive-table thead th */
-    #diarioDetailsModal .responsive-table thead th {
+    .diario-details-modal .responsive-table thead th {
         background-color: #1e2c4b;
         border: 1px solid #1e2c4b;
         color: #fff;
@@ -384,21 +408,21 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         text-align: center;
     }
 
-    #diarioDetailsModal .responsive-table thead th:first-of-type {
+    .diario-details-modal .responsive-table thead th:first-of-type {
         text-align: left;
     }
 
     /* admin.css (min-width 52em): filas pares */
-    #diarioDetailsModal .responsive-table tbody tr:nth-of-type(even) {
+    .diario-details-modal .responsive-table tbody tr:nth-of-type(even) {
         background-color: rgba(94, 93, 82, 0.1);
     }
 
     /* admin.css (min-width 52em): tbody td */
-    #diarioDetailsModal .responsive-table tbody td {
+    .diario-details-modal .responsive-table tbody td {
         text-align: center;
     }
 
-    #diarioDetailsModal .close-btn {
+    .diario-details-modal .close-btn {
         color: #aaa;
         font-size: 28px;
         font-weight: bold;
@@ -406,8 +430,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         line-height: 1;
     }
 
-    #diarioDetailsModal .close-btn:hover,
-    #diarioDetailsModal .close-btn:focus {
+    .diario-details-modal .close-btn:hover,
+    .diario-details-modal .close-btn:focus {
         color: #000;
     }
 
@@ -431,16 +455,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         border-radius: 8px;
         font-weight: 600;
         color: #035c67;
-    }
-
-    .swal2-detalle-compra {
-        width: min(70rem, calc(100vw - 30px)) !important;
-    }
-
-    .swal2-detalle-compra-html {
-        text-align: left !important;
-        margin: 0 !important;
-        padding: 0.5rem 0 !important;
     }
 
     #diarioEditModal.modal {
@@ -623,7 +637,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <div id="loadingDiarioDetalle" style="display:none;"><div class="box">Cargando detalles…</div></div>
 
-<div id="diarioDetailsModal" class="modal" style="display: none !important;">
+<div id="diarioDetailsModal" class="modal diario-details-modal" style="display: none !important;">
     <div class="modal-content">
         <span class="close-btn" onclick="diarioCerrarModalVenta()" title="Cerrar">&times;</span>
         <h2>Detalles de Productos y Servicios</h2>
@@ -646,6 +660,32 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     </tr>
                 </thead>
                 <tbody id="diarioDetailsVentaBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="diarioDetailsCompraModal" class="modal diario-details-modal" style="display: none !important;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="diarioCerrarModalCompra()" title="Cerrar">&times;</span>
+        <h2>Detalles de la Compra</h2>
+        <div class="table-container">
+            <table id="diarioDetailsCompraTable" class="responsive-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Cuenta</th>
+                        <th scope="col">Código Producto</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Unidad</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">ISV</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">Descuento %</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="diarioDetailsCompraBody"></tbody>
             </table>
         </div>
     </div>
@@ -1059,6 +1099,13 @@ function diarioVerDetalleVenta(orderId) {
         });
 }
 
+function diarioCerrarModalCompra() {
+    var modal = document.getElementById('diarioDetailsCompraModal');
+    if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+    }
+}
+
 function diarioVerDetalleCompra(idCompra) {
     diarioShowLoadingDetalle();
     fetch('diario_detalle_compra.php?id_compra=' + encodeURIComponent(idCompra), { cache: 'no-store' })
@@ -1071,48 +1118,33 @@ function diarioVerDetalleCompra(idCompra) {
                     return;
                 }
                 var detalles = Array.isArray(payload.data) ? payload.data : [];
-                if (detalles.length > 0) {
-                    var detallesHTML = '<div style="overflow-x:auto;width:100%;max-width:100%;">' +
-                        '<h3 style="margin-top:0;">ID compra: ' + idCompra + '</h3>' +
-                        '<table style="width:100%;border-collapse:collapse;"><thead><tr>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Cuenta</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Código Producto</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Descripción</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Cantidad</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Unidad</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Precio Unitario</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">ISV</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Subtotal</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Descuento %</th>' +
-                        '<th style="border:1px solid #e0e0e0;padding:8px;background-color:#06adbf;color:#fff;">Total</th>' +
-                        '</tr></thead><tbody>';
-                    detalles.forEach(function(item) {
-                        detallesHTML += '<tr>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.cat_cuenta || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.codigo_producto || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.descripcion || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.cantidad || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.unidad || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.precio_unitario || 0).toFixed(2) + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.isv || 0).toFixed(2) + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.subtotal || '') + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + parseFloat(item.descuento_porcentaje || 0).toFixed(2) + '</td>' +
-                            '<td style="border:1px solid #e0e0e0;padding:8px;">' + (item.total_item || '') + '</td>' +
-                            '</tr>';
-                    });
-                    detallesHTML += '</tbody></table></div>';
-                    Swal.fire({
-                        title: 'Detalles de la Compra',
-                        html: detallesHTML,
-                        width: '70rem',
-                        confirmButtonText: 'Cerrar',
-                        customClass: {
-                            popup: 'swal2-detalle-compra',
-                            htmlContainer: 'swal2-detalle-compra-html'
-                        }
-                    });
-                } else {
+                if (detalles.length === 0) {
                     Swal.fire('No se encontraron detalles', 'No hay detalles disponibles para esta compra.', 'info');
+                    return;
+                }
+                var body = document.getElementById('diarioDetailsCompraBody');
+                if (!body) {
+                    return;
+                }
+                body.innerHTML = '';
+                detalles.forEach(function(item) {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>' + (item.cat_cuenta || '') + '</td>' +
+                        '<td>' + (item.codigo_producto || '') + '</td>' +
+                        '<td>' + (item.descripcion || '') + '</td>' +
+                        '<td>' + (item.cantidad || '') + '</td>' +
+                        '<td>' + (item.unidad || '') + '</td>' +
+                        '<td>' + parseFloat(item.precio_unitario || 0).toFixed(2) + '</td>' +
+                        '<td>' + parseFloat(item.isv || 0).toFixed(2) + '</td>' +
+                        '<td>' + (item.subtotal || '') + '</td>' +
+                        '<td>' + parseFloat(item.descuento_porcentaje || 0).toFixed(2) + '</td>' +
+                        '<td>' + (item.total_item || '') + '</td>';
+                    body.appendChild(tr);
+                });
+                var modal = document.getElementById('diarioDetailsCompraModal');
+                if (modal) {
+                    modal.style.setProperty('display', 'flex', 'important');
                 }
             } catch (e) {
                 console.error(e);
@@ -1128,6 +1160,9 @@ function diarioVerDetalleCompra(idCompra) {
 document.addEventListener('click', function(ev) {
     if (ev.target && ev.target.id === 'diarioDetailsModal') {
         diarioCerrarModalVenta();
+    }
+    if (ev.target && ev.target.id === 'diarioDetailsCompraModal') {
+        diarioCerrarModalCompra();
     }
     if (ev.target && ev.target.id === 'diarioEditModal') {
         cerrarModalEditarPartida();

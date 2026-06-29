@@ -69,6 +69,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 <button class="button" onclick="cambiarColor(this, 'diariogeneral_user.php')">Diario General</button>
 <button class="button" onclick="cambiarColor(this, 'partida_manual_user.php')">Partida Manual</button>
 <button class="button" onclick="cambiarColor(this, 'transacciones_user.php')">Transacciones Capturadas</button>
+<button class="button" onclick="cambiarColor(this, '../contabilidad/cuentas_por_pagar_user.php')">Cuentas por Pagar</button>
 
 <br>
             
@@ -101,6 +102,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <option value="PARTIDA_MANUAL">Partida manual</option>
                 <option value="CIERRE_VENTA">Cierre de venta</option>
                 <option value="REVERSION_ANULACION">Reversión / anulación</option>
+                <option value="PAGO_PROVEEDOR">Pago a proveedor</option>
+                <option value="PAGO_HONORARIO_MEDICO">Pago a honorario médico</option>
             </select>
         </div>
         <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
