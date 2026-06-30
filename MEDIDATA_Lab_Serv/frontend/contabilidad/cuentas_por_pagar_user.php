@@ -58,7 +58,7 @@ include_once '../contabilidad/menu.php';
             <h2 class="catalog-title">Cuentas por Pagar (Proveedores)</h2>
             
             <!-- Filtros -->
-            <div id="diario-filtros" class="filters-container">
+            <form id="diario-filtros" class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="tipoProveedor">Tipo de Proveedor:</label>
                     <select id="tipoProveedor" class="select2">
@@ -74,8 +74,8 @@ include_once '../contabilidad/menu.php';
                     <label for="fechaHasta" title="Filtra por fecha final">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo date('Y-m-t'); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
-            </div>
+                <button type="submit" class="btn-filter">Buscar</button>
+            </form>
 
             <div class="export-buttons" style="margin-bottom:15px;display:flex;gap:8px;flex-wrap:wrap;">
                 <button type="button" class="dt-button buttons-copy" onclick="exportarTabla('copy')">Copiar</button>

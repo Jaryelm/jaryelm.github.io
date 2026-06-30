@@ -58,7 +58,7 @@ include_once '../admin/menu.php';
             <h2 class="catalog-title">Cuentas por Pagar (Proveedores)</h2>
             
             <!-- Filtros -->
-            <div id="diario-filtros" class="filters-container">
+            <form id="diario-filtros" class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="tipoProveedor">Tipo de Proveedor:</label>
                     <select id="tipoProveedor" class="select2">
@@ -74,8 +74,8 @@ include_once '../admin/menu.php';
                     <label for="fechaHasta" title="Filtra por fecha final">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo date('Y-m-t'); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
-            </div>
+                <button type="submit" class="btn-filter">Buscar</button>
+            </form>
 
             <div class="export-buttons" style="margin-bottom:15px;display:flex;gap:8px;flex-wrap:wrap;">
                 <button type="button" class="dt-button buttons-copy" onclick="exportarTabla('copy')">Copiar</button>
@@ -182,23 +182,7 @@ include_once '../admin/menu.php';
             </div>
         </div>
 
-        <!-- Modal de Historial de Pagos (Partidas) -->
-        <div id="partidasModal" class="modal" style="display: none; z-index: 1000;">
-            <div class="modal-content" style="max-width: 90%; width: 800px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 id="modalPartidasTitle" style="margin: 0;">Historial de Pagos</h2>
-                    <span class="close-btn" onclick="cerrarModalPartidas()" title="Cerrar">&times;</span>
-                </div>
-                <div class="table-container">
-                    <table id="tablaPartidasDetalle" class="responsive-table" style="width:100%">
-                        <thead id="theadPartidas">
-                            <!-- Injected dynamically -->
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Modal de Registrar Pago -->
         <div id="pagoModal" class="modal" style="display: none; z-index: 1100;">
@@ -668,47 +652,13 @@ include_once '../admin/menu.php';
                 });
             });
 
-            let dtPartidasDetalle = null;
-
             $(document).on('click', '.btn_ver_partidas', function(e) {
                 e.stopPropagation();
                 var id_ref = $(this).data('id');
                 var modo = $(this).data('modo');
-                
-                $('#modalPartidasTitle').text(modo === 'comercial' ? 'Abonos a Factura' : 'Historial de Pago Médico');
-                
-                if (dtPartidasDetalle) {
-                    dtPartidasDetalle.destroy();
-                    $('#tablaPartidasDetalle').empty();
-                }
-                
-                let thead = modo === 'comercial' 
-                    ? '<tr><th>No. Partida</th><th>Fecha</th><th>Descripción</th><th>Monto Abonado</th></tr>'
-                    : '<tr><th>No. Orden</th><th>Fecha Efectiva</th><th>Pagado Por</th><th>Total Honorario</th></tr>';
-                $('#tablaPartidasDetalle').html('<thead>' + thead + '</thead><tbody></tbody>');
-                
-                dtPartidasDetalle = $('#tablaPartidasDetalle').DataTable({
-                    language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
-                    pageLength: 10,
-                    lengthChange: false,
-                    destroy: true,
-                    ajax: {
-                        url: '../../backend/registros/get_cuentas_por_pagar.php',
-                        type: 'POST',
-                        data: function (d) {
-                            d.tipo = modo;
-                            d.accion = 'ver_partidas';
-                            d.id_referencia = id_ref;
-                        }
-                    }
-                });
-                
-                $('#partidasModal').css('display', 'flex');
+                var prefix = (modo === 'comercial') ? 'COMP-' : 'HON-';
+                window.location.href = 'diariogeneral.php?search=' + encodeURIComponent(prefix + id_ref);
             });
-
-            window.cerrarModalPartidas = function() {
-                $('#partidasModal').css('display', 'none');
-            };
 
     </script>
 </body>

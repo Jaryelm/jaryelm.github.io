@@ -78,7 +78,7 @@ function tipo_descuento_predominante($row) {
         <div class="catalog-container">
             <h2 class="catalog-title">Detalle Pago</h2>
 
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
                     <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
@@ -87,9 +87,9 @@ function tipo_descuento_predominante($row) {
                     <label for="fechaHasta">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
+                <button type="submit" class="btn-filter">Buscar</button>
                 <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-            </div>
+            </form>
 
             <div class="table-container">
                 <div class="table-responsive">

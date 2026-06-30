@@ -77,7 +77,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <h2 class="catalog-title">Diario General</h2>
     
     <!-- Filtros -->
-    <div id="diario-filtros" class="filters-container">
+    <form id="diario-filtros" class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
         <div class="filter-group">
             <label for="fechaDesde" title="Filtra por fecha de ocurrencia">Desde:</label>
             <input type="date" id="fechaDesde" class="filter-input" title="Fecha de ocurrencia">
@@ -106,9 +106,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 <option value="PAGO_HONORARIO_MEDICO">Pago a honorario médico</option>
             </select>
         </div>
-        <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
-        <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-    </div>
+        <button type="submit" class="btn-filter">Buscar</button>
+        <button type="button" class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
+    </form>
 
     <div class="export-buttons" style="margin-bottom:15px;display:flex;gap:8px;flex-wrap:wrap;">
         <button type="button" class="dt-button buttons-copy" onclick="exportarDiario('copy')">Copiar</button>
@@ -786,7 +786,10 @@ $(function () {
             $fdTipo.val(qTipo).trigger('change');
         }
     }
+    var initialSearch = new URLSearchParams(window.location.search).get('search') || '';
+
     tablaDiarioGeneral = $('#tablaDiarioGeneral').DataTable({
+        search: { search: initialSearch },
         processing: true,
         serverSide: true,
         dom: 'frtip',
