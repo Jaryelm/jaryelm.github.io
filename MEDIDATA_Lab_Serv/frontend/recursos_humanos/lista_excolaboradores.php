@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 require_once '../../backend/registros/rrhh_guard.php';
@@ -38,7 +38,13 @@ if ($pdoRrhh) {
     <title>MEDIDATA</title>
 </head>
 <body>
-    <?php include_once '../admin/menu.php'; ?>
+    <?php 
+    if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') {
+        include_once '../admin/menu.php'; 
+    } else {
+        include_once '../recursos_humanos/menu.php'; 
+    }
+    ?>
 
     <section id="content">
         <nav>
@@ -52,14 +58,14 @@ if ($pdoRrhh) {
         <main>
             <?php
             $hora_actual = date('H');
-            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos DÃ­as" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
+            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
             <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
-                <a href="lista_colaboradores.php?area=medico" class="button tab-button">MÃ©dicos</a>
-                <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">EnfermerÃ­a</a>
+                <a href="lista_colaboradores.php?area=medico" class="button tab-button">Médicos</a>
+                <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">Enfermería</a>
                 <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
                 <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
                 <a href="lista_excolaboradores.php" class="button tab-button active">Excolaboradores</a>
@@ -121,7 +127,7 @@ if ($pdoRrhh) {
                                 <tr>
                                     <th>CATEGORÃA</th>
                                     <th>TIPO DE EMPLEADO</th>
-                                    <th>NÂ° EMPLEADO</th>
+                                    <th>N° EMPLEADO</th>
                                     <th>DNI</th>
                                     <th>APELLIDOS</th>
                                     <th>NOMBRES</th>
@@ -129,9 +135,9 @@ if ($pdoRrhh) {
                                     <th>ÃREA/DEPTO</th>
                                     <th>NIVEL SALARIAL</th>
                                     <th>SALARIO</th>
-                                    <th>NÂ° CUENTA</th>
+                                    <th>N° CUENTA</th>
                                     <th>FECHA DE INGRESO</th>
-                                    <th>TELÃ‰FONO</th>
+                                    <th>TELÉFONO</th>
                                     <th>CORREO</th>
                                     <th>MARCAJE</th>
                                     <th>LOKER</th>
@@ -145,8 +151,8 @@ if ($pdoRrhh) {
                                 <?php
                                     $categoria_label = '';
                                     if ($d->source_table == 'staff_administrative') $categoria_label = 'Administrativo';
-                                    elseif ($d->source_table == 'doctor') $categoria_label = 'MÃ©dico';
-                                    elseif ($d->source_table == 'nurse') $categoria_label = 'EnfermerÃ­a';
+                                    elseif ($d->source_table == 'doctor') $categoria_label = 'Médico';
+                                    elseif ($d->source_table == 'nurse') $categoria_label = 'Enfermería';
                                     elseif ($d->source_table == 'staff_general_services') $categoria_label = 'Servicios Generales';
                                 ?>
                                 <tr>
@@ -194,24 +200,31 @@ if ($pdoRrhh) {
                                     <td>
                                         <?php if (!empty($d->url_contrato)): ?>
                                             <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->id; ?>&doc=contrato&table=<?php echo htmlspecialchars($d->source_table); ?>&idcol=<?php echo htmlspecialchars($d->source_idcol); ?>" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
+                                            <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                             <a href="#" onclick="deleteContract(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none; margin-left:4px;" title="Eliminar contrato"><i class="bx bx-trash"></i></a>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="badge-warning" style="padding:4px;">N/D</span>
                                         <?php endif; ?>
+                                        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                         <br>
                                         <label class="badge-primary" style="padding:4px; cursor:pointer; display:inline-block; margin-top:4px;" onclick="document.getElementById('upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>').click();">
                                             <i class="bx bx-upload"></i> Subir
                                         </label>
                                         <input type="file" id="upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>" style="display:none;" accept=".pdf,.jpg,.png" onchange="uploadContract(this, <?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>')">
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <label class="switch">
-                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?>/>
+                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?> <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>/>
                                             <span class="slider"></span>
                                         </label>
                                     </td>
                                     <td>
+                                        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                         <a title="Actualizar" href="<?php echo htmlspecialchars($d->edit_file); ?>?id=<?php echo (int) $d->id; ?>" class="fa fa-pencil tooltip"></a>
+                                        <a href="#" onclick="deleteRecord(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none;" title="Eliminar Permanentemente"><i class="bx bx-trash"></i></a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -269,7 +282,7 @@ if ($pdoRrhh) {
                         "sSearch": "Buscar:",
                         "oPaginate": {
                             "sFirst": "Primero",
-                            "sLast": "Ãšltimo",
+                            "sLast": "Último",
                             "sNext": "Siguiente",
                             "sPrevious": "Anterior"
                         }
@@ -306,7 +319,7 @@ if ($pdoRrhh) {
                     success: function(response) {
                         if (response.success || response.status === 'success') {
                             Swal.fire({
-                                title: 'Ã‰xito',
+                                title: 'Éxito',
                                 text: response.message || 'Estado actualizado',
                                 icon: 'success',
                                 timer: 1500,
@@ -321,7 +334,7 @@ if ($pdoRrhh) {
                         }
                     },
                     error: function() {
-                        Swal.fire('Error', 'Error de comunicaciÃ³n con el servidor.', 'error');
+                        Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
                         checkbox.prop('checked', !checkbox.is(':checked'));
                     }
                 });

@@ -1,5 +1,9 @@
-﻿<?php
+<?php
 include_once '../../backend/registros/session_check.php';
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header('Location: lista_colaboradores.php');
+    exit;
+}
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
 
@@ -26,7 +30,13 @@ try {
     <title>MEDIDATA - Agregar Colaborador</title>
 </head>
 <body>
-<?php include_once '../admin/menu.php'; ?>
+<?php 
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') {
+    include_once '../admin/menu.php'; 
+} else {
+    include_once '../recursos_humanos/menu.php'; 
+}
+?>
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
@@ -37,14 +47,14 @@ try {
     <main>
         <?php
         $hora = (int) date('H');
-        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos DÃ­as' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+        $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
         
         <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
             <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
-            <a href="lista_colaboradores.php?area=medico" class="button tab-button">MÃ©dicos</a>
-            <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">EnfermerÃ­a</a>
+            <a href="lista_colaboradores.php?area=medico" class="button tab-button">Médicos</a>
+            <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">Enfermería</a>
             <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
             <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
             <a href="lista_excolaboradores.php" class="button tab-button">Excolaboradores</a>
@@ -61,33 +71,33 @@ try {
                 </div>
                 <hr>
                 
-                <label><b>Ãrea o Tipo de Colaborador</b></label><span class="badge-warning">*</span>
+                <label><b>Área o Tipo de Colaborador</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="area_colaborador" required>
-                    <option value="">Seleccione un Ã¡rea...</option>
-                    <option value="doctor">MÃ©dico</option>
-                    <option value="nurse">EnfermerÃ­a</option>
+                    <option value="">Seleccione un área...</option>
+                    <option value="doctor">Médico</option>
+                    <option value="nurse">Enfermería</option>
                     <option value="staff_administrative">Administrativo</option>
                     <option value="staff_general_services">Servicios Generales</option>
                 </select>
 
                 <hr>
 
-                <label><b>NÂ° de Empleado (Institucional)</b></label>
-                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automÃ¡tico)">
+                <label><b>N° de Empleado (Institucional)</b></label>
+                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automático)">
 
-                <label><b>NÂ° de identificaciÃ³n (DNI)</b></label><span class="badge-warning">*</span>
+                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
                 <input type="text" name="identificacion" maxlength="14" placeholder="ejm: 0801199012345" required>
                 
                 <label><b>Nombres</b></label><span class="badge-warning">*</span>
-                <input type="text" name="nombres" placeholder="ejm: Juan RaÃºl" required>
+                <input type="text" name="nombres" placeholder="ejm: Juan Raúl" required>
                 
                 <label><b>Apellidos</b></label><span class="badge-warning">*</span>
-                <input type="text" name="apellidos" placeholder="ejm: RamÃ­rez Requena" required>
+                <input type="text" name="apellidos" placeholder="ejm: Ramírez Requena" required>
                 
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
                 <input type="date" name="fecha_nacimiento" required>
                 
-                <label><b>GÃ©nero</b></label><span class="badge-warning">*</span>
+                <label><b>Género</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="genero" required>
                     <option value="">Seleccione</option>
                     <option value="Masculino">Masculino</option>
@@ -95,7 +105,7 @@ try {
                 </select>
 
                 <hr>
-                <h3>InformaciÃ³n Laboral</h3>
+                <h3>Información Laboral</h3>
                 
                 <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
@@ -105,7 +115,7 @@ try {
                 </select>
 
                 <div id="duracion_contrato_div" style="display:none; margin-top:10px;">
-                    <label><b>DuraciÃ³n de Contrato</b></label>
+                    <label><b>Duración de Contrato</b></label>
                     <input type="text" name="duracion_contrato" placeholder="Ej: 6 meses">
                 </div>
 
@@ -117,7 +127,7 @@ try {
                     <option value="" disabled selected>Seleccione...</option>
                 </select>
 
-                <label><b>Cargo / PosiciÃ³n</b></label><span class="badge-warning">*</span>
+                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="id_cargo" required>
                     <option value="" disabled selected>Seleccione...</option>
                     <?php foreach ($cargos as $cargo): ?>
@@ -138,25 +148,25 @@ try {
                 <label><b>Salario Base</b></label>
                 <input type="number" step="0.01" name="salario" placeholder="Ej: 15000.00">
 
-                <label><b>NÂ° Cuenta de BAC</b></label>
-                <input type="text" name="cuenta_bac" placeholder="NÃºmero de cuenta de banco BAC">
+                <label><b>N° Cuenta de BAC</b></label>
+                <input type="text" name="cuenta_bac" placeholder="Número de cuenta de banco BAC">
 
                 <hr>
-                <h3>InformaciÃ³n de Contacto y Accesos</h3>
+                <h3>Información de Contacto y Accesos</h3>
 
-                <label><b>TelÃ©fono Celular</b></label>
+                <label><b>Teléfono Celular</b></label>
                 <input type="text" name="telefono" placeholder="Ej: 99887766">
 
                 <label><b>Correo Personal</b></label>
-                <input type="email" name="correo_personal" placeholder="Correo electrÃ³nico personal">
+                <input type="email" name="correo_personal" placeholder="Correo electrónico personal">
 
                 <label><b>Correo Institucional</b></label>
-                <input type="email" name="correo_institucional" placeholder="Correo electrÃ³nico de Medicasa">
+                <input type="email" name="correo_institucional" placeholder="Correo electrónico de Medicasa">
 
-                <label><b>NÂ° de Locker Asignado</b></label>
+                <label><b>N° de Locker Asignado</b></label>
                 <input type="text" name="num_locker" placeholder="Ej: L-10">
 
-                <label><b>ID Empleado (Reloj BiomÃ©trico)</b></label>
+                <label><b>ID Empleado (Reloj Biométrico)</b></label>
                 <input type="number" name="id_biometrico" placeholder="Ej: 123">
 
                 <label><b>Usuario del Sistema (Opcional)</b></label>
@@ -172,7 +182,7 @@ try {
                 <label>Solicitud de empleo</label>
                 <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
                 
-                <label>Pruebas PsicomÃ©tricas</label>
+                <label>Pruebas Psicométricas</label>
                 <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
                 
                 <label>Copia de partida de nacimiento de hijos</label>
@@ -181,10 +191,10 @@ try {
                 <label>Foto (Para su Carnet)</label>
                 <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
                 
-                <label>Documento de identidad (revÃ©s y derecho)</label>
+                <label>Documento de identidad (revés y derecho)</label>
                 <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
                 
-                <label>Copia de recibo (agua, luz, telÃ©fono)</label>
+                <label>Copia de recibo (agua, luz, teléfono)</label>
                 <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
                 
                 <label>Antecedentes Penales</label>
@@ -199,7 +209,7 @@ try {
                 <label>2 Referencias profesionales</label>
                 <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
                 
-                <label>Diplomas o tÃ­tulos recibidos</label>
+                <label>Diplomas o títulos recibidos</label>
                 <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
                 
                 <label>Croquis de vivienda</label>

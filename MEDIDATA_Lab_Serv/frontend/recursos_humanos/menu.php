@@ -36,11 +36,9 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
             <a href="#"><i class='bx bxs-user-detail icon'></i> RECURSOS HUMANOS<i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li>
-                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores_usr.php">LISTA COLABORADORES</a>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores.php">LISTA COLABORADORES</a>
                 </li>
-                <li>
-                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores_medicos_usr.php">LISTA DE MÉDICOS</a>
-                </li>
+                
                 <li>
                     <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>positions_usr.php">LISTA POSICIONES</a>
                 </li>
@@ -66,12 +64,7 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>relojbio_usr.php">RELOJ BIOMÉTRICO</a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="#" class="new-submenu-link">COLABORADORES</a>
-                    <ul class="new-side-dropdown">
-                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>agregar_colaborador.php">REGISTRAR COLABORADOR</a></li>
-                    </ul>
-                </li>
+                
             </ul>
         </li>
         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>mostrar.php"><i class='bx bxs-info-circle icon'></i>ACERCA DE MEDIDATA</a></li>

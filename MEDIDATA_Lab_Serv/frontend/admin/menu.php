@@ -82,9 +82,7 @@
                 <li>
                     <a href="../recursos_humanos/lista_colaboradores.php"><span>LISTA COLABORADORES</span></a>
                 </li>
-                <li>
-                    <a href="../recursos_humanos/lista_colaboradores_medicos.php"><span>LISTA DE MÉDICOS</span></a>
-                </li>
+                
                 <li>
                     <a href="../recursos_humanos/positions.php"><span>POSICIONES DE TRABAJO</span></a>
                 </li>
@@ -116,15 +114,7 @@
                         <li><a href="../recursos/relojbio.php"><span>RELOJ BIOMÉTRICO</span></a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="#" class="new-submenu-link"><span>COLABORADORES</span></a>
-                    <ul class="new-side-dropdown">
-                        <li><a href="../recursos/enfermera_nuevo.php"><span>REGISTRAR ENFERMERÍA</span></a></li>
-                        <li><a href="../recursos_humanos/administrativo_nuevo.php"><span>REGISTRAR ADMINISTRATIVO</span></a></li>
-                        <li><a href="../recursos_humanos/servicios_generales_nuevo.php"><span>REGISTRAR SERVICIOS GENERALES</span></a></li>
-                        <li><a href="../medicos/nuevo.php"><span>REGISTRAR MÉDICO</span></a></li>
-                    </ul>
-                </li>
+                
             </ul>
         </li>
 
