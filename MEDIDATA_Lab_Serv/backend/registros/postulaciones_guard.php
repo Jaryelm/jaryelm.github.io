@@ -65,8 +65,8 @@ if (!function_exists('medidata_postulaciones_resolver_ruta_cv')) {
         }
         $fileName = basename($path);
         $uploadDirs = [
-            '/home/medicasa/MedicasaDATAUpdate2/uploads/Postulantes_CV/',
-            '/home4/medic9ue/uploads/',
+            dirname(__DIR__, 2) . '/uploads/Postulantes_CV/',
+            dirname(__DIR__, 2) . '/uploads/',
         ];
         foreach ($uploadDirs as $dir) {
             $candidates[] = rtrim($dir, '/') . '/' . $fileName;

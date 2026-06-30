@@ -24,6 +24,7 @@ html {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+	scrollbar-gutter: stable;
 }
 
 body {
@@ -31,6 +32,129 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+}
+
+body.swal2-shown {
+	padding-right: 0 !important;
+}
+
+.diario-details-modal.modal {
+	display: none;
+	position: fixed;
+	z-index: 12000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+}
+
+.diario-details-modal .modal-content {
+	background-color: #fefefe;
+	border: 1px solid #888;
+	padding: 20px;
+	width: 80%;
+	max-width: 1400px;
+	max-height: 90%;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.diario-details-modal .modal-content > .close-btn {
+	float: right;
+}
+
+.diario-details-modal .modal-content h2 {
+	margin: 0 0 10px 0;
+	padding-right: 36px;
+	font-size: 1.25rem;
+	color: #111;
+	font-weight: bold;
+}
+
+.diario-details-modal .modal-content .table-container {
+	max-height: 60vh;
+	overflow-y: auto;
+	overflow-x: auto;
+	margin-top: 10px;
+	flex-grow: 1;
+	box-shadow: none;
+	border-radius: 0;
+	padding: 0;
+	background: transparent;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.diario-details-modal .responsive-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	margin-bottom: 0;
+}
+
+.diario-details-modal .responsive-table thead {
+	position: static;
+	clip: auto;
+	height: auto;
+	width: auto;
+	overflow: visible;
+	padding: 0;
+	border: 0;
+}
+
+.diario-details-modal .responsive-table thead tr,
+.diario-details-modal .responsive-table tbody tr {
+	display: table-row;
+	margin: 0;
+	border: none;
+}
+
+.diario-details-modal .responsive-table th,
+.diario-details-modal .responsive-table td {
+	display: table-cell;
+	padding: 10px;
+	border: 1px solid #ddd;
+	white-space: normal;
+}
+
+.diario-details-modal .responsive-table thead th {
+	background-color: #1e2c4b;
+	border: 1px solid #1e2c4b;
+	color: #fff;
+	font-weight: normal;
+	text-align: center;
+}
+
+.diario-details-modal .responsive-table thead th:first-of-type {
+	text-align: left;
+}
+
+.diario-details-modal .responsive-table tbody tr:nth-of-type(even) {
+	background-color: rgba(94, 93, 82, 0.1);
+}
+
+.diario-details-modal .responsive-table tbody td {
+	text-align: center;
+}
+
+.diario-details-modal .close-btn {
+	color: #aaa;
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
+	line-height: 1;
+}
+
+.diario-details-modal .close-btn:hover,
+.diario-details-modal .close-btn:focus {
+	color: #000;
 }
 
 a {
@@ -1696,6 +1820,51 @@ main .btn-send:hover {
   max-width: none;
   box-sizing: border-box;
   vertical-align: middle;
+}
+
+/* ---- Botones de documento (contrato, etc.) con color global ---- */
+.doc-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+}
+.doc-actions .doc-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+.doc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 96px;
+  background-color: #035c67;
+  color: #fff !important;
+  text-decoration: none;
+  padding: 4px 11px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+.doc-btn:hover {
+  background-color: #02434c;
+  color: #fff !important;
+}
+.doc-btn i {
+  font-size: 0.95rem;
+}
+.doc-empty {
+  font-size: 0.72rem;
+  color: #9aa0a6;
+  font-style: italic;
 }
 
 
@@ -3935,6 +4104,14 @@ input:checked + .slider:before {
 .btn_ver_detalles:hover {
   background-color: #06adbf;
 }
+.acciones-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
 .modal-pdf {
   display: none;
   position: fixed;
@@ -4179,6 +4356,35 @@ input:checked + .slider:before {
 }
 #catalogo-cuentas .select2-dropdown {
   z-index: 10050;
+}
+
+/* Select2 en tablas de colaboradores / médicos (edición inline en celdas).
+   Mantiene el aire compacto de la celda y la pista de "editable" (borde guion). */
+#example td .select2-container {
+  width: 100% !important;
+  min-width: 110px;
+}
+#example td .select2-container--default .select2-selection--single {
+  height: 34px;
+  border: 1px dashed #ccc;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+#example td .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 34px;
+  padding-left: 8px;
+  padding-right: 22px;
+  font-size: 13px;
+  color: #333;
+}
+#example td .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 32px;
+  right: 4px;
+}
+#example td .select2-container--default.select2-container--focus .select2-selection--single,
+#example td .select2-container--default.select2-container--open .select2-selection--single {
+  border-color: #035c67;
+  background: #fff;
 }
 
 .filters-container {
@@ -4451,55 +4657,6 @@ main .containerss .demo-flujo-step-num {
 }
 
 /* NOTIFICATION COMPONENT (RRHH navbar bell) */
-/* ==================== RRHH CALENDAR & MODALS ==================== */
-#calendar { min-height: 500px; }
-.details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-.details-table th { background: #06adbf; color: white; padding: 10px; text-align: left; width: 35%; }
-.details-table td { border: 1px solid #ddd; padding: 10px; }
-
-/* Notification Item */
-.notification-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-}
-.notification-item.opacity-70 { opacity: 0.7; }
-.notification-item.border-danger { border-left: 5px solid #f44336; }
-
-/* Modals */
-.modal-custom { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); overflow-y: auto; }
-.modal-custom-content { background: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 50%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); margin-bottom: 50px; }
-.modal-custom-close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
-.modal-custom-close:hover { color: #000; }
-.modal-custom-title { color: #035c67; margin-bottom: 15px; }
-.modal-custom-footer { margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; }
-
-/* Buttons */
-.rrhh-btn-inline { border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; color: white; display: inline-block; text-align: center; }
-.rrhh-btn-inline:hover { opacity: 0.9; }
-.rrhh-btn-danger { background: #FC3B56; }
-.rrhh-btn-primary { background: #035c67; }
-.rrhh-btn-info { background: #06adbf; }
-
-/* Forms */
-.rrhh-form-group { margin-bottom: 15px; }
-.rrhh-form-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-.rrhh-form-color { width: 100%; height: 40px; padding: 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-.rrhh-text-right { text-align: right; }
-
-/* FullCalendar Customizations */
-.fc-event .fc-title {
-    white-space: normal;
-    word-wrap: break-word;
-    display: block;
-}
-.fc-event .fc-content {
-    white-space: normal;
-}
-
-/* NOTIFICATION COMPONENT */
 .notification-bell {
   font-size: 24px;
   cursor: pointer;
@@ -4511,6 +4668,7 @@ main .containerss .demo-flujo-step-num {
   align-items: center;
   justify-content: center;
 }
+
 .notification-badge-main {
   position: absolute;
   top: -5px;
@@ -4559,11 +4717,13 @@ main .containerss .demo-flujo-step-num {
   cursor: pointer;
   font-size: 18px;
 }
+
 .notification-tabs {
   display: flex;
   border-bottom: 1px solid #ddd;
   background: #f9f9f9;
 }
+
 .notif-tab {
   flex: 1;
   text-align: center;
@@ -4574,6 +4734,7 @@ main .containerss .demo-flujo-step-num {
   color: #888;
   border-bottom: 2px solid transparent;
 }
+
 .notif-tab.active {
   color: #06adbf;
   border-bottom: 2px solid #06adbf;
@@ -4601,6 +4762,7 @@ main .containerss .demo-flujo-step-num {
   background: #fafafa;
   padding: 0;
 }
+
 .notif-card {
   padding: 12px 15px;
   border-bottom: 1px solid #eee;
@@ -4618,16 +4780,19 @@ main .containerss .demo-flujo-step-num {
   font-size: 13px;
   color: #333;
 }
+
 .notif-card small {
   color: #888;
   font-size: 11px;
 }
+
 .notif-empty {
   padding: 15px;
   text-align: center;
   color: #888;
   font-size: 14px;
 }
+
 .notification-footer {
   display: flex;
   align-items: center;
@@ -4642,20 +4807,24 @@ main .containerss .demo-flujo-step-num {
   font-size: 12px;
   font-weight: bold;
 }
+
 .ws-status-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   display: inline-block;
 }
+
 .ws-online {
   background-color: #2ecc71;
   box-shadow: 0 0 5px #2ecc71;
 }
+
 .ws-reconnecting {
   background-color: #f1c40f;
   box-shadow: 0 0 5px #f1c40f;
 }
+
 .ws-failed {
   background-color: #e74c3c;
   box-shadow: 0 0 5px #e74c3c;
@@ -4669,4 +4838,109 @@ main .containerss .demo-flujo-step-num {
 .rrhh-calendar-layout .notification-item.border-danger,
 .notification-item.border-danger {
   border-left: 5px solid #f44336;
+}
+
+/* ===========================================================
+   Controles de informe de Cierres de Caja (estilo global).
+   Usado en los escritorios admin / contabilidad / auxcontable.
+   =========================================================== */
+.report-controls {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.report-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.report-control-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.report-controls label {
+    font-weight: bold;
+    color: #035c67;
+}
+
+/* Misma altura y padding para input, select y botón (alineación homogénea) */
+.report-controls input[type="date"],
+.report-controls select {
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.report-controls select {
+    min-width: 200px;
+}
+
+.report-controls .report-control-btn {
+    height: 40px;
+    padding: 0 20px;
+    background-color: #06adbf;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-controls .report-control-btn:hover {
+    background-color: #035c67;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.report-controls input[type="date"]:focus,
+.report-controls select:focus {
+    outline: none;
+    border-color: #06adbf;
+    box-shadow: 0 0 5px rgba(6, 173, 191, 0.3);
+}
+
+@media (max-width: 768px) {
+    .report-controls-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .report-control-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .report-controls .report-control-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+    }
+
+    .report-controls input[type="date"],
+    .report-controls select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .report-controls input[type="date"] {
+        text-align: center;
+    }
 }

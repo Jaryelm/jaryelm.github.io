@@ -4,8 +4,7 @@ $(function(){
         $.post('../../frontend/funciones/cat_schedules.php').done(function(respuesta) {
             var currentValue = $selectElement.val();
             $selectElement.html(respuesta);
-        $selectElement.trigger("change.select2");
-            if (currentValue && currentValue != "0") {
+            if (currentValue) {
                 $selectElement.val(currentValue).trigger('change');
             }
             if ($selectElement.hasClass('select2-hidden-accessible')) {

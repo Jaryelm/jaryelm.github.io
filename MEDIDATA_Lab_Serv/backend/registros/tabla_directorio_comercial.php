@@ -12,19 +12,7 @@ try {
         
         // Si hay un término de búsqueda, añade condiciones a la consulta
         if (!empty($search)) {
-            $sql .= " WHERE nombre_empresa LIKE :search 
-                      OR direccion LIKE :search 
-                      OR rtn_comercial LIKE :search 
-                      OR tel_fijo LIKE :search 
-                      OR correo_comercial LIKE :search
-                      OR cel_whatsapp LIKE :search
-                      OR nombre_legal LIKE :search
-                      OR dni_comercial LIKE :search
-                      OR cel_comercial LIKE :search
-                      OR cuenta_bac_comercial LIKE :search
-                      OR tipo_cuenta_comercial LIKE :search
-                      OR archivo_constancia_comercial LIKE :search
-                      OR nom_contacto LIKE :search";
+            $sql .= " WHERE CONCAT_WS(' ', nombre_empresa, direccion, rtn_comercial, tel_fijo, correo_comercial, cel_whatsapp, nombre_legal, dni_comercial, cel_comercial, cuenta_bac_comercial, tipo_cuenta_comercial, archivo_constancia_comercial, nom_contacto) LIKE :search";
         }
 
         // Añadir ordenamiento a la consulta

@@ -21,10 +21,7 @@ include_once '../../backend/php/add_cart.php';
 </head>
 <body>
     
-<?php
-include_once '../caja/menu.php';
-// incuir el archivo menu principal
-?>
+<?php include_once '../admin/menu.php'; ?>
 
 <!-- NAVBAR -->
 <section id="content">
@@ -34,7 +31,7 @@ include_once '../caja/menu.php';
             <div class="form-group"></div>
         </form>
         <span class="divider"></span>
-        <?php include_once '../caja/perfil.php'; ?>
+        <?php include_once '../admin/perfil.php'; ?>
     </nav>
     <!-- NAVBAR -->
 
@@ -46,12 +43,12 @@ include_once '../caja/menu.php';
         <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
         <!-- Botones de Navegación -->
-        <button class="button" onclick="cambiarColor(this, '../caja/new_sale.php')">Nueva Venta</button>
-        <button class="button" onclick="cambiarColor(this, '../caja/cart.php')">Procesar Venta</button>
+        <button class="button" onclick="cambiarColor(this, '../almacen/new_sale.php')">Nueva Venta</button>
+        <button class="button" onclick="cambiarColor(this, '../almacen/cart.php')">Procesar Venta</button>
         <button class="button" onclick="cambiarColor(this, '#')">Cotizaciones</button>
         <button class="button" onclick="cambiarColor(this, '#')">Estados de Cuenta</button>
-        <button class="button" onclick="cambiarColor(this, '../caja/venta.php')">Resumen de Ventas</button>
-        <button class="button" onclick="cambiarColor(this, '../caja/mostrar.php')">Resumen de Citas</button>
+        <button class="button" onclick="cambiarColor(this, '../almacen/venta.php')">Resumen de Ventas</button>
+        <button class="button" onclick="cambiarColor(this, '../citas/mostrar.php')">Resumen de Citas</button>
 
         <!-- Tabla de Servicios -->
         <div class="data">
@@ -307,7 +304,6 @@ $(document).ready(function() {
 <script src='../../backend/js/submenu.js'></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-<<<<<<<< HEAD:MEDIDATA_Lab_Serv/frontend/almacen/new_sale.php
 <?php if (!empty($_SESSION['swal_flash'])): ?>
 <script>
 Swal.fire({
@@ -318,9 +314,5 @@ Swal.fire({
 });
 </script>
 <?php unset($_SESSION['swal_flash']); endif; ?>
-========
-<script src='../../backend/registros/script/cierre_caja.js'></script>
-<?php include_once '../../backend/php/add_cart.php'; ?>
->>>>>>>> chore/rrhh-interviews:MEDIDATA_Lab_Serv/uploads/frontend/caja/new_sale.php
 </body>
 </html>

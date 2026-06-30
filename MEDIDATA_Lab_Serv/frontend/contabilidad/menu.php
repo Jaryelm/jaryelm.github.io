@@ -26,6 +26,7 @@
                 <li><a href="../../frontend/contabilidad/tabla_cheque_user.php">CHEQUES REGISTRADOS</a></li>
                 <li><a href="../../frontend/contabilidad/conciliacion_bancaria_user.php">CONCILIACIÓN BANCARIA</a></li>
                 <li><a href="../../frontend/contabilidad/recibir_pagos_user.php">RECIBIR PAGOS</a></li>
+                <li><a href="../../frontend/contabilidad/cuentas_por_pagar_user.php">CUENTAS POR PAGAR</a></li>
                 <li><a href="#">DEPOSITO BANCARIO</a></li>
                 
             </ul>

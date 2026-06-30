@@ -25,6 +25,7 @@
                         <li><a href="../../frontend/contabilidad/tabla_cheque.php"><span>CHEQUES REGISTRADOS</span></a></li>
                         <li><a href="../../frontend/contabilidad/conciliacion_bancaria.php"><span>CONCILIACIÓN BANCARIA</span></a></li>
                         <li><a href="../../frontend/contabilidad/recibir_pagos.php"><span>RECIBIR PAGOS</span></a></li>
+                        <li><a href="../../frontend/contabilidad/cuentas_por_pagar.php"><span>CUENTAS POR PAGAR</span></a></li>
                         <li><a href="#"><span>DEPOSITO BANCARIO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio.php"><span>DIRECTORIO MÉDICO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio_comercial.php"><span>DIRECTORIO COMERCIAL</span></a></li>
@@ -158,7 +159,7 @@
         <li>
             <a href="#"><i class='bx bxs-bulb icon'></i><span>CRM MARKETING</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
-                <li><a href="#"><span>CUMPLEAÑOS</span></a></li>
+                <li><a href="../crm_marketing/invitados_wifi.php"><span>INVITADOS WIFI</span></a></li>
             </ul>
         </li>
 

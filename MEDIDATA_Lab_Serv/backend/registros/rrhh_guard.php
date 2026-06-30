@@ -38,7 +38,34 @@ if (!function_exists('medidata_rrhh_recurrence_options')) {
     }
 }
 
-
+if (!function_exists('medidata_rrhh_ensure_recurrence_columns')) {
+    /**
+     * Garantiza que rrhh_custom_events tenga las columnas de recurrencia.
+     * Auto-sanado para despliegues antiguos (idempotente; corre una vez).
+     */
+    function medidata_rrhh_ensure_recurrence_columns(PDO $pdo): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
+        try {
+            $stmt = $pdo->query("SHOW COLUMNS FROM `rrhh_custom_events` LIKE 'recurrence'");
+            if (!$stmt || !$stmt->fetch(PDO::FETCH_ASSOC)) {
+                $pdo->exec("ALTER TABLE `rrhh_custom_events`
+                    ADD COLUMN `recurrence` VARCHAR(20) NOT NULL DEFAULT 'none' AFTER `is_public`");
+            }
+            $stmt2 = $pdo->query("SHOW COLUMNS FROM `rrhh_custom_events` LIKE 'recurrence_until'");
+            if (!$stmt2 || !$stmt2->fetch(PDO::FETCH_ASSOC)) {
+                $pdo->exec("ALTER TABLE `rrhh_custom_events`
+                    ADD COLUMN `recurrence_until` DATE NULL DEFAULT NULL AFTER `recurrence`");
+            }
+        } catch (Throwable $e) {
+            error_log('medidata_rrhh_ensure_recurrence_columns: ' . $e->getMessage());
+        }
+    }
+}
 
 if (!function_exists('medidata_rrhh_json_fail')) {
     function medidata_rrhh_json_fail(int $code = 503): void
@@ -430,7 +457,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 $events[] = $vac;
             }
 
-
+            medidata_rrhh_ensure_recurrence_columns($pdo);
             $stmtCustom = $pdo->prepare("
                 SELECT
                     e.id,
