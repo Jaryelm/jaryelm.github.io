@@ -90,12 +90,13 @@ try {
                 $totalSaldado = (float)($r['TotalSaldado'] ?? 0);
                 $saldoNeto = $valorFactura - $totalSaldado;
                 
-                $btnPagar = ($saldoNeto > 0.005)
-                    ? '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial" data-saldo="' . $saldoNeto . '">Pagar</button>'
+                $chkPagar = ($saldoNeto > 0.005)
+                    ? '<input type="checkbox" class="chk-pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial" data-saldo="' . $saldoNeto . '" style="transform: scale(1.5); cursor:pointer;">'
                     : '';
                 $btnPartidas = '<button type="button" class="btn_ver_detalles btn_ver_partidas" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="comercial">Ver Partidas</button>';
                 
                 $detalles[] = [
+                    $chkPagar,
                     htmlspecialchars((string)($r['Fecha'] ?? ''), ENT_QUOTES, 'UTF-8'),
                     htmlspecialchars((string)($r['NumeroFactura'] ?? ''), ENT_QUOTES, 'UTF-8'),
                     htmlspecialchars((string)($r['Fecha_Vencimiento'] ?? ''), ENT_QUOTES, 'UTF-8'),
@@ -103,7 +104,7 @@ try {
                     'L. ' . number_format($totalSaldado, 2),
                     'L. ' . number_format($saldoNeto, 2),
                     htmlspecialchars((string)($r['Estado'] ?? ''), ENT_QUOTES, 'UTF-8'),
-                    '<div class="acciones-wrap">' . $btnPagar . ' ' . $btnPartidas . '</div>'
+                    '<div class="acciones-wrap">' . $btnPartidas . '</div>'
                 ];
             } else {
                 if (!isset($summary[$prov])) {
@@ -158,12 +159,13 @@ try {
                 $totalSaldado = (float)($r['TotalSaldado'] ?? 0);
                 $saldoNeto = $valorFactura - $totalSaldado;
                 
-                $btnPagar = ($saldoNeto > 0.005)
-                    ? '<button type="button" class="btn_ver_detalles btn_pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico" data-saldo="' . $saldoNeto . '">Pagar</button>'
+                $chkPagar = ($saldoNeto > 0.005)
+                    ? '<input type="checkbox" class="chk-pagar" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico" data-saldo="' . $saldoNeto . '" style="transform: scale(1.5); cursor:pointer;">'
                     : '';
                 $btnPartidas = '<button type="button" class="btn_ver_detalles btn_ver_partidas" data-id="' . htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8') . '" data-modo="medico">Historial Pagos</button>';
                 
                 $detalles[] = [
+                    $chkPagar,
                     htmlspecialchars((string)($r['Fecha'] ?? ''), ENT_QUOTES, 'UTF-8'),
                     htmlspecialchars((string)($r['NumeroFactura'] ?? ''), ENT_QUOTES, 'UTF-8'),
                     htmlspecialchars((string)($r['NombrePaciente'] ?? '') . ' - ' . (string)($r['Estudio'] ?? ''), ENT_QUOTES, 'UTF-8'),
@@ -171,7 +173,7 @@ try {
                     'L. ' . number_format($totalSaldado, 2),
                     'L. ' . number_format($saldoNeto, 2),
                     htmlspecialchars((string)($r['Estado'] ?? ''), ENT_QUOTES, 'UTF-8'),
-                    '<div class="acciones-wrap">' . $btnPagar . ' ' . $btnPartidas . '</div>'
+                    '<div class="acciones-wrap">' . $btnPartidas . '</div>'
                 ];
             } else {
                 if (!isset($summary[$prov])) {

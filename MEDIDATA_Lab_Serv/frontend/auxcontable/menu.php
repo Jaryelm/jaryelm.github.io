@@ -20,7 +20,7 @@
             </ul>
         </li>
         <li>
-            <a href="#" class="new-submenu-link">GESTIÓN DE PAGOS</a>
+            <a href="#" class="new-submenu-link">PROVEEDORES</a>
             <ul class="new-side-dropdown">
                 <li><a href="../../frontend/auxcontable/emitir_cheque_user.php">EMITIR CHEQUES</a></li>
                 <li><a href="../../frontend/auxcontable/tabla_cheque_user.php">CHEQUES REGISTRADOS</a></li>

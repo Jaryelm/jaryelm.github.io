@@ -19,7 +19,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#" class="new-submenu-link"><span>GESTIÓN DE PAGOS</span></a>
+                    <a href="#" class="new-submenu-link"><span>PROVEEDORES</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../../frontend/contabilidad/emitir_cheque.php"><span>EMITIR CHEQUES</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_cheque.php"><span>CHEQUES REGISTRADOS</span></a></li>
