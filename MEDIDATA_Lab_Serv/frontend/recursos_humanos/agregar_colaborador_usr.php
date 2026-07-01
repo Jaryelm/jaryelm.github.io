@@ -1,9 +1,6 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
-    header('Location: agregar_colaborador_usr.php');
-    exit;
-}
+
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
 
@@ -31,7 +28,7 @@ try {
 </head>
 <body>
 <?php 
-    include_once '../admin/menu.php'; 
+    include_once '../recursos_humanos/menu.php'; 
 ?>
 <section id="content">
     <nav>
@@ -48,17 +45,17 @@ try {
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
         
         <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-            <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
-            <a href="lista_colaboradores.php?area=medico" class="button tab-button">Médicos</a>
-            <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">Enfermería</a>
-            <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
-            <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
-            <a href="lista_excolaboradores.php" class="button tab-button">Excolaboradores</a>
-            <a href="agregar_colaborador.php" class="button tab-button active" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
+            <a href="lista_colaboradores_usr.php?area=todos" class="button tab-button">Todos</a>
+            <a href="lista_colaboradores_usr.php?area=medico" class="button tab-button">Médicos</a>
+            <a href="lista_colaboradores_usr.php?area=enfermeria" class="button tab-button">Enfermería</a>
+            <a href="lista_colaboradores_usr.php?area=administrativo" class="button tab-button">Administrativos</a>
+            <a href="lista_colaboradores_usr.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
+            <a href="lista_excolaboradores_usr.php" class="button tab-button">Excolaboradores</a>
+            <a href="agregar_colaborador_usr.php" class="button tab-button active" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
         </div>
 
         <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
-            <input type="hidden" name="return_page" value="lista_colaboradores.php">
+            <input type="hidden" name="return_page" value="lista_colaboradores_usr.php">
             <div class="containerss">
                 <h1>Nuevo Colaborador</h1>
                 <div class="alert-danger">

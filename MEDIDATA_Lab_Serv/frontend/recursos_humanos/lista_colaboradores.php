@@ -1,5 +1,9 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
+    header('Location: lista_colaboradores_usr.php');
+    exit;
+}
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
@@ -16,6 +20,11 @@ if ($pdoRrhh) {
         $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
         while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
             $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
+        }
+        $cargo_map = [];
+        $stmt_cargo = $pdoRrhh->query("SELECT id, name FROM positions WHERE deleted = 0");
+        while ($row = $stmt_cargo->fetch(PDO::FETCH_ASSOC)) {
+            $cargo_map[$row['id']] = $row['name'];
         }
     } catch (Exception $e) {}
 }
@@ -39,11 +48,7 @@ if ($pdoRrhh) {
 </head>
 <body>
     <?php 
-    if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') {
-        include_once '../admin/menu.php'; 
-    } else {
-        include_once '../recursos_humanos/menu.php'; 
-    }
+    include_once '../admin/menu.php'; 
     ?>
 
     <section id="content">
@@ -72,9 +77,7 @@ if ($pdoRrhh) {
                 <a href="lista_colaboradores.php?area=administrativo" class="button tab-button <?php echo $filtro_area == 'administrativo' ? 'active' : ''; ?>">Administrativos</a>
                 <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button <?php echo $filtro_area == 'servicios_generales' ? 'active' : ''; ?>">Servicios Generales</a>
                 <a href="lista_excolaboradores.php" class="button tab-button">Excolaboradores</a>
-                <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                 <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
-                <?php endif; ?>
             </div>
 
             <div class="data">
@@ -88,8 +91,8 @@ if ($pdoRrhh) {
                         $sql_administrativo = "SELECT 
                                 'staff_administrative' AS source_table, 'idadm' AS source_idcol, idadm AS id,
                                 num_empleado, numide AS identificacion, nomadm AS nombres, apeadm AS apellidos, sexadm AS sexo,
-                                'nomadm' AS field_nombres, 'apeadm' AS field_apellidos, 'sexadm' AS field_sexo, 'numide' AS field_identificacion,
-                                tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+                                'nomadm' AS field_nombres, 'apeadm' AS field_apellidos, 'sexadm' AS field_sexo, 'numide' AS field_identificacion, 'nacadm' AS field_nacimiento,
+                                tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                                 correo_personal, correo_institucional, nacadm AS fecha_nacimiento, id_biometrico, num_locker,
                                 url_contrato, state, 'administrativo_editar.php' AS edit_file
                             FROM staff_administrative WHERE state = '1'";
@@ -97,8 +100,8 @@ if ($pdoRrhh) {
                         $sql_medico = "SELECT 
                                 'doctor' AS source_table, 'idodc' AS source_idcol, idodc AS id,
                                 num_empleado, ceddoc AS identificacion, nodoc AS nombres, apdoc AS apellidos, sexd AS sexo,
-                                'nodoc' AS field_nombres, 'apdoc' AS field_apellidos, 'sexd' AS field_sexo, 'ceddoc' AS field_identificacion,
-                                tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+                                'nodoc' AS field_nombres, 'apdoc' AS field_apellidos, 'sexd' AS field_sexo, 'ceddoc' AS field_identificacion, 'nacd' AS field_nacimiento,
+                                tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                                 correo_personal, correo_institucional, nacd AS fecha_nacimiento, id_biometrico, num_locker,
                                 url_contrato, state, '../medicos/editar.php' AS edit_file
                             FROM doctor WHERE state = '1'";
@@ -106,8 +109,8 @@ if ($pdoRrhh) {
                         $sql_enfermeria = "SELECT 
                                 'nurse' AS source_table, 'idnur' AS source_idcol, idnur AS id,
                                 num_empleado, numide AS identificacion, nomnur AS nombres, apenur AS apellidos, sexnur AS sexo,
-                                'nomnur' AS field_nombres, 'apenur' AS field_apellidos, 'sexnur' AS field_sexo, 'numide' AS field_identificacion,
-                                tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+                                'nomnur' AS field_nombres, 'apenur' AS field_apellidos, 'sexnur' AS field_sexo, 'numide' AS field_identificacion, 'nacinur' AS field_nacimiento,
+                                tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                                 correo_personal, correo_institucional, nacinur AS fecha_nacimiento, id_biometrico, num_locker,
                                 url_contrato, state, '../enfermeria/editar.php' AS edit_file
                             FROM nurse WHERE state = '1'";
@@ -115,8 +118,8 @@ if ($pdoRrhh) {
                         $sql_servicios_generales = "SELECT 
                                 'staff_general_services' AS source_table, 'idsg' AS source_idcol, idsg AS id,
                                 num_empleado, numide AS identificacion, nomsg AS nombres, apesg AS apellidos, sexsg AS sexo,
-                                'nomsg' AS field_nombres, 'apesg' AS field_apellidos, 'sexsg' AS field_sexo, 'numide' AS field_identificacion,
-                                tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+                                'nomsg' AS field_nombres, 'apesg' AS field_apellidos, 'sexsg' AS field_sexo, 'numide' AS field_identificacion, 'nacsg' AS field_nacimiento,
+                                tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                                 correo_personal, correo_institucional, nacsg AS fecha_nacimiento, id_biometrico, num_locker,
                                 url_contrato, state, 'servicios_generales_editar.php' AS edit_file
                             FROM staff_general_services WHERE state = '1'";
@@ -137,20 +140,22 @@ if ($pdoRrhh) {
                         <table id="example" class="responsive-table">
                             <thead>
                                 <tr>
-                                    <th>CATEGORÃA</th>
                                     <th>TIPO DE EMPLEADO</th>
-                                    <th>N° EMPLEADO</th>
+                                    <th>N°</th>
                                     <th>DNI</th>
                                     <th>APELLIDOS</th>
                                     <th>NOMBRES</th>
                                     <th>SEXO</th>
-                                    <th>ÃREA/DEPTO</th>
-                                    <th>NIVEL SALARIAL</th>
+                                    <th>DEPTO</th>
+                                    <th>CARGO</th>
                                     <th>SALARIO</th>
-                                    <th>N° CUENTA</th>
+                                    <th>NIVEL SALARIAL</th>
+                                    <th>N°CUENTA</th>
                                     <th>FECHA DE INGRESO</th>
-                                    <th>TELÉFONO</th>
-                                    <th>CORREO</th>
+                                    <th>CONTACTO</th>
+                                    <th>CORREO PERSONAL</th>
+                                    <th>CORREO INSTITUCIONAL</th>
+                                    <th>FECHA DE NACIMIENTO</th>
                                     <th>MARCAJE</th>
                                     <th>LOKER</th>
                                     <th>CONTRATO</th>
@@ -168,26 +173,25 @@ if ($pdoRrhh) {
                                     elseif ($d->source_table == 'staff_general_services') $categoria_label = 'Servicios Generales';
                                 ?>
                                 <tr>
-                                    <td><span class="badge-primary" style="padding:4px; border-radius:4px; font-size:0.8rem;"><?php echo $categoria_label; ?></span></td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="tipo_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="tipo_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" >
                                             <option value="Permanente" <?php echo (($d->tipo_empleado ?? '') == 'Permanente') ? 'selected' : ''; ?>>Permanente</option>
                                             <option value="Temporal" <?php echo (($d->tipo_empleado ?? '') == 'Temporal') ? 'selected' : ''; ?>>Temporal</option>
                                             <option value="Tiempo parcial" <?php echo (($d->tipo_empleado ?? '') == 'Tiempo parcial') ? 'selected' : ''; ?>>Tiempo parcial</option>
                                         </select>
                                     </td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="num_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
-                                    <th scope="row" <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_identificacion); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->identificacion); ?></th>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_apellidos); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->apellidos); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nombres); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->nombres); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="num_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_identificacion); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->identificacion); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_apellidos); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->apellidos); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nombres); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->nombres); ?></td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_sexo); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_sexo); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" >
                                             <option value="Masculino" <?php echo ($d->sexo == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
                                             <option value="Femenino" <?php echo ($d->sexo == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_departamento" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_departamento" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
                                             <option value="">—</option>
                                             <?php foreach ($depto_map as $id_dept => $name_dept): ?>
                                                 <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
@@ -195,47 +199,51 @@ if ($pdoRrhh) {
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_salary_level" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_cargo" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
+                                            <option value="">—</option>
+                                            <?php foreach ($cargo_map as $id_cargo => $name_cargo): ?>
+                                                <option value="<?php echo $id_cargo; ?>" <?php echo ($d->id_cargo == $id_cargo) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_cargo); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="salario" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
+                                    <td>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_salary_level" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
                                             <option value="">—</option>
                                             <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
                                                 <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="salario" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="cuenta_bac" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="fecha_ingreso" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="telefono" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
-                                    <td><?php echo htmlspecialchars(($d->correo_personal ?? '—') . ' / ' . ($d->correo_institucional ?? '—')); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="id_biometrico" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
-                                    <td <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin') ? 'class="editable-cell" contenteditable="true"' : ''; ?> data-id="<?php echo (int) $d->id; ?>" data-field="num_locker" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="cuenta_bac" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="fecha_ingreso" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="telefono" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="correo_personal" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_personal ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="correo_institucional" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_institucional ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nacimiento); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 1990-05-15"><?php echo htmlspecialchars($d->fecha_nacimiento ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="id_biometrico" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="num_locker" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
                                     <td>
                                         <?php if (!empty($d->url_contrato)): ?>
                                             <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->id; ?>&doc=contrato&table=<?php echo htmlspecialchars($d->source_table); ?>&idcol=<?php echo htmlspecialchars($d->source_idcol); ?>" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
-                                            <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                             <a href="#" onclick="deleteContract(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none; margin-left:4px;" title="Eliminar contrato"><i class="bx bx-trash"></i></a>
-                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="badge-warning" style="padding:4px;">N/D</span>
                                         <?php endif; ?>
-                                        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                         <br>
                                         <label class="badge-primary" style="padding:4px; cursor:pointer; display:inline-block; margin-top:4px;" onclick="document.getElementById('upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>').click();">
                                             <i class="bx bx-upload"></i> Subir
                                         </label>
                                         <input type="file" id="upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>" style="display:none;" accept=".pdf,.jpg,.png" onchange="uploadContract(this, <?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>')">
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <label class="switch">
-                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?> <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] != 'admin') ? 'disabled' : ''; ?>/>
+                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?> />
                                             <span class="slider"></span>
                                         </label>
                                     </td>
                                     <td>
-                                        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'admin'): ?>
                                         <a title="Actualizar" href="<?php echo htmlspecialchars($d->edit_file); ?>?id=<?php echo (int) $d->id; ?>" class="fa fa-pencil tooltip"></a>
-                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -359,4 +367,5 @@ if ($pdoRrhh) {
     <script src="../../backend/registros/script/botones_color.js"></script>
 </body>
 </html>
+
 

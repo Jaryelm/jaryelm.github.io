@@ -36,7 +36,7 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
             <a href="#"><i class='bx bxs-user-detail icon'></i> RECURSOS HUMANOS<i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li>
-                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores.php">LISTA COLABORADORES</a>
+                    <a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>lista_colaboradores_usr.php">LISTA COLABORADORES</a>
                 </li>
                 
                 <li>

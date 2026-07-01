@@ -21,13 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id_biometrico', 'num_locker', 
         'num_empleado', 'numide', 'nomadm', 'apeadm', 
         'salario', 'cuenta_bac', 'telefono', 'fecha_ingreso',
-        'tipo_empleado', 'sexadm', 'id_departamento', 'id_salary_level',
+        'tipo_empleado', 'sexadm', 'id_departamento', 'id_salary_level', 'id_cargo',
+        'correo_personal', 'correo_institucional', 'nacadm',
         // Nurse fields
-        'nomnur', 'apenur', 'sexnur',
+        'nomnur', 'apenur', 'sexnur', 'nacinur',
         // Doctor fields
-        'ceddoc', 'nodoc', 'apdoc', 'sexd',
+        'ceddoc', 'nodoc', 'apdoc', 'sexd', 'nacd',
         // SG fields
-        'nomsg', 'apesg', 'sexsg'
+        'nomsg', 'apesg', 'sexsg', 'nacsg'
     ];
 
     if (!in_array($table, $allowed_tables) || !in_array($field, $allowed_fields)) {
