@@ -47,11 +47,11 @@ $salarioTexto = (isset($candidato->salary_expectation) && $candidato->salary_exp
 
                     <span class="rrhh-estado-rapidos-label">Avance rápido</span>
                     <div class="rrhh-estado-rapidos">
-                        <button type="button" class="button rrhh-estado-rapido" data-status="Formulario Empleados">Formulario</button>
-                        <button type="button" class="button rrhh-estado-rapido" data-status="Entrevista">Entrevista</button>
-                        <button type="button" class="button rrhh-estado-rapido" data-status="Pruebas Psicometricas">Psicométricas</button>
-                        <button type="button" class="button rrhh-estado-rapido" data-status="Llenando Expediente">Expediente</button>
-                        <button type="button" class="button rrhh-estado-rapido" data-status="Contratado">Contratado</button>
+                        <button type="button" class="button rrhh-estado-rapido" data-status="Formulario Empleados" data-action="formulario">Formulario</button>
+                        <button type="button" class="button rrhh-estado-rapido" data-status="Entrevista" data-action="entrevista">Entrevista</button>
+                        <button type="button" class="button rrhh-estado-rapido" data-status="Pruebas Psicometricas" data-action="psicometricas">Psicométricas</button>
+                        <button type="button" class="button rrhh-estado-rapido" data-status="Llenando Expediente" data-action="expediente">Expediente</button>
+                        <button type="button" class="button rrhh-estado-rapido" data-status="Contratado" data-action="contratado">Contratado</button>
                         <button type="button" class="pabtn rrhh-estado-rapido" data-status="Descartado">Descartar</button>
                     </div>
 
@@ -114,10 +114,9 @@ $salarioTexto = (isset($candidato->salary_expectation) && $candidato->salary_exp
                         <i class="fa fa-certificate"></i>
                         <strong>Profesión:</strong>&nbsp;<span><?php echo htmlspecialchars($candidato->profession ?? 'N/A'); ?></span>
                     </div>
-                    <div class="info-item info-item-block">
+                    <div class="info-item">
                         <i class="fa fa-history"></i>
-                        <strong>Experiencia previa:</strong>
-                        <span><?php echo htmlspecialchars($candidato->previous_experience ?? 'N/A'); ?></span>
+                        <strong>Experiencia previa:</strong>&nbsp;<span><?php echo htmlspecialchars($candidato->previous_experience ?? 'N/A'); ?></span>
                     </div>
                     <div class="info-item">
                         <i class="fa fa-money-bill-wave"></i>
@@ -144,7 +143,12 @@ $salarioTexto = (isset($candidato->salary_expectation) && $candidato->salary_exp
 <script>
 window.MEDIDATA_CANDIDATO_ESTADO = {
     candidateId: <?php echo (int) ($candidato->id ?? 0); ?>,
+    candidateEmail: <?php echo json_encode($candidato->email ?? '', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>,
+    candidateName: <?php echo json_encode($candidato->fullname ?? '', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>,
     estadoUrl: '../../backend/php/rrhh_candidato_estado.php',
+    formularioUrl: '../../backend/php/rrhh_formulario_empleado_link.php',
+    expedienteUrl: '../../backend/php/rrhh_expediente_link.php',
+    isUsr: <?php echo json_encode(strpos($_SERVER['SCRIPT_NAME'] ?? '', '_usr.php') !== false); ?>,
     returnUrl: <?php echo json_encode($volverUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES); ?>
 };
 </script>

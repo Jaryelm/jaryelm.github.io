@@ -4,6 +4,45 @@ include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
 medidata_staff_ensure_tables($connect);
 
+$prefillColab = [
+    'identificacion' => '',
+    'nombres' => '',
+    'apellidos' => '',
+    'fecha_nacimiento' => '',
+    'telefono' => '',
+    'correo_personal' => '',
+];
+$id_candidato = isset($_GET['id_candidato']) ? (int) $_GET['id_candidato'] : 0;
+$candidatoContratado = null;
+if ($id_candidato > 0) {
+    require_once '../../backend/php/rrhh_candidato_workflow_lib.php';
+    $pdoRrhh = medidata_rrhh_pdo();
+    if ($pdoRrhh) {
+        $stmtCand = $pdoRrhh->prepare(
+            'SELECT fullname, dni, email, phonenumber, birthdate FROM candidates WHERE id = ? AND deleted = 0 LIMIT 1'
+        );
+        $stmtCand->execute([$id_candidato]);
+        $candidatoContratado = $stmtCand->fetch(PDO::FETCH_ASSOC);
+        if ($candidatoContratado) {
+            $parts = medidata_rrhh_candidate_name_parts((string) ($candidatoContratado['fullname'] ?? ''));
+            $prefillColab['identificacion'] = (string) ($candidatoContratado['dni'] ?? '');
+            $prefillColab['nombres'] = $parts['nombres'];
+            $prefillColab['apellidos'] = $parts['apellidos'];
+            $prefillColab['telefono'] = (string) ($candidatoContratado['phonenumber'] ?? '');
+            $prefillColab['correo_personal'] = (string) ($candidatoContratado['email'] ?? '');
+            $bd = (string) ($candidatoContratado['birthdate'] ?? '');
+            if ($bd !== '' && strpos($bd, '0000') === false) {
+                $prefillColab['fecha_nacimiento'] = substr($bd, 0, 10);
+            }
+        }
+    }
+}
+
+function medidata_colab_prefill_val(array $prefill, string $key): string
+{
+    return htmlspecialchars((string) ($prefill[$key] ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
 $staffUsers = medidata_staff_fetch_users_for_select($connect);
 
 $cargos = [];
@@ -52,6 +91,12 @@ $page_titulo = $esMedico ? 'MEDIDATA - Agregar Médico' : 'MEDIDATA - Agregar Co
         $saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
         ?>
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
+        <?php if ($candidatoContratado): ?>
+        <div class="alert" style="background:#d4edda;border-color:#81D43A;color:#155724;">
+            <strong>Candidato contratado:</strong> complete el registro de colaborador con los datos precargados.
+            <a href="lista_colaboradores_usr.php" class="button" style="margin-left:12px;">Ir a lista de colaboradores</a>
+        </div>
+        <?php endif; ?>
         
         <div class="rrhh-tab-nav">
             <a href="lista_colaboradores_usr.php" class="button tab-button<?php echo $esMedico ? '' : ' active'; ?>">Lista de Colaboradores</a>
@@ -89,16 +134,16 @@ $page_titulo = $esMedico ? 'MEDIDATA - Agregar Médico' : 'MEDIDATA - Agregar Co
                 <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automático)">
 
                 <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
-                <input type="text" name="identificacion" maxlength="14" placeholder="ejm: 0801199012345" required>
+                <input type="text" name="identificacion" maxlength="14" placeholder="ejm: 0801199012345" required value="<?php echo medidata_colab_prefill_val($prefillColab, 'identificacion'); ?>">
                 
                 <label><b>Nombres</b></label><span class="badge-warning">*</span>
-                <input type="text" name="nombres" placeholder="ejm: Juan Raúl" required>
+                <input type="text" name="nombres" placeholder="ejm: Juan Raúl" required value="<?php echo medidata_colab_prefill_val($prefillColab, 'nombres'); ?>">
                 
                 <label><b>Apellidos</b></label><span class="badge-warning">*</span>
-                <input type="text" name="apellidos" placeholder="ejm: Ramírez Requena" required>
+                <input type="text" name="apellidos" placeholder="ejm: Ramírez Requena" required value="<?php echo medidata_colab_prefill_val($prefillColab, 'apellidos'); ?>">
                 
                 <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
-                <input type="date" name="fecha_nacimiento" required>
+                <input type="date" name="fecha_nacimiento" required value="<?php echo medidata_colab_prefill_val($prefillColab, 'fecha_nacimiento'); ?>">
                 
                 <label><b>Género</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="genero" required>
@@ -158,10 +203,10 @@ $page_titulo = $esMedico ? 'MEDIDATA - Agregar Médico' : 'MEDIDATA - Agregar Co
                 <h3>Información de Contacto y Accesos</h3>
 
                 <label><b>Teléfono Celular</b></label>
-                <input type="text" name="telefono" placeholder="Ej: 99887766">
+                <input type="text" name="telefono" placeholder="Ej: 99887766" value="<?php echo medidata_colab_prefill_val($prefillColab, 'telefono'); ?>">
 
                 <label><b>Correo Personal</b></label>
-                <input type="email" name="correo_personal" placeholder="Correo electrónico personal">
+                <input type="email" name="correo_personal" placeholder="Correo electrónico personal" value="<?php echo medidata_colab_prefill_val($prefillColab, 'correo_personal'); ?>">
 
                 <label><b>Correo Institucional</b></label>
                 <input type="email" name="correo_institucional" placeholder="Correo electrónico de Medicasa">

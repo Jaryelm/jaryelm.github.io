@@ -5,7 +5,7 @@ if (isset($connect_rrhh) && $connect_rrhh instanceof PDO) {
     medidata_ensure_departament_phone_ext($connect_rrhh);
 }
 
-$depContext = 'admin';
+$depContext = 'usr';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,14 +22,14 @@ $depContext = 'admin';
 </head>
 <body>
 
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once '../recursos_humanos/menu.php'; ?>
 
     <section id="content">
         <nav>
             <i class='bx bx-menu toggle-sidebar'></i>
             <form action="#"><div class="form-group"></div></form>
             <span class="divider"></span>
-            <?php include_once '../admin/perfil.php'; ?>
+            <?php include_once '../recursos_humanos/perfil.php'; ?>
         </nav>
 
         <main>

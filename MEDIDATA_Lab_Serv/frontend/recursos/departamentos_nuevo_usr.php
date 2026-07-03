@@ -51,6 +51,7 @@ include_once '../../backend/registros/session_check.php';
 <form action="" method="POST" autocomplete="off">
   <div class="containerss">
     <h1>Nuevo Departamento</h1>
+    <input type="hidden" name="dep_context" value="usr">
    
     <div class="alert-danger">
       <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
@@ -74,7 +75,10 @@ include_once '../../backend/registros/session_check.php';
     <input type="email" placeholder="rrhh@medicasa.hn" name="dep_email">
 
     <label for="dep_phone"><b>Teléfono Departamento</b></label>
-    <input type="text" placeholder="2234-1001" name="dep_phone" maxlength="10">
+    <input type="text" placeholder="2234-1001 (opcional)" name="dep_phone" maxlength="10">
+
+    <label for="dep_phone_ext"><b>Extensión (Ext)</b></label>
+    <input type="text" placeholder="ejm: 1205 (si no tiene teléfono directo)" name="dep_phone_ext" maxlength="10">
 
     <label for="dep_status"><b>Estado</b></label><span class="badge-warning">*</span>
     <select class="select2" required name="dep_status">

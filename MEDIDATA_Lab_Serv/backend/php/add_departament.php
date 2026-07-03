@@ -1,5 +1,11 @@
 <?php 
-require_once('../../backend/bd/Conexion.php'); 
+require_once('../../backend/bd/Conexion.php');
+require_once __DIR__ . '/departament_schema.php';
+
+if (isset($connect_rrhh) && $connect_rrhh instanceof PDO) {
+    medidata_ensure_departament_phone_ext($connect_rrhh);
+}
+
  if(isset($_POST['add_departament']))
  {
     $departament_code=trim($_POST['dep_code']);
@@ -8,9 +14,12 @@ require_once('../../backend/bd/Conexion.php');
     $description=trim($_POST['dep_description']);
     $email=trim($_POST['dep_email']);
     $phone=trim($_POST['dep_phone']);
+    $phone_ext=trim($_POST['dep_phone_ext'] ?? '');
     $status=trim($_POST['dep_status']);
     $observations=trim($_POST['dep_observations']);
     $created_by = $_SESSION['name'] ?? 'System';
+    $returnList = medidata_departament_return_list_url();
+    $returnNew = medidata_departament_return_new_url();
 
   if(empty($departament_code)){
    $errMSG = "Por favor ingrese el código del departamento.";
@@ -23,7 +32,7 @@ require_once('../../backend/bd/Conexion.php');
    if(empty($departament_code)) {
              echo '<script type="text/javascript">
 Swal.fire("Error!", "Código de departamento es requerido", "error").then(function() {
-            window.location = "departamentos_nuevo.php";
+            window.location = "' . $returnNew . '";
         });
         </script>';
          }
@@ -39,7 +48,7 @@ Swal.fire("Error!", "Código de departamento es requerido", "error").then(functi
             {
                 if(!isset($errMSG))
   {
-   $stmt = $connect_rrhh->prepare("INSERT INTO departaments(departament_code, name, head_departament, description, email, phone, status, observations, created_by) VALUES(:departament_code, :name, :head_departament, :description, :email, :phone, :status, :observations, :created_by)");
+   $stmt = $connect_rrhh->prepare("INSERT INTO departaments(departament_code, name, head_departament, description, email, phone, phone_ext, status, observations, created_by) VALUES(:departament_code, :name, :head_departament, :description, :email, :phone, :phone_ext, :status, :observations, :created_by)");
 
 
 $stmt->bindParam(':departament_code',$departament_code);
@@ -48,6 +57,7 @@ $stmt->bindParam(':head_departament',$head_departament);
 $stmt->bindParam(':description',$description);
 $stmt->bindParam(':email',$email);
 $stmt->bindParam(':phone',$phone);
+$stmt->bindParam(':phone_ext',$phone_ext);
 $stmt->bindParam(':status',$status);
 $stmt->bindParam(':observations',$observations);
 $stmt->bindParam(':created_by',$created_by);
@@ -57,7 +67,7 @@ $stmt->bindParam(':created_by',$created_by);
    {
     echo '<script type="text/javascript">
 Swal.fire("Agregado!", "Departamento agregado correctamente", "success").then(function() {
-            window.location = "departamentos.php";
+            window.location = "' . $returnList . '";
         });
         </script>';
    }
@@ -73,7 +83,7 @@ Swal.fire("Agregado!", "Departamento agregado correctamente", "success").then(fu
 
                      echo '<script type="text/javascript">
 Swal.fire("Error!", "El código o nombre del departamento ya existe", "error").then(function() {
-            window.location = "departamentos_nuevo.php";
+            window.location = "' . $returnNew . '";
         });
         </script>';
 

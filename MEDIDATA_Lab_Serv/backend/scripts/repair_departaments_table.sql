@@ -17,6 +17,7 @@ CREATE TABLE `departaments` (
     description VARCHAR(700) NOT NULL,
     email VARCHAR(100) DEFAULT '',
     phone VARCHAR(10),
+    phone_ext VARCHAR(10) DEFAULT NULL,
     status ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
     observations VARCHAR(300),
     created_by VARCHAR(100) NOT NULL,

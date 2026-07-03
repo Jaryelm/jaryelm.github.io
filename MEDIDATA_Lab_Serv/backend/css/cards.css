@@ -1300,14 +1300,28 @@ body.rrhh-modal-open {
     height: 42px;
 }
 
+.card-candidato-detalle .info-item {
+    align-items: flex-start;
+    line-height: 1.45;
+}
+
+.card-candidato-detalle .info-item i {
+    margin-top: 2px;
+}
+
+.card-candidato-detalle .info-item span {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
 .card-candidato-detalle .info-item.info-item-block {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
 }
 
 .card-candidato-detalle .info-item.info-item-block span {
-    margin-top: 4px;
-    line-height: 1.45;
+    margin-top: 0;
 }
 
 @media (max-width: 992px) {

@@ -82,6 +82,7 @@
                     <ul class="new-side-dropdown">
                         <li><a href="../recursos_humanos/puestos_trabajo.php"><span>PUESTOS DE TRABAJO</span></a></li>
                         <li><a href="../recursos_humanos/vacantes_trabajo.php"><span>VACANTES DE TRABAJO</span></a></li>
+                        <li><a href="../recursos/reclutamiento.php"><span>RECLUTAMIENTO</span></a></li>
                         <li><a href="../recursos_humanos/reclutamiento.php"><span>SOLICITUDES DE EMPLEO</span></a></li>
                         <li><a href="../recursos_humanos/postulantes.php"><span>POSTULANTES</span></a></li>
                         <li><a href="../recursos_humanos/entrevista.php"><span>ENTREVISTAS</span></a></li>
@@ -92,7 +93,6 @@
                 <li>
                     <a href="#" class="new-submenu-link"><span>PERSONAL</span></a>
                     <ul class="new-side-dropdown">
-                        <li><a href="../recursos/reclutamiento.php"><span>RECLUTAMIENTO</span></a></li>
                         <li><a href="../recursos/relojbio.php"><span>RELOJ BIOMÉTRICO</span></a></li>
                     </ul>
                 </li>

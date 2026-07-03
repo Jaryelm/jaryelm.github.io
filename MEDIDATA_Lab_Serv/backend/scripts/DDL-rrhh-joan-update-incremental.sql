@@ -138,3 +138,9 @@ SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
     WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'vacant_positions' AND COLUMN_NAME = 'requesting_boss');
 SET @sql := IF(@col > 0, 'ALTER TABLE `vacant_positions` DROP COLUMN `requesting_boss`', 'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Extensión telefónica en departamentos (Ext)
+SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'departaments' AND COLUMN_NAME = 'phone_ext');
+SET @sql := IF(@col = 0, 'ALTER TABLE `departaments` ADD COLUMN `phone_ext` VARCHAR(10) NULL DEFAULT NULL AFTER `phone`', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
