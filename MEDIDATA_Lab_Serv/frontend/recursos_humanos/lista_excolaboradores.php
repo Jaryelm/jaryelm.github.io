@@ -10,24 +10,37 @@ medidata_staff_ensure_tables($connect);
 
 $depto_map = [];
 $salary_level_map = [];
+$cargo_map = [];
+
 $pdoRrhh = medidata_rrhh_pdo();
 if ($pdoRrhh) {
     try {
-        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
-        while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
-            $depto_map[$row['id']] = $row['name'];
+        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments ORDER BY name ASC");
+        if ($stmt_dept) {
+            while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
+                $depto_map[$row['id']] = $row['name'];
+            }
         }
-        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
-        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
-            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
-        }
-        $cargo_map = [];
-        $stmt_cargo = $pdoRrhh->query("SELECT id, name FROM positions WHERE deleted = 0");
-        while ($row = $stmt_cargo->fetch(PDO::FETCH_ASSOC)) {
-            $cargo_map[$row['id']] = $row['name'];
+    } catch (Exception $e) {}
+
+    try {
+        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels");
+        if ($stmt_sl) {
+            while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
+                $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
+            }
         }
     } catch (Exception $e) {}
 }
+
+try {
+    $stmt_cargo = $connect->query("SELECT id, name FROM positions ORDER BY name ASC");
+    if ($stmt_cargo) {
+        while ($row = $stmt_cargo->fetch(PDO::FETCH_ASSOC)) {
+            $cargo_map[$row['id']] = $row['name'];
+        }
+    }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -67,20 +80,22 @@ if ($pdoRrhh) {
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
+            <?php
+            $filtro_area = isset($_GET['area']) ? $_GET['area'] : 'colaboradores';
+            ?>
+
             <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
+                <a href="lista_colaboradores.php?area=colaboradores" class="button tab-button">Colaboradores</a>
                 <a href="lista_colaboradores.php?area=medico" class="button tab-button">Médicos</a>
-                <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">Enfermería</a>
-                <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
-                <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
-                <a href="lista_excolaboradores.php" class="button tab-button active">Excolaboradores</a>
+                <a href="lista_excolaboradores.php?area=colaboradores" class="button tab-button <?php echo $filtro_area == 'colaboradores' ? 'active' : ''; ?>">Excolaboradores</a>
+                <a href="lista_excolaboradores.php?area=medico" class="button tab-button <?php echo $filtro_area == 'medico' ? 'active' : ''; ?>">Ex Médicos</a>
                 <a href="agregar_colaborador.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
             </div>
 
             <div class="data">
                 <div class="content-data">
                     <div class="table-title">
-                        <h1>Lista General de Excolaboradores</h1>
+                        <h1>Lista de <?php echo $filtro_area == 'colaboradores' ? 'Excolaboradores' : 'Ex Médicos'; ?></h1>
                     </div>
                     
                     <div class="table-responsive" style="overflow-x:auto;">
@@ -121,7 +136,18 @@ if ($pdoRrhh) {
                                 url_contrato, state, 'servicios_generales_editar.php' AS edit_file
                             FROM staff_general_services WHERE state = '0'";
 
-                        $sentencia = $connect->prepare("($sql_administrativo) UNION ALL ($sql_medico) UNION ALL ($sql_enfermeria) UNION ALL ($sql_servicios_generales) ORDER BY nombres ASC");
+                        $queries = [];
+                        if ($filtro_area == 'colaboradores') {
+                            $queries[] = $sql_administrativo;
+                            $queries[] = $sql_enfermeria;
+                            $queries[] = $sql_servicios_generales;
+                        }
+                        if ($filtro_area == 'medico') {
+                            $queries[] = $sql_medico;
+                        }
+
+                        $final_query = implode(" UNION ALL ", $queries) . " ORDER BY nombres ASC";
+                        $sentencia = $connect->prepare($final_query);
                         $sentencia->execute();
                         $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
                         ?>
@@ -129,6 +155,7 @@ if ($pdoRrhh) {
                         <table id="example" class="responsive-table">
                             <thead>
                                 <tr>
+                                    <th>ÁREA</th>
                                     <th>TIPO DE EMPLEADO</th>
                                     <th>N°</th>
                                     <th>DNI</th>
@@ -162,6 +189,9 @@ if ($pdoRrhh) {
                                     elseif ($d->source_table == 'staff_general_services') $categoria_label = 'Servicios Generales';
                                 ?>
                                 <tr>
+                                    <td>
+                                        <span style="font-weight:bold; color:#035c67;"><?php echo $categoria_label; ?></span>
+                                    </td>
                                     <td>
                                         <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="tipo_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" >
                                             <option value="Permanente" <?php echo (($d->tipo_empleado ?? '') == 'Permanente') ? 'selected' : ''; ?>>Permanente</option>

@@ -9,21 +9,32 @@ $salary_level_map = [];
 $pdoRrhh = medidata_rrhh_pdo();
 if ($pdoRrhh) {
     try {
-        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
-        while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
-            $depto_map[$row['id']] = $row['name'];
+        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments ORDER BY name ASC");
+        if ($stmt_dept) {
+            while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
+                $depto_map[$row['id']] = $row['name'];
+            }
         }
-        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
-        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
-            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
-        }
-        $cargo_map = [];
-        $stmt_cargo = $pdoRrhh->query("SELECT id, name FROM positions WHERE deleted = 0");
-        while ($row = $stmt_cargo->fetch(PDO::FETCH_ASSOC)) {
-            $cargo_map[$row['id']] = $row['name'];
+    } catch (Exception $e) {}
+
+    try {
+        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels");
+        if ($stmt_sl) {
+            while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
+                $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
+            }
         }
     } catch (Exception $e) {}
 }
+
+try {
+    $stmt_cargo = $connect->query("SELECT id, name FROM positions ORDER BY name ASC");
+    if ($stmt_cargo) {
+        while ($row = $stmt_cargo->fetch(PDO::FETCH_ASSOC)) {
+            $cargo_map[$row['id']] = $row['name'];
+        }
+    }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -64,22 +75,20 @@ if ($pdoRrhh) {
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
             <?php
-            $filtro_area = isset($_GET['area']) ? $_GET['area'] : 'todos';
+            $filtro_area = isset($_GET['area']) ? $_GET['area'] : 'colaboradores';
             ?>
             <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <a href="lista_colaboradores_usr.php?area=todos" class="button tab-button <?php echo $filtro_area == 'todos' ? 'active' : ''; ?>">Todos</a>
+                <a href="lista_colaboradores_usr.php?area=colaboradores" class="button tab-button <?php echo $filtro_area == 'colaboradores' ? 'active' : ''; ?>">Colaboradores</a>
                 <a href="lista_colaboradores_usr.php?area=medico" class="button tab-button <?php echo $filtro_area == 'medico' ? 'active' : ''; ?>">Médicos</a>
-                <a href="lista_colaboradores_usr.php?area=enfermeria" class="button tab-button <?php echo $filtro_area == 'enfermeria' ? 'active' : ''; ?>">Enfermería</a>
-                <a href="lista_colaboradores_usr.php?area=administrativo" class="button tab-button <?php echo $filtro_area == 'administrativo' ? 'active' : ''; ?>">Administrativos</a>
-                <a href="lista_colaboradores_usr.php?area=servicios_generales" class="button tab-button <?php echo $filtro_area == 'servicios_generales' ? 'active' : ''; ?>">Servicios Generales</a>
-                <a href="lista_excolaboradores_usr.php" class="button tab-button">Excolaboradores</a>
+                <a href="lista_excolaboradores_usr.php?area=colaboradores" class="button tab-button">Excolaboradores</a>
+                <a href="lista_excolaboradores_usr.php?area=medico" class="button tab-button">Ex Médicos</a>
                 <a href="agregar_colaborador_usr.php" class="button tab-button" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
             </div>
 
             <div class="data">
                 <div class="content-data">
                     <div class="table-title">
-                        <h1>Lista de Colaboradores Activos <?php echo $filtro_area != 'todos' ? '- ' . ucfirst(str_replace('_', ' ', $filtro_area)) : ''; ?></h1>
+                        <h1>Lista de <?php echo $filtro_area == 'colaboradores' ? 'Colaboradores' : 'Médicos'; ?> Activos</h1>
                     </div>
                     
                     <div class="table-responsive" style="overflow-x:auto;">
@@ -121,10 +130,14 @@ if ($pdoRrhh) {
                             FROM staff_general_services WHERE state = '1'";
 
                         $queries = [];
-                        if ($filtro_area == 'todos' || $filtro_area == 'administrativo') $queries[] = $sql_administrativo;
-                        if ($filtro_area == 'todos' || $filtro_area == 'medico') $queries[] = $sql_medico;
-                        if ($filtro_area == 'todos' || $filtro_area == 'enfermeria') $queries[] = $sql_enfermeria;
-                        if ($filtro_area == 'todos' || $filtro_area == 'servicios_generales') $queries[] = $sql_servicios_generales;
+                        if ($filtro_area == 'colaboradores') {
+                            $queries[] = $sql_administrativo;
+                            $queries[] = $sql_enfermeria;
+                            $queries[] = $sql_servicios_generales;
+                        }
+                        if ($filtro_area == 'medico') {
+                            $queries[] = $sql_medico;
+                        }
 
                         $final_query = implode(" UNION ALL ", $queries) . " ORDER BY nombres ASC";
                         
@@ -136,6 +149,7 @@ if ($pdoRrhh) {
                         <table id="example" class="responsive-table">
                             <thead>
                                 <tr>
+                                    <th>ÁREA</th>
                                     <th>TIPO DE EMPLEADO</th>
                                     <th>N°</th>
                                     <th>DNI</th>
@@ -170,24 +184,27 @@ if ($pdoRrhh) {
                                 ?>
                                 <tr>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="tipo_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" disabled>
+                                        <span style="font-weight:bold; color:#035c67;"><?php echo $categoria_label; ?></span>
+                                    </td>
+                                    <td>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="tipo_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" >
                                             <option value="Permanente" <?php echo (($d->tipo_empleado ?? '') == 'Permanente') ? 'selected' : ''; ?>>Permanente</option>
                                             <option value="Temporal" <?php echo (($d->tipo_empleado ?? '') == 'Temporal') ? 'selected' : ''; ?>>Temporal</option>
                                             <option value="Tiempo parcial" <?php echo (($d->tipo_empleado ?? '') == 'Tiempo parcial') ? 'selected' : ''; ?>>Tiempo parcial</option>
                                         </select>
                                     </td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="num_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_identificacion); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->identificacion); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_apellidos); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->apellidos); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nombres); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->nombres); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="num_empleado" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_empleado ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_identificacion); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->identificacion); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_apellidos); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->apellidos); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nombres); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->nombres); ?></td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_sexo); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" disabled>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_sexo); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer;" >
                                             <option value="Masculino" <?php echo ($d->sexo == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
                                             <option value="Femenino" <?php echo ($d->sexo == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_departamento" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" disabled>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_departamento" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
                                             <option value="">—</option>
                                             <?php foreach ($depto_map as $id_dept => $name_dept): ?>
                                                 <option value="<?php echo $id_dept; ?>" <?php echo ($d->id_departamento == $id_dept) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_dept); ?></option>
@@ -195,44 +212,51 @@ if ($pdoRrhh) {
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_cargo" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" disabled>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_cargo" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
                                             <option value="">—</option>
                                             <?php foreach ($cargo_map as $id_cargo => $name_cargo): ?>
                                                 <option value="<?php echo $id_cargo; ?>" <?php echo ($d->id_cargo == $id_cargo) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_cargo); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="salario" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="salario" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->salario ?? ''); ?></td>
                                     <td>
-                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_salary_level" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" disabled>
+                                        <select class="inline-select" data-id="<?php echo (int) $d->id; ?>" data-field="id_salary_level" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="border:1px dashed #ccc; background:#f9f9f9; cursor:pointer; min-width: 120px;" >
                                             <option value="">—</option>
                                             <?php foreach ($salary_level_map as $id_sl => $name_sl): ?>
                                                 <option value="<?php echo $id_sl; ?>" <?php echo (isset($d->id_salary_level) && $d->id_salary_level == $id_sl) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name_sl); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="cuenta_bac" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="fecha_ingreso" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="telefono" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="correo_personal" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_personal ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="correo_institucional" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_institucional ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nacimiento); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 1990-05-15"><?php echo htmlspecialchars($d->fecha_nacimiento ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="id_biometrico" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
-                                    <td  data-id="<?php echo (int) $d->id; ?>" data-field="num_locker" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="cuenta_bac" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->cuenta_bac ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="fecha_ingreso" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 2024-01-30"><?php echo htmlspecialchars($d->fecha_ingreso ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="telefono" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->telefono ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="correo_personal" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_personal ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="correo_institucional" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->correo_institucional ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="<?php echo htmlspecialchars($d->field_nacimiento); ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;" title="Ej: 1990-05-15"><?php echo htmlspecialchars($d->fecha_nacimiento ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="id_biometrico" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->id_biometrico ?? '—'); ?></td>
+                                    <td class="editable-cell" contenteditable="true" data-id="<?php echo (int) $d->id; ?>" data-field="num_locker" data-table="<?php echo htmlspecialchars($d->source_table); ?>" data-idcol="<?php echo htmlspecialchars($d->source_idcol); ?>" style="background-color: #f9f9f9; border: 1px dashed #ccc; cursor: pointer;"><?php echo htmlspecialchars($d->num_locker ?? '—'); ?></td>
                                     <td>
                                         <?php if (!empty($d->url_contrato)): ?>
                                             <a href="../../backend/php/view_staff_doc.php?id=<?php echo (int) $d->id; ?>&doc=contrato&table=<?php echo htmlspecialchars($d->source_table); ?>&idcol=<?php echo htmlspecialchars($d->source_idcol); ?>" target="_blank" class="badge-success" style="padding:4px; text-decoration:none;"><i class="bx bx-file"></i> Ver</a>
+                                            <a href="#" onclick="deleteContract(<?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>'); return false;" class="badge-danger" style="padding:4px; text-decoration:none; margin-left:4px;" title="Eliminar contrato"><i class="bx bx-trash"></i></a>
                                         <?php else: ?>
                                             <span class="badge-warning" style="padding:4px;">N/D</span>
                                         <?php endif; ?>
+                                        <br>
+                                        <label class="badge-primary" style="padding:4px; cursor:pointer; display:inline-block; margin-top:4px;" onclick="document.getElementById('upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>').click();">
+                                            <i class="bx bx-upload"></i> Subir
+                                        </label>
+                                        <input type="file" id="upload_contrato_<?php echo htmlspecialchars($d->source_table . '_' . $d->id); ?>" style="display:none;" accept=".pdf,.jpg,.png" onchange="uploadContract(this, <?php echo $d->id; ?>, '<?php echo htmlspecialchars($d->source_table); ?>', '<?php echo htmlspecialchars($d->source_idcol); ?>')">
                                     </td>
                                     <td>
                                         <label class="switch">
-                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?> disabled/>
+                                            <input type="checkbox" class="unified-state-toggle" data-id="<?php echo (int) $d->id; ?>" data-table="<?php echo htmlspecialchars($d->source_table); ?>" <?php echo $d->state == '1' ? 'checked' : ''; ?> />
                                             <span class="slider"></span>
                                         </label>
                                     </td>
                                     <td>
+                                        <a title="Actualizar" href="<?php echo htmlspecialchars($d->edit_file); ?>?id=<?php echo (int) $d->id; ?>" class="fa fa-pencil tooltip"></a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

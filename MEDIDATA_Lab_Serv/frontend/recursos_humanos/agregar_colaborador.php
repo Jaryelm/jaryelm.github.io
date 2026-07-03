@@ -48,12 +48,10 @@ try {
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
         
         <div class="rrhh-tab-nav" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-            <a href="lista_colaboradores.php?area=todos" class="button tab-button">Todos</a>
+            <a href="lista_colaboradores.php?area=colaboradores" class="button tab-button">Colaboradores</a>
             <a href="lista_colaboradores.php?area=medico" class="button tab-button">Médicos</a>
-            <a href="lista_colaboradores.php?area=enfermeria" class="button tab-button">Enfermería</a>
-            <a href="lista_colaboradores.php?area=administrativo" class="button tab-button">Administrativos</a>
-            <a href="lista_colaboradores.php?area=servicios_generales" class="button tab-button">Servicios Generales</a>
-            <a href="lista_excolaboradores.php" class="button tab-button">Excolaboradores</a>
+            <a href="lista_excolaboradores.php?area=colaboradores" class="button tab-button">Excolaboradores</a>
+            <a href="lista_excolaboradores.php?area=medico" class="button tab-button">Ex Médicos</a>
             <a href="agregar_colaborador.php" class="button tab-button active" style="background-color: #28a745; color: white;">Agregar Colaborador</a>
         </div>
 
