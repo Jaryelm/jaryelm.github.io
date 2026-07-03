@@ -1,6 +1,7 @@
 <?php
 include_once __DIR__ . '/../registros/session_check.php';
 require_once __DIR__ . '/staff_colaborador_bootstrap.php';
+require_once __DIR__ . '/staff_user_link_lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 medidata_staff_ensure_tables($connect);
@@ -16,6 +17,7 @@ if ($id <= 0 || ($state !== 0 && $state !== 1)) {
 try {
     $stmt = $connect->prepare('UPDATE staff_general_services SET state = :state WHERE idsg = :id LIMIT 1');
     $ok = $stmt->execute([':state' => (string) $state, ':id' => $id]);
+    medidata_link_user_state_from_staff($connect, 'staff_general_services', 'idsg', $id, $state);
     echo json_encode(['success' => (bool) $ok, 'message' => $ok ? 'Estado actualizado.' : 'No se pudo actualizar el estado.']);
 } catch (Throwable $e) {
     error_log('toggle_general_services_state: ' . $e->getMessage());

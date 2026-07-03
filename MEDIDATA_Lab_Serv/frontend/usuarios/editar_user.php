@@ -24,14 +24,14 @@ if (function_exists('session_write_close')) {
 </head>
 <body>
 
-<?php include_once '../admin/menu.php'; ?>
+<?php include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/menu.php' : '../admin/menu.php'); ?>
 
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
         <form action="#"><div class="form-group"></div></form>
         <span class="divider"></span>
-        <?php include_once '../admin/perfil.php'; ?>
+        <?php include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/perfil.php' : '../admin/perfil.php'); ?>
     </nav>
 
     <main>
@@ -93,6 +93,7 @@ if (function_exists('session_write_close')) {
                 <select name="rol" id="rol" class="select2" data-placeholder="Seleccione un rol..." required>
                     <option value="">Seleccione...</option>
                     <option value="Administrador" <?php echo ($user->rol === 'Administrador') ? 'selected' : ''; ?>>Administrador</option>
+                    <option value="IT" <?php echo ($user->rol === 'IT') ? 'selected' : ''; ?>>IT (Soporte / Sistemas)</option>
                     <option value="Caja" <?php echo ($user->rol === 'Caja') ? 'selected' : ''; ?>>Caja</option>
                     <option value="Contabilidad" <?php echo ($user->rol === 'Contabilidad') ? 'selected' : ''; ?>>Contabilidad</option>
                     <option value="Auxiliar Contable" <?php echo ($user->rol === 'Auxiliar Contable') ? 'selected' : ''; ?>>Auxiliar Contable</option>

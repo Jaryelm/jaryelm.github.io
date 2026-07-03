@@ -51,7 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['empresa'])) {
         // Manejo del archivo "archivo_constancia_comercial"
         $archivo_constancia_comercial = null;
         if (isset($_FILES['archivo-constancia-comercial']) && $_FILES['archivo-constancia-comercial']['error'] == UPLOAD_ERR_OK) {
-            $upload_dir = '/home4/medic9ue/medidata.medicasa.hn/uploads/';
+            $upload_dir = dirname(__DIR__, 2) . '/uploads/';
+            if (!is_dir($upload_dir)) { @mkdir($upload_dir, 0775, true); }
             $nombre_empresa_sanitizado = preg_replace('/[^a-zA-Z0-9\s]/', '', $nombre_empresa); 
             $archivo_extension = pathinfo($_FILES['archivo-constancia-comercial']['name'], PATHINFO_EXTENSION);
             $nuevo_nombre_archivo = $nombre_empresa_sanitizado . '.' . $archivo_extension;
@@ -67,7 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['empresa'])) {
         // Manejo del archivo "firma_digital_comercial"
         $firma_digital_comercial = null;
         if (isset($_FILES['firma-digital-comercial']) && $_FILES['firma-digital-comercial']['error'] == UPLOAD_ERR_OK) {
-            $firmas_dir = '/home4/medic9ue/medidata.medicasa.hn/uploads/firmas/';
+            $firmas_dir = dirname(__DIR__, 2) . '/uploads/firmas/';
+            if (!is_dir($firmas_dir)) { @mkdir($firmas_dir, 0775, true); }
             $nuevo_nombre_firma = $nombre_empresa . '.png'; 
             $firma_ruta = $firmas_dir . $nuevo_nombre_firma;
             if (move_uploaded_file($_FILES['firma-digital-comercial']['tmp_name'], $firma_ruta)) {

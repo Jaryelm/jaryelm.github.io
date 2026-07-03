@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result && $result['archivo_constancia']) {
-            $archivoRuta = '/home4/medic9ue/medidata.medicasa.hn/uploads/' . basename($result['archivo_constancia']);
+            $archivoRuta = dirname(__DIR__, 2) . '/uploads/' . basename($result['archivo_constancia']);
             
             if (file_exists($archivoRuta)) {
                 // Configura los headers para la descarga

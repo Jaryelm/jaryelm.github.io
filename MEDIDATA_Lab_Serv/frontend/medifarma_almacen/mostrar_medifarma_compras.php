@@ -118,6 +118,30 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     </main>
 </section>
 
+<div id="detalleCompraModal" class="modal diario-details-modal" style="display: none !important;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="cerrarDetalleCompraModal()" title="Cerrar">&times;</span>
+        <h2>Detalles de la Compra</h2>
+        <div class="table-container">
+            <table class="responsive-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Unidad</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">ISV</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">Total Item</th>
+                    </tr>
+                </thead>
+                <tbody id="detalleCompraBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script src="../../backend/js/jquery.min.js"></script>
 <script>
     // Cargar datos de compras al cargar la página
@@ -165,47 +189,65 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 }
 
         // Función para ver detalles de una compra
+        window.cerrarDetalleCompraModal = function() {
+            const modal = document.getElementById('detalleCompraModal');
+            if (modal) {
+                modal.style.setProperty('display', 'none', 'important');
+            }
+        };
+
         window.verDetalles = function(idCompra) {
             $.ajax({
                 url: "../../backend/registros/obtener_medifarma_detalle_compras.php",
                 type: "POST",
                 data: { id_compra: idCompra },
                 success: function(data) {
-                    const detalles = JSON.parse(data);
-                    let detallesHTML = '<h3>Detalles de la Compra</h3><table border="1" style="width:100%; border-collapse: collapse;">';
-                    detallesHTML += '<tr><th>Código</th><th>Cantidad</th><th>Unidad</th><th>Descripción</th><th>Precio Unitario</th><th>ISV</th><th>Subtotal</th><th>Total Item</th></tr>';
-                    
+                    const detalles = (typeof data === 'string') ? JSON.parse(data) : data;
+                    if (!Array.isArray(detalles) || detalles.length === 0) {
+                        return;
+                    }
+                    const tbody = document.getElementById('detalleCompraBody');
+                    if (!tbody) {
+                        return;
+                    }
+                    tbody.innerHTML = '';
                     detalles.forEach(detalle => {
-                        detallesHTML += `<tr>
-                            <td>${detalle.codigo_producto}</td>
-                            <td>${detalle.cantidad}</td>
-                            <td>${detalle.unidad}</td>
-                            <td>${detalle.descripcion}</td>
-                            <td>${detalle.precio_unitario}</td>
-                            <td>${detalle.isv}</td>
-                            <td>${detalle.subtotal}</td>
-                            <td>${detalle.total_item}</td>
-                        </tr>`;
+                        const tr = document.createElement('tr');
+                        tr.innerHTML =
+                            `<td>${detalle.codigo_producto || ''}</td>` +
+                            `<td>${detalle.cantidad || ''}</td>` +
+                            `<td>${detalle.unidad || ''}</td>` +
+                            `<td>${detalle.descripcion || ''}</td>` +
+                            `<td>${detalle.precio_unitario || ''}</td>` +
+                            `<td>${detalle.isv || ''}</td>` +
+                            `<td>${detalle.subtotal || ''}</td>` +
+                            `<td>${detalle.total_item || ''}</td>`;
+                        tbody.appendChild(tr);
                     });
-                    
-                    detallesHTML += '</table>';
-                    
-                    // Mostrar en un modal o alert
-                    alert(detallesHTML);
+                    const modal = document.getElementById('detalleCompraModal');
+                    if (modal) {
+                        modal.style.setProperty('display', 'flex', 'important');
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error("Error al cargar los detalles:", error);
                 }
             });
         };
+
+        document.addEventListener('click', function(ev) {
+            if (ev.target && ev.target.id === 'detalleCompraModal') {
+                cerrarDetalleCompraModal();
+            }
+        });
     });
-
-    // SubMenu
-    <script src='../../backend/js/submenu.js'></script>
-
-    <!-- Script para manejar el cambio de color en los botones -->
-    <script src="../../backend/registros/script/botones_color.js"></script>
 </script>
+
+<!-- SubMenu -->
+<script src='../../backend/js/submenu.js'></script>
+
+<!-- Script para manejar el cambio de color en los botones -->
+<script src="../../backend/registros/script/botones_color.js"></script>
 
 <style>
     .btn_ver_detalles {

@@ -16,7 +16,7 @@ include_once '../../backend/registros/session_check.php';
 <body>
 
 <?php
-include_once '../admin/menu.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/menu.php' : '../admin/menu.php');
 // incuir el archivo menu principal
 ?>
 
@@ -30,7 +30,7 @@ include_once '../admin/menu.php';
         </form>
         <span class="divider"></span>
 <?php
-include_once '../admin/perfil.php';
+include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/perfil.php' : '../admin/perfil.php');
 // incuir el archivo menu principal
 ?>
     </nav>

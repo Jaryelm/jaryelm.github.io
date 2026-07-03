@@ -16,8 +16,9 @@ function cargarRegistros(searchValue = '') {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            actualizarTabla(data);
-            actualizarConteo(data.length, searchValue);  // Actualizar conteo de registros
+            const lista = Array.isArray(data) ? data : [];
+            actualizarTabla(lista);
+            actualizarConteo(lista.length, searchValue);  // Actualizar conteo de registros
         })
         .catch(error => {
             console.error('Error:', error);

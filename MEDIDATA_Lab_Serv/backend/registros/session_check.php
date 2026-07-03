@@ -155,6 +155,23 @@ function cerrarSesion() {
     session_destroy();
     setcookie(session_name(), '', time() - 3600, '/'); // Borra cookie de sesión
 
+    // Si la petición es AJAX (fetch/$.ajax), responder JSON claro en vez de HTML,
+    // así el frontend muestra "Sesión expirada" en lugar de un error genérico.
+    $xrw = strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? ''));
+    $accept = strtolower((string) ($_SERVER['HTTP_ACCEPT'] ?? ''));
+    $isAjax = $xrw === 'xmlhttprequest' || strpos($accept, 'application/json') !== false;
+    if ($isAjax) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode([
+            'success' => false,
+            'session_expired' => true,
+            'message' => 'Su sesión expiró. Vuelva a iniciar sesión.',
+        ]);
+        exit();
+    }
+
     echo '<script>
         localStorage.clear();
         sessionStorage.clear();

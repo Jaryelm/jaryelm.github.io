@@ -50,8 +50,8 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
     <!-- DataTables -->
-        <link rel="stylesheet" href="../../backend/vendor/datatables/dataTables.bs4.css" />
-        <link rel="stylesheet" href="../../backend/vendor/datatables/dataTables.bs4-custom.css" />
+        <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css" />
+        <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css" />
         <link href="../../backend/vendor/datatables/buttons.bs.css" rel="stylesheet" />
 
     <!-- FullCalendar -->
@@ -303,26 +303,7 @@ $totalFacturas = $connect->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 $facturasCobradas = $connect->query("SELECT COUNT(*) FROM orders WHERE invoice_status = 'Cobrada'")->fetchColumn();
 $facturasPendientes = $connect->query("SELECT COUNT(*) FROM orders WHERE invoice_status = 'Pendiente'")->fetchColumn();
 
-$ultimasEntregadas = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Cobrada' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$ultimasPendientes = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Pendiente' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$facturasHospitalizacion = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Pendiente' AND tipo = 'Hospitalizado' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
+// Las tablas de facturas se cargan server-side via get_facturas.php (DataTables, 10/pagina).
 
 // Ventas Diarias Ajustadas
 $ventasDiarias = $connect->prepare("
@@ -432,122 +413,66 @@ $totalPendientesRequisiciones = $connect->query("
 </script>
         </div>
 
-        <!-- Últimas Facturas -->
-         <br>
-<header style="position: relative; text-align: center; margin-bottom: 10px;">
-    <h1 style="margin: 0;">Últimas Facturas Pagadas</h1>
-    <div class="table-filters" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);">
-        <input type="text" id="busqueda" placeholder="Buscar..." style="padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
-</header>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Número de Factura</th>
-                    <th>Nombre Completo</th>
-                    <th>Motivo Ingreso</th>
-                    <th>Procesado Por</th>
-                    <th>Fecha</th>
-                    <th>Total a Pagar</th>
-                </tr>
-            </thead>
-            <tbody id="tablaBody">
-                <?php foreach ($ultimasEntregadas as $factura): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($factura['invoice_number']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['nomcl']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['tipo']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['processed_by']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['placed_on']); ?></td>
-                    <td>LPS <?php echo number_format($factura['total_price'], 2); ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-<!-- Botones de paginación -->
-<div id="pagination">
-    <button id="prevPage" disabled>Anterior</button>
-    <span id="currentPage">1</span>
-    <button id="nextPage">Siguiente</button>
-</div>
+        <!-- Últimas Facturas (DataTables server-side) -->
+        <br>
+        <header style="text-align: center; margin-bottom: 10px;">
+            <h1 style="margin: 0;">Últimas Facturas Pagadas</h1>
+        </header>
+        <div class="table-responsive" style="overflow-x:auto;">
+            <table id="tabla_pagadas" class="responsive-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Número de Factura</th>
+                        <th>Nombre Completo</th>
+                        <th>Motivo Ingreso</th>
+                        <th>Procesado Por</th>
+                        <th>Fecha</th>
+                        <th>Total a Pagar</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
         <br>
-<!-- Últimas Facturas No Pagadas -->
-<header style="position: relative; text-align: center; margin-bottom: 10px;">
-    <h1 style="margin: 0;">Últimas Facturas No Pagadas</h1>
-    <div class="table-filters" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);">
-        <input type="text" id="busquedaNoPagadas" placeholder="Buscar...">
-    </div>
-</header>
-        <table>
-            <thead>
-                <tr>
-                    <th>Número de Factura</th>
-                    <th>Nombre Completo</th>
-                    <th>Motivo Ingreso</th>
-                    <th>Procesado Por</th>
-                    <th>Fecha</th>
-                    <th>Total a Pagar</th>
-                </tr>
-            </thead>
-            <tbody id="tablaNoPagadas">
-                <?php foreach ($ultimasPendientes as $factura): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($factura['invoice_number']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['nomcl']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['tipo']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['processed_by']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['placed_on']); ?></td>
-                    <td>LPS <?php echo number_format($factura['total_price'], 2); ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-        <!-- Botones de paginación reutilizando el estilo definido en #pagination -->
-<div id="pagination">
-    <button id="prevPageNoPagadas" disabled>Anterior</button>
-    <span id="currentPageNoPagadas">1</span>
-    <button id="nextPageNoPagadas">Siguiente</button>
-</div>
+        <header style="text-align: center; margin-bottom: 10px;">
+            <h1 style="margin: 0;">Últimas Facturas No Pagadas</h1>
+        </header>
+        <div class="table-responsive" style="overflow-x:auto;">
+            <table id="tabla_nopagadas" class="responsive-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Número de Factura</th>
+                        <th>Nombre Completo</th>
+                        <th>Motivo Ingreso</th>
+                        <th>Procesado Por</th>
+                        <th>Fecha</th>
+                        <th>Total a Pagar</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
         <br>
-<!-- Facturas Abiertas por Hospitalización -->
-<header style="position: relative; text-align: center; margin-bottom: 10px;">
-    <h1 style="margin: 0;">Facturas Abiertas por Hospitalización</h1>
-    <div class="table-filters" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);">
-        <input type="text" id="busquedaHospitalizacion" placeholder="Buscar...">
-    </div>
-</header>
-        <table>
-            <thead>
-                <tr>
-                    <th>Número de Factura</th>
-                    <th>Nombre Completo</th>
-                    <th>Motivo Ingreso</th>
-                    <th>Procesado Por</th>
-                    <th>Fecha</th>
-                    <th>Total a Pagar</th>
-                </tr>
-            </thead>
-            <tbody id="tablaHospitalizacion">
-                <?php foreach ($facturasHospitalizacion as $factura): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($factura['invoice_number']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['nomcl']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['tipo']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['processed_by']); ?></td>
-                    <td><?php echo htmlspecialchars($factura['placed_on']); ?></td>
-                    <td>LPS <?php echo number_format($factura['total_price'], 2); ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-<!-- Contenedor de paginación: reutilizamos los estilos definidos para #pagination -->
-<div id="pagination" class="pagination">
-    <button id="prevPageHospitalizacion" disabled>Anterior</button>
-    <span id="currentPageHospitalizacion">1</span>
-    <button id="nextPageHospitalizacion">Siguiente</button>
-</div>
+        <header style="text-align: center; margin-bottom: 10px;">
+            <h1 style="margin: 0;">Facturas Abiertas por Hospitalización</h1>
+        </header>
+        <div class="table-responsive" style="overflow-x:auto;">
+            <table id="tabla_hosp" class="responsive-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Número de Factura</th>
+                        <th>Nombre Completo</th>
+                        <th>Motivo Ingreso</th>
+                        <th>Procesado Por</th>
+                        <th>Fecha</th>
+                        <th>Total a Pagar</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
@@ -598,188 +523,7 @@ $totalPendientesRequisiciones = $connect->query("
     }
 </style>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const busquedaInput = document.getElementById("busqueda");
-    const tableBody = document.getElementById("tablaBody");
-    
-    // Verifica que existan los elementos necesarios
-    if (!busquedaInput || !tableBody) {
-        console.error("No se encontró el input de búsqueda o el cuerpo de la tabla ('tablaBody').");
-        return;
-    }
-    
-    // Guardamos una copia de todas las filas originales
-    const allRows = Array.from(tableBody.querySelectorAll("tr"));
-    let filteredRows = allRows.slice(); // copia
-    let currentPage = 1;
-    const recordsPerPage = 10;
-    
-    function renderTable() {
-        // Limpiar el contenido actual
-        tableBody.innerHTML = "";
-        const start = (currentPage - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        const pageRows = filteredRows.slice(start, end);
-        
-        // Vuelve a insertar las filas filtradas
-        pageRows.forEach(row => {
-            tableBody.appendChild(row);
-        });
-        
-        // Actualiza el estado de los botones de paginación
-        document.getElementById("prevPage").disabled = currentPage === 1;
-        document.getElementById("nextPage").disabled = end >= filteredRows.length;
-        document.getElementById("currentPage").textContent = currentPage;
-    }
-    
-    function filterRows() {
-        const searchValue = busquedaInput.value.toLowerCase();
-        // Filtramos usando la copia de todas las filas
-        filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(searchValue));
-        currentPage = 1;
-        renderTable();
-    }
-    
-    // Evento para búsqueda en tiempo real
-    busquedaInput.addEventListener("input", filterRows);
-    
-    // Eventos para los botones de paginación
-    document.getElementById("prevPage").addEventListener("click", function() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-    
-    document.getElementById("nextPage").addEventListener("click", function() {
-        if (currentPage * recordsPerPage < filteredRows.length) {
-            currentPage++;
-            renderTable();
-        }
-    });
-    
-    // Renderizamos la tabla inicialmente
-    renderTable();
-});
-</script>
-
-<!-- Script para búsqueda en tiempo real y paginación -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const busquedaInput = document.getElementById("busquedaNoPagadas");
-    const tableBody = document.getElementById("tablaNoPagadas");
-    
-    if (!busquedaInput || !tableBody) {
-        console.error("No se encontró el input de búsqueda o el cuerpo de la tabla ('tablaNoPagadas').");
-        return;
-    }
-    
-    // Guardamos una copia de todas las filas originales
-    const allRows = Array.from(tableBody.querySelectorAll("tr"));
-    let filteredRows = allRows.slice();
-    let currentPage = 1;
-    const recordsPerPage = 10;
-    
-    function renderTable() {
-        tableBody.innerHTML = "";
-        const start = (currentPage - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        const pageRows = filteredRows.slice(start, end);
-        
-        pageRows.forEach(row => {
-            tableBody.appendChild(row);
-        });
-        
-        document.getElementById("prevPageNoPagadas").disabled = currentPage === 1;
-        document.getElementById("nextPageNoPagadas").disabled = end >= filteredRows.length;
-        document.getElementById("currentPageNoPagadas").textContent = currentPage;
-    }
-    
-    function filterRows() {
-        const searchValue = busquedaInput.value.toLowerCase();
-        filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(searchValue));
-        currentPage = 1;
-        renderTable();
-    }
-    
-    busquedaInput.addEventListener("input", filterRows);
-    
-    document.getElementById("prevPageNoPagadas").addEventListener("click", function() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-    
-    document.getElementById("nextPageNoPagadas").addEventListener("click", function() {
-        if (currentPage * recordsPerPage < filteredRows.length) {
-            currentPage++;
-            renderTable();
-        }
-    });
-    
-    renderTable();
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const busquedaInput = document.getElementById("busquedaHospitalizacion");
-    const tableBody = document.getElementById("tablaHospitalizacion");
-    
-    if (!busquedaInput || !tableBody) {
-        console.error("No se encontró el input de búsqueda o el cuerpo de la tabla ('tablaHospitalizacion').");
-        return;
-    }
-    
-    // Se guarda una copia de todas las filas originales
-    const allRows = Array.from(tableBody.querySelectorAll("tr"));
-    let filteredRows = allRows.slice();
-    let currentPage = 1;
-    const recordsPerPage = 10;
-    
-    function renderTable() {
-        tableBody.innerHTML = "";
-        const start = (currentPage - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        const pageRows = filteredRows.slice(start, end);
-        
-        pageRows.forEach(row => {
-            tableBody.appendChild(row);
-        });
-        
-        document.getElementById("prevPageHospitalizacion").disabled = currentPage === 1;
-        document.getElementById("nextPageHospitalizacion").disabled = end >= filteredRows.length;
-        document.getElementById("currentPageHospitalizacion").textContent = currentPage;
-    }
-    
-    function filterRows() {
-        const searchValue = busquedaInput.value.toLowerCase();
-        filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(searchValue));
-        currentPage = 1;
-        renderTable();
-    }
-    
-    busquedaInput.addEventListener("input", filterRows);
-    
-    document.getElementById("prevPageHospitalizacion").addEventListener("click", function() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-    
-    document.getElementById("nextPageHospitalizacion").addEventListener("click", function() {
-        if (currentPage * recordsPerPage < filteredRows.length) {
-            currentPage++;
-            renderTable();
-        }
-    });
-    
-    renderTable();
-});
-</script>
+<!-- Paginacion server-side via DataTables (ver init al final del archivo) -->
 
 <!-- Dashboard Caja End -->
 
@@ -1036,14 +780,80 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="/backend/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../../backend/js/script.js"></script>
 
-    <!-- Data Tables -->
-    <script src="../../backend/vendor/datatables/dataTables.min.js"></script>
-    <script src="../../backend/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <!-- Data Tables (stack estandar MEDIDATA: server-side + exportacion) -->
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 
+    <!-- Inicializacion DataTables server-side (facturas) -->
+    <script>
+    (function () {
+        function esc(text) {
+            if (text === null || text === undefined || text === '') { return ''; }
+            return $('<div>').text(text).html();
+        }
+        function lps(v) {
+            var n = parseFloat(v);
+            if (isNaN(n)) { n = 0; }
+            return 'LPS ' + n.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        var idiomaDataTable = {
+            lengthMenu: 'Mostrar _MENU_ registros',
+            zeroRecords: 'No se encontraron resultados',
+            emptyTable: 'No hay registros disponibles.',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros totales)',
+            search: 'Buscar:',
+            processing: 'Cargando...',
+            paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
+        };
 
-    <!-- Custom Data tables -->
-    <script src="../../backend/vendor/datatables/custom/custom-datatables.js"></script>
-    <script src="../../backend/vendor/datatables/custom/fixedHeader.js"></script>
+        var columnasFactura = [
+            { data: 'invoice_number', render: function (d) { return esc(d) || '—'; } },
+            { data: 'nomcl', render: function (d) { return esc(d) || '—'; } },
+            { data: 'tipo', render: function (d) { return esc(d) || '—'; } },
+            { data: 'processed_by', render: function (d) { return esc(d) || '—'; } },
+            { data: 'placed_on', render: function (d) { return esc(d) || '—'; } },
+            { data: 'total_price', className: 'dt-right', render: function (d) { return lps(d); } }
+        ];
+
+        function initFacturas(selector, estado, tipo, exportName) {
+            $(selector).DataTable({
+                processing: true,
+                serverSide: true,
+                dom: 'Bfrtip',
+                scrollX: true,
+                order: [[4, 'desc']],
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                ajax: {
+                    url: '../../backend/php/get_facturas.php',
+                    type: 'GET',
+                    data: function (d) { d.estado = estado; if (tipo) { d.tipo = tipo; } }
+                },
+                columns: columnasFactura,
+                buttons: [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button', title: exportName },
+                    { extend: 'excel', className: 'button', title: exportName },
+                    { extend: 'print', className: 'button' }
+                ],
+                language: idiomaDataTable
+            });
+        }
+
+        $(function () {
+            initFacturas('#tabla_pagadas', 'Cobrada', '', 'facturas_pagadas');
+            initFacturas('#tabla_nopagadas', 'Pendiente', '', 'facturas_no_pagadas');
+            initFacturas('#tabla_hosp', 'Pendiente', 'Hospitalizado', 'facturas_hospitalizacion');
+        });
+    })();
+    </script>
 
 
     <!-- FullCalendar -->

@@ -20,25 +20,7 @@ try {
             $sql = "SELECT p.*, c.nomcat 
                     FROM almacen_hospitalario p
                     LEFT JOIN category c ON p.idcat = c.idcat
-                    WHERE p.codpro LIKE :search 
-                    OR p.codbars LIKE :search
-                    OR p.nompro LIKE :search
-                    OR p.principio_activo LIKE :search
-                    OR p.idcat LIKE :search 
-                    OR p.preprd LIKE :search 
-                    OR p.stock LIKE :search 
-                    OR p.state LIKE :search 
-                    OR p.fere LIKE :search 
-                    OR p.precio_venta LIKE :search 
-                    OR p.impuesto LIKE :search 
-                    OR p.margen_ganancia LIKE :search 
-                    OR p.fecha_vencimiento LIKE :search 
-                    OR p.via_administracion LIKE :search 
-                    OR p.concentracion LIKE :search 
-                    OR p.forma_farmaceutica LIKE :search
-                    OR p.presentacion LIKE :search
-                    OR p.sub_linea LIKE :search
-                    OR p.linea LIKE :search 
+                    WHERE CONCAT_WS(' ', p.codpro, p.codbars, p.nompro, p.principio_activo, p.idcat, p.preprd, p.stock, p.state, p.fere, p.precio_venta, p.impuesto, p.margen_ganancia, p.fecha_vencimiento, p.via_administracion, p.concentracion, p.forma_farmaceutica, p.presentacion, p.sub_linea, p.linea) LIKE :search
                     ORDER BY p.fere DESC" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $search_param = '%' . $search . '%';

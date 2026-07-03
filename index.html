@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MEDIDATA · Planificación Mayo – Octubre 2026 · Recursos Humanos & Enfermería</title>
+<title>MEDIDATA · Planificación Mayo – Noviembre 2026 · Recursos Humanos & Enfermería</title>
 
 <!-- SEO -->
-<meta name="description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. Cronograma de 6 meses (Mayo - Octubre 2026) con 19 entregables, reuniones quincenales y capacitación a IT de Medicasa." />
+<meta name="description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. Cronograma de 7 meses (Mayo - Noviembre 2026) con 19 entregables, reuniones quincenales y capacitación a IT de Medicasa." />
 <meta name="keywords" content="MEDIDATA, NEXAR, Recursos Humanos, Enfermería, planificación, cronograma, Medicasa, hospital, software médico" />
 <meta name="author" content="NEXAR" />
 <meta name="theme-color" content="#06adbf" />
 
 <!-- Open Graph (WhatsApp, Slack, Facebook, LinkedIn) -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="MEDIDATA · Planificación Mayo – Octubre 2026" />
-<meta property="og:description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. 6 meses, 19 entregables, reuniones quincenales con el cliente." />
+<meta property="og:title" content="MEDIDATA · Planificación Mayo – Noviembre 2026" />
+<meta property="og:description" content="Plan de finalización de los módulos Recursos Humanos y Enfermería de MEDIDATA. 7 meses, 19 entregables, reuniones quincenales con el cliente." />
 <meta property="og:image" content="logo_N_nexar.png" />
 <meta property="og:locale" content="es_HN" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="MEDIDATA · Planificación Mayo – Octubre 2026" />
-<meta name="twitter:description" content="Plan de 6 meses para finalizar Recursos Humanos y Enfermería de MEDIDATA." />
+<meta name="twitter:title" content="MEDIDATA · Planificación Mayo – Noviembre 2026" />
+<meta name="twitter:description" content="Plan de 7 meses para finalizar Recursos Humanos y Enfermería de MEDIDATA." />
 <meta name="twitter:image" content="logo_N_nexar.png" />
 
 <link rel="icon" type="image/png" href="logo_N_nexar.png" />
@@ -246,9 +246,9 @@
   }
   .gantt-hint i{font-size:16px;color:var(--teal)}
   .gantt{
-    min-width:1480px;
+    min-width:1600px;
     display:grid;
-    grid-template-columns:260px repeat(26,1fr);
+    grid-template-columns:260px repeat(29,1fr);
     gap:0;
   }
   .g-head{display:contents}
@@ -271,6 +271,7 @@
   .g-month.ago{grid-column:15 / span 4}
   .g-month.sep{grid-column:19 / span 4}
   .g-month.oct{grid-column:23 / span 5}
+  .g-month.nov{grid-column:28 / span 3}
 
   .g-row{display:contents}
   .g-row .row-label{
@@ -287,9 +288,9 @@
   }
   .g-row.rh .row-label i{background:var(--orange-soft);color:#b45309}
   .g-row .row-track{
-    grid-column:2 / span 26;border-bottom:1px solid var(--line);
+    grid-column:2 / span 29;border-bottom:1px solid var(--line);
     height:68px;position:relative;background:
-      repeating-linear-gradient(90deg, transparent, transparent calc(100%/26 - 1px), var(--line) calc(100%/26 - 1px), var(--line) calc(100%/26));
+      repeating-linear-gradient(90deg, transparent, transparent calc(100%/29 - 1px), var(--line) calc(100%/29 - 1px), var(--line) calc(100%/29));
   }
   .g-row:hover .row-label{background:#f0f7f8}
   .g-row:hover .row-track{background-color:#fafdfd}
@@ -444,6 +445,24 @@
   .callout .opt .badge-alt{
     display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
     background:#e0e7ef;color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  }
+  /* Variante "entregado / éxito" */
+  .callout.success{
+    background:linear-gradient(135deg,#effaf3 0%, #d9f2e3 100%);
+    border:1px solid #a7dcbb;border-left:6px solid var(--green);
+  }
+  .callout.success .ico{color:#166534;box-shadow:0 4px 12px rgba(22,101,52,.18)}
+  .callout.success h3{color:#14532d}
+  .callout.success p{color:#14532d}
+  .callout.success .opt{border:1px solid #bfe3cc}
+  .callout.success .opt b i{color:var(--green)}
+  .callout.success .opt .badge-done{
+    display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
+    background:var(--green-soft);color:#166534;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  }
+  .callout.success .opt .badge-tech{
+    display:inline-block;margin-top:8px;padding:3px 10px;border-radius:6px;
+    background:var(--teal-soft);color:var(--teal-dark);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
   }
   /* ======= Footer ======= */
   footer{
@@ -609,11 +628,11 @@
     </div>
     <span class="badge"><i class='bx bx-pulse'></i>MEDIDATA · Plan de Trabajo Q2–Q4 2026</span>
     <h1>Plan de Finalización <span>Recursos Humanos</span> &amp; <span>Enfermería</span></h1>
-    <p class="lead">Cronograma realista de seis meses (Mayo a Octubre 2026) para cerrar las funciones pendientes de ambos módulos, con entregas semanales, reuniones quincenales de seguimiento y validación continua con el cliente.</p>
+    <p class="lead">Cronograma actualizado de siete meses (Mayo a Noviembre 2026) para cerrar las funciones pendientes de ambos módulos, con entregas semanales, reuniones quincenales de seguimiento y validación continua con el cliente.</p>
     <div class="hero-meta">
       <div class="meta-pill"><i class='bx bx-calendar'></i><span><b>Inicio:</b> 04 Mayo 2026</span></div>
-      <div class="meta-pill"><i class='bx bx-flag-checkered'></i><span><b>Cierre:</b> 30 Octubre 2026</span></div>
-      <div class="meta-pill"><i class='bx bx-time-five'></i><span><b>Duración:</b> 26 semanas</span></div>
+      <div class="meta-pill"><i class='bx bx-flag-checkered'></i><span><b>Cierre:</b> 20 Noviembre 2026</span></div>
+      <div class="meta-pill"><i class='bx bx-time-five'></i><span><b>Duración:</b> 29 semanas</span></div>
       <div class="meta-pill"><i class='bx bx-check-double'></i><span><b>Entregables:</b> 19 funciones</span></div>
     </div>
     <a href="capacitacion.html" class="hero-cta">
@@ -707,9 +726,9 @@
         <div class="feat-line"><span class="name">Reclutamiento &amp; postulaciones</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">Registrar &amp; listar Enfermería</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">Registrar &amp; listar Médicos</span><span class="tag tag-ok">Lista</span></div>
-        <div class="feat-line"><span class="name">Reloj Biométrico <em style="color:var(--orange);font-style:normal;font-weight:600">⚠ Requiere decisión de hardware</em></span><span class="tag tag-mid">Bloqueado</span></div>
-        <div class="feat-line"><span class="name">Proceso de Entrevistas</span><span class="tag tag-todo">Pendiente</span></div>
-        <div class="feat-line"><span class="name">Registrar Administrativo</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Reloj Biométrico</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Proceso de Entrevistas</span><span class="tag tag-ok">Lista</span></div>
+        <div class="feat-line"><span class="name">Registrar Administrativo</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">Registrar Servicios Generales</span><span class="tag tag-todo">Pendiente</span></div>
         <div class="feat-line"><span class="name">Vacaciones / Permisos</span><span class="tag tag-todo">Pendiente</span></div>
         <div class="feat-line"><span class="name">Plantilla activa / Organigrama</span><span class="tag tag-todo">Pendiente</span></div>
@@ -730,7 +749,7 @@
         <div class="feat-line"><span class="name">MH-PACS (worklist, estudios, transcripciones)</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">UCI · Cuidados Intensivos</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">Bloque Quirúrgico</span><span class="tag tag-ok">Lista</span></div>
-        <div class="feat-line"><span class="name">Pre-Clínica (signos pre-consulta)</span><span class="tag tag-todo">Pendiente</span></div>
+        <div class="feat-line"><span class="name">Pre-Clínica (signos pre-consulta)</span><span class="tag tag-ok">Lista</span></div>
         <div class="feat-line"><span class="name">Catálogo de Servicios</span><span class="tag tag-todo">Pendiente</span></div>
         <div class="feat-line"><span class="name">Hospitalización</span><span class="tag tag-todo">Pendiente</span></div>
         <div class="feat-line"><span class="name">Cuidados Intermedios</span><span class="tag tag-todo">Pendiente</span></div>
@@ -745,27 +764,27 @@
   </div>
 </section>
 
-<!-- ============ AVISO RELOJ BIOMÉTRICO ============ -->
+<!-- ============ RELOJ BIOMÉTRICO · ENTREGADO ============ -->
 <section style="padding-top:0">
   <div class="wrap">
-    <div class="callout">
-      <div class="ico"><i class='bx bx-error'></i></div>
+    <div class="callout success">
+      <div class="ico"><i class='bx bx-check-shield'></i></div>
       <div style="flex:1">
-        <h3><i class='bx bx-time-five'></i>Punto crítico · Reloj Biométrico</h3>
-        <p>El reloj biométrico físico que utiliza Medicasa actualmente está <b>obsoleto</b>: su API no es compatible con la nueva arquitectura de MEDIDATA, por lo que no podemos integrarlo de forma directa y automática. Para destrabar esta función, presentamos dos caminos posibles. La decisión la toma el cliente.</p>
+        <h3><i class='bx bx-check-circle'></i>Resuelto y entregado · Reloj Biométrico</h3>
+        <p>El reto del reloj biométrico <b>quedó resuelto</b>. Se realizó la <b>integración directa con el reloj ZKTeco MB360</b>, conectándolo a la nueva arquitectura de MEDIDATA. La sincronización de marcaciones funciona de forma <b>automática y en tiempo real</b>, sin necesidad de reemplazar el hardware ni de cargas manuales. <b>La prueba en producción salió perfecta.</b></p>
         <div class="options">
           <div class="opt">
-            <b><i class='bx bx-wifi'></i>Opción A · Reemplazar el hardware</b>
-            <span>Adquirir un reloj biométrico moderno con API compatible (red TCP/IP o servicio en la nube). Permite que MEDIDATA reciba marcaciones en <b>tiempo real</b>, sin intervención humana, y generar reportes automáticos.</span>
-            <span class="badge-rec">Recomendada</span>
+            <b><i class='bx bx-wifi'></i>Integración ZKTeco MB360</b>
+            <span>Conexión directa con el dispositivo <b>ZKTeco MB360</b> sobre red TCP/IP. MEDIDATA lee las marcaciones automáticamente, sin intervención humana y sin reemplazo de equipo.</span>
+            <span class="badge-done">Implementado</span>
           </div>
           <div class="opt">
-            <b><i class='bx bx-usb'></i>Opción B · Carga manual por USB</b>
-            <span>Mantener el reloj actual y exportar las marcaciones a un archivo desde el dispositivo. Un <b>operador de RR.HH.</b> sube ese archivo a MEDIDATA <b>cada mes</b> (o con la frecuencia que el cliente defina) para visualizar la asistencia desde el sistema.</span>
-            <span class="badge-alt">Alternativa</span>
+            <b><i class='bx bx-bar-chart-alt-2'></i>Qué quedó funcionando</b>
+            <span>Sincronización en tiempo real, tabla de marcaciones por colaborador, reportes automáticos y exportación a Excel/PDF, todo desde el sistema.</span>
+            <span class="badge-tech">En producción</span>
           </div>
         </div>
-        <p style="margin-top:14px;font-size:13px"><b>Implicación en el cronograma:</b> la Opción A puede requerir tiempo adicional dependiendo del proveedor del nuevo reloj. La Opción B se entrega dentro del plazo previsto (1 semana, viernes 9 de mayo) e incluye el módulo de carga del archivo.</p>
+        <p style="margin-top:14px;font-size:13px"><b>Resultado:</b> función entregada y operando correctamente. No genera impacto en el cronograma de los entregables pendientes.</p>
       </div>
     </div>
   </div>
@@ -789,103 +808,104 @@
           <div class="g-month ago">Agosto</div>
           <div class="g-month sep">Septiembre</div>
           <div class="g-month oct">Octubre</div>
+          <div class="g-month nov">Noviembre</div>
         </div>
 
         <!-- Filas: cada barra usa left% y width% sobre 26 semanas (3.846% por semana) -->
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-time-five'></i>Reloj Biométrico</div>
-          <div class="row-track"><div class="bar rh short" style="left:0%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">9 May</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:0%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">9 May</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-pulse'></i>Pre-Clínica</div>
-          <div class="row-track"><div class="bar enf short" style="left:3.846%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">16 May</span></div></div>
+          <div class="row-track"><div class="bar enf short" style="left:3.448%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">16 May</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-conversation'></i>Proceso de Entrevistas</div>
-          <div class="row-track"><div class="bar rh short" style="left:7.692%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">22 May</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:6.897%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">22 May</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-clipboard'></i>Registrar Administrativo</div>
-          <div class="row-track"><div class="bar rh short" style="left:11.538%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">29 May</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:10.345%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">29 May</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-wrench'></i>Servicios Generales</div>
-          <div class="row-track"><div class="bar rh short" style="left:15.385%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">5 Jun</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:20.690%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">27 Jun</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-list-ul'></i>Catálogo de Servicios</div>
-          <div class="row-track"><div class="bar enf short" style="left:19.231%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">12 Jun</span></div></div>
+          <div class="row-track"><div class="bar enf short" style="left:27.586%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">3 Jul</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-calendar-x'></i>Vacaciones / Permisos</div>
-          <div class="row-track"><div class="bar rh short" style="left:23.077%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">19 Jun</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:31.034%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">10 Jul</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-bed'></i>Hospitalización</div>
-          <div class="row-track"><div class="bar enf" style="left:26.923%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">3 Jul</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:34.483%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">24 Jul</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-plus-medical'></i>Cuidados Intermedios</div>
-          <div class="row-track"><div class="bar enf short" style="left:34.615%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">10 Jul</span></div></div>
+          <div class="row-track"><div class="bar enf short" style="left:41.379%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">31 Jul</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-injection'></i>Procedimientos</div>
-          <div class="row-track"><div class="bar enf" style="left:38.462%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">24 Jul</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:44.828%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">14 Ago</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-sitemap'></i>Plantilla / Organigrama</div>
-          <div class="row-track"><div class="bar rh short" style="left:46.154%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">31 Jul</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:51.724%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">21 Ago</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-first-aid'></i>Emergencia / Triage</div>
-          <div class="row-track"><div class="bar enf" style="left:50.000%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">14 Ago</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:55.172%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">4 Sep</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-test-tube'></i>Laboratorio Clínico</div>
-          <div class="row-track"><div class="bar enf" style="left:57.692%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">28 Ago</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:62.069%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">18 Sep</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-medal'></i>Evaluaciones Desempeño</div>
-          <div class="row-track"><div class="bar rh short" style="left:65.385%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">4 Sep</span></div></div>
+          <div class="row-track"><div class="bar rh short" style="left:68.966%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">25 Sep</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bxs-baby-carriage'></i>Maternidad</div>
-          <div class="row-track"><div class="bar enf" style="left:69.231%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">18 Sep</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:72.414%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">9 Oct</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-glasses'></i>Óptica</div>
-          <div class="row-track"><div class="bar enf short" style="left:76.923%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">25 Sep</span></div></div>
+          <div class="row-track"><div class="bar enf short" style="left:79.310%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">16 Oct</span></div></div>
         </div>
 
         <div class="g-row enf">
           <div class="row-label"><i class='bx bx-smile'></i>Odontología</div>
-          <div class="row-track"><div class="bar enf" style="left:80.769%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">9 Oct</span></div></div>
+          <div class="row-track"><div class="bar enf" style="left:82.759%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">30 Oct</span></div></div>
         </div>
 
         <div class="g-row rh">
           <div class="row-label"><i class='bx bx-bar-chart-alt-2'></i>Reportes / Dashboard RH</div>
-          <div class="row-track"><div class="bar rh" style="left:88.462%;width:7.692%"><span class="dur-full">2 semanas</span><span class="end">23 Oct</span></div></div>
+          <div class="row-track"><div class="bar rh" style="left:89.655%;width:6.897%"><span class="dur-full">2 semanas</span><span class="end">13 Nov</span></div></div>
         </div>
 
         <div class="g-row">
           <div class="row-label"><i class='bx bx-trophy'></i>QA · Capacitación a IT · Entrega</div>
-          <div class="row-track"><div class="bar cierre short" style="left:96.154%;width:3.846%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">30 Oct</span></div></div>
+          <div class="row-track"><div class="bar cierre short" style="left:96.552%;width:3.448%"><span class="dur-full">1 sem</span><span class="dur-short">1s</span><span class="end">20 Nov</span></div></div>
         </div>
 
       </div>
@@ -920,21 +940,21 @@
           <tr><td class="num-cell">02</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Pre-Clínica — toma de signos previos a la consulta médica</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 16 Mayo</td></tr>
           <tr><td class="num-cell">03</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Proceso de Entrevistas — evaluación, calificación y estados</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 22 Mayo</td></tr>
           <tr><td class="num-cell">04</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Registrar Administrativo — formulario CRUD del personal admin.</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 29 Mayo</td></tr>
-          <tr><td class="num-cell">05</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Registrar Servicios Generales — limpieza, mantenimiento, lavandería</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 5 Junio</td></tr>
-          <tr><td class="num-cell">06</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Catálogo de Servicios — administración centralizada</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 12 Junio</td></tr>
-          <tr><td class="num-cell">07</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Vacaciones / Permisos — solicitud, aprobación, saldos</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 19 Junio</td></tr>
-          <tr><td class="num-cell">08</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Hospitalización — asignación de cama, ingreso/egreso, evoluciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 3 Julio</td></tr>
-          <tr><td class="num-cell">09</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Cuidados Intermedios — control de pacientes en transición</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 10 Julio</td></tr>
-          <tr><td class="num-cell">10</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Procedimientos — programación + reporte clínico</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 24 Julio</td></tr>
-          <tr><td class="num-cell">11</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Plantilla Activa / Organigrama visual</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 31 Julio</td></tr>
-          <tr><td class="num-cell">12</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Emergencia / Triage — clasificación y atención inmediata</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 14 Agosto</td></tr>
-          <tr><td class="num-cell">13</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Laboratorio Clínico — recepción de muestras y entrega de resultados</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 28 Agosto</td></tr>
-          <tr><td class="num-cell">14</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Evaluaciones de Desempeño — formulario + histórico</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 4 Sept.</td></tr>
-          <tr><td class="num-cell">15</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Maternidad — registro de parto y atención a recién nacido</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 18 Sept.</td></tr>
-          <tr><td class="num-cell">16</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Óptica — receta, control y entrega de lentes</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 25 Sept.</td></tr>
-          <tr><td class="num-cell">17</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Odontología — odontograma y plan de tratamiento</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 9 Oct.</td></tr>
-          <tr><td class="num-cell">18</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Reportes &amp; Dashboard — asistencia, plantilla, vacaciones, evaluaciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 23 Oct.</td></tr>
-          <tr><td class="num-cell">19</td><td><span class="pill cie"><i class='bx bx-trophy'></i>Cierre</span></td><td>QA cruzado, integración, <b>capacitación a IT de Medicasa</b> (Formación de formadores) y entrega final</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 30 Oct.</td></tr>
+          <tr><td class="num-cell">05</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Registrar Servicios Generales — limpieza, mantenimiento, lavandería</td><td class="dur-cell">1 semana</td><td class="date-cell">Sáb 27 Junio</td></tr>
+          <tr><td class="num-cell">06</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Catálogo de Servicios — administración centralizada</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 3 Julio</td></tr>
+          <tr><td class="num-cell">07</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Vacaciones / Permisos — solicitud, aprobación, saldos</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 10 Julio</td></tr>
+          <tr><td class="num-cell">08</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Hospitalización — asignación de cama, ingreso/egreso, evoluciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 24 Julio</td></tr>
+          <tr><td class="num-cell">09</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Cuidados Intermedios — control de pacientes en transición</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 31 Julio</td></tr>
+          <tr><td class="num-cell">10</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Procedimientos — programación + reporte clínico</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 14 Agosto</td></tr>
+          <tr><td class="num-cell">11</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Plantilla Activa / Organigrama visual</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 21 Agosto</td></tr>
+          <tr><td class="num-cell">12</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Emergencia / Triage — clasificación y atención inmediata</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 4 Sept.</td></tr>
+          <tr><td class="num-cell">13</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Laboratorio Clínico — recepción de muestras y entrega de resultados</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 18 Sept.</td></tr>
+          <tr><td class="num-cell">14</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Evaluaciones de Desempeño — formulario + histórico</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 25 Sept.</td></tr>
+          <tr><td class="num-cell">15</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Maternidad — registro de parto y atención a recién nacido</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 9 Oct.</td></tr>
+          <tr><td class="num-cell">16</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Óptica — receta, control y entrega de lentes</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 16 Oct.</td></tr>
+          <tr><td class="num-cell">17</td><td><span class="pill enf"><i class='bx bx-plus-medical'></i>Enfermería</span></td><td>Odontología — odontograma y plan de tratamiento</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 30 Oct.</td></tr>
+          <tr><td class="num-cell">18</td><td><span class="pill rh"><i class='bx bxs-user-detail'></i>RH</span></td><td>Reportes &amp; Dashboard — asistencia, plantilla, vacaciones, evaluaciones</td><td class="dur-cell">2 semanas</td><td class="date-cell">Vie 13 Nov.</td></tr>
+          <tr><td class="num-cell">19</td><td><span class="pill cie"><i class='bx bx-trophy'></i>Cierre</span></td><td>QA cruzado, integración, <b>capacitación a IT de Medicasa</b> (Formación de formadores) y entrega final</td><td class="dur-cell">1 semana</td><td class="date-cell">Vie 20 Nov.</td></tr>
         </tbody>
       </table>
     </div>
@@ -950,51 +970,52 @@
     <h3 style="margin:30px 0 0;color:var(--orange)"><i class='bx bxs-user-detail'></i> Recursos Humanos</h3>
     <div class="func-grid">
       <div class="func-card rh">
-        <div class="func-head"><span class="num">01</span><span class="date">9 Mayo</span></div>
-        <h4>Reloj Biométrico <span style="color:var(--orange);font-size:13px">⚠</span></h4>
-        <p class="desc"><b>Requiere decisión de hardware.</b> El reloj actual de Medicasa está obsoleto y su API no es compatible con MEDIDATA. Dos caminos posibles:</p>
-        <div class="what" style="border-left-color:var(--green)"><b>Opción A · Hardware nuevo:</b> reloj moderno con API compatible. Marcaciones en tiempo real, reportes automáticos, sin intervención humana.</div>
-        <div class="what"><b>Opción B · Carga manual USB:</b> un operador de RR.HH. exporta los datos del reloj actual y los sube al sistema cada mes (o con la frecuencia que el cliente defina).</div>
-        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibirás (en ambas opciones):</b> tabla de marcaciones, reporte por colaborador, exportación a Excel/PDF y alertas de tardanza.</div>
+        <div class="func-head"><span class="num">01</span><span class="date">Entregado</span></div>
+        <h4>Reloj Biométrico <span style="color:var(--green);font-size:13px">✓</span></h4>
+        <p class="desc"><b>Resuelto y en producción.</b> Se integró directamente el reloj <b>ZKTeco MB360</b> con MEDIDATA sobre red TCP/IP. La prueba salió perfecta.</p>
+        <div class="what" style="border-left-color:var(--green)"><b>Integración ZKTeco MB360:</b> lectura automática de marcaciones en tiempo real, sin reemplazo de hardware ni cargas manuales.</div>
+        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibiste:</b> tabla de marcaciones, reporte por colaborador, exportación a Excel/PDF y alertas de tardanza.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">03</span><span class="date">22 Mayo</span></div>
-        <h4>Proceso de Entrevistas</h4>
-        <p class="desc">Convertir cada postulación en una entrevista evaluable, con calificación, comentarios y estado (citado, entrevistado, contratado, descartado).</p>
-        <div class="what"><b>Qué recibirás:</b> ficha de entrevista, panel kanban de candidatos y bitácora de decisiones de RR.HH.</div>
+        <div class="func-head"><span class="num">03</span><span class="date">Entregado</span></div>
+        <h4>Proceso de Entrevistas <span style="color:var(--green);font-size:13px">✓</span></h4>
+        <p class="desc"><b>Entregado y en producción.</b> Cada postulación se convierte en una entrevista evaluable, con calificación, comentarios y estado (citado, entrevistado, contratado, descartado). La prueba salió perfecta.</p>
+        <div class="what" style="border-left-color:var(--green)"><b>Estado:</b> entregado y operando correctamente.</div>
+        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibiste:</b> ficha de entrevista, panel kanban de candidatos y bitácora de decisiones de RR.HH.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">04</span><span class="date">29 Mayo</span></div>
-        <h4>Registrar Administrativo</h4>
-        <p class="desc">CRUD completo del personal administrativo (gerencia, finanzas, recepción, secretarías) con expediente digital.</p>
-        <div class="what"><b>Qué recibirás:</b> formulario multi-paso, listado con buscador y ficha individual con foto, datos de contacto y puesto.</div>
+        <div class="func-head"><span class="num">04</span><span class="date">Entregado</span></div>
+        <h4>Registrar Administrativo <span style="color:var(--green);font-size:13px">✓</span></h4>
+        <p class="desc"><b>Entregado y en producción.</b> CRUD completo del personal administrativo (gerencia, finanzas, recepción, secretarías) con expediente digital. La prueba salió perfecta.</p>
+        <div class="what" style="border-left-color:var(--green)"><b>Estado:</b> entregado y operando correctamente.</div>
+        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibiste:</b> formulario multi-paso, listado con buscador y ficha individual con foto, datos de contacto y puesto.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">05</span><span class="date">5 Junio</span></div>
+        <div class="func-head"><span class="num">05</span><span class="date">27 Jun.</span></div>
         <h4>Servicios Generales</h4>
         <p class="desc">Registro y gestión del personal de limpieza, mantenimiento, lavandería y seguridad. Mismo flujo que administrativo, pero con campos propios del puesto.</p>
         <div class="what"><b>Qué recibirás:</b> formulario, listado y asignación a turnos.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">07</span><span class="date">19 Junio</span></div>
+        <div class="func-head"><span class="num">07</span><span class="date">10 Julio</span></div>
         <h4>Vacaciones &amp; Permisos</h4>
         <p class="desc">Solicitud digital con días disponibles, aprobación por jefatura y registro automático en el calendario del colaborador.</p>
         <div class="what"><b>Qué recibirás:</b> formulario de solicitud, bandeja de aprobaciones, saldos por colaborador y calendario consolidado.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">11</span><span class="date">31 Julio</span></div>
+        <div class="func-head"><span class="num">11</span><span class="date">21 Agosto</span></div>
         <h4>Plantilla / Organigrama</h4>
         <p class="desc">Vista visual de la estructura organizacional: jerarquía, áreas y plazas activas.</p>
         <div class="what"><b>Qué recibirás:</b> organigrama interactivo, conteo de plazas por área y filtro por departamento.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">14</span><span class="date">4 Sept.</span></div>
+        <div class="func-head"><span class="num">14</span><span class="date">25 Sept.</span></div>
         <h4>Evaluaciones de Desempeño</h4>
         <p class="desc">Formulario de evaluación periódica (trimestral o semestral) con preguntas configurables y resultado histórico.</p>
         <div class="what"><b>Qué recibirás:</b> formulario, histórico por colaborador y comparativo entre periodos.</div>
       </div>
       <div class="func-card rh">
-        <div class="func-head"><span class="num">18</span><span class="date">23 Octubre</span></div>
+        <div class="func-head"><span class="num">18</span><span class="date">13 Noviembre</span></div>
         <h4>Reportes &amp; Dashboard RH</h4>
         <p class="desc">Tablero ejecutivo que cruza asistencia (biométrico), plantilla, vacaciones y evaluaciones.</p>
         <div class="what"><b>Qué recibirás:</b> dashboard con gráficos, indicadores clave (KPIs) y exportación de reportes consolidados.</div>
@@ -1004,61 +1025,62 @@
     <h3 style="margin:40px 0 0;color:var(--teal-dark)"><i class='bx bx-plus-medical'></i> Enfermería</h3>
     <div class="func-grid">
       <div class="func-card">
-        <div class="func-head"><span class="num">02</span><span class="date">16 Mayo</span></div>
-        <h4>Pre-Clínica</h4>
-        <p class="desc">Toma rápida de signos vitales (presión, peso, talla, temperatura) antes de pasar al médico, asociada al expediente del paciente.</p>
-        <div class="what"><b>Qué recibirás:</b> formulario corto, lista de pacientes en espera y traspaso automático al médico tratante.</div>
+        <div class="func-head"><span class="num">02</span><span class="date">Entregado</span></div>
+        <h4>Pre-Clínica <span style="color:var(--green);font-size:13px">✓</span></h4>
+        <p class="desc"><b>Entregado y en producción.</b> Toma rápida de signos vitales (presión, peso, talla, temperatura) antes de pasar al médico, asociada al expediente del paciente. La prueba salió perfecta.</p>
+        <div class="what" style="border-left-color:var(--green)"><b>Estado:</b> entregado y operando correctamente.</div>
+        <div class="what" style="border-left-color:var(--teal-dark)"><b>Qué recibiste:</b> formulario corto, lista de pacientes en espera y traspaso automático al médico tratante.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">06</span><span class="date">12 Junio</span></div>
+        <div class="func-head"><span class="num">06</span><span class="date">3 Julio</span></div>
         <h4>Catálogo de Servicios</h4>
         <p class="desc">Administración centralizada de los servicios clínicos que ofrece el hospital, con sus tarifas y áreas asociadas.</p>
         <div class="what"><b>Qué recibirás:</b> CRUD del catálogo, agrupación por áreas y conexión con facturación existente.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">08</span><span class="date">3 Julio</span></div>
+        <div class="func-head"><span class="num">08</span><span class="date">24 Julio</span></div>
         <h4>Hospitalización</h4>
         <p class="desc">Módulo central de pacientes hospitalizados: asignación de cama, ingreso, evoluciones, medicación, signos vitales y egreso.</p>
         <div class="what"><b>Qué recibirás:</b> mapa de camas, ficha del paciente hospitalizado, registro de evoluciones y reporte de estancia.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">09</span><span class="date">10 Julio</span></div>
+        <div class="func-head"><span class="num">09</span><span class="date">31 Julio</span></div>
         <h4>Cuidados Intermedios</h4>
         <p class="desc">Área de transición entre UCI y hospitalización general, con monitoreo más frecuente.</p>
         <div class="what"><b>Qué recibirás:</b> ficha clínica con frecuencia configurable, alertas y reporte de turno.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">10</span><span class="date">24 Julio</span></div>
+        <div class="func-head"><span class="num">10</span><span class="date">14 Agosto</span></div>
         <h4>Procedimientos</h4>
         <p class="desc">Programación y reporte de procedimientos no quirúrgicos: endoscopias, biopsias, suturas, etc.</p>
         <div class="what"><b>Qué recibirás:</b> agenda, formulario de reporte, insumos utilizados y firma digital del responsable.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">12</span><span class="date">14 Agosto</span></div>
+        <div class="func-head"><span class="num">12</span><span class="date">4 Sept.</span></div>
         <h4>Emergencia / Triage</h4>
         <p class="desc">Clasificación rápida del paciente que llega a emergencia (rojo, amarillo, verde, azul) y atención prioritaria.</p>
         <div class="what"><b>Qué recibirás:</b> tablero de triage, ficha rápida y derivación al área correspondiente.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">13</span><span class="date">28 Agosto</span></div>
+        <div class="func-head"><span class="num">13</span><span class="date">18 Sept.</span></div>
         <h4>Laboratorio Clínico</h4>
         <p class="desc">Recepción de muestras, registro de procesos y entrega de resultados al expediente del paciente.</p>
         <div class="what"><b>Qué recibirás:</b> ingreso de muestras, panel de pendientes, captura de resultados y notificación al médico.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">15</span><span class="date">18 Sept.</span></div>
+        <div class="func-head"><span class="num">15</span><span class="date">9 Oct.</span></div>
         <h4>Maternidad</h4>
         <p class="desc">Registro del trabajo de parto, parto y atención al recién nacido, incluyendo Apgar y tamizaje.</p>
         <div class="what"><b>Qué recibirás:</b> ficha de parto, ficha del recién nacido, signos vitales y reporte hospitalario.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">16</span><span class="date">25 Sept.</span></div>
+        <div class="func-head"><span class="num">16</span><span class="date">16 Oct.</span></div>
         <h4>Óptica</h4>
         <p class="desc">Manejo de prescripciones oftalmológicas y entrega de lentes/lentillas al paciente.</p>
         <div class="what"><b>Qué recibirás:</b> formulario de receta, control de pedido y entrega.</div>
       </div>
       <div class="func-card">
-        <div class="func-head"><span class="num">17</span><span class="date">9 Oct.</span></div>
+        <div class="func-head"><span class="num">17</span><span class="date">30 Oct.</span></div>
         <h4>Odontología</h4>
         <p class="desc">Odontograma interactivo, plan de tratamiento por pieza dental y avance de citas.</p>
         <div class="what"><b>Qué recibirás:</b> odontograma visual, plan de tratamiento y bitácora de citas dentales.</div>
@@ -1073,9 +1095,9 @@
     <h2><small>06 · Plan de Reuniones</small>Seguimiento y validación con el cliente</h2>
     <div class="meetings">
       <h3><i class='bx bx-calendar-check'></i>Reuniones Quincenales de Seguimiento</h3>
-      <p>Cada dos semanas validamos lo entregado y ajustamos el siguiente entregable. Las reuniones se realizan vía <b>Google Meet</b> o <b>presenciales</b>, según convenga al cliente. Duración estimada: 45–60 minutos. En cada sesión revisamos: avance, pruebas funcionales, ajustes solicitados y siguiente entrega.</p>
+      <p>Cada dos semanas validamos lo entregado y ajustamos el siguiente entregable. Las reuniones se realizan vía <b>MEDICLOUD Meet</b> o <b>presenciales</b>, según convenga al cliente. Duración estimada: 45–60 minutos. En cada sesión revisamos: avance, pruebas funcionales, ajustes solicitados y siguiente entrega.</p>
       <div class="meet-modes">
-        <div class="mode-pill"><i class='bx bx-video'></i>Google Meet</div>
+        <div class="mode-pill"><i class='bx bx-video'></i>MEDICLOUD Meet</div>
         <div class="mode-pill"><i class='bx bx-buildings'></i>Presencial</div>
         <div class="mode-pill"><i class='bx bx-time'></i>45–60 min</div>
         <div class="mode-pill"><i class='bx bx-user-voice'></i>Cliente + Equipo NEXAR</div>
@@ -1083,17 +1105,17 @@
       <div class="meet-list">
         <div class="meet-pill"><b>Reunión 1</b><span>Vie 9 Mayo · Cierre Reloj Biométrico</span></div>
         <div class="meet-pill"><b>Reunión 2</b><span>Vie 22 Mayo · Pre-Clínica + Entrevistas</span></div>
-        <div class="meet-pill"><b>Reunión 3</b><span>Vie 5 Junio · Administrativo + Servicios Generales</span></div>
-        <div class="meet-pill"><b>Reunión 4</b><span>Vie 19 Junio · Catálogo + Vacaciones</span></div>
-        <div class="meet-pill"><b>Reunión 5</b><span>Vie 3 Julio · Hospitalización (corte 1)</span></div>
-        <div class="meet-pill"><b>Reunión 6</b><span>Vie 17 Julio · Cuidados Intermedios + Procedimientos</span></div>
-        <div class="meet-pill"><b>Reunión 7</b><span>Vie 31 Julio · Plantilla / Organigrama</span></div>
-        <div class="meet-pill"><b>Reunión 8</b><span>Vie 14 Agosto · Emergencia / Triage</span></div>
-        <div class="meet-pill"><b>Reunión 9</b><span>Vie 28 Agosto · Laboratorio Clínico</span></div>
-        <div class="meet-pill"><b>Reunión 10</b><span>Vie 11 Septiembre · Evaluaciones + avance</span></div>
-        <div class="meet-pill"><b>Reunión 11</b><span>Vie 25 Septiembre · Maternidad + Óptica</span></div>
-        <div class="meet-pill"><b>Reunión 12</b><span>Vie 9 Octubre · Odontología + revisión final</span></div>
-        <div class="meet-pill"><b>Cierre</b><span>Vie 30 Octubre · Entrega final &amp; capacitación a IT</span></div>
+        <div class="meet-pill"><b>Reunión 3</b><span>Vie 26 Junio · Administrativo + Servicios Generales</span></div>
+        <div class="meet-pill"><b>Reunión 4</b><span>Vie 10 Julio · Catálogo + Vacaciones</span></div>
+        <div class="meet-pill"><b>Reunión 5</b><span>Vie 24 Julio · Hospitalización (corte 1)</span></div>
+        <div class="meet-pill"><b>Reunión 6</b><span>Vie 7 Agosto · Cuidados Intermedios + Procedimientos</span></div>
+        <div class="meet-pill"><b>Reunión 7</b><span>Vie 21 Agosto · Plantilla / Organigrama</span></div>
+        <div class="meet-pill"><b>Reunión 8</b><span>Vie 4 Septiembre · Emergencia / Triage</span></div>
+        <div class="meet-pill"><b>Reunión 9</b><span>Vie 18 Septiembre · Laboratorio Clínico</span></div>
+        <div class="meet-pill"><b>Reunión 10</b><span>Vie 2 Octubre · Evaluaciones + avance</span></div>
+        <div class="meet-pill"><b>Reunión 11</b><span>Vie 16 Octubre · Maternidad + Óptica</span></div>
+        <div class="meet-pill"><b>Reunión 12</b><span>Vie 30 Octubre · Odontología + revisión final</span></div>
+        <div class="meet-pill"><b>Cierre</b><span>Vie 20 Noviembre · Entrega final &amp; capacitación a IT</span></div>
       </div>
     </div>
 
@@ -1140,7 +1162,7 @@
       <img src="logo_N_nexar.png" alt="Logo NEXAR" />
       <span class="brand">MEDIDATA<small>by NEXAR</small></span>
     </div>
-    <div>Plan de Trabajo · Recursos Humanos &amp; Enfermería · <b>Mayo – Octubre 2026</b></div>
+    <div>Plan de Trabajo · Recursos Humanos &amp; Enfermería · <b>Mayo – Noviembre 2026</b></div>
     <div style="margin-top:6px;color:#9ee9f0">Sujeto a validación con cliente MEDICASA</div>
   </div>
 </footer>

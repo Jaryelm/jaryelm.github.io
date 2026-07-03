@@ -160,17 +160,24 @@ if (isset($_POST['order'])) {
                     $cump_amb = $year_nac . '-01-01';
                 }
 
-                $ya_existe = false;
-                if ($dni_amb !== 'N/A' && $dni_amb !== '') {
-                    $stmt_ex = $connect->prepare("SELECT id FROM patients_ambulatorios WHERE numhs = ? LIMIT 1");
-                    $stmt_ex->execute([$dni_amb]);
-                    $ya_existe = $stmt_ex->rowCount() > 0;
-                }
-                if (!$ya_existe) {
-                    $nombre_completo_buscar = trim($nompa_amb . ' ' . $apepa_amb);
-                    $stmt_ex2 = $connect->prepare("SELECT id FROM patients_ambulatorios WHERE TRIM(CONCAT(IFNULL(nompa,''), ' ', IFNULL(apepa,''))) = ? LIMIT 1");
-                    $stmt_ex2->execute([$nombre_completo_buscar]);
-                    $ya_existe = $stmt_ex2->rowCount() > 0;
+                // La deduplicacion se hace por NOMBRE COMPLETO, NO por cedula.
+                // Motivo: si se reutiliza una cedula con un paciente distinto (error de
+                // digitacion), el nuevo paciente DEBE registrarse igual; de lo contrario
+                // "desaparece" de la lista de pacientes al facturar.
+                $nombre_completo_buscar = trim($nompa_amb . ' ' . $apepa_amb);
+                $stmt_ex2 = $connect->prepare("SELECT id FROM patients_ambulatorios WHERE TRIM(CONCAT(IFNULL(nompa,''), ' ', IFNULL(apepa,''))) = ? LIMIT 1");
+                $stmt_ex2->execute([$nombre_completo_buscar]);
+                $ya_existe = $stmt_ex2->rowCount() > 0;
+
+                // Auditoria: si la cedula ya pertenece a OTRO paciente, registrar alerta
+                // (posible error de digitacion de la cedula) sin bloquear el guardado.
+                if (!$ya_existe && $dni_amb !== 'N/A' && $dni_amb !== '') {
+                    $stmt_dni = $connect->prepare("SELECT TRIM(CONCAT(IFNULL(nompa,''), ' ', IFNULL(apepa,''))) AS existente FROM patients_ambulatorios WHERE numhs = ? LIMIT 1");
+                    $stmt_dni->execute([$dni_amb]);
+                    $otro_nombre = $stmt_dni->fetchColumn();
+                    if ($otro_nombre && mb_strtolower(trim($otro_nombre)) !== mb_strtolower($nombre_completo_buscar)) {
+                        error_log("ALERTA CAJA: la cedula {$dni_amb} ya pertenece a '{$otro_nombre}' pero se esta facturando a '{$nombre_completo_buscar}'. Se registra igual; verificar la cedula del paciente.");
+                    }
                 }
 
                 if (!$ya_existe) {

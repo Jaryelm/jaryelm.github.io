@@ -15,28 +15,7 @@ try {
         } else {
             // Manejar la búsqueda
             $sql = "SELECT * FROM registros_articulos 
-                    WHERE linea LIKE :search 
-                    OR sub_linea LIKE :search 
-                    OR sucursal_bodega LIKE :search 
-                    OR envase LIKE :search 
-                    OR farmaceutica LIKE :search 
-                    OR concentracion LIKE :search 
-                    OR via_administracion LIKE :search 
-                    OR codigo_articulo LIKE :search 
-                    OR nombre LIKE :search 
-                    OR descripcion LIKE :search 
-                    OR precio_max_venta LIKE :search 
-                    OR existencia_min LIKE :search 
-                    OR existencia_max LIKE :search 
-                    OR comision LIKE :search 
-                    OR fecha_registro LIKE :search
-                    OR fecha_vence LIKE :search
-                    OR existencia_actual LIKE :search
-                    OR costo LIKE :search 
-                    OR margen_ganancia LIKE :search 
-                    OR precio_venta LIKE :search 
-                    OR impuestos LIKE :search 
-                    OR lote LIKE :search
+                    WHERE CONCAT_WS(' ', linea, sub_linea, sucursal_bodega, envase, farmaceutica, concentracion, via_administracion, codigo_articulo, nombre, descripcion, precio_maximo_venta, existencia_minima, existencia_maxima, comision, fecha_registro, fecha_vence, costo, margen_ganancia, precio_venta, impuestos, lote) LIKE :search
                     ORDER BY fecha_registro DESC" . medidata_tablas_mysql_limit_clause();
             $stmt = $connect->prepare($sql);
             $search_param = '%' . $search . '%';

@@ -48,8 +48,8 @@ $events = $req->fetchAll(PDO::FETCH_ASSOC);
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
 
     <!-- DataTables -->
-        <link rel="stylesheet" href="../../backend/vendor/datatables/dataTables.bs4.css" />
-        <link rel="stylesheet" href="../../backend/vendor/datatables/dataTables.bs4-custom.css" />
+        <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css" />
+        <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css" />
         <link href="../../backend/vendor/datatables/buttons.bs.css" rel="stylesheet" />
 
     <!-- FullCalendar -->
@@ -301,26 +301,7 @@ $totalFacturas = $connect->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 $facturasCobradas = $connect->query("SELECT COUNT(*) FROM orders WHERE invoice_status = 'Cobrada'")->fetchColumn();
 $facturasPendientes = $connect->query("SELECT COUNT(*) FROM orders WHERE invoice_status = 'Pendiente'")->fetchColumn();
 
-$ultimasEntregadas = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Cobrada' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$ultimasPendientes = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Pendiente' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$facturasHospitalizacion = $connect->query("
-    SELECT invoice_number, nomcl, tipo, processed_by, placed_on, total_price 
-    FROM orders 
-    WHERE invoice_status = 'Pendiente' AND tipo = 'Hospitalizado' 
-    ORDER BY placed_on DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
+// (Este escritorio no muestra tablas de facturas; se omiten esas consultas.)
 
 // Ventas Diarias Ajustadas
 $ventasDiarias = $connect->prepare("
@@ -696,11 +677,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <!-- Dashboard Cierre Caja Start -->
 
 <?php
-$cierres = $connect->query("
-    SELECT fecha_cierre, total_ventas, total_facturas, facturas_cobradas, facturas_pendientes, total_por_metodo, usuario_cierre 
-    FROM cierre_caja 
-    ORDER BY fecha_cierre DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+// Cierres de caja: se cargan server-side via get_cierres_caja.php?scope=all (DataTables).
 
 // Usuarios de caja para el desplegable (solo perfil Contabilidad)
 $usuarios_caja = $connect->query("
@@ -738,14 +715,9 @@ $usuarios_caja = $connect->query("
     </div>
 </div>
 
-<!-- Filtros de Búsqueda -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <h3 style="margin: 0; color: #035c67;">Registros de Cierres</h3>
-    <div class="table-filters">
-        <input type="text" id="busquedaCierres" placeholder="Buscar..." style="padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
-</div>
-    <table class="cierre-caja-table">
+<h3 style="margin: 0 0 15px; color: #035c67;">Registros de Cierres</h3>
+<div class="table-responsive" style="overflow-x:auto;">
+    <table id="tabla_cierres" class="cierre-caja-table" style="width:100%;">
         <thead>
             <tr>
                 <th>Fecha de Cierre</th>
@@ -757,32 +729,8 @@ $usuarios_caja = $connect->query("
                 <th>Usuario</th>
             </tr>
         </thead>
-        <tbody id="tablaCierres">
-            <?php foreach ($cierres as $cierre): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($cierre['fecha_cierre']); ?></td>
-                <td>LPS <?php echo number_format($cierre['total_ventas'], 2); ?></td>
-                <td><?php echo htmlspecialchars($cierre['total_facturas']); ?></td>
-                <td><?php echo htmlspecialchars($cierre['facturas_cobradas']); ?></td>
-                <td><?php echo htmlspecialchars($cierre['facturas_pendientes']); ?></td>
-                <td>
-                    <?php
-                    $metodos = json_decode($cierre['total_por_metodo'], true);
-                    foreach ($metodos as $metodo => $monto) {
-                        echo htmlspecialchars($metodo) . ': LPS ' . number_format($monto, 2) . '<br>';
-                    }
-                    ?>
-                </td>
-                <td><?php echo htmlspecialchars($cierre['usuario_cierre']); ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
+        <tbody></tbody>
     </table>
-<!-- Contenedor de paginación: reutilizamos el estilo definido (por ejemplo, para #pagination) -->
-<div id="pagination" class="pagination">
-    <button id="prevPageCierres" disabled>Anterior</button>
-    <span id="currentPageCierres">1</span>
-    <button id="nextPageCierres">Siguiente</button>
 </div>
 </div>
 
@@ -817,61 +765,7 @@ $usuarios_caja = $connect->query("
 }
 </style>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const busquedaInput = document.getElementById("busquedaCierres");
-    const tableBody = document.getElementById("tablaCierres");
-    
-    if (!busquedaInput || !tableBody) {
-        console.error("No se encontró el input de búsqueda o el tbody ('tablaCierres').");
-        return;
-    }
-    
-    // Guarda una copia de todas las filas originales
-    const allRows = Array.from(tableBody.querySelectorAll("tr"));
-    let filteredRows = allRows.slice();
-    let currentPage = 1;
-    const recordsPerPage = 10;
-    
-    function renderTable() {
-        tableBody.innerHTML = "";
-        const start = (currentPage - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        const pageRows = filteredRows.slice(start, end);
-        
-        pageRows.forEach(row => tableBody.appendChild(row));
-        
-        document.getElementById("prevPageCierres").disabled = currentPage === 1;
-        document.getElementById("nextPageCierres").disabled = end >= filteredRows.length;
-        document.getElementById("currentPageCierres").textContent = currentPage;
-    }
-    
-    function filterRows() {
-        const searchValue = busquedaInput.value.toLowerCase();
-        filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(searchValue));
-        currentPage = 1;
-        renderTable();
-    }
-    
-    busquedaInput.addEventListener("input", filterRows);
-    
-    document.getElementById("prevPageCierres").addEventListener("click", function() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-    
-    document.getElementById("nextPageCierres").addEventListener("click", function() {
-        if (currentPage * recordsPerPage < filteredRows.length) {
-            currentPage++;
-            renderTable();
-        }
-    });
-    
-    renderTable();
-});
-</script>
+<!-- Cierres de caja: DataTable server-side (ver init al final del archivo) -->
 
 <!-- Dashboard Cierre Caja End -->
 
@@ -1094,14 +988,85 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="/backend/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../../backend/js/script.js"></script>
 
-    <!-- Data Tables -->
-    <script src="../../backend/vendor/datatables/dataTables.min.js"></script>
-    <script src="../../backend/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <!-- Data Tables (stack estandar MEDIDATA: server-side + exportacion) -->
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 
+    <!-- Inicializacion DataTables server-side (cierres de caja, historial completo) -->
+    <script>
+    (function () {
+        function esc(text) {
+            if (text === null || text === undefined || text === '') { return ''; }
+            return $('<div>').text(text).html();
+        }
+        function lps(v) {
+            var n = parseFloat(v);
+            if (isNaN(n)) { n = 0; }
+            return 'LPS ' + n.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        var idiomaDataTable = {
+            lengthMenu: 'Mostrar _MENU_ registros',
+            zeroRecords: 'No se encontraron resultados',
+            emptyTable: 'No hay registros disponibles.',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros totales)',
+            search: 'Buscar:',
+            processing: 'Cargando...',
+            paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
+        };
 
-    <!-- Custom Data tables -->
-    <script src="../../backend/vendor/datatables/custom/custom-datatables.js"></script>
-    <script src="../../backend/vendor/datatables/custom/fixedHeader.js"></script>
+        $(function () {
+            $('#tabla_cierres').DataTable({
+                processing: true,
+                serverSide: true,
+                dom: 'Bfrtip',
+                scrollX: true,
+                order: [[0, 'desc']],
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                ajax: {
+                    url: '../../backend/php/get_cierres_caja.php',
+                    type: 'GET',
+                    data: function (d) { d.scope = 'all'; }
+                },
+                columns: [
+                    { data: 'fecha_cierre', render: function (d) { return esc(d) || '—'; } },
+                    { data: 'total_ventas', className: 'dt-right', render: function (d) { return lps(d); } },
+                    { data: 'total_facturas', render: function (d) { return esc(d) || '0'; } },
+                    { data: 'facturas_cobradas', render: function (d) { return esc(d) || '0'; } },
+                    { data: 'facturas_pendientes', render: function (d) { return esc(d) || '0'; } },
+                    {
+                        data: 'total_por_metodo',
+                        orderable: false,
+                        render: function (d) {
+                            if (!d) { return '—'; }
+                            var obj;
+                            try { obj = JSON.parse(d); } catch (e) { return esc(d); }
+                            if (!obj || typeof obj !== 'object') { return '—'; }
+                            return Object.keys(obj).map(function (k) {
+                                return esc(k) + ': ' + lps(obj[k]);
+                            }).join('<br>') || '—';
+                        }
+                    },
+                    { data: 'usuario_cierre', render: function (d) { return esc(d) || '—'; } }
+                ],
+                buttons: [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button', title: 'cierres_de_caja' },
+                    { extend: 'excel', className: 'button', title: 'cierres_de_caja' },
+                    { extend: 'print', className: 'button' }
+                ],
+                language: idiomaDataTable
+            });
+        });
+    })();
+    </script>
 
 
     <!-- FullCalendar -->
@@ -1595,109 +1560,7 @@ foreach ($events as $event):
 }
 </style>
 
-<!-- Estilos del bloque de reporte (estándar del sistema: misma altura y alineación para input, select y botón) -->
-<style>
-.report-controls {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-}
-
-.report-controls-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.report-control-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.report-controls label {
-    font-weight: bold;
-    color: #035c67;
-}
-
-/* Misma altura y padding para input, select y botón (alineación homogénea) */
-.report-controls input[type="date"],
-.report-controls select {
-    height: 40px;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-    margin: 0;
-}
-
-.report-controls select {
-    min-width: 200px;
-}
-
-.report-controls .report-control-btn {
-    height: 40px;
-    padding: 0 20px;
-    background-color: #06adbf;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.report-controls .report-control-btn:hover {
-    background-color: #035c67;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.report-controls input[type="date"]:focus,
-.report-controls select:focus {
-    outline: none;
-    border-color: #06adbf;
-    box-shadow: 0 0 5px rgba(6, 173, 191, 0.3);
-}
-
-@media (max-width: 768px) {
-    .report-controls-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-
-    .report-control-item {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .report-controls .report-control-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 12px 20px;
-    }
-
-    .report-controls input[type="date"],
-    .report-controls select {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .report-controls input[type="date"] {
-        text-align: center;
-    }
-}
-</style>
+<!-- Estilos de .report-controls ahora en admin.css (global) -->
 
 </body>
 </html>

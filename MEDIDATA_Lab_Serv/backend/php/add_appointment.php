@@ -5,7 +5,7 @@ require_once('../../backend/bd/Conexion.php');
 date_default_timezone_set('America/Tegucigalpa'); // Cambia esto a tu zona horaria local
 
 // Configuración de logs
-ini_set('error_log', '/home4/medic9ue/medidata.medicasa.hn/backend/php/error_log.log');
+ini_set('error_log', __DIR__ . '/error_log.log');
 
 if (isset($_POST['add_appointment'])) {
     error_log("Datos POST recibidos: " . json_encode($_POST));

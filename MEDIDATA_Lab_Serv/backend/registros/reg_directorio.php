@@ -33,7 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nombre-proveedor'])) {
     // Manejo del archivo "firma_digital"
     $firma_digital = null;
     if (isset($_FILES['firma-digital']) && $_FILES['firma-digital']['error'] == UPLOAD_ERR_OK) {
-        $firmas_dir = '/home4/medic9ue/medidata.medicasa.hn/uploads/firmas/';
+        $firmas_dir = dirname(__DIR__, 2) . '/uploads/firmas/';
+        if (!is_dir($firmas_dir)) { @mkdir($firmas_dir, 0775, true); }
         $nuevo_nombre_firma = $nombre_proveedor . '.png'; 
         $firma_ruta = $firmas_dir . $nuevo_nombre_firma;
         if (move_uploaded_file($_FILES['firma-digital']['tmp_name'], $firma_ruta)) {
@@ -83,7 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nombre-proveedor'])) {
             if ($stmt->execute()) {
                 // Si el registro fue exitoso, se procede a manejar el archivo de constancia
                 if (isset($_FILES['archivo-constancia']) && $_FILES['archivo-constancia']['error'] == UPLOAD_ERR_OK) {
-                    $upload_dir = '/home4/medic9ue/medidata.medicasa.hn/uploads/';
+                    $upload_dir = dirname(__DIR__, 2) . '/uploads/';
+                    if (!is_dir($upload_dir)) { @mkdir($upload_dir, 0775, true); }
                     $nombre_proveedor_sanitizado = str_replace('_', ' ', trim($nombre_proveedor));
                     $archivo_extension = pathinfo($_FILES['archivo-constancia']['name'], PATHINFO_EXTENSION);
                     $nuevo_nombre_archivo = $nombre_proveedor_sanitizado . '.' . $archivo_extension;

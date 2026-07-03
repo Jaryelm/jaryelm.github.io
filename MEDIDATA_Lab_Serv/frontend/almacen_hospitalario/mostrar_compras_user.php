@@ -14,6 +14,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
     <title>MEDIDATA</title>
 
@@ -138,6 +139,32 @@ include_once '../almacen/perfil.php';
     </main>
 </section>
 
+<div id="detalleCompraModal" class="modal diario-details-modal" style="display: none !important;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="cerrarDetalleCompraModal()" title="Cerrar">&times;</span>
+        <h2>Detalles de la Compra</h2>
+        <div class="table-container">
+            <table class="responsive-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Cuenta</th>
+                        <th scope="col">Código Producto</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Unidad</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">ISV</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">Descuento %</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="detalleCompraBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script src="../../backend/js/jquery.min.js"></script>
 <script>
     // Cargar datos de compras al cargar la página
@@ -217,99 +244,71 @@ $('#compras_table').DataTable({
 }
 
 
+window.cerrarDetalleCompraModal = function() {
+    const modal = document.getElementById('detalleCompraModal');
+    if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+    }
+};
+
 window.verDetalles = function(idCompra) {
     $.ajax({
         url: "../../backend/registros/obtener_detalle_compras.php",
         type: "POST",
         data: { id_compra: idCompra },
         success: function(data) {
-            console.log("Respuesta de obtener_detalle_compras.php:", data);
-
             try {
-                const detalles = JSON.parse(data);
-                if (detalles.length > 0) {
-                    let detallesHTML = `
-                        <div style="overflow-x:auto; max-width: 900px;">
-                            <h3>ID: ${idCompra}</h3>
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Cuenta</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Código Producto</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Descripción</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Cantidad</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Unidad</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Precio Unitario</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">ISV</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Subtotal</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Descuento %</th>
-                                        <th style="border: 1px solid #e0e0e0; padding: 8px; background-color: #06adbf; color: white;">Total</th>
-                                        
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-                    
-                    detalles.forEach(item => {
-                        detallesHTML += `
-                            <tr>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.cat_cuenta}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.codigo_producto}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.descripcion}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.cantidad}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.unidad}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${parseFloat(item.precio_unitario).toFixed(2)}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${parseFloat(item.isv).toFixed(2)}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.subtotal}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${parseFloat(item.descuento_porcentaje).toFixed(2)}</td>
-                                <td style="border: 1px solid #e0e0e0; padding: 8px;">${item.total_item}</td>
-                                
-                            </tr>`;
-                    });
-
-                    detallesHTML += `</tbody></table></div>`;
-
-                    // Configuración del modal de SweetAlert con mayor ancho
-                    swal({
-                        title: "Detalles de la Compra",
-                        content: $(detallesHTML)[0],
-                        buttons: {
-                            confirm: {
-                                text: "Cerrar",
-                                value: true,
-                                visible: true,
-                                className: "btn_ver_detalles",
-                                closeModal: true
-                            }
-                        }
-                    });
-
-                    // Ajustar el ancho del modal usando CSS de SweetAlert
-                    $(".swal-modal").css({
-                        "width": "80%",  // Expandir al 80% del ancho de la pantalla
-                        "max-width": "900px", // Limitar el máximo a 900px para pantallas más grandes
-                        "overflow-x": "auto" // Permitir scroll horizontal si es necesario
-                    });
-                } else {
-                    swal("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
+                const detalles = (typeof data === 'string') ? JSON.parse(data) : data;
+                if (!Array.isArray(detalles) || detalles.length === 0) {
+                    Swal.fire("No se encontraron detalles", "No hay detalles disponibles para esta compra.", "info");
+                    return;
+                }
+                const tbody = document.getElementById('detalleCompraBody');
+                if (!tbody) {
+                    return;
+                }
+                tbody.innerHTML = '';
+                detalles.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML =
+                        `<td>${item.cat_cuenta || ''}</td>` +
+                        `<td>${item.codigo_producto || ''}</td>` +
+                        `<td>${item.descripcion || ''}</td>` +
+                        `<td>${item.cantidad || ''}</td>` +
+                        `<td>${item.unidad || ''}</td>` +
+                        `<td>${parseFloat(item.precio_unitario || 0).toFixed(2)}</td>` +
+                        `<td>${parseFloat(item.isv || 0).toFixed(2)}</td>` +
+                        `<td>${item.subtotal || ''}</td>` +
+                        `<td>${parseFloat(item.descuento_porcentaje || 0).toFixed(2)}</td>` +
+                        `<td>${item.total_item || ''}</td>`;
+                    tbody.appendChild(tr);
+                });
+                const modal = document.getElementById('detalleCompraModal');
+                if (modal) {
+                    modal.style.setProperty('display', 'flex', 'important');
                 }
             } catch (e) {
                 console.error("Error al analizar la respuesta:", e);
-                swal("Error", "Hubo un problema al cargar los detalles.", "error");
+                Swal.fire("Error", "Hubo un problema al cargar los detalles.", "error");
             }
         },
         error: function(xhr, status, error) {
             console.error("Error de AJAX:", status, error);
-            swal("Error", "No se pudo cargar los detalles de la compra.", "error");
+            Swal.fire("Error", "No se pudo cargar los detalles de la compra.", "error");
         }
     });
 }
 
-
+document.addEventListener('click', function(ev) {
+    if (ev.target && ev.target.id === 'detalleCompraModal') {
+        cerrarDetalleCompraModal();
+    }
+});
 
     });
 </script>
 
-<script src="/backend/vendor/sweetalert/sweetalert.min.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Data Tables -->
     <script type="text/javascript" src="../../backend/js/datatable.js"></script>

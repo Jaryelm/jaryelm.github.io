@@ -83,19 +83,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    swal("Éxito", data.message, "success");
+                    Swal.fire("Éxito", data.message, "success");
                     this.reset();
                     signaturePadMedico.clear();
                 } else {
-                    swal("Error", data.message, "error");
+                    Swal.fire("Error", data.message, "error");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                swal("Error", "Ocurrió un error al enviar el formulario.", "error");
+                Swal.fire("Error", "Ocurrió un error al enviar el formulario.", "error");
             });
         } else {
-            swal("Advertencia", "Por favor, firme el documento.", "warning");
+            Swal.fire("Advertencia", "Por favor, firme el documento.", "warning");
         }
     });
     
@@ -126,19 +126,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    swal("Éxito", data.message, "success");
+                    Swal.fire("Éxito", data.message, "success");
                     this.reset();
                     signaturePadComercial.clear();
                 } else {
-                    swal("Error", data.message, "error");
+                    Swal.fire("Error", data.message, "error");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                swal("Error", "Ocurrió un error al enviar el formulario.", "error");
+                Swal.fire("Error", "Ocurrió un error al enviar el formulario.", "error");
             });
         } else {
-            swal("Advertencia", "Por favor, firme el documento.", "warning");
+            Swal.fire("Advertencia", "Por favor, firme el documento.", "warning");
         }
     });
 
