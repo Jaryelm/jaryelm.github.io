@@ -1,0 +1,1405 @@
+/* 
+ * MedicaData Lab - Responsive Management Cards 
+ * Shared classes for Job Positions and Vacancies grids.
+ */
+
+/* Container for the responsive grid */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+
+/* Base Card Style */
+.mgmt-card {
+    background: var(--light, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mgmt-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* Variant: Left Border (Job Positions) */
+.card-puesto {
+    border-left: 5px solid var(--blue, #06adbf);
+}
+
+/* Variant: Top Border (Vacancies) */
+.card-vacante {
+    border-top: 5px solid var(--blue, #06adbf);
+}
+
+.mgmt-card .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+
+.mgmt-card .card-header {
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.mgmt-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-blue, #035c67);
+    margin: 0;
+    line-height: 1.4;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.mgmt-card .candidate-status-badge {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.mgmt-card .candidate-status-badge--espera {
+    background-color: var(--blue, #06adbf);
+}
+
+.mgmt-card .candidate-status-badge--proceso {
+    background-color: var(--dark-blue, #035c67);
+}
+
+.mgmt-card .candidate-status-badge--contratado {
+    background-color: var(--green, #81D43A);
+}
+
+.mgmt-card .candidate-status-badge--descartado {
+    background-color: var(--red, #FC3B56);
+}
+
+.mgmt-card .candidate-status-badge--default {
+    background-color: #6c757d;
+}
+
+.mgmt-card .card-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.mgmt-card .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.mgmt-card .info-item i {
+    width: 20px;
+    color: var(--blue, #06adbf);
+    margin-right: 10px;
+    text-align: center;
+}
+
+.mgmt-card .card-description {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mgmt-card .card-footer {
+    padding: 12px 16px;
+    background: #fdfdfd;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.mgmt-card .card-footer .status-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.mgmt-card .card-footer .switch {
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.mgmt-card .card-footer .slider:before {
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+}
+
+.mgmt-card .card-footer input:checked + .slider:before {
+    left: auto;
+    right: 3px;
+}
+
+.mgmt-card .card-footer .vacante-status-label {
+    display: inline-block;
+    min-width: 3.25rem;
+    font-size: 0.8rem;
+    color: #777;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.mgmt-card .card-footer .card-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.mgmt-card .card-footer .btn-postulantes {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--blue, #06adbf);
+    color: #fff;
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    line-height: 1;
+    white-space: nowrap;
+    box-sizing: border-box;
+    min-height: 34px;
+}
+
+.mgmt-card .card-footer .btn-postulantes:hover {
+    background: var(--dark-blue, #035c67);
+    color: #fff;
+}
+
+.mgmt-card .card-footer .btn-postulantes .fa {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.mgmt-card .card-footer .action-btn-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 5px;
+    border: 1px solid rgba(6, 173, 191, 0.35);
+    background: #fff;
+    text-decoration: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    line-height: 1;
+}
+
+.mgmt-card .card-footer .action-btn-edit:hover {
+    background: var(--light-blue, #D0E4FF);
+    border-color: var(--blue, #06adbf);
+}
+
+.mgmt-card .card-footer .action-btn-edit .fa {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: var(--blue, #06adbf) !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.mgmt-card .card-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.mgmt-card .action-btn {
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.mgmt-card .action-btn:hover {
+    color: var(--dark-blue, #035c67);
+}
+
+/* Priority Badges for Vacancies */
+.priority-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.priority-urgente { background: var(--red, #FC3B56); color: #fff; border: 1px solid var(--red, #FC3B56); }
+.priority-alta { background: var(--blue, #06adbf); color: #fff; border: 1px solid var(--blue, #06adbf); }
+.priority-media { background: var(--dark-blue, #035c67); color: #fff; border: 1px solid var(--dark-blue, #035c67); }
+.priority-baja { background: var(--dark-grey, #8D8D8D); color: #fff; border: 1px solid var(--dark-grey, #8D8D8D); }
+
+.slots-badge {
+    background: var(--blue, #06adbf);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.applicants-badge {
+    background: var(--green, #81D43A);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 10px;
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--dark-grey, #8D8D8D);
+    font-weight: normal;
+}
+
+.empty-state .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+    color: var(--blue, #06adbf) !important;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--dark-grey, #8D8D8D);
+    font-size: 0.95rem;
+}
+
+/* Priority Sections for Vacancies */
+.priority-section {
+    margin-bottom: 40px;
+}
+.priority-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--grey, #F1F0F6);
+    color: var(--dark-blue, #035c67);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.priority-title i {
+    font-size: 1.4rem;
+}
+.priority-title .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+.title-urgente { color: var(--red, #FC3B56); border-color: var(--red, #FC3B56); }
+.title-alta { color: var(--blue, #06adbf); border-color: var(--blue, #06adbf); }
+.title-media { color: var(--dark-blue, #035c67); border-color: var(--dark-blue, #035c67); }
+.title-baja { color: var(--dark-grey, #8D8D8D); border-color: var(--dark-grey, #8D8D8D); }
+
+/* Inline Search Container */
+.search-container-inline {
+    background: var(--light, #fff);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.search-container-inline input {
+    flex-grow: 1;
+    margin: 0 !important;
+    border: 1px solid #ddd !important;
+    background: #fdfdfd !important;
+}
+.search-container-inline .search-btn {
+    background: var(--dark-blue, #035c67);
+    color: var(--light, #fff);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.search-container-inline .search-btn .fa {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
+.search-container-inline .search-btn:hover {
+    background: var(--blue, #06adbf);
+}
+
+/* Collapsible priority sections (vacantes) */
+.priority-section .priority-title {
+    cursor: pointer;
+    justify-content: space-between;
+    user-select: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: opacity 0.3s;
+}
+
+.priority-section .priority-title:hover {
+    opacity: 0.9;
+}
+
+.priority-title .priority-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.priority-title .vacantes-count-badge {
+    background: var(--light, #fff);
+    color: #333;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    min-width: 30px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.priority-title .chevron-icon {
+    transition: transform 0.3s;
+}
+
+.priority-section.collapsed .chevron-icon {
+    transform: rotate(-90deg);
+}
+
+.priority-section.collapsed .grid-container {
+    display: none !important;
+}
+
+/* Paginación tarjetas RRHH (vacantes, postulantes) */
+.rrhh-cards-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0 8px;
+    padding-top: 8px;
+}
+
+.rrhh-cards-pagination .pagination-button {
+    min-width: 110px;
+    text-transform: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.rrhh-cards-pagination .rrhh-page-info {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #035c67;
+    min-width: 180px;
+    text-align: center;
+}
+
+/* Pestañas en la misma página (positions, etc.) — activo = teal claro como botones_color.js */
+.rrhh-tab-nav {
+    margin-bottom: 20px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+#content main .button.tab-button {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#content main .button.tab-button:not(.active) {
+    background-color: var(--dark-blue, #035c67) !important;
+    color: #fff !important;
+}
+
+#content main .button.tab-button.active {
+    background-color: var(--blue, #06adbf) !important;
+    color: #fff !important;
+}
+
+#content main .button.tab-button:focus,
+#content main .button.tab-button:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Filtros RRHH */
+main .content-data form.rrhh-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.rrhh-filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Pisa main .form-group { display:flex } de admin.css (label+select en fila) */
+main .content-data .rrhh-filter-row .form-group {
+    display: block !important;
+    width: auto !important;
+    flex: 1 1 240px;
+    min-width: 200px;
+    margin-bottom: 0 !important;
+    grid-gap: unset !important;
+}
+
+.rrhh-filter-row .form-group {
+    flex: 1 1 240px;
+    min-width: 200px;
+    margin-bottom: 0;
+}
+
+.rrhh-filter-row .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
+.rrhh-filter-row .form-group select,
+.rrhh-filter-row .form-group input[type="text"],
+.rrhh-filter-row .form-group input[type="date"] {
+    width: 100%;
+    height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    box-sizing: border-box;
+    margin: 0 !important;
+}
+
+/* Select2 en formularios y filtros RRHH */
+main .select2-container {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+main .select2-container--default .select2-selection--single {
+    height: 42px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+main .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 40px;
+    padding-left: 10px;
+    padding-right: 28px;
+}
+
+main .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px;
+    right: 6px;
+}
+
+.rrhh-filter-row .select2-container--default .select2-selection--single {
+    height: 42px;
+}
+
+.rrhh-filter-actions .select2-container {
+    min-width: 0 !important;
+}
+
+.rrhh-filter-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    height: 42px;
+    margin: 0;
+    padding: 0;
+}
+
+.rrhh-btn-inline {
+    margin: 0 !important;
+    width: auto !important;
+    min-width: 110px;
+    height: 42px !important;
+    padding: 0 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 1.2 !important;
+    flex-shrink: 0;
+    align-self: auto;
+}
+
+.rrhh-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.rrhh-btn-row .button,
+.rrhh-btn-row .pabtn {
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8px 18px !important;
+}
+
+/* Tabla postulantes website (DataTables — reclutamiento.php / reclutamiento_usr.php) */
+.rrhh-aplica-dt-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table.rrhh-aplica-dt {
+    width: 100% !important;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+table.rrhh-aplica-dt thead th {
+    background-color: #1e2c4b;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    padding: 0.55em 0.45em;
+    border: 1px solid #1e2c4b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table.rrhh-aplica-dt tbody td {
+    border: 1px solid rgba(218, 220, 226, 0.95);
+    padding: 0.45em 0.5em;
+    vertical-align: middle;
+    font-size: 0.86rem;
+    line-height: 1.35;
+    overflow: hidden;
+    max-width: 0;
+}
+
+table.rrhh-aplica-dt tbody tr:nth-of-type(even) {
+    background-color: rgba(94, 93, 82, 0.06);
+}
+
+table.rrhh-aplica-dt .rrhh-aplica-ellipsis {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+table.rrhh-aplica-dt .rrhh-vacante-sugerida {
+    max-width: 100%;
+    font-size: 0.84rem;
+}
+
+table.rrhh-aplica-dt .rrhh-aplica-col-estado {
+    text-align: center;
+}
+
+table.rrhh-aplica-dt .rrhh-aplica-col-estado .badge-rrhh {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+table.rrhh-aplica-dt .rrhh-aplica-col-fecha,
+table.rrhh-aplica-dt .rrhh-aplica-col-id {
+    font-size: 0.82rem;
+}
+
+table.rrhh-aplica-dt .rrhh-aplica-col-actions {
+    overflow: visible;
+    max-width: none;
+    text-align: center;
+}
+
+table.rrhh-aplica-dt .rrhh-actions-cell {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+table.rrhh-aplica-dt .rrhh-actions-cell .rrhh-action-btn,
+table.rrhh-aplica-dt .rrhh-actions-cell .rrhh-action-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+table.rrhh-aplica-dt .rrhh-actions-cell .rrhh-cv-view {
+    flex-shrink: 0;
+    cursor: pointer;
+    color: #06adbf;
+    font-size: 22px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+table.rrhh-aplica-dt .rrhh-actions-cell .rrhh-cv-view:hover {
+    color: #035c67;
+    transform: scale(1.08);
+}
+
+table.rrhh-aplica-dt .rrhh-actions-cell .fa {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+table.rrhh-aplica-dt .rrhh-action-icon--muted {
+    background: #e9ecef !important;
+    color: #666 !important;
+    cursor: help;
+}
+
+.rrhh-filter-row a.pabtn.rrhh-btn-inline,
+.rrhh-filter-row button.button.rrhh-btn-inline {
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    opacity: 1;
+}
+
+.content-data form .form-group select {
+    height: 42px;
+    box-sizing: border-box;
+}
+
+/* Badges de estado (tablas RRHH) */
+.badge-rrhh {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    display: inline-block;
+}
+
+.badge-rrhh-yes {
+    background-color: var(--green, #81D43A);
+}
+
+.badge-rrhh-no {
+    background-color: var(--red, #FC3B56);
+}
+
+.badge-rrhh-pending {
+    background-color: var(--blue, #06adbf);
+}
+
+/* Dashboard RRHH (escritorio) */
+.rrhh-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.rrhh-kpi {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--dark-blue, #035c67);
+    color: var(--light, #fff);
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    cursor: default;
+}
+
+.rrhh-kpi h2 {
+    margin-top: 0;
+    color: var(--light, #fff);
+    font-size: 1.1em;
+    text-transform: uppercase;
+}
+
+.rrhh-kpi p {
+    color: var(--light, #fff);
+    font-size: 2em;
+    font-weight: bold;
+    margin: 10px 0 0 0;
+}
+
+.rrhh-kpi:hover {
+    background-color: var(--blue, #06adbf);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(3, 92, 103, 0.2);
+}
+
+.rrhh-page-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--dark-blue, #035c67);
+}
+
+/* Calendario / panel RRHH */
+.rrhh-calendar-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+
+.rrhh-calendar-layout #calendar {
+    flex: 1;
+    max-width: 60%;
+    min-height: 500px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: var(--light, #fff);
+}
+
+.rrhh-calendar-layout #notification-panel {
+    flex: 1;
+    max-width: 35%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: var(--grey, #F1F0F6);
+    overflow-y: auto;
+    max-height: 75.5vh;
+}
+
+.rrhh-calendar-layout #notification-panel h4 {
+    margin-bottom: 10px;
+    color: var(--dark-blue, #035c67);
+}
+
+.rrhh-calendar-layout #notification-panel h5 {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    color: var(--blue, #06adbf);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.rrhh-calendar-layout .notification-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: var(--light, #fff);
+}
+
+.rrhh-calendar-layout .notification-item.occupied {
+    background-color: #ffe8eb;
+}
+
+.rrhh-calendar-layout .notification-item.available {
+    background-color: var(--light-green, #E3FFCB);
+}
+
+@media (max-width: 768px) {
+    .rrhh-calendar-layout {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .rrhh-calendar-layout #calendar,
+    .rrhh-calendar-layout #notification-panel {
+        max-width: 100%;
+        flex: none;
+    }
+}
+
+/* Modales agenda RRHH (escritorio.php) — estilo original, aislado de .modal ventas (admin.css) */
+html.rrhh-modal-open,
+body.rrhh-modal-open {
+    overflow: hidden;
+}
+
+.modal.modal--rrhh {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.modal--rrhh .modal-content.modal-content--rrhh {
+    text-align: left;
+    background: #fff;
+    padding: 48px 25px 25px;
+    border: none;
+    border-radius: 8px;
+    width: 50%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 10001;
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.modal.modal--rrhh .close-btn {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    float: none;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+    background: none;
+    border: none;
+    padding: 0;
+    z-index: 2;
+}
+
+.modal.modal--rrhh .close-btn:hover,
+.modal.modal--rrhh .close-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+.modal.modal--rrhh .rrhh-modal-title {
+    margin: 0 0 15px;
+    color: #035c67;
+}
+
+.rrhh-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.rrhh-details-table th {
+    background: #06adbf;
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    width: 35%;
+}
+
+.rrhh-details-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.rrhh-modal-footer {
+    margin-top: 20px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.modal.modal--rrhh .rrhh-modal-footer .rrhh-btn-inline {
+    min-width: auto !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 10px 15px !important;
+    border-radius: 5px !important;
+    line-height: 1.2 !important;
+}
+
+.modal.modal--rrhh .rrhh-modal-footer .rrhh-btn-inline:hover {
+    opacity: 0.9;
+}
+
+.rrhh-calendar-event-form .rrhh-form-group {
+    margin-bottom: 15px;
+}
+
+.rrhh-calendar-event-form label {
+    display: block;
+    margin-bottom: 0;
+    font-weight: normal;
+    color: inherit;
+}
+
+.rrhh-form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+.rrhh-form-control--color {
+    height: 40px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.rrhh-form-actions {
+    text-align: right;
+}
+
+.rrhh-btn-submit {
+    background: #035c67 !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+    cursor: pointer;
+    min-width: auto !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.rrhh-btn-submit:hover {
+    opacity: 0.9;
+}
+
+.rrhh-calendar-layout .notification-item--accent {
+    border-left: 5px solid var(--notif-accent, var(--blue, #06adbf));
+}
+
+.rrhh-calendar-layout .notification-item--vacancy {
+    border-left: 5px solid #f44336;
+}
+
+.rrhh-form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.rrhh-form-row .rrhh-form-control {
+    flex: 1 1 0;
+}
+
+.rrhh-form-group--inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rrhh-calendar-event-form textarea.rrhh-form-control {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.rrhh-calendar-layout .notification-item--past {
+    opacity: 0.7;
+}
+
+/* Actividad Reciente: scroll propio cuando la lista crece (~9 items visibles).
+   Responsivo: se reduce en pantallas bajas. */
+.rrhh-calendar-layout #past-occupancy {
+    max-height: min(560px, 48vh);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.rrhh-calendar-layout #past-occupancy::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rrhh-calendar-layout #past-occupancy::-webkit-scrollbar-thumb {
+    background-color: #cfd3da;
+    border-radius: 4px;
+}
+
+.rrhh-calendar-layout #past-occupancy::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal.modal--rrhh .rrhh-btn-inline--danger {
+    background: #FC3B56 !important;
+    color: #fff !important;
+    border: none !important;
+    cursor: pointer;
+}
+
+.modal.modal--rrhh .rrhh-btn-inline--primary {
+    background: #035c67 !important;
+    color: #fff !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+
+.modal.modal--rrhh .rrhh-btn-inline--accent {
+    background: #06adbf !important;
+    color: #fff !important;
+    border: none !important;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .modal.modal--rrhh .modal-content.modal-content--rrhh {
+        width: 92%;
+    }
+}
+
+/* Postulantes website → RRHH */
+.rrhh-panel-hint {
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.rrhh-vacante-sugerida {
+    font-size: 0.88rem;
+    line-height: 1.35;
+}
+
+.rrhh-web-actions {
+    white-space: nowrap;
+}
+
+.rrhh-action-btn,
+.rrhh-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0 2px;
+    border-radius: 4px;
+    border: none;
+    background: var(--dark-blue, #035c67);
+    color: #fff !important;
+    cursor: pointer;
+    vertical-align: middle;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.rrhh-action-btn:hover,
+.rrhh-action-icon:hover {
+    background: var(--blue, #06adbf);
+}
+
+.rrhh-btn-incorporar {
+    background: var(--blue, #06adbf);
+}
+
+.rrhh-btn-descartar {
+    background: var(--red, #FC3B56);
+}
+
+/* RRHH — detalle candidato (una tarjeta mgmt-card a ancho completo) */
+.candidato-detalle-wrap {
+    padding: 16px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.candidato-detalle-wrap .mgmt-card.card-candidato-detalle {
+    border-left: 5px solid var(--dark-blue, #035c67);
+    max-width: 100%;
+}
+
+.candidato-detalle-wrap .mgmt-card.card-candidato-detalle:hover {
+    transform: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-candidato-detalle .card-header {
+    align-items: center;
+    gap: 12px;
+}
+
+.card-candidato-detalle .card-body.card-candidato-grid {
+    padding: 0;
+}
+
+.card-candidato-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+}
+
+.card-candidato-section {
+    padding: 22px 24px;
+}
+
+.card-candidato-section + .card-candidato-section {
+    border-left: 1px solid #eee;
+}
+
+.card-candidato-section-title {
+    margin: 0 0 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-blue, #035c67);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--grey, #f1f0f6);
+}
+
+.card-candidato-detalle .rrhh-estado-rapidos-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+.card-candidato-detalle .rrhh-estado-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 18px;
+}
+
+.card-candidato-detalle .rrhh-estado-rapidos .button,
+.card-candidato-detalle .rrhh-estado-rapidos .pabtn {
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    font-size: 0.85rem;
+}
+
+.card-candidato-detalle .card-candidato-estado-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+    margin: 12px 0 6px;
+}
+
+.card-candidato-detalle .card-candidato-estado-form select,
+.card-candidato-detalle .card-candidato-estado-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 0 0 14px;
+    border: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.92rem;
+    resize: vertical;
+}
+
+.card-candidato-detalle .card-candidato-estado-form textarea {
+    min-height: 96px;
+}
+
+.card-candidato-detalle .card-candidato-estado-form .registerbtn {
+    width: 100%;
+    margin: 8px 0 0;
+}
+
+.card-candidato-detalle .select2-container {
+    width: 100% !important;
+    margin-bottom: 14px;
+}
+
+.card-candidato-detalle .select2-container--default .select2-selection--single {
+    min-height: 44px;
+    border: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    border-radius: 0;
+}
+
+.card-candidato-detalle .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 42px;
+    padding-left: 14px;
+}
+
+.card-candidato-detalle .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 42px;
+}
+
+.card-candidato-detalle .info-item.info-item-block {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card-candidato-detalle .info-item.info-item-block span {
+    margin-top: 4px;
+    line-height: 1.45;
+}
+
+@media (max-width: 992px) {
+    .card-candidato-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-candidato-section + .card-candidato-section {
+        border-left: none;
+        border-top: 1px solid #eee;
+    }
+}
+
+.rrhh-estado-panel .rrhh-estado-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 16px 0 20px;
+}
+
+.rrhh-estado-rapidos-label {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.rrhh-estado-form .form-group {
+    margin-bottom: 14px;
+}
+
+.rrhh-estado-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+/* Demo flujo RRHH */
+.demo-flujo-hero {
+    background: var(--light-blue, #D0E4FF);
+    border-left: 5px solid var(--blue, #06adbf);
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.demo-flujo-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.demo-flujo-step {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.demo-flujo-step-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.demo-flujo-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--dark-blue, #035c67);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.demo-flujo-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.demo-flujo-table {
+    width: 100%;
+    margin-top: 10px;
+}
+
