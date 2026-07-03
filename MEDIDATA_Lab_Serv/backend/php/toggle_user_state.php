@@ -11,6 +11,12 @@ if ($id <= 0 || ($state !== 0 && $state !== 1)) {
     exit;
 }
 
+$currentUserId = (int) ($_SESSION['id'] ?? 0);
+if ($id === $currentUserId) {
+    echo json_encode(['success' => false, 'message' => 'No puedes cambiar el estado de tu propia cuenta.']);
+    exit;
+}
+
 try {
     $stmt = $connect->prepare('UPDATE users SET state = :state WHERE id = :id LIMIT 1');
     $ok = $stmt->execute([':state' => (string) $state, ':id' => $id]);

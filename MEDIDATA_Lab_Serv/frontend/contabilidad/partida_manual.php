@@ -92,7 +92,7 @@ include_once '../../backend/registros/session_check.php';
 
         <div class="catalog-container" style="margin-top: 30px;">
             <h2 class="catalog-title">Partidas Manuales Registradas</h2>
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltrosPartidas();">
                 <div class="filter-group">
                     <label for="filtroDesde">Desde:</label>
                     <input type="date" id="filtroDesde" class="filter-input">
@@ -101,9 +101,9 @@ include_once '../../backend/registros/session_check.php';
                     <label for="filtroHasta">Hasta:</label>
                     <input type="date" id="filtroHasta" class="filter-input">
                 </div>
-                <button type="button" class="btn-filter" onclick="aplicarFiltrosPartidas()">Buscar</button>
+                <button type="submit" class="btn-filter">Buscar</button>
                 <button type="button" class="btn-filter btn-reset" onclick="limpiarFiltrosPartidas()">Limpiar</button>
-            </div>
+            </form>
             <div class="table-container">
                 <div class="table-responsive">
                 <table id="tablaPartidasManuales" class="display" style="width:100%">

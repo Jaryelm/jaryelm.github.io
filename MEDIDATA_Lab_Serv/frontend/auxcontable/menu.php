@@ -20,15 +20,9 @@
             </ul>
         </li>
         <li>
-            <a href="#" class="new-submenu-link">GESTIÓN DE PAGOS</a>
+            <a href="#" class="new-submenu-link">PROVEEDORES</a>
             <ul class="new-side-dropdown">
-                <li><a href="../../frontend/auxcontable/emitir_cheque_user.php">EMITIR CHEQUES</a></li>
-                <li><a href="../../frontend/auxcontable/tabla_cheque_user.php">CHEQUES REGISTRADOS</a></li>
-                <li><a href="../../frontend/auxcontable/conciliacion_bancaria_user.php">CONCILIACIÓN BANCARIA</a></li>
-                <li><a href="../../frontend/auxcontable/recibir_pagos_user.php">RECIBIR PAGOS</a></li>
                 <li><a href="../../frontend/contabilidad/cuentas_por_pagar_user.php">CUENTAS POR PAGAR</a></li>
-                <li><a href="#">DEPOSITO BANCARIO</a></li>
-                
             </ul>
         </li>
         <li>

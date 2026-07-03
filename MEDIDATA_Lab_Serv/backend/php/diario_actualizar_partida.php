@@ -95,6 +95,21 @@ try {
         }
     }
 
+    $idOrden = null;
+    if ($tipoTransaccion === 'CIERRE_VENTA') {
+        if (ctype_digit($referencia)) {
+            $idOrden = (int) $referencia;
+        } else {
+            $stOrd = $connect->prepare('SELECT idord FROM orders WHERE invoice_number = ? LIMIT 1');
+            $stOrd->execute([$referencia]);
+            $idOrden = (int) ($stOrd->fetchColumn() ?: 0);
+        }
+        if ($idOrden > 0) {
+            $stOrden = $connect->prepare('UPDATE orders SET placed_on = ? WHERE idord = ?');
+            $stOrden->execute([$fechaNueva . ' 00:00:00', $idOrden]);
+        }
+    }
+
     $ip = trim((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
     $stAudit = $connect->prepare(
         'INSERT INTO diario_general_ediciones
@@ -119,6 +134,7 @@ try {
         'message' => 'Partida actualizada correctamente.',
         'renglones' => $renglonesAfectados,
         'compra_sincronizada' => $idCompra,
+        'orden_sincronizada' => $idOrden ?? null,
     ], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
     if ($connect->inTransaction()) {

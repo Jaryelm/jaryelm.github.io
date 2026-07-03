@@ -1,34 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-
-/** Formato lempiras: miles con coma, decimales con punto (ej. L. 2,836.27) */
-function fmt_lempiras_reporte($valor) {
-    $n = (float)($valor ?? 0);
-    return 'L. ' . number_format($n, 2, '.', ',');
-}
-
-/**
- * Determina el tipo predominante de descuento en una orden a partir de las
- * sumas por categoría calculadas con SQL. Si no hay descuento alguno, retorna '-'.
- */
-function tipo_descuento_predominante($row) {
-    $categorias = [
-        'Edad 30%'  => (float)($row->desc_edad_30 ?? 0),
-        'Edad 40%'  => (float)($row->desc_edad_40 ?? 0),
-        'Promoción' => (float)($row->desc_promocion ?? 0),
-        'Otros'     => (float)($row->desc_otros ?? 0),
-        'Porcentaje'=> (float)($row->desc_porcentaje ?? 0),
-    ];
-    $max_nombre = '-';
-    $max_valor  = 0.0;
-    foreach ($categorias as $nombre => $valor) {
-        if ($valor > $max_valor) {
-            $max_valor  = $valor;
-            $max_nombre = $nombre;
-        }
-    }
-    return $max_valor > 0 ? $max_nombre : '-';
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -71,6 +42,7 @@ function tipo_descuento_predominante($row) {
         <button class="button" onclick="cambiarColor(this, 'reporte_cuadre_caja.php')">Cuadre Caja</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_pago.php')">Detalle Pago</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_factura.php')">Detalle Factura</button>
+        <button class="button" onclick="cambiarColor(this, 'dashboard_ventas.php')">Dashboard Ventas</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_devoluciones_ventas.php')">Devoluciones</button>
 
         <br>
@@ -78,7 +50,7 @@ function tipo_descuento_predominante($row) {
         <div class="catalog-container">
             <h2 class="catalog-title">Detalle Pago</h2>
 
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
                     <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
@@ -87,9 +59,9 @@ function tipo_descuento_predominante($row) {
                     <label for="fechaHasta">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
-                <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-            </div>
+                <button type="submit" class="btn-filter">Buscar</button>
+                <button type="button" class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
+            </form>
 
             <div class="table-container">
                 <div class="table-responsive">
@@ -111,94 +83,7 @@ function tipo_descuento_predominante($row) {
                                 <th>Total</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $desde = $_GET['desde'] ?? '';
-                            $hasta = $_GET['hasta'] ?? '';
-
-                            // Detectar columnas opcionales en orders (defensivo en producción)
-                            $col_tel = false;
-                            try {
-                                $col_tel = $connect->query("SHOW COLUMNS FROM orders LIKE 'telefono_paciente'")->rowCount() > 0;
-                            } catch (Exception $e) { /* ignorar */ }
-                            $expr_tel = $col_tel ? "o.telefono_paciente" : "NULL";
-
-                            $sql = "SELECT
-                                        o.idord,
-                                        o.invoice_number,
-                                        o.placed_on,
-                                        o.method,
-                                        o.invoice_status,
-                                        o.nomcl,
-                                        o.dni_paciente,
-                                        $expr_tel AS telefono_paciente,
-                                        o.price_without_discount,
-                                        o.discount_amount,
-                                        o.total_price,
-                                        COALESCE(o.tax_amount, 0) AS tax_amount,
-                                        p.phon AS paciente_phon,
-                                        det.detalle_examen,
-                                        det.desc_edad_30,
-                                        det.desc_edad_40,
-                                        det.desc_promocion,
-                                        det.desc_otros,
-                                        det.desc_porcentaje
-                                    FROM orders o
-                                    LEFT JOIN patients p ON p.numhs = o.dni_paciente
-                                    LEFT JOIN (
-                                        SELECT
-                                            order_id,
-                                            GROUP_CONCAT(descripcion SEPARATOR ', ') AS detalle_examen,
-                                            SUM(COALESCE(age_discount_30, 0))   AS desc_edad_30,
-                                            SUM(COALESCE(age_discount_40, 0))   AS desc_edad_40,
-                                            SUM(COALESCE(promotion_discount,0)) AS desc_promocion,
-                                            SUM(COALESCE(other_discount, 0))    AS desc_otros,
-                                            SUM(COALESCE(discount_percentage,0))AS desc_porcentaje
-                                        FROM order_details
-                                        GROUP BY order_id
-                                    ) det ON det.order_id = o.idord";
-
-                            $params = [];
-                            if ($desde && $hasta) {
-                                $sql .= " WHERE DATE(o.placed_on) BETWEEN :desde AND :hasta";
-                                $params[':desde'] = $desde;
-                                $params[':hasta'] = $hasta;
-                            } elseif ($desde) {
-                                $sql .= " WHERE DATE(o.placed_on) >= :desde";
-                                $params[':desde'] = $desde;
-                            } elseif ($hasta) {
-                                $sql .= " WHERE DATE(o.placed_on) <= :hasta";
-                                $params[':hasta'] = $hasta;
-                            }
-                            $sql .= " ORDER BY o.placed_on DESC";
-
-                            $stmt = $connect->prepare($sql);
-                            $stmt->execute($params);
-                            while ($row = $stmt->fetchObject()):
-                                $fh_raw  = $row->placed_on ?? '';
-                                $fecha   = $fh_raw ? date('d-m-Y', strtotime($fh_raw)) : '-';
-                                $hora    = $fh_raw ? date('H:i', strtotime($fh_raw)) : '-';
-                                // Celular: priorizar el guardado en la orden (ambulatorio); si no, el de patients
-                                $celular = $row->telefono_paciente ?: ($row->paciente_phon ?: '-');
-                                $tipo_desc = tipo_descuento_predominante($row);
-                            ?>
-                            <tr>
-                                <td data-order="<?php echo htmlspecialchars($fh_raw); ?>"><?php echo htmlspecialchars($fecha); ?></td>
-                                <td><?php echo htmlspecialchars($hora); ?></td>
-                                <td><?php echo htmlspecialchars($row->method ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->invoice_status ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars(!empty($row->invoice_number) ? $row->invoice_number : '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->detalle_examen ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->nomcl ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($celular); ?></td>
-                                <td><?php echo htmlspecialchars($tipo_desc); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->price_without_discount); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->discount_amount); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->tax_amount); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->total_price); ?></td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -217,49 +102,21 @@ function tipo_descuento_predominante($row) {
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#tablaReporteDetallePago').DataTable({
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']],
-        initComplete: function() {
-            $('.dataTables_wrapper').addClass('dt-ready');
-            $('#page-loading-overlay').hide();
-        },
-        language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando 0 a 0 de 0 registros",
-            sInfoFiltered: "(filtrado de _MAX_ registros totales)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        }
-    });
+    medidataReporteComprasSS.initDetallePago();
 });
 
 function aplicarFiltros() {
-    var desde = document.getElementById('fechaDesde').value;
-    var hasta = document.getElementById('fechaHasta').value;
-    var params = [];
-    if (desde) params.push('desde=' + encodeURIComponent(desde));
-    if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_detalle_pago.php';
-    if (params.length) url += '?' + params.join('&');
-    window.location.href = url;
+    medidataReporteComprasSS.recargar();
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_detalle_pago.php';
+    document.getElementById('fechaDesde').value = '';
+    document.getElementById('fechaHasta').value = '';
+    medidataReporteComprasSS.recargar();
 }
 </script>
 </body>

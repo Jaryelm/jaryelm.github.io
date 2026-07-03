@@ -1,34 +1,27 @@
 <?php
-    require_once('../../backend/bd/Conexion.php');
-if(isset($_POST['delete_patients'])){
-////////////// Actualizar la tabla /////////
-$consulta = "DELETE FROM `nurse` WHERE `idnur`=:idnur";
-$sql = $connect-> prepare($consulta);
-$sql -> bindParam(':idnur', $idnur, PDO::PARAM_INT);
-$idnur=trim($_POST['idnur']);
-$sql->execute();
+include_once __DIR__ . '/../registros/session_check.php';
+require_once __DIR__ . '/staff_colaborador_bootstrap.php';
 
-if($sql->rowCount() > 0)
-{
-$count = $sql -> rowCount();
-echo '<script type="text/javascript">
-Swal.fire("Eliminado!", "Eliminado correctamente", "success").then(function() {
-            window.location = "enfermera.php";
-        });
-        </script>';
+header('Content-Type: application/json; charset=utf-8');
+medidata_staff_ensure_tables($connect);
+
+$id = (int) ($_POST['idnur'] ?? $_POST['id'] ?? 0);
+
+if ($id <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Identificador no válido.']);
+    exit;
 }
-else{
-    echo '<script type="text/javascript">
-Swal.fire("Error!", "Error", "error").then(function() {
-            window.location = "enfermera.php";
-        });
-        </script>';
 
-print_r($sql->errorInfo()); 
+try {
+    $stmt = $connect->prepare('DELETE FROM nurse WHERE idnur = :id LIMIT 1');
+    $stmt->execute([':id' => $id]);
+
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true, 'message' => 'Colaborador de enfermería eliminado correctamente.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No se encontró el registro.']);
+    }
+} catch (Throwable $e) {
+    error_log('delete_nurse: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Error al eliminar el colaborador.']);
 }
-}// Cierra envio de guardado
-?>
-
-
- 
-

@@ -14,7 +14,9 @@ require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/users_rrhh_extra_lib.php';
 header('Content-Type: application/json; charset=utf-8');
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($_SESSION['id'])) {
     http_response_code(401);
     echo json_encode(['draw' => intval($_GET['draw'] ?? 1), 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => [], 'error' => 'No autorizado']);
@@ -45,51 +47,48 @@ try {
     $excluirFilter = in_array($excluir, $tipoAllow, true) ? " AND t.source_table <> '" . $excluir . "'" : '';
 
     /*
-     * Caso "médico + usuario" (misma persona con ficha de médico Y cuenta de login):
-     *  - Listas ACTIVAS (estado=1): debe verse DOS veces -> como médico en "Lista de
-     *    Médicos" (tipo=doctor) y como usuario en "Lista de Colaboradores" (excluir=doctor).
-     *    Por eso NO se oculta la fila de usuario aunque tenga ficha de médico enlazada.
-     *  - EXCOLABORADORES (estado=0): la lista muestra todo junto, así que se oculta la
-     *    fila de usuario cuando tiene ficha de médico enlazada, para que aparezca UNA
-     *    sola vez (como médico). La desactivación enlazada deja ambos en estado 0.
+     * Usuarios vinculados a ficha de médico: no deben aparecer en "Lista de Colaboradores"
+     * (excluir=doctor). Solo se listan como médico en "Lista de Médicos" (tipo=doctor).
+     * En excolaboradores (estado=0) se aplica la misma regla para evitar duplicados.
      */
-    $usuarioMedicoFilter = ($estado === '0')
-        ? "AND u.id NOT IN ( SELECT id_user FROM doctor WHERE id_user IS NOT NULL )"
-        : '';
+    $usuarioMedicoFilter = '';
+    if ($estado === '0' || $excluir === 'doctor') {
+        $usuarioMedicoFilter = "AND u.id NOT IN ( SELECT id_user FROM doctor WHERE id_user IS NOT NULL AND id_user > 0 )";
+    }
 
     // UNION de las 4 tablas de personal con columnas normalizadas.
     $union = "
         SELECT 'staff_administrative' AS source_table, idadm AS id,
                num_empleado, numide AS identificacion, nomadm AS nombres, apeadm AS apellidos, sexadm AS sexo,
-               tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+               tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                correo_personal, correo_institucional, nacadm AS fecha_nacimiento, NULL AS especialidad, id_biometrico, num_locker,
                (url_contrato IS NOT NULL) AS tiene_contrato, state
         FROM staff_administrative
         UNION ALL
         SELECT 'doctor' AS source_table, idodc AS id,
                num_empleado, ceddoc AS identificacion, nodoc AS nombres, apdoc AS apellidos, sexd AS sexo,
-               tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+               tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                correo_personal, correo_institucional, nacd AS fecha_nacimiento, nomesp AS especialidad, id_biometrico, num_locker,
                (url_contrato IS NOT NULL) AS tiene_contrato, state
         FROM doctor
         UNION ALL
         SELECT 'nurse' AS source_table, idnur AS id,
                num_empleado, numide AS identificacion, nomnur AS nombres, apenur AS apellidos, sexnur AS sexo,
-               tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+               tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                correo_personal, correo_institucional, nacinur AS fecha_nacimiento, NULL AS especialidad, id_biometrico, num_locker,
                (url_contrato IS NOT NULL) AS tiene_contrato, state
         FROM nurse
         UNION ALL
         SELECT 'staff_general_services' AS source_table, idsg AS id,
                num_empleado, numide AS identificacion, nomsg AS nombres, apesg AS apellidos, sexsg AS sexo,
-               tipo_empleado, id_departamento, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+               tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
                correo_personal, correo_institucional, nacsg AS fecha_nacimiento, NULL AS especialidad, id_biometrico, num_locker,
                (url_contrato IS NOT NULL) AS tiene_contrato, state
         FROM staff_general_services
         UNION ALL
         SELECT 'users' AS source_table, u.id AS id,
                ue.num_empleado, u.cedula AS identificacion, u.name AS nombres, '' AS apellidos, u.sexo AS sexo,
-               ue.tipo_empleado, ue.id_departamento, ue.id_salary_level, ue.salario, ue.cuenta_bac, ue.fecha_ingreso, ue.telefono,
+               ue.tipo_empleado, ue.id_departamento, ue.id_cargo, ue.id_salary_level, ue.salario, ue.cuenta_bac, ue.fecha_ingreso, ue.telefono,
                ue.correo_personal, u.email AS correo_institucional, NULL AS fecha_nacimiento, u.rol AS especialidad,
                u.uid_biometrico AS id_biometrico, ue.num_locker,
                (ue.url_contrato IS NOT NULL) AS tiene_contrato, u.state
@@ -142,12 +141,12 @@ try {
         4 => 't.nombres',
         5 => 't.apellidos',
         6 => 't.sexo',
-        9 => 't.salario',
-        10 => 't.cuenta_bac',
-        11 => 't.fecha_ingreso',
-        12 => 't.telefono',
-        14 => 't.id_biometrico',
-        15 => 't.num_locker',
+        10 => 't.salario',
+        11 => 't.cuenta_bac',
+        12 => 't.fecha_ingreso',
+        13 => 't.telefono',
+        17 => 't.id_biometrico',
+        18 => 't.num_locker',
     ];
     $orderColIdx = intval($_GET['order'][0]['column'] ?? 4);
     $orderDir = strtoupper((string) ($_GET['order'][0]['dir'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
@@ -177,6 +176,7 @@ try {
             'sexo' => $r['sexo'],
             'tipo_empleado' => $r['tipo_empleado'],
             'id_departamento' => $r['id_departamento'] !== null ? (int) $r['id_departamento'] : null,
+            'id_cargo' => isset($r['id_cargo']) && $r['id_cargo'] !== null ? (int) $r['id_cargo'] : null,
             'id_salary_level' => $r['id_salary_level'] !== null ? (int) $r['id_salary_level'] : null,
             'salario' => $r['salario'],
             'cuenta_bac' => $r['cuenta_bac'],

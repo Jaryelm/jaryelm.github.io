@@ -58,13 +58,40 @@ if (function_exists('session_write_close')) {
     <!-- Estilos para botones de acción -->
     <style>
         .btn-action {
-            display: inline-block;
-            padding: 8px 12px;
-            margin: 0 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            margin: 0;
             border-radius: 6px;
             text-decoration: none;
             transition: all 0.3s ease;
             font-size: 14px;
+            line-height: 1;
+        }
+
+        #example tbody td.usuarios-col-acciones,
+        #example tbody td.usuarios-col-acciones .usuarios-acciones-cell {
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        #example tbody td.usuarios-col-acciones .usuarios-acciones-cell {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+
+        #example tbody td.usuarios-col-estado {
+            white-space: nowrap;
+            vertical-align: middle;
+            text-align: center;
+            width: 1%;
         }
         
         .btn-edit {
@@ -178,6 +205,7 @@ include_once ((($_SESSION['rol'] ?? '') === 'IT') ? '../it/perfil.php' : '../adm
                             <th scope="col">Rol</th>
                             <th scope="col">Fecha Creación</th>
                             <th scope="col">Ultima Actividad</th>
+                            <th scope="col">Estado</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -246,7 +274,7 @@ function esc(text) {
 }
 
 $(document).ready(function() {
-    $('#example').DataTable({
+    var tablaUsuarios = $('#example').DataTable({
         processing: true,
         serverSide: true,
         scrollX: true,
@@ -267,21 +295,39 @@ $(document).ready(function() {
             { data: 'created_at', render: function (d) { return esc(d) || '—'; } },
             { data: 'last_activity', render: function (d) { return esc(d) || '—'; } },
             {
+                data: 'state',
+                orderable: false,
+                searchable: false,
+                render: function (state, type, row) {
+                    var id = parseInt(row.id, 10);
+                    var checked = String(state) === '1' ? ' checked' : '';
+                    var disabled = (id === MEDIDATA_CURRENT_USER_ID) ? ' disabled' : '';
+                    return '<label class="switch" title="' + (disabled ? 'No puedes cambiar tu propio estado' : 'Activar / desactivar usuario') + '">'
+                        + '<input type="checkbox" class="user-state-toggle" data-id="' + id + '"' + checked + disabled + '>'
+                        + '<span class="slider"></span></label>';
+                }
+            },
+            {
                 data: null,
                 orderable: false,
                 searchable: false,
                 render: function (row) {
                     var id = parseInt(row.id, 10);
-                    var html = ''
-                        + '<a title="Editar Usuario" href="editar_user.php?id=' + id + '" class="btn-action btn-edit-perfil"><i class="fas fa-user-edit"></i></a> '
+                    var html = '<span class="usuarios-acciones-cell">'
+                        + '<a title="Editar Usuario" href="editar_user.php?id=' + id + '" class="btn-action btn-edit-perfil"><i class="fas fa-user-edit"></i></a>'
                         + '<a title="Cambiar Contraseña" href="password.php?id=' + id + '" class="btn-action btn-edit"><i class="fas fa-key"></i></a>';
                     if (id !== MEDIDATA_CURRENT_USER_ID) {
                         var u = String(row.username || '').replace(/'/g, "\\'");
-                        html += ' <a title="Eliminar Usuario" href="javascript:void(0);" onclick="confirmarEliminacion(' + id + ', \'' + esc(u) + '\')" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>';
+                        html += '<a title="Eliminar Usuario" href="javascript:void(0);" onclick="confirmarEliminacion(' + id + ', \'' + esc(u) + '\')" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>';
                     }
+                    html += '</span>';
                     return html;
                 }
             }
+        ],
+        columnDefs: [
+            { targets: -2, className: 'usuarios-col-estado' },
+            { targets: -1, className: 'usuarios-col-acciones', width: '1%' }
         ],
         order: [[6, 'desc']], // Fecha de Creación, descendente
         buttons: ['copy', 'csv', 'excel', 'print'],
@@ -300,6 +346,43 @@ $(document).ready(function() {
                 "sPrevious": "Anterior"
             }
         }
+    });
+
+    $('#example tbody').on('change', '.user-state-toggle', function () {
+        var checkbox = $(this);
+        var id = parseInt(checkbox.data('id'), 10);
+        var newState = checkbox.is(':checked') ? 1 : 0;
+
+        if (id === MEDIDATA_CURRENT_USER_ID) {
+            checkbox.prop('checked', !checkbox.is(':checked'));
+            return;
+        }
+
+        $.ajax({
+            url: '../../backend/php/toggle_user_state.php',
+            type: 'POST',
+            data: { id: id, state: newState },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: response.message || 'Estado actualizado',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                    tablaUsuarios.ajax.reload(null, false);
+                } else {
+                    Swal.fire('Error', response.message || 'No se pudo actualizar el estado.', 'error');
+                    checkbox.prop('checked', !checkbox.is(':checked'));
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
+                checkbox.prop('checked', !checkbox.is(':checked'));
+            }
+        });
     });
 });
 

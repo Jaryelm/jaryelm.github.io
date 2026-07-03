@@ -9,6 +9,7 @@ if (!isset($_POST['upd_user_colab'])) {
 }
 
 require_once __DIR__ . '/users_rrhh_extra_lib.php';
+require_once __DIR__ . '/user_role_guard.php';
 
 $idUser = (int) ($_POST['midp'] ?? 0);
 
@@ -17,6 +18,16 @@ try {
         throw new RuntimeException('Identificador no válido.');
     }
     medidata_users_rrhh_extra_ensure($connect);
+
+    $rolPost = trim((string) ($_POST['rol'] ?? ''));
+    if (medidata_user_rol_bloqueado_autoedicion($idUser)) {
+        $stmtRolActual = $connect->prepare('SELECT rol FROM users WHERE id = ? LIMIT 1');
+        $stmtRolActual->execute([$idUser]);
+        $rolDb = $stmtRolActual->fetchColumn();
+        if (is_string($rolDb) && $rolDb !== '') {
+            $rolPost = $rolDb;
+        }
+    }
 
     // 1) Identidad en `users` (sin tocar usuario/contraseña).
     $name = trim((string) ($_POST['name'] ?? ''));
@@ -33,7 +44,7 @@ try {
         ':cedula' => ($v = trim((string) ($_POST['cedula'] ?? ''))) !== '' ? $v : null,
         ':sexo' => ($v = trim((string) ($_POST['sexo'] ?? ''))) !== '' ? $v : null,
         ':email' => trim((string) ($_POST['email'] ?? '')),
-        ':rol' => ($v = trim((string) ($_POST['rol'] ?? ''))) !== '' ? $v : null,
+        ':rol' => $rolPost !== '' ? $rolPost : null,
         ':uid' => ($v = trim((string) ($_POST['uid_biometrico'] ?? ''))) !== '' ? $v : null,
         ':id' => $idUser,
     ]);

@@ -1,7 +1,7 @@
 <?php
 require '../../backend/bd/Conexion.php';
 
-echo '<option value="0">Seleccione cuenta</option>';
+echo '<option value="">Seleccione cuenta</option>';
 
 // Elimina el filtro 'WHERE tipo_cuenta = :tipo_cuenta' para mostrar todas las cuentas
 $stmt = $connect->prepare('SELECT * FROM `cuentas_catalogo` ORDER BY cuenta ASC');

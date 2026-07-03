@@ -58,7 +58,7 @@ include_once '../admin/menu.php';
             <h2 class="catalog-title">Cuentas por Pagar (Proveedores)</h2>
             
             <!-- Filtros -->
-            <div id="diario-filtros" class="filters-container">
+            <form id="diario-filtros" class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="tipoProveedor">Tipo de Proveedor:</label>
                     <select id="tipoProveedor" class="select2">
@@ -74,8 +74,8 @@ include_once '../admin/menu.php';
                     <label for="fechaHasta" title="Filtra por fecha final">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo date('Y-m-t'); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
-            </div>
+                <button type="submit" class="btn-filter">Buscar</button>
+            </form>
 
             <div class="export-buttons" style="margin-bottom:15px;display:flex;gap:8px;flex-wrap:wrap;">
                 <button type="button" class="dt-button buttons-copy" onclick="exportarTabla('copy')">Copiar</button>
@@ -156,12 +156,16 @@ include_once '../admin/menu.php';
             <div class="modal-content" style="max-width: 90%; width: 1000px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2 id="modalFacturasTitle" style="margin: 0;">Facturas</h2>
-                    <span class="close-btn" onclick="cerrarModalFacturas()" title="Cerrar">&times;</span>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <button type="button" class="btn-filter" id="btnPagarSeleccionadas" style="display:none; background-color:#28a745;">Pagar seleccionadas</button>
+                        <span class="close-btn" onclick="cerrarModalFacturas()" title="Cerrar">&times;</span>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table id="tablaFacturasDetalle" class="responsive-table" style="width:100%">
                         <thead>
                             <tr>
+                                <th><input type="checkbox" id="selectAllFacturas" title="Seleccionar todas" style="transform: scale(1.5); cursor:pointer;"></th>
                                 <th>Fecha</th>
                                 <th>No. Factura</th>
                                 <th id="thDetalleCol3">Vencimiento / Paciente</th>
@@ -178,23 +182,7 @@ include_once '../admin/menu.php';
             </div>
         </div>
 
-        <!-- Modal de Historial de Pagos (Partidas) -->
-        <div id="partidasModal" class="modal" style="display: none; z-index: 1000;">
-            <div class="modal-content" style="max-width: 90%; width: 800px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 id="modalPartidasTitle" style="margin: 0;">Historial de Pagos</h2>
-                    <span class="close-btn" onclick="cerrarModalPartidas()" title="Cerrar">&times;</span>
-                </div>
-                <div class="table-container">
-                    <table id="tablaPartidasDetalle" class="responsive-table" style="width:100%">
-                        <thead id="theadPartidas">
-                            <!-- Injected dynamically -->
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Modal de Registrar Pago -->
         <div id="pagoModal" class="modal" style="display: none; z-index: 1100;">
@@ -205,11 +193,17 @@ include_once '../admin/menu.php';
                 </div>
                 <p id="pagoResumen" style="margin: 0 0 12px 0; color:#333;"></p>
                 <div class="filter-group" style="text-align:left;">
+                    <label for="pagoFecha">Fecha del pago:</label>
+                    <input type="date" id="pagoFecha" class="filter-input" style="width:100%;" value="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <div class="filter-group" style="text-align:left; margin-top:12px;">
+                    <label for="pagoReferenciaBancaria">Referencia bancaria:</label>
+                    <input type="text" id="pagoReferenciaBancaria" class="filter-input" style="width:100%;" maxlength="120" placeholder="Ej. transferencia, cheque, No. operación">
+                </div>
+                <div class="filter-group" style="text-align:left; margin-top:12px;">
                     <label for="pagoCuentaSalida">Cuenta de salida (de dónde sale el dinero):</label>
                     <select id="pagoCuentaSalida" class="filter-input" style="width:100%;">
-                        <option value="110100101">Caja</option>
-                        <option value="110100401">Tarjeta de Crédito BAC</option>
-                        <option value="110100402">Tarjeta de Crédito Banpaís</option>
+                        <option value="">Cargando cuentas...</option>
                     </select>
                 </div>
                 <div style="margin-top:18px; display:flex; gap:10px; justify-content:flex-end;">
@@ -372,6 +366,25 @@ include_once '../admin/menu.php';
     $(document).ready(function () {
         var $dp = $('#content').length ? $('#content') : $(document.body);
         $('#tipoProveedor').select2({ minimumResultsForSearch: Infinity, dropdownParent: $dp, width: '220px' });
+        $('#pagoCuentaSalida').select2({ dropdownParent: $('#pagoModal'), width: '100%', placeholder: 'Cargando...' });
+
+        // Cargar cuentas para pagos
+        fetch('../../backend/registros/lista_catalogo.php')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.cuentas) {
+                    var sel = $('#pagoCuentaSalida');
+                    sel.empty();
+                    data.cuentas.forEach(c => {
+                        sel.append($('<option>').val(c.cuenta).text(c.cuenta + ' - ' + c.nombre));
+                    });
+                    sel.select2({ dropdownParent: $('#pagoModal'), width: '100%', placeholder: 'Seleccione cuenta...' });
+                    if (sel.find("option[value='110100101']").length) {
+                        sel.val('110100101').trigger('change.select2');
+                    }
+                }
+            })
+            .catch(e => console.error('Error cargando cuentas:', e));
 
         dtComerciales = $('#tablaComerciales').DataTable({
             serverSide: false,
@@ -534,12 +547,15 @@ include_once '../admin/menu.php';
                 if (dtFacturasDetalle) {
                     dtFacturasDetalle.destroy();
                     $('#tablaFacturasDetalle').empty(); // Clear DOM for re-init
-                    $('#tablaFacturasDetalle').html('<thead><tr><th>Fecha</th><th>No. Factura</th><th id="thDetalleCol3">' + (modo === 'comercial' ? 'Vencimiento' : 'Paciente - Estudio') + '</th><th>Valor</th><th>Saldado</th><th>Saldo Neto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody>');
+                    $('#tablaFacturasDetalle').html('<thead><tr><th><input type="checkbox" id="selectAllFacturas" title="Seleccionar todas" style="transform: scale(1.5); cursor:pointer;"></th><th>Fecha</th><th>No. Factura</th><th id="thDetalleCol3">' + (modo === 'comercial' ? 'Vencimiento' : 'Paciente - Estudio') + '</th><th>Valor</th><th>Saldado</th><th>Saldo Neto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody>');
                 }
+                $('#btnPagarSeleccionadas').hide();
+                $('#selectAllFacturas').prop('checked', false);
                 
                 dtFacturasDetalle = $('#tablaFacturasDetalle').DataTable({
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
-                    pageLength: 10,
+                    pageLength: -1,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todas"]],
                     destroy: true,
                     dom: 'Bfrtip',
                     buttons: ['copy', 'csv', 'excel', 'print'],
@@ -554,7 +570,8 @@ include_once '../admin/menu.php';
                         }
                     },
                     columnDefs: [
-                        { targets: [3, 4, 5], className: 'text-right' }
+                        { targets: [0], orderable: false, searchable: false },
+                        { targets: [4, 5, 6], className: 'text-right' }
                     ]
                 });
                 
@@ -567,17 +584,46 @@ include_once '../admin/menu.php';
 
             let pagoPendiente = null;
 
-            $(document).on('click', '.btn_pagar', function(e) {
+            $(document).on('change', '.chk-pagar', function() {
+                var checkedCount = $('.chk-pagar:checked').length;
+                if (checkedCount > 0) {
+                    $('#btnPagarSeleccionadas').show();
+                } else {
+                    $('#btnPagarSeleccionadas').hide();
+                }
+                
+                // Actualizar "Seleccionar todas" si están todas marcadas o no
+                var allChecked = $('.chk-pagar:not(:checked)').length === 0 && $('.chk-pagar').length > 0;
+                $('#selectAllFacturas').prop('checked', allChecked);
+            });
+
+            $(document).on('change', '#selectAllFacturas', function() {
+                var checked = $(this).is(':checked');
+                $('.chk-pagar').prop('checked', checked).trigger('change');
+            });
+
+            $(document).on('click', '#btnPagarSeleccionadas', function(e) {
                 e.stopPropagation();
-                var id = $(this).data('id');
-                var saldo = parseFloat($(this).data('saldo')) || 0;
-                var modo = $(this).data('modo');
-                pagoPendiente = { id: id, saldo: saldo, modo: modo };
-                var etiqueta = (modo === 'comercial') ? 'proveedor comercial' : 'honorario médico';
-                $('#pagoResumen').html('Se registrará el pago del ' + etiqueta + ' por <strong>L. ' +
-                    saldo.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-                    '</strong>. Se generará la partida contable balanceada en el Diario General.');
-                $('#pagoCuentaSalida').val('110100101');
+                
+                var ids = [];
+                var totalSaldo = 0;
+                var modo = '';
+                
+                $('.chk-pagar:checked').each(function() {
+                    ids.push($(this).data('id'));
+                    totalSaldo += parseFloat($(this).data('saldo')) || 0;
+                    if (!modo) modo = $(this).data('modo');
+                });
+                
+                if (ids.length === 0) return;
+
+                pagoPendiente = { ids: ids, saldo: totalSaldo, modo: modo };
+                var etiqueta = (modo === 'comercial') ? 'proveedores comerciales' : 'honorarios médicos';
+                $('#pagoFecha').val(new Date().toISOString().slice(0, 10));
+                $('#pagoReferenciaBancaria').val('');
+                $('#pagoResumen').html('Se registrará el pago múltiple de ' + ids.length + ' factura(s) por un total de <strong>L. ' +
+                    totalSaldo.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                    '</strong>. Se generará una partida contable balanceada en el Diario General.');
                 $('#pagoModal').css('display', 'flex');
             });
 
@@ -587,7 +633,7 @@ include_once '../admin/menu.php';
             };
 
             $(document).on('click', '#btnConfirmarPago', function() {
-                if (!pagoPendiente) { return; }
+                if (!pagoPendiente || !pagoPendiente.ids || pagoPendiente.ids.length === 0) { return; }
                 var $btn = $(this);
                 var cuentaSalida = $('#pagoCuentaSalida').val();
                 $btn.prop('disabled', true).text('Procesando...');
@@ -595,12 +641,29 @@ include_once '../admin/menu.php';
                     url: '../../backend/registros/pagar_cuenta_por_pagar.php',
                     type: 'POST',
                     dataType: 'json',
-                    data: { modo: pagoPendiente.modo, id: pagoPendiente.id, cuenta_salida: cuentaSalida }
+                    data: {
+                        modo: pagoPendiente.modo,
+                        ids: pagoPendiente.ids,
+                        cuenta_salida: cuentaSalida,
+                        fecha_pago: $('#pagoFecha').val(),
+                        referencia_bancaria: $('#pagoReferenciaBancaria').val().trim()
+                    }
                 }).done(function(resp) {
                     if (resp && resp.success) {
                         var modoPago = pagoPendiente.modo;
+                        var partidaNum = (resp.numero_partida) ? resp.numero_partida : '';
+                        var refBanco = (resp.referencia_bancaria) ? resp.referencia_bancaria : '';
                         cerrarModalPago();
-                        Swal.fire({ icon: 'success', title: 'Pago registrado', text: resp.message || 'Partida generada.', timer: 2800, showConfirmButton: false });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pago registrado',
+                            html: '<p style="margin:0 0 10px 0;">' + (resp.message || 'Partida generada correctamente.') + '</p>'
+                                + '<p style="margin:0;font-size:1.15em;"><strong>Partida:</strong> '
+                                + '<span id="swalPartidaNum" style="user-select:all;">' + partidaNum + '</span></p>'
+                                + (refBanco ? '<p style="margin:8px 0 0 0;"><strong>Ref. bancaria:</strong> ' + refBanco + '</p>' : ''),
+                            confirmButtonText: 'Cerrar',
+                            allowOutsideClick: false
+                        });
                         if (dtFacturasDetalle) { dtFacturasDetalle.ajax.reload(null, false); }
                         if (modoPago === 'comercial') { if (dtComerciales) dtComerciales.ajax.reload(null, false); }
                         else { if (dtMedicos) dtMedicos.ajax.reload(null, false); }
@@ -616,47 +679,13 @@ include_once '../admin/menu.php';
                 });
             });
 
-            let dtPartidasDetalle = null;
-
             $(document).on('click', '.btn_ver_partidas', function(e) {
                 e.stopPropagation();
                 var id_ref = $(this).data('id');
                 var modo = $(this).data('modo');
-                
-                $('#modalPartidasTitle').text(modo === 'comercial' ? 'Abonos a Factura' : 'Historial de Pago Médico');
-                
-                if (dtPartidasDetalle) {
-                    dtPartidasDetalle.destroy();
-                    $('#tablaPartidasDetalle').empty();
-                }
-                
-                let thead = modo === 'comercial' 
-                    ? '<tr><th>No. Partida</th><th>Fecha</th><th>Descripción</th><th>Monto Abonado</th></tr>'
-                    : '<tr><th>No. Orden</th><th>Fecha Efectiva</th><th>Pagado Por</th><th>Total Honorario</th></tr>';
-                $('#tablaPartidasDetalle').html('<thead>' + thead + '</thead><tbody></tbody>');
-                
-                dtPartidasDetalle = $('#tablaPartidasDetalle').DataTable({
-                    language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
-                    pageLength: 10,
-                    lengthChange: false,
-                    destroy: true,
-                    ajax: {
-                        url: '../../backend/registros/get_cuentas_por_pagar.php',
-                        type: 'POST',
-                        data: function (d) {
-                            d.tipo = modo;
-                            d.accion = 'ver_partidas';
-                            d.id_referencia = id_ref;
-                        }
-                    }
-                });
-                
-                $('#partidasModal').css('display', 'flex');
+                var prefix = (modo === 'comercial') ? 'COMP-' : 'HON-';
+                window.location.href = 'diariogeneral.php?search=' + encodeURIComponent(prefix + id_ref);
             });
-
-            window.cerrarModalPartidas = function() {
-                $('#partidasModal').css('display', 'none');
-            };
 
     </script>
 </body>

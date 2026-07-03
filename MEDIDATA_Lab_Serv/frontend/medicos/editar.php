@@ -65,7 +65,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
-<?php $medicos_nav_rrhh = false; include __DIR__ . '/_botones_medicos.php'; ?>
+<?php $medicos_nav_unified = true; $medicos_nav_medicos_tab = true; include __DIR__ . '/_botones_medicos.php'; ?>
            
            <!-- multistep form -->
 <?php 

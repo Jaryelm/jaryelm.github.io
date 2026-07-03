@@ -31,6 +31,16 @@ if (!function_exists('medidata_session_json_api_script')) {
             'tabla_puestos_trabajo.php',
             'tabla_vacantes_trabajo.php',
             'tabla_niveles_salariales.php',
+            'get_reporte_compras_ingresadas.php',
+            'get_reporte_compras_detalladas.php',
+            'get_reporte_detalle_factura.php',
+            'get_colaboradores.php',
+            'get_dashboard_ventas_resumen.php',
+            'get_dashboard_ventas_detalle.php',
+            'get_reporte_detalle_pago.php',
+            'get_reporte_cuadre_caja.php',
+            'get_reporte_devoluciones_ventas.php',
+            'get_cierres_caja.php',
         ];
         return in_array($base, $allowed, true) ? $base : null;
     }
@@ -45,7 +55,15 @@ if (!function_exists('medidata_session_emit_json_db_unavailable')) {
         header('Content-Type: application/json; charset=utf-8');
         http_response_code(503);
         $msg = 'Base de datos temporalmente no disponible. Intente de nuevo en un momento.';
-        if ($apiScript === 'get_partidas_manuales.php') {
+        if ($apiScript === 'get_partidas_manuales.php'
+            || $apiScript === 'get_reporte_compras_ingresadas.php'
+            || $apiScript === 'get_reporte_compras_detalladas.php'
+            || $apiScript === 'get_reporte_detalle_factura.php'
+            || $apiScript === 'get_reporte_detalle_pago.php'
+            || $apiScript === 'get_reporte_cuadre_caja.php'
+            || $apiScript === 'get_reporte_devoluciones_ventas.php'
+            || $apiScript === 'get_cierres_caja.php'
+            || $apiScript === 'get_colaboradores.php') {
             echo json_encode([
                 'draw' => intval($_GET['draw'] ?? 1),
                 'recordsTotal' => 0,

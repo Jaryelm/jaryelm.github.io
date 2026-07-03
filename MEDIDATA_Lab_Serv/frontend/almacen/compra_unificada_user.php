@@ -514,6 +514,13 @@ include_once '../almacen/menu.php';
                                 return false;
                             }
                         }
+                        const cuentaSel = m.querySelector('select[name^="cat_cuenta"]');
+                        const cuentaVal = cuentaSel ? String(cuentaSel.value || '').trim() : '';
+                        if (!cuentaVal || cuentaVal === '0') {
+                            alert('Línea ' + (i + 1) + ': seleccione la cuenta contable de inventario.');
+                            if (cuentaSel) cuentaSel.focus();
+                            return false;
+                        }
                     }
                     return true;
                 }

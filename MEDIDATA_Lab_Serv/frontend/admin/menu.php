@@ -25,8 +25,6 @@
                         <li><a href="../../frontend/contabilidad/tabla_cheque.php"><span>CHEQUES REGISTRADOS</span></a></li>
                         <li><a href="../../frontend/contabilidad/conciliacion_bancaria.php"><span>CONCILIACIÓN BANCARIA</span></a></li>
                         <li><a href="../../frontend/contabilidad/recibir_pagos.php"><span>RECIBIR PAGOS</span></a></li>
-                        <li><a href="../../frontend/contabilidad/cuentas_por_pagar.php"><span>CUENTAS POR PAGAR</span></a></li>
-                        <li><a href="#"><span>DEPOSITO BANCARIO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio.php"><span>DIRECTORIO MÉDICO</span></a></li>
                         <li><a href="../../frontend/contabilidad/tabla_directorio_comercial.php"><span>DIRECTORIO COMERCIAL</span></a></li>
                     </ul>
@@ -39,13 +37,7 @@
                         <li><a href="../../frontend/contabilidad/reporte_detalle_factura.php"><span>DETALLE FACTURA</span></a></li>
                         <li><a href="../../frontend/contabilidad/reporte_devoluciones_ventas.php"><span>DEVOLUCIONES</span></a></li>
                         <li><a href="../../frontend/contabilidad/rango_facturacion.php"><span>RANGO CAI FACTURACIÓN</span></a></li>
-                        <li><a href="#"><span>INFORMACIÓN DE VENTAS</span></a></li>
-                        <li><a href="#"><span>COTIZACIONES ORDENES FACTURAS</span></a></li>
-                        <li><a href="#"><span>REGISTROS DE VENTAS</span></a></li>
-                        <li><a href="#"><span>TRANSACCIONES CAPTURADAS</span></a></li>
-                        <li><a href="#"><span>PAGOS AL CLIENTE</span></a></li>
-                        <li><a href="#"><span>IMPRIMIR ESTADOS DE CUENTA</span></a></li>
-                        <li><a href="#"><span>IMPRIMIR VENTAS</span></a></li>
+                        <li><a href="../../frontend/contabilidad/dashboard_ventas.php"><span>DASHBOARD VENTAS</span></a></li>
                     </ul>
                 </li>
                 <li>
@@ -53,17 +45,6 @@
                     <ul class="new-side-dropdown">
                         <li><a href="../../frontend/contabilidad/reporte_compras_ingresadas.php"><span>COMPRAS INGRESADAS</span></a></li>
                         <li><a href="../../frontend/contabilidad/reporte_compras_detalladas.php"><span>COMPRAS DETALLADAS</span></a></li>
-                        <li><a href="#"><span>COTIZACIONES ORDENES DE COMPRAS</span></a></li>
-                        <li><a href="#"><span>DEVOLUCIONES</span></a></li>
-                        <li><a href="#"><span>TRANSACCIONES CAPTURADAS</span></a></li>
-                        <li><a href="#"><span>PAGO AL PROVEEDOR</span></a></li>
-                        <li><a href="#"><span>IMPRIMIR FORMULARIO DE COMPRAS</span></a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="new-submenu-link"><span>INVENTARIO</span></a>
-                    <ul class="new-side-dropdown">
-                        <li><a href="../../frontend/contabilidad/lista_inventario.php"><span>LISTA DE INVENTARIO</span></a></li>
                     </ul>
                 </li>
                 <li>
@@ -83,9 +64,7 @@
                 <li>
                     <a href="../recursos_humanos/lista_colaboradores.php"><span>LISTA COLABORADORES</span></a>
                 </li>
-                <li>
-                    <a href="../recursos_humanos/lista_colaboradores_medicos.php"><span>LISTA DE MÉDICOS</span></a>
-                </li>
+                
                 <li>
                     <a href="../recursos_humanos/positions.php"><span>POSICIONES DE TRABAJO</span></a>
                 </li>
@@ -117,15 +96,7 @@
                         <li><a href="../recursos/relojbio.php"><span>RELOJ BIOMÉTRICO</span></a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="#" class="new-submenu-link"><span>COLABORADORES</span></a>
-                    <ul class="new-side-dropdown">
-                        <li><a href="../recursos/enfermera_nuevo.php"><span>REGISTRAR ENFERMERÍA</span></a></li>
-                        <li><a href="../recursos_humanos/administrativo_nuevo.php"><span>REGISTRAR ADMINISTRATIVO</span></a></li>
-                        <li><a href="../recursos_humanos/servicios_generales_nuevo.php"><span>REGISTRAR SERVICIOS GENERALES</span></a></li>
-                        <li><a href="../medicos/nuevo.php"><span>REGISTRAR MÉDICO</span></a></li>
-                    </ul>
-                </li>
+                
             </ul>
         </li>
 
@@ -159,7 +130,7 @@
         <li>
             <a href="#"><i class='bx bxs-bulb icon'></i><span>CRM MARKETING</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
-                <li><a href="../crm_marketing/invitados_wifi.php"><span>INVITADOS WIFI</span></a></li>
+                <li><a href="#"><span>CUMPLEAÑOS</span></a></li>
             </ul>
         </li>
 

@@ -1,14 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-
-$medidataComprasTieneNpc = false;
-try {
-    $___chkNpc = $connect->query("SHOW COLUMNS FROM compras LIKE 'numero_partida_contable'");
-    $medidataComprasTieneNpc = (bool) ($___chkNpc && $___chkNpc->fetch(PDO::FETCH_ASSOC));
-} catch (Throwable $e) {
-    $medidataComprasTieneNpc = false;
-}
-$medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL AS numero_partida_contable';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,7 +13,20 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
+    <style>
+        .acciones-wrap { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+        .btn-editar-compra, .btn-eliminar-compra {
+            background-color: #035c67; color: #fff; border: none; padding: 5px 10px;
+            border-radius: 5px; cursor: pointer; font-size: 12px;
+        }
+        .btn-eliminar-compra { background-color: #c0392b; }
+        .btn-editar-compra:hover { background-color: #06adbf; }
+        .btn-eliminar-compra:hover { background-color: #e74c3c; }
+        #modalEditarCompra .modal-content { max-width: 520px; width: 95%; }
+        #avisoCompraPagos { display: none; color: #856404; background: #fff3cd; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+    </style>
 </head>
 <body>
 <div id="page-loading-overlay">
@@ -58,13 +62,13 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
             <div class="filters-container">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
-                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
+                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? date('Y-m-01')); ?>">
                 </div>
                 <div class="filter-group">
                     <label for="fechaHasta">Hasta:</label>
-                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
+                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? date('Y-m-t')); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
+                <button type="button" class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
                 <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
             </div>
 
@@ -81,52 +85,61 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
                                 <th>SubTotal</th>
                                 <th>Total</th>
                                 <th>Partida contable</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $desde = $_GET['desde'] ?? '';
-                            $hasta = $_GET['hasta'] ?? '';
-                            $sql = "SELECT id_compra, fecha_emision, prov_datos, dato_fac, isv_global, sub_total, total, {$medidataSqlNpc} FROM compras";
-                            $params = [];
-                            if ($desde && $hasta) {
-                                $sql .= " WHERE DATE(fecha_emision) BETWEEN :desde AND :hasta";
-                                $params[':desde'] = $desde;
-                                $params[':hasta'] = $hasta;
-                            } elseif ($desde) {
-                                $sql .= " WHERE DATE(fecha_emision) >= :desde";
-                                $params[':desde'] = $desde;
-                            } elseif ($hasta) {
-                                $sql .= " WHERE DATE(fecha_emision) <= :hasta";
-                                $params[':hasta'] = $hasta;
-                            }
-                            $sql .= " ORDER BY fecha_registro DESC";
-                            $stmt = $connect->prepare($sql);
-                            $stmt->execute($params);
-                            while ($row = $stmt->fetchObject()):
-                                $fecha = $row->fecha_emision ? date('d-m-Y', strtotime($row->fecha_emision)) : '-';
-                                $impuesto = number_format((float)($row->isv_global ?? 0), 2, '.', ',');
-                                $subtotal = number_format((float)($row->sub_total ?? 0), 2, '.', ',');
-                                $total = number_format((float)($row->total ?? 0), 2, '.', ',');
-                            ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row->id_compra); ?></td>
-                                <td><?php echo htmlspecialchars($fecha); ?></td>
-                                <td><?php echo htmlspecialchars($row->prov_datos ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->dato_fac ?? '-'); ?></td>
-                                <td>L. <?php echo $impuesto; ?></td>
-                                <td>L. <?php echo $subtotal; ?></td>
-                                <td>L. <?php echo $total; ?></td>
-                                <td><?php echo htmlspecialchars($row->numero_partida_contable ?? ''); ?></td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 </section>
+
+<div id="modalEditarCompra" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 style="margin:0;">Corregir compra</h2>
+            <span class="close-btn" onclick="cerrarModalEditarCompra()" title="Cerrar">&times;</span>
+        </div>
+        <form id="formEditarCompra">
+            <input type="hidden" id="editCompraId" name="id_compra">
+            <div id="avisoCompraPagos">Esta compra ya tiene pagos. Solo puede corregir fecha, proveedor o número de factura.</div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraFecha">Fecha de emisión</label>
+                <input type="date" id="editCompraFecha" name="fecha_emision" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraProveedor">Proveedor</label>
+                <input type="text" id="editCompraProveedor" name="prov_datos" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraFactura">Número de factura</label>
+                <input type="text" id="editCompraFactura" name="dato_fac" class="filter-input" style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraSubtotal">Subtotal</label>
+                <input type="number" step="0.01" min="0" id="editCompraSubtotal" name="sub_total" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraIsv">Impuesto (ISV)</label>
+                <input type="number" step="0.01" min="0" id="editCompraIsv" name="isv_global" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraTotal">Total</label>
+                <input type="number" step="0.01" min="0" id="editCompraTotal" name="total" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraMotivo">Motivo de corrección</label>
+                <textarea id="editCompraMotivo" name="motivo" rows="3" maxlength="255" class="filter-input" required style="width:100%;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                <button type="button" class="btn-filter btn-reset" onclick="cerrarModalEditarCompra()">Cancelar</button>
+                <button type="submit" class="btn-filter">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
@@ -139,45 +152,22 @@ $medidataSqlNpc = $medidataComprasTieneNpc ? 'numero_partida_contable' : 'NULL A
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
+<script src="../../backend/registros/script/gestion_compra_reporte.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#tablaReporteCompras').DataTable({
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[1, 'desc']],
-        language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando 0 a 0 de 0 registros",
-            sInfoFiltered: "(filtrado de _MAX_ registros totales)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        }
-    });
+    medidataReporteComprasSS.initIngresadas();
+    medidataComprasReporte.init({ pagina: 'reporte_compras_ingresadas.php' });
 });
 
 function aplicarFiltros() {
-    var desde = document.getElementById('fechaDesde').value;
-    var hasta = document.getElementById('fechaHasta').value;
-    var params = [];
-    if (desde) params.push('desde=' + encodeURIComponent(desde));
-    if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_compras_ingresadas.php';
-    if (params.length) url += '?' + params.join('&');
-    window.location.href = url;
+    medidataReporteComprasSS.recargar();
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_compras_ingresadas.php';
+    medidataComprasReporte.limpiarFiltros();
 }
 </script>
 </body>

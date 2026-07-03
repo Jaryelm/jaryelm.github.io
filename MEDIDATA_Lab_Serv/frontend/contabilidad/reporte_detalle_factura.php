@@ -1,11 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-
-/** Formato lempiras: miles con coma, decimales con punto (ej. L. 2,836.27) */
-function fmt_lempiras_reporte($valor) {
-    $n = (float)($valor ?? 0);
-    return 'L. ' . number_format($n, 2, '.', ',');
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,7 +13,19 @@ function fmt_lempiras_reporte($valor) {
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
+    <style>
+        .acciones-wrap { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+        .btn-editar-ingreso, .btn-eliminar-ingreso {
+            background-color: #035c67; color: #fff; border: none; padding: 5px 10px;
+            border-radius: 5px; cursor: pointer; font-size: 12px;
+        }
+        .btn-eliminar-ingreso { background-color: #c0392b; }
+        .btn-editar-ingreso:hover { background-color: #06adbf; }
+        .btn-eliminar-ingreso:hover { background-color: #e74c3c; }
+        #modalEditarIngreso .modal-content { max-width: 520px; width: 95%; }
+    </style>
 </head>
 <body>
 <div id="page-loading-overlay">
@@ -48,6 +54,7 @@ function fmt_lempiras_reporte($valor) {
         <button class="button" onclick="cambiarColor(this, 'reporte_cuadre_caja.php')">Cuadre Caja</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_pago.php')">Detalle Pago</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_factura.php')">Detalle Factura</button>
+        <button class="button" onclick="cambiarColor(this, 'dashboard_ventas.php')">Dashboard Ventas</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_devoluciones_ventas.php')">Devoluciones</button>
 
         <br>
@@ -55,18 +62,18 @@ function fmt_lempiras_reporte($valor) {
         <div class="catalog-container">
             <h2 class="catalog-title">Detalle Factura</h2>
 
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
-                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
+                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? date('Y-m-01')); ?>">
                 </div>
                 <div class="filter-group">
                     <label for="fechaHasta">Hasta:</label>
-                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
+                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? date('Y-m-t')); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
+                <button type="submit" class="btn-filter">Buscar</button>
                 <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-            </div>
+            </form>
 
             <div class="table-container">
                 <div class="table-responsive">
@@ -79,55 +86,58 @@ function fmt_lempiras_reporte($valor) {
                                 <th>Forma de Pago</th>
                                 <th>Usuario</th>
                                 <th>Total</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $desde = $_GET['desde'] ?? '';
-                            $hasta = $_GET['hasta'] ?? '';
-
-                            $sql = "SELECT idord, placed_on, invoice_number, method, processed_by, total_price
-                                    FROM orders
-                                    WHERE invoice_status = 'Cobrada'
-                                      AND invoice_number IS NOT NULL
-                                      AND invoice_number <> ''";
-
-                            $params = [];
-                            if ($desde && $hasta) {
-                                $sql .= " AND DATE(placed_on) BETWEEN :desde AND :hasta";
-                                $params[':desde'] = $desde;
-                                $params[':hasta'] = $hasta;
-                            } elseif ($desde) {
-                                $sql .= " AND DATE(placed_on) >= :desde";
-                                $params[':desde'] = $desde;
-                            } elseif ($hasta) {
-                                $sql .= " AND DATE(placed_on) <= :hasta";
-                                $params[':hasta'] = $hasta;
-                            }
-                            $sql .= " ORDER BY placed_on DESC";
-
-                            $stmt = $connect->prepare($sql);
-                            $stmt->execute($params);
-                            while ($row = $stmt->fetchObject()):
-                                $fecha_raw = $row->placed_on ?? '';
-                                $fecha = $fecha_raw ? date('d-m-Y', strtotime($fecha_raw)) : '-';
-                            ?>
-                            <tr>
-                                <td data-order="<?php echo htmlspecialchars($fecha_raw); ?>"><?php echo htmlspecialchars($fecha); ?></td>
-                                <td><?php echo htmlspecialchars($row->idord); ?></td>
-                                <td><?php echo htmlspecialchars($row->invoice_number ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->method ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->processed_by ?? '-'); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->total_price); ?></td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 </section>
+
+<div id="modalEditarIngreso" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 style="margin:0;">Corregir ingreso</h2>
+            <span class="close-btn" onclick="cerrarModalEditarIngreso()" title="Cerrar">&times;</span>
+        </div>
+        <form id="formEditarIngreso">
+            <input type="hidden" id="editIngresoId" name="idord">
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editIngresoFecha">Fecha</label>
+                <input type="date" id="editIngresoFecha" name="placed_on" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editIngresoFactura">Número de factura</label>
+                <input type="text" id="editIngresoFactura" name="invoice_number" class="filter-input" style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editIngresoMetodo">Forma de pago</label>
+                <select id="editIngresoMetodo" name="method" class="filter-input" required style="width:100%;">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Pago Mixto">Pago Mixto</option>
+                    <option value="Credito Colaborador">Credito Colaborador</option>
+                    <option value="Crédito Colaborador">Crédito Colaborador</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editIngresoTotal">Total</label>
+                <input type="number" step="0.01" min="0" id="editIngresoTotal" name="total_price" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editIngresoMotivo">Motivo de corrección</label>
+                <textarea id="editIngresoMotivo" name="motivo" rows="3" maxlength="255" class="filter-input" required style="width:100%;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                <button type="button" class="btn-filter btn-reset" onclick="cerrarModalEditarIngreso()">Cancelar</button>
+                <button type="submit" class="btn-filter">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
@@ -140,49 +150,22 @@ function fmt_lempiras_reporte($valor) {
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
+<script src="../../backend/registros/script/gestion_ingreso_reporte.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#tablaReporteDetalleFactura').DataTable({
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']],
-        initComplete: function() {
-            $('.dataTables_wrapper').addClass('dt-ready');
-            $('#page-loading-overlay').hide();
-        },
-        language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando 0 a 0 de 0 registros",
-            sInfoFiltered: "(filtrado de _MAX_ registros totales)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        }
-    });
+    medidataReporteComprasSS.initDetalleFactura();
+    medidataIngresosReporte.init({ pagina: 'reporte_detalle_factura.php' });
 });
 
 function aplicarFiltros() {
-    var desde = document.getElementById('fechaDesde').value;
-    var hasta = document.getElementById('fechaHasta').value;
-    var params = [];
-    if (desde) params.push('desde=' + encodeURIComponent(desde));
-    if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_detalle_factura.php';
-    if (params.length) url += '?' + params.join('&');
-    window.location.href = url;
+    medidataReporteComprasSS.recargar();
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_detalle_factura.php';
+    medidataIngresosReporte.limpiarFiltros();
 }
 </script>
 </body>

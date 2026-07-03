@@ -8,7 +8,8 @@
  *       estado: '1',            // '1' colaboradores | '0' excolaboradores
  *       variant: '',            // '' admin | 'usr'
  *       deptoMap: { id: 'nombre', ... },
- *       salaryMap: { id: 'etiqueta', ... }
+ *       salaryMap: { id: 'etiqueta', ... },
+ *       cargoMap: { id: 'nombre', ... }
  *   };
  */
 (function ($) {
@@ -17,35 +18,36 @@
     var cfg = window.MEDIDATA_COLAB_CONFIG || {};
     var deptoMap = cfg.deptoMap || {};
     var salaryMap = cfg.salaryMap || {};
+    var cargoMap = cfg.cargoMap || {};
     var variant = cfg.variant || '';
 
     // Metadatos por tabla de origen (nombres de campo reales + columna ID + form de edicion).
     var FIELD_MAP = {
         staff_administrative: {
             label: 'Administrativo', idcol: 'idadm',
-            f_nombres: 'nomadm', f_apellidos: 'apeadm', f_sexo: 'sexadm', f_ident: 'numide',
+            f_nombres: 'nomadm', f_apellidos: 'apeadm', f_sexo: 'sexadm', f_ident: 'numide', f_nac: 'nacadm',
             edit: variant === 'usr' ? 'administrativo_editar_usr.php' : 'administrativo_editar.php'
         },
         doctor: {
             label: 'Médico', idcol: 'idodc',
-            f_nombres: 'nodoc', f_apellidos: 'apdoc', f_sexo: 'sexd', f_ident: 'ceddoc',
+            f_nombres: 'nodoc', f_apellidos: 'apdoc', f_sexo: 'sexd', f_ident: 'ceddoc', f_nac: 'nacd',
             edit: variant === 'usr' ? '../medicos/editar_usr.php' : '../medicos/editar.php'
         },
         nurse: {
             label: 'Enfermería', idcol: 'idnur',
-            f_nombres: 'nomnur', f_apellidos: 'apenur', f_sexo: 'sexnur', f_ident: 'numide',
+            f_nombres: 'nomnur', f_apellidos: 'apenur', f_sexo: 'sexnur', f_ident: 'numide', f_nac: 'nacinur',
             edit: '../recursos/enfermera_editar.php'
         },
         staff_general_services: {
             label: 'Servicios Generales', idcol: 'idsg',
-            f_nombres: 'nomsg', f_apellidos: 'apesg', f_sexo: 'sexsg', f_ident: 'numide',
+            f_nombres: 'nomsg', f_apellidos: 'apesg', f_sexo: 'sexsg', f_ident: 'numide', f_nac: 'nacsg',
             edit: variant === 'usr' ? 'servicios_generales_editar_usr.php' : 'servicios_generales_editar.php'
         },
         // Cuentas de usuario (login): se muestran como SOLO LECTURA. Se gestionan en "Usuarios Registrados".
         users: {
             label: 'Usuario', idcol: 'id',
-            f_nombres: 'name', f_apellidos: '', f_sexo: 'sexo', f_ident: 'cedula',
-            edit: 'editar_colaborador_usr.php'
+            f_nombres: 'name', f_apellidos: '', f_sexo: 'sexo', f_ident: 'cedula', f_nac: '',
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
         }
     };
 
@@ -104,6 +106,10 @@
 
     function titleCase(s) {
         return String(s).toLowerCase().replace(/\b[a-záéíóúñ]/g, function (c) { return c.toUpperCase(); });
+    }
+
+    function actionsCell(innerHtml) {
+        return '<div class="rrhh-acciones-cell">' + innerHtml + '</div>';
     }
 
     // Categoría a mostrar (solo visual). Para médicos se usa la especialidad (nomesp);
@@ -168,7 +174,17 @@
                 return html + '</select>';
             }
         },
-        { // 8 Nivel salarial
+        { // 8 Cargo
+            data: null, orderable: false,
+            render: function (d, t, row) {
+                var html = selectOpen(row, 'id_cargo', ' min-width:120px;') + opt('', '—', !row.id_cargo);
+                Object.keys(cargoMap).forEach(function (idCargo) {
+                    html += opt(idCargo, cargoMap[idCargo], String(row.id_cargo) === String(idCargo));
+                });
+                return html + '</select>';
+            }
+        },
+        { // 9 Nivel salarial
             data: null, orderable: false,
             render: function (d, t, row) {
                 var html = selectOpen(row, 'id_salary_level', ' min-width:120px;') + opt('', '—', !row.id_salary_level);
@@ -178,19 +194,29 @@
                 return html + '</select>';
             }
         },
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'salario', row.salario === null ? '' : row.salario); } }, // 9
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'cuenta_bac', row.cuenta_bac); } }, // 10
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'fecha_ingreso', row.fecha_ingreso); } }, // 11
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'telefono', row.telefono); } }, // 12
-        { // 13 Correo (solo lectura)
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'salario', row.salario === null ? '' : row.salario); } }, // 10
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'cuenta_bac', row.cuenta_bac); } }, // 11
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'fecha_ingreso', row.fecha_ingreso); } }, // 12
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'telefono', row.telefono); } }, // 13
+        { data: null, orderable: false, render: function (d, t, row) { return editableCell(row, 'correo_personal', row.correo_personal); } }, // 14
+        { // 15 Correo institucional
             data: null, orderable: false,
             render: function (d, t, row) {
-                return esc((row.correo_personal || '—') + ' / ' + (row.correo_institucional || '—'));
+                var field = isUser(row) ? 'email' : 'correo_institucional';
+                return editableCell(row, field, row.correo_institucional);
             }
         },
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'id_biometrico', row.id_biometrico); } }, // 14
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'num_locker', row.num_locker); } }, // 15
-        { // 16 Contrato
+        { // 16 Fecha nacimiento
+            data: null, orderable: false,
+            render: function (d, t, row) {
+                var meta = FIELD_MAP[row.source_table];
+                if (!meta || !meta.f_nac) { return readonlyCell(row.fecha_nacimiento); }
+                return editableCell(row, meta.f_nac, row.fecha_nacimiento);
+            }
+        },
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'id_biometrico', row.id_biometrico); } }, // 17
+        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'num_locker', row.num_locker); } }, // 18
+        { // 19 Contrato
             data: null, orderable: false, searchable: false,
             render: function (d, t, row) {
                 var meta = FIELD_MAP[row.source_table];
@@ -211,24 +237,24 @@
                 return html;
             }
         },
-        { // 17 Estado
+        { // 20 Estado
             data: null, orderable: false, searchable: false,
             render: function (d, t, row) {
                 return '<label class="switch"><input type="checkbox" class="unified-state-toggle" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '"' + (row.state == '1' ? ' checked' : '') + '/><span class="slider"></span></label>';
             }
         },
-        { // 18 Acciones
+        { // 21 Acciones
             data: null, orderable: false, searchable: false,
             render: function (d, t, row) {
-                var meta = FIELD_MAP[row.source_table];
+                var fieldMeta = FIELD_MAP[row.source_table];
                 if (isUser(row)) {
-                    return '<a title="Editar usuario" href="' + meta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>';
+                    return actionsCell('<a title="Editar usuario" href="' + fieldMeta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>');
                 }
-                var html = '<a title="Actualizar" href="' + meta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>';
+                var html = '<a title="Actualizar" href="' + fieldMeta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>';
                 if (cfg.allowDelete) {
-                    html += ' <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-colab" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '" data-idcol="' + meta.idcol + '"></a>';
+                    html += ' <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-colab" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '" data-idcol="' + fieldMeta.idcol + '"></a>';
                 }
-                return html;
+                return actionsCell(html);
             }
         }
     ];
@@ -248,9 +274,23 @@
                     d.estado = cfg.estado || '1';
                     d.tipo = cfg.tipo || '';
                     d.excluir = cfg.excluir || '';
+                },
+                error: function (xhr) {
+                    var msg = 'No se pudieron cargar los datos de la lista.';
+                    try {
+                        var res = JSON.parse(xhr.responseText || '{}');
+                        if (res.error) { msg = res.error; }
+                        if (res.message) { msg = res.message; }
+                    } catch (e) {}
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Error', msg, 'error');
+                    }
                 }
             },
             columns: columns,
+            columnDefs: [
+                { targets: -1, className: 'rrhh-col-acciones', width: cfg.allowDelete ? '5.5rem' : '3.5rem' }
+            ],
             order: [[4, 'asc']],
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
@@ -272,7 +312,12 @@
                 paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
             },
             drawCallback: function () {
-                // Convierte los <select> inline en Select2 tras cada redibujado.
+                $('#example select.inline-select.select2').each(function () {
+                    var $el = $(this);
+                    if ($el.data('select2')) {
+                        $el.select2('destroy');
+                    }
+                });
                 if (typeof window.medidataInitRrhhSelect2 === 'function') {
                     window.medidataInitRrhhSelect2($('#example'));
                 }
@@ -329,7 +374,16 @@
             var idcol = btn.data('idcol');
 
             var deleteEndpoints = {
-                'doctor': '../../backend/php/delete_doctor.php'
+                'doctor': '../../backend/php/delete_doctor.php',
+                'nurse': '../../backend/php/delete_nurse.php',
+                'staff_administrative': '../../backend/php/delete_administrative.php',
+                'staff_general_services': '../../backend/php/delete_general_services.php'
+            };
+            var deleteWarnings = {
+                'doctor': 'Se eliminarán también citas, eventos y registros vinculados.',
+                'nurse': 'El registro de enfermería se eliminará permanentemente.',
+                'staff_administrative': 'El registro administrativo se eliminará permanentemente.',
+                'staff_general_services': 'El registro de servicios generales se eliminará permanentemente.'
             };
             var url = deleteEndpoints[table];
             if (!url) {
@@ -339,7 +393,7 @@
 
             Swal.fire({
                 title: '¿Eliminar registro?',
-                text: 'Se eliminarán también citas, eventos y registros vinculados.',
+                text: deleteWarnings[table] || 'Esta acción no se puede deshacer.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',

@@ -89,6 +89,11 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 </div>
 
 <style>
+    body {
+        background-color: #f4f4f4;
+        color: #000;
+    }
+
     .content-container {
     display: flex;
     flex-wrap: wrap;

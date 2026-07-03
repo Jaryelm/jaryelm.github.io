@@ -3144,6 +3144,20 @@ input:checked + .slider:before {
   margin: 0; /* Elimina márgenes por defecto */
 }
 
+/* RRHH — título de lista + botón agregar (colaboradores / médicos) */
+.rrhh-table-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.rrhh-table-title-bar .rrhh-btn-agregar {
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 /* Ajustes responsivos para el título */
 @media (max-width: 768px) {
   .table-title h1 {
@@ -4385,6 +4399,32 @@ input:checked + .slider:before {
 #example td .select2-container--default.select2-container--open .select2-selection--single {
   border-color: #035c67;
   background: #fff;
+}
+
+/* RRHH — columna ACCIONES: + y lápiz en fila horizontal */
+#example tbody td.rrhh-col-acciones,
+#example tbody td.rrhh-col-acciones .rrhh-acciones-cell {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+#example tbody td.rrhh-col-acciones .rrhh-acciones-cell {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+#example tbody td.rrhh-col-acciones .rrhh-acciones-cell .fa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0;
+  text-decoration: none;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .filters-container {
