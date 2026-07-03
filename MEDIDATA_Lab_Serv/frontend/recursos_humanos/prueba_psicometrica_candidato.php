@@ -16,7 +16,7 @@ $saveUrl = '../../backend/php/rrhh_psicometrica_guardar.php';
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title>MEDICASA</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 <?php include_once '../admin/menu.php'; ?>

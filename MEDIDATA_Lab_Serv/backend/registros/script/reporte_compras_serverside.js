@@ -55,6 +55,147 @@
         };
     }
 
+    function detallePagoExportFilters() {
+        var search = '';
+        if (window.medidataReporteComprasSS && medidataReporteComprasSS.tabla) {
+            search = medidataReporteComprasSS.tabla.search() || '';
+        }
+        return {
+            fechaDesde: ($('#fechaDesde').val() || '').trim(),
+            fechaHasta: ($('#fechaHasta').val() || '').trim(),
+            search: search.trim()
+        };
+    }
+
+    function swalAlert(icon, title, text) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({ icon: icon, title: title, text: text });
+        }
+        window.alert(text || title);
+        return Promise.resolve();
+    }
+
+    function swalConfirm(title, text) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({
+                icon: 'warning',
+                title: title,
+                text: text,
+                showCancelButton: true,
+                confirmButtonColor: '#035c67',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, exportar',
+                cancelButtonText: 'Cancelar'
+            }).then(function(result) {
+                return result.isConfirmed;
+            });
+        }
+        return Promise.resolve(window.confirm((title ? title + '\n\n' : '') + text));
+    }
+
+    function runDetallePagoExport(format, f) {
+        var params = new URLSearchParams();
+        params.set('format', format);
+        params.set('fechaDesde', f.fechaDesde);
+        params.set('fechaHasta', f.fechaHasta);
+        if (f.search) {
+            params.set('search', f.search);
+        }
+        params.set('_ts', String(Date.now()));
+
+        var exportUrl = (window.MEDIDATA_DETALLE_PAGO_EXPORT && window.MEDIDATA_DETALLE_PAGO_EXPORT.url)
+            ? window.MEDIDATA_DETALLE_PAGO_EXPORT.url
+            : 'get_reporte_detalle_pago_export.php';
+        var url = exportUrl + '?' + params.toString();
+        var fetchOpts = {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        };
+
+        if (format === 'print' || format === 'pdf') {
+            window.open(url, '_blank', 'width=1200,height=800');
+            return;
+        }
+
+        if (format === 'csv' || format === 'excel') {
+            window.location.href = url;
+            return;
+        }
+
+        if (format === 'copy') {
+            fetch(url, fetchOpts).then(function(r) {
+                if (!r.ok) {
+                    return r.text().then(function(body) {
+                        var msg = 'HTTP ' + r.status;
+                        try {
+                            var j = JSON.parse(body);
+                            if (j.error || j.message) {
+                                msg = j.error || j.message;
+                            }
+                        } catch (ignore) {}
+                        throw new Error(msg);
+                    });
+                }
+                return r.text();
+            }).then(function(text) {
+                var lines = text.split('\n').length;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text).then(function() {
+                        swalAlert('success', 'Copiado', 'Datos copiados al portapapeles (' + lines + ' filas).');
+                    });
+                }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Copiar datos',
+                        html: '<textarea readonly style="width:100%;height:220px;font-size:12px;">' +
+                            $('<div>').text(text).html() + '</textarea>',
+                        confirmButtonText: 'Cerrar'
+                    });
+                } else {
+                    window.prompt('Copie los datos (Ctrl+C):', text);
+                }
+            }).catch(function(err) {
+                swalAlert('error', 'Error', err && err.message ? err.message : 'Error al obtener los datos para copiar.');
+            });
+        }
+    }
+
+    function exportDetallePago(format) {
+        var f = detallePagoExportFilters();
+        var tieneFiltroFecha = f.fechaDesde !== '' || f.fechaHasta !== '';
+
+        if (tieneFiltroFecha && (!f.fechaDesde || !f.fechaHasta)) {
+            swalAlert('warning', 'Aviso', 'Para exportar un mes, indique fecha Desde y Hasta.');
+            return;
+        }
+
+        if (!tieneFiltroFecha && !f.search) {
+            swalConfirm(
+                'Sin filtros activos',
+                'No hay filtros activos. ¿Exportar todos los registros de detalle de pago?'
+            ).then(function(ok) {
+                if (ok) {
+                    runDetallePagoExport(format, f);
+                }
+            });
+            return;
+        }
+
+        runDetallePagoExport(format, f);
+    }
+
+    function detallePagoExportButtons() {
+        return [
+            { extend: 'copy', text: 'Copy', action: function() { exportDetallePago('copy'); } },
+            { extend: 'csv', text: 'CSV', action: function() { exportDetallePago('csv'); } },
+            { extend: 'excel', text: 'Excel', action: function() { exportDetallePago('excel'); } },
+            { extend: 'pdf', text: 'PDF', action: function() { exportDetallePago('pdf'); } },
+            { extend: 'print', text: 'Print', action: function() { exportDetallePago('print'); } }
+        ];
+    }
+
     window.medidataReporteComprasSS = {
         tabla: null,
 
@@ -134,6 +275,7 @@
 
         initDetallePago: function() {
             var cfg = baseConfig('../../backend/registros/get_reporte_detalle_pago.php');
+            cfg.buttons = detallePagoExportButtons();
             cfg.order = [[0, 'desc']];
             cfg.columns = [
                 { data: 'fecha' },

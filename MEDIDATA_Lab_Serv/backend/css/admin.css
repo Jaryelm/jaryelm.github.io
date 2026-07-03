@@ -2458,6 +2458,22 @@ a.rrhh-icon-edit:hover,
 button.rrhh-icon-edit:hover {
   color: #048a99;
 }
+a.rrhh-icon-delete,
+button.rrhh-icon-delete {
+  color: #dc3545;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-decoration: none;
+  padding: 0;
+  margin-left: 0.5rem;
+}
+a.rrhh-icon-delete:hover,
+button.rrhh-icon-delete:hover {
+  color: #b02a37;
+}
 .switch {
   position: relative;
   display: inline-block;

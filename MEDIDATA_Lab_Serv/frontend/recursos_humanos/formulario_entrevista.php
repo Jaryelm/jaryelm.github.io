@@ -18,7 +18,7 @@ $calendarioUrl = 'entrevista.php';
 <?php include __DIR__ . '/_rrhh_select2_head.php'; ?>
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title>MEDICASA</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 <?php include_once '../admin/menu.php'; ?>

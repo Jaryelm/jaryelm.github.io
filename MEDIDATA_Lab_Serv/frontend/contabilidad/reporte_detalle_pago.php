@@ -13,6 +13,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
 </head>
 <body>
@@ -102,7 +103,8 @@ include_once '../../backend/registros/session_check.php';
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
-<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js?v=20260703c"></script>
 
 <script>
 $(document).ready(function() {

@@ -14,7 +14,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
-    <title>MEDIDATA - Nuevo Departamento</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 

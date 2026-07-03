@@ -20,7 +20,7 @@ if ($estado) {
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title>MEDICASA</title>
+    <title>MEDIDATA</title>
     <style>
         body { background: #f4f4f4; margin: 0; font-family: Arial, sans-serif; }
         .ex-wrap { max-width: 760px; margin: 24px auto; padding: 0 16px 40px; }

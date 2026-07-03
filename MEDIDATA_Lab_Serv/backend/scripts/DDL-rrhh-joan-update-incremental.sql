@@ -144,3 +144,19 @@ SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
     WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'departaments' AND COLUMN_NAME = 'phone_ext');
 SET @sql := IF(@col = 0, 'ALTER TABLE `departaments` ADD COLUMN `phone_ext` VARCHAR(10) NULL DEFAULT NULL AFTER `phone`', 'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Descanso y horas efectivas en horarios
+SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'schedules' AND COLUMN_NAME = 'break_minutes');
+SET @sql := IF(@col = 0, 'ALTER TABLE `schedules` ADD COLUMN `break_minutes` INT NOT NULL DEFAULT 0 AFTER `name`', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'schedules' AND COLUMN_NAME = 'weekly_effective_hours');
+SET @sql := IF(@col = 0, 'ALTER TABLE `schedules` ADD COLUMN `weekly_effective_hours` DECIMAL(6,2) NULL DEFAULT NULL AFTER `break_minutes`', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = 'medic9ue_medi_rrhh_interviews' AND TABLE_NAME = 'schedule_details' AND COLUMN_NAME = 'apply_break');
+SET @sql := IF(@col = 0, 'ALTER TABLE `schedule_details` ADD COLUMN `apply_break` TINYINT(1) NOT NULL DEFAULT 1 AFTER `exit_time`', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;

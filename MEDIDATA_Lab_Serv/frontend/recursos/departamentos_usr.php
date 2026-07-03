@@ -21,7 +21,7 @@ if (isset($connect_rrhh) && $connect_rrhh instanceof PDO) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
-    <title>MEDIDATA - Departamentos</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
     

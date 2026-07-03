@@ -19,35 +19,8 @@ try {
     $hasta = trim((string) ($_GET['fechaHasta'] ?? $_GET['hasta'] ?? ''));
 
     $baseFrom = medidata_reporte_detalle_pago_from_sql($connect);
-    $selectSql = medidata_reporte_detalle_pago_select_sql($connect);
-
     $params = [];
-    $whereExtra = '';
-
-    if ($desde !== '' && $hasta !== '') {
-        $whereExtra .= ' AND DATE(o.placed_on) BETWEEN :desde AND :hasta';
-        $params[':desde'] = $desde;
-        $params[':hasta'] = $hasta;
-    } elseif ($desde !== '') {
-        $whereExtra .= ' AND DATE(o.placed_on) >= :desde';
-        $params[':desde'] = $desde;
-    } elseif ($hasta !== '') {
-        $whereExtra .= ' AND DATE(o.placed_on) <= :hasta';
-        $params[':hasta'] = $hasta;
-    }
-
-    if ($searchValue !== '') {
-        $whereExtra .= ' AND (
-            CAST(o.idord AS CHAR) LIKE :s0
-            OR o.invoice_number LIKE :s1
-            OR o.nomcl LIKE :s2
-            OR o.method LIKE :s3
-            OR o.invoice_status LIKE :s4
-            OR det.detalle_examen LIKE :s5
-        )';
-        medidata_reporte_dt_like_params($params, $searchValue, [':s0', ':s1', ':s2', ':s3', ':s4', ':s5']);
-    }
-
+    $whereExtra = medidata_reporte_detalle_pago_build_where($desde, $hasta, $searchValue, $params);
     $fromWhere = $baseFrom . $whereExtra;
 
     $stmtTotal = $connect->prepare('SELECT COUNT(o.idord) ' . $fromWhere);
@@ -78,6 +51,7 @@ try {
     ];
     $orderBy = $columns[$orderColumn] ?? 'o.placed_on';
 
+    $selectSql = medidata_reporte_detalle_pago_select_sql($connect);
     $query = $selectSql . $fromWhere . " ORDER BY {$orderBy} {$orderDir}, o.idord DESC"
         . medidata_reporte_dt_limit_sql($start, $length);
     $stmt = $connect->prepare($query);
@@ -88,31 +62,7 @@ try {
 
     $data = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $fhRaw = $row['placed_on'] ?? '';
-        $celular = trim((string) ($row['telefono_paciente'] ?? ''));
-        if ($celular === '') {
-            $celular = trim((string) ($row['paciente_phon'] ?? ''));
-        }
-        if ($celular === '') {
-            $celular = '-';
-        }
-
-        $data[] = [
-            'fecha' => $fhRaw ? date('d-m-Y', strtotime($fhRaw)) : '-',
-            'fecha_iso' => $fhRaw,
-            'hora' => $fhRaw ? date('H:i', strtotime($fhRaw)) : '-',
-            'forma_pago' => $row['method'] ?? '-',
-            'estado' => $row['invoice_status'] ?? '-',
-            'factura' => !empty($row['invoice_number']) ? $row['invoice_number'] : '-',
-            'detalle_examen' => $row['detalle_examen'] ?? '-',
-            'cliente' => $row['nomcl'] ?? '-',
-            'cliente_celular' => $celular,
-            'tipo_descuento' => medidata_reporte_tipo_descuento_predominante($row),
-            'subtotal' => medidata_reporte_fmt_lempiras($row['price_without_discount'] ?? 0),
-            'descuento' => medidata_reporte_fmt_lempiras($row['discount_amount'] ?? 0),
-            'impuesto' => medidata_reporte_fmt_lempiras($row['tax_amount'] ?? 0),
-            'total' => medidata_reporte_fmt_lempiras($row['total_price'] ?? 0),
-        ];
+        $data[] = medidata_reporte_detalle_pago_format_row($row);
     }
 
     echo json_encode([

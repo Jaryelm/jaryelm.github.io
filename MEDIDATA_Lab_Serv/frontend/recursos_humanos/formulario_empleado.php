@@ -34,7 +34,7 @@ function fe_val(array $prefill, string $key): string
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title>Formulario de empleado — MEDICASA</title>
+    <title>MEDIDATA</title>
     <style>
         body { background: #f4f4f4; margin: 0; }
         .fe-wrap { max-width: 720px; margin: 24px auto; padding: 0 16px 40px; }

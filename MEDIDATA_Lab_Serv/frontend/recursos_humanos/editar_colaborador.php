@@ -15,7 +15,7 @@ medidata_users_rrhh_extra_ensure($connect);
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <?php include __DIR__ . '/_rrhh_select2_head.php'; ?>
-    <title>MEDIDATA - Editar Colaborador</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 

@@ -59,7 +59,7 @@ if (!in_array($contexto, ['colaboradores', 'medicos'], true)) {
 $esMedico = ($contexto === 'medicos');
 $return_page = $esMedico ? 'lista_colaboradores_medicos_usr.php' : 'lista_colaboradores_usr.php';
 $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
-$page_titulo = $esMedico ? 'MEDIDATA - Agregar Médico' : 'MEDIDATA - Agregar Colaborador';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -72,7 +72,7 @@ $page_titulo = $esMedico ? 'MEDIDATA - Agregar Médico' : 'MEDIDATA - Agregar Co
     <?php include __DIR__ . '/_rrhh_select2_head.php'; ?>
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title><?php echo htmlspecialchars($page_titulo); ?></title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 <?php 

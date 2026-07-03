@@ -31,7 +31,7 @@ if ($is_edit && $pdoRrhh) {
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <title>MEDIDATA - <?php echo $is_edit ? 'Editar' : 'Registrar'; ?> Nivel Salarial</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 

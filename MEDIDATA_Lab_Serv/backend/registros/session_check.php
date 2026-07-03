@@ -42,6 +42,8 @@ if (!function_exists('medidata_session_json_api_script')) {
             'get_dashboard_ventas_resumen.php',
             'get_dashboard_ventas_detalle.php',
             'get_reporte_detalle_pago.php',
+            'export_reporte_detalle_pago.php',
+            'get_reporte_detalle_pago_export.php',
             'get_reporte_cuadre_caja.php',
             'get_reporte_devoluciones_ventas.php',
             'get_cierres_caja.php',
