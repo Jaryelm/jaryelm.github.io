@@ -23,7 +23,7 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             PRIMARY KEY (`idadm`),
             UNIQUE KEY `uq_staff_administrative_numide` (`numide`),
             KEY `idx_staff_administrative_user` (`id_user`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         $connect->exec("CREATE TABLE IF NOT EXISTS `staff_general_services` (
             `idsg` int(11) NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             PRIMARY KEY (`idsg`),
             UNIQUE KEY `uq_staff_general_services_numide` (`numide`),
             KEY `idx_staff_general_services_user` (`id_user`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         $connect->exec("CREATE TABLE IF NOT EXISTS `staff_medifarma` (
             `idmf` int(11) NOT NULL AUTO_INCREMENT,
@@ -69,9 +69,9 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             `id_biometrico` int(11) DEFAULT NULL,
             `id_candidate_rrhh` int(11) DEFAULT NULL,
             
-            `url_contrato` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-            `url_solicitud` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-            `url_psicometricas` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `url_contrato` longblob DEFAULT NULL,
+            `url_solicitud` longblob DEFAULT NULL,
+            `url_psicometricas` longblob DEFAULT NULL,
             
             `area` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
             `state` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
@@ -79,7 +79,7 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             PRIMARY KEY (`idmf`),
             UNIQUE KEY `uq_staff_medifarma_numide` (`numide`),
             KEY `idx_staff_medifarma_user` (`id_user`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         medidata_staff_ensure_id_user_column($connect, 'staff_administrative');
         medidata_staff_ensure_id_user_column($connect, 'staff_general_services');

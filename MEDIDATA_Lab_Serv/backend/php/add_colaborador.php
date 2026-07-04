@@ -210,6 +210,13 @@ try {
         }
     }
 
+    $extraCols = '';
+    $extraVals = '';
+    if ($area_colaborador === 'doctor') {
+        $extraCols = ', nomesp, direcd, phd, corr';
+        $extraVals = ", '', '', '', ''";
+    }
+
     // Insertar en la BD principal
     $stmt = $connect->prepare("
         INSERT INTO {$area_colaborador} (
@@ -217,13 +224,13 @@ try {
             num_empleado, tipo_empleado, duracion_contrato, fecha_ingreso,
             id_departamento, id_cargo, id_horario, id_salary_level, salario,
             cuenta_bac, telefono, correo_personal, correo_institucional,
-            num_locker, id_biometrico, url_contrato, url_solicitud, url_psicometricas, id_candidate_rrhh
+            num_locker, id_biometrico, url_contrato, url_solicitud, url_psicometricas, id_candidate_rrhh{$extraCols}
         ) VALUES (
             :id_user, :numide, :nombres, :apellidos, :nacimiento, :genero, '1',
             :num_empleado, :tipo_empleado, :duracion_contrato, :fecha_ingreso,
             :id_departamento, :id_cargo, :id_horario, :id_salary_level, :salario,
             :cuenta_bac, :telefono, :correo_personal, :correo_institucional,
-            :num_locker, :id_biometrico, :url_contrato, :url_solicitud, :url_psicometricas, :id_candidate_rrhh
+            :num_locker, :id_biometrico, :url_contrato, :url_solicitud, :url_psicometricas, :id_candidate_rrhh{$extraVals}
         )
     ");
     

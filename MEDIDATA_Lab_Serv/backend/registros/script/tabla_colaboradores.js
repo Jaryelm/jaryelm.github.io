@@ -255,6 +255,9 @@
             render: function (d, t, row) {
                 var fieldMeta = FIELD_MAP[row.source_table];
                 var html = '<a title="Actualizar" href="' + fieldMeta.edit + '?id=' + row.id + '&table=' + escAttr(row.source_table) + '" class="fa fa-pencil tooltip"></a>';
+                if (cfg.estado === '1' && row.source_table !== 'users') {
+                    html += ' <a title="Trasladar" href="#" class="fa fa-exchange tooltip btn-transfer-colab" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '" style="background-color: #17a2b8; color: white; margin-left: 5px;"></a>';
+                }
                 if (cfg.allowDelete) {
                     html += ' <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-colab" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '" data-idcol="' + fieldMeta.idcol + '"></a>';
                 }
@@ -336,6 +339,50 @@
             var id = checkbox.data('id');
             var table = checkbox.data('table');
             var newState = checkbox.is(':checked') ? 1 : 0;
+
+            if (cfg.estado === '0' && newState === 1 && table !== 'users') {
+                // Modo ex-colaboradores: al reactivar, preguntar destino
+                checkbox.prop('checked', false); // revertir temporalmente
+                
+                var optionsHtml = '<select id="transfer-target" class="form-control form-select" style="display: block; width: 100%; font-size:1rem; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; background-color: #fff; color: #495057; cursor: pointer; outline: none;">' +
+                    '<option value="staff_administrative"' + (table==='staff_administrative'?' selected':'') + '>Colaboradores (Administrativos)</option>' +
+                    '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
+                    '<option value="staff_medifarma"' + (table==='staff_medifarma'?' selected':'') + '>Medifarma</option>' +
+                    '<option value="nurse"' + (table==='nurse'?' selected':'') + '>Enfermería</option>' +
+                    '<option value="staff_general_services"' + (table==='staff_general_services'?' selected':'') + '>Servicios Generales</option>' +
+                    '</select>';
+
+                Swal.fire({
+                    title: 'Reintegrar Colaborador',
+                    html: 'Seleccione a qué área desea reintegrar a esta persona:<br><br>' + optionsHtml,
+                    showCancelButton: true,
+                    confirmButtonText: 'Reintegrar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#28a745'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        var targetTable = $('#transfer-target').val();
+                        $.ajax({
+                            url: '../../backend/php/transfer_colaborador.php',
+                            type: 'POST',
+                            data: { id: id, source_table: table, target_table: targetTable, new_state: 1 },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({ title: 'Éxito', text: 'Reintegrado exitosamente', icon: 'success', timer: 1200, showConfirmButton: false });
+                                    tabla.ajax.reload(null, false);
+                                } else {
+                                    Swal.fire('Error', response.message || 'Error al reintegrar.', 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Error de comunicación', 'error');
+                            }
+                        });
+                    }
+                });
+                return;
+            }
 
             var endpoints = {
                 'doctor': '../../backend/php/toggle_doctor_state.php',
@@ -426,6 +473,55 @@
                         Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
                     }
                 });
+            });
+        });
+        // Traslado (botón de transfer) para colaboradores activos
+        $('#example tbody').on('click', '.btn-transfer-colab', function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            var id = btn.data('id');
+            var table = btn.data('table');
+
+            var optionsHtml = '<select id="transfer-target-btn" class="form-control form-select" style="display: block; width: 100%; font-size:1rem; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; background-color: #fff; color: #495057; cursor: pointer; outline: none;">' +
+                '<option value="staff_administrative"' + (table==='staff_administrative'?' selected':'') + '>Colaboradores (Administrativos)</option>' +
+                '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
+                '<option value="staff_medifarma"' + (table==='staff_medifarma'?' selected':'') + '>Medifarma</option>' +
+                '<option value="nurse"' + (table==='nurse'?' selected':'') + '>Enfermería</option>' +
+                '<option value="staff_general_services"' + (table==='staff_general_services'?' selected':'') + '>Servicios Generales</option>' +
+                '</select>';
+
+            Swal.fire({
+                title: 'Trasladar Personal',
+                html: 'Seleccione la nueva área a la que será transferido:<br><br>' + optionsHtml,
+                showCancelButton: true,
+                confirmButtonText: 'Trasladar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#17a2b8'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    var targetTable = $('#transfer-target-btn').val();
+                    if (targetTable === table) {
+                        Swal.fire('Atención', 'Ya pertenece a esta área.', 'info');
+                        return;
+                    }
+                    $.ajax({
+                        url: '../../backend/php/transfer_colaborador.php',
+                        type: 'POST',
+                        data: { id: id, source_table: table, target_table: targetTable },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({ title: 'Éxito', text: 'Trasladado exitosamente', icon: 'success', timer: 1200, showConfirmButton: false });
+                                tabla.ajax.reload(null, false);
+                            } else {
+                                Swal.fire('Error', response.message || 'Error al trasladar.', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error de comunicación', 'error');
+                        }
+                    });
+                }
             });
         });
     });

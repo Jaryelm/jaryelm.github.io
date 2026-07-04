@@ -116,7 +116,7 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
             ajaxUrl: '../../backend/php/get_colaboradores.php',
             estado: '1',
             variant: 'usr',
-            excluir: 'doctor',
+            excluir: 'doctor,staff_medifarma',
             deptoMap: <?php echo json_encode($depto_map, JSON_UNESCAPED_UNICODE); ?>,
             salaryMap: <?php echo json_encode($salary_level_map, JSON_UNESCAPED_UNICODE); ?>,
             cargoMap: <?php echo json_encode($cargo_map, JSON_UNESCAPED_UNICODE); ?>,

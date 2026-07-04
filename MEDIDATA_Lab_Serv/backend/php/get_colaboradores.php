@@ -42,9 +42,15 @@ try {
     $tipo = trim((string) ($_GET['tipo'] ?? ''));
     $tipoFilter = in_array($tipo, $tipoAllow, true) ? " AND t.source_table = '" . $tipo . "'" : '';
 
-    // Exclusión opcional (ej. la lista de colaboradores excluye médicos).
-    $excluir = trim((string) ($_GET['excluir'] ?? ''));
-    $excluirFilter = in_array($excluir, $tipoAllow, true) ? " AND t.source_table <> '" . $excluir . "'" : '';
+    // Exclusión opcional (ej. la lista de colaboradores excluye médicos y medifarma).
+    $excluirRaw = trim((string) ($_GET['excluir'] ?? ''));
+    $excluirList = array_filter(array_map('trim', explode(',', $excluirRaw)));
+    $excluirFilter = '';
+    foreach ($excluirList as $ex) {
+        if (in_array($ex, $tipoAllow, true)) {
+            $excluirFilter .= " AND t.source_table <> '" . $ex . "'";
+        }
+    }
 
     // UNION de las 4 tablas de personal con columnas normalizadas.
     $union = "
