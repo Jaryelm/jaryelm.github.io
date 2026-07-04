@@ -75,6 +75,13 @@ try {
         throw new Exception("Registro original no encontrado.");
     }
 
+    // 3.5 Check if record already exists in target table
+    $stmtCheck = $connect->prepare("SELECT COUNT(*) FROM `$target_table` WHERE `" . $targetMeta['ident'] . "` = :ident");
+    $stmtCheck->execute([':ident' => $row[$sourceMeta['ident']]]);
+    if ((int)$stmtCheck->fetchColumn() > 0) {
+        throw new Exception("Ya existe un registro con este DNI/Identificación en el área de destino. Puede que esté como excolaborador, verifique y elimínelo antes de trasladar.");
+    }
+
     // 4. Preparar inserción en destino
     $commonFields = [
         'num_empleado', 'tipo_empleado', 'id_departamento', 'id_cargo', 'id_salary_level', 

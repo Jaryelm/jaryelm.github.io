@@ -86,12 +86,13 @@
     }
 
     function editableCell(row, field, value, tag) {
-        tag = tag || 'td';
+        // DataTables ya genera el <td>, así que debemos retornar un elemento válido en su interior (ej. div o span)
+        tag = 'div';
         var meta = FIELD_MAP[row.source_table];
         return '<' + tag + ' class="editable-cell" contenteditable="true"' +
             ' data-id="' + row.id + '" data-field="' + field + '"' +
             ' data-table="' + escAttr(row.source_table) + '" data-idcol="' + meta.idcol + '"' +
-            ' style="background-color:#f9f9f9; border:1px dashed #ccc; cursor:pointer;">' +
+            ' style="background-color:#f9f9f9; border:1px dashed #ccc; cursor:text; padding: 4px; border-radius: 4px; min-width: 50px;">' +
             (value === null || value === undefined || value === '' ? '—' : esc(value)) +
             '</' + tag + '>';
     }
