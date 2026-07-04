@@ -43,17 +43,17 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
             <div class="rrhh-tab-nav">
-                <a href="lista_colaboradores_usr.php" class="button tab-button active">Lista de Colaboradores</a>
+                <a href="lista_colaboradores_usr.php" class="button tab-button">Lista de Colaboradores</a>
                 <a href="lista_colaboradores_medicos_usr.php" class="button tab-button">Lista de Médicos</a>
-                <a href="lista_colaboradores_medifarma_usr.php" class="button tab-button">Lista Medifarma</a>
+                <a href="lista_colaboradores_medifarma_usr.php" class="button tab-button active">Lista Medifarma</a>
                 <a href="lista_excolaboradores_usr.php" class="button tab-button">Lista de Excolaboradores</a>
             </div>
 
             <div class="data">
                 <div class="content-data">
                     <?php
-                    $rrhh_lista_titulo = 'Lista Colaboradores';
-                    $rrhh_lista_add_url = 'agregar_colaborador_usr.php?contexto=colaboradores';
+                    $rrhh_lista_titulo = 'Lista Medifarma';
+                    $rrhh_lista_add_url = 'agregar_colaborador_usr.php?contexto=medifarma';
                     $rrhh_lista_add_label = 'Agregar colaborador';
                     include __DIR__ . '/_rrhh_lista_titulo_toolbar.php';
                     ?>
@@ -116,7 +116,8 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
             ajaxUrl: '../../backend/php/get_colaboradores.php',
             estado: '1',
             variant: 'usr',
-            excluir: 'doctor',
+            excluir: '',
+            tipo: 'staff_medifarma',
             deptoMap: <?php echo json_encode($depto_map, JSON_UNESCAPED_UNICODE); ?>,
             salaryMap: <?php echo json_encode($salary_level_map, JSON_UNESCAPED_UNICODE); ?>,
             cargoMap: <?php echo json_encode($cargo_map, JSON_UNESCAPED_UNICODE); ?>,

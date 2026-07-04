@@ -38,7 +38,7 @@ if ($area_colaborador === '' || $numide === '' || $nombres === '') {
 }
 
 $lista_contexto = trim((string) ($_POST['lista_contexto'] ?? 'colaboradores'));
-if (!in_array($lista_contexto, ['colaboradores', 'medicos'], true)) {
+if (!in_array($lista_contexto, ['colaboradores', 'medicos', 'medifarma'], true)) {
     $lista_contexto = 'colaboradores';
 }
 if ($lista_contexto === 'medicos' && $area_colaborador !== 'doctor') {
@@ -50,7 +50,7 @@ if ($lista_contexto === 'colaboradores' && $area_colaborador === 'doctor') {
     return;
 }
 
-$valid_areas = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services'];
+$valid_areas = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
 if (!in_array($area_colaborador, $valid_areas)) {
     echo '<script>Swal.fire("Área no válida", "El área seleccionada no es válida.", "error");</script>';
     return;
@@ -89,6 +89,12 @@ if ($area_colaborador === 'staff_administrative') {
     $col_nacimiento = 'nacd';
     $col_genero = 'sexd';
     $label_area = 'Médico';
+} elseif ($area_colaborador === 'staff_medifarma') {
+    $col_nombres = 'nommf';
+    $col_apellidos = 'apemf';
+    $col_nacimiento = 'nacmf';
+    $col_genero = 'sexmf';
+    $label_area = 'Medifarma';
 }
 
 try {
@@ -250,7 +256,10 @@ try {
     ]);
 
     if ($ok) {
-        $defaultReturn = ($lista_contexto === 'medicos') ? 'lista_colaboradores_medicos.php' : 'lista_colaboradores.php';
+        $defaultReturn = 'lista_colaboradores.php';
+        if ($lista_contexto === 'medicos') $defaultReturn = 'lista_colaboradores_medicos.php';
+        if ($lista_contexto === 'medifarma') $defaultReturn = 'lista_colaboradores_medifarma.php';
+
         $returnPage = medidata_staff_return_page($_POST, $defaultReturn);
         echo '<script>Swal.fire("Agregado", "Colaborador de ' . $label_area . ' registrado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
     } else {

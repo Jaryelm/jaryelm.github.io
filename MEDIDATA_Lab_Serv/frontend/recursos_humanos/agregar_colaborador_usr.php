@@ -53,12 +53,19 @@ try {
 } catch (Exception $e) {}
 
 $contexto = isset($_GET['contexto']) ? trim((string) $_GET['contexto']) : 'colaboradores';
-if (!in_array($contexto, ['colaboradores', 'medicos'], true)) {
+if (!in_array($contexto, ['colaboradores', 'medicos', 'medifarma'], true)) {
     $contexto = 'colaboradores';
 }
 $esMedico = ($contexto === 'medicos');
-$return_page = $esMedico ? 'lista_colaboradores_medicos_usr.php' : 'lista_colaboradores_usr.php';
-$form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
+$esMedifarma = ($contexto === 'medifarma');
+
+$return_page = 'lista_colaboradores_usr.php';
+if ($esMedico) $return_page = 'lista_colaboradores_medicos_usr.php';
+if ($esMedifarma) $return_page = 'lista_colaboradores_medifarma_usr.php';
+
+$form_titulo = 'Nuevo Colaborador';
+if ($esMedico) $form_titulo = 'Nuevo Médico';
+if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
 
 ?>
 <!DOCTYPE html>
@@ -99,8 +106,9 @@ $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
         <?php endif; ?>
         
         <div class="rrhh-tab-nav">
-            <a href="lista_colaboradores_usr.php" class="button tab-button<?php echo $esMedico ? '' : ' active'; ?>">Lista de Colaboradores</a>
+            <a href="lista_colaboradores_usr.php" class="button tab-button<?php echo ($contexto === 'colaboradores') ? ' active' : ''; ?>">Lista de Colaboradores</a>
             <a href="lista_colaboradores_medicos_usr.php" class="button tab-button<?php echo $esMedico ? ' active' : ''; ?>">Lista de Médicos</a>
+            <a href="lista_colaboradores_medifarma_usr.php" class="button tab-button<?php echo $esMedifarma ? ' active' : ''; ?>">Lista Medifarma</a>
             <a href="lista_excolaboradores_usr.php" class="button tab-button">Lista de Excolaboradores</a>
         </div>
 
@@ -119,6 +127,9 @@ $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
                 <?php if ($esMedico): ?>
                 <input type="hidden" name="area_colaborador" value="doctor">
                 <input type="text" value="Médico" readonly style="background:#f5f5f5; cursor:not-allowed;">
+                <?php elseif ($esMedifarma): ?>
+                <input type="hidden" name="area_colaborador" value="staff_medifarma">
+                <input type="text" value="Medifarma" readonly style="background:#f5f5f5; cursor:not-allowed;">
                 <?php else: ?>
                 <select class="select2" name="area_colaborador" required>
                     <option value="">Seleccione un área...</option>

@@ -45,6 +45,7 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
             <div class="rrhh-tab-nav">
                 <a href="lista_colaboradores.php" class="button tab-button">Lista de Colaboradores</a>
                 <a href="lista_colaboradores_medicos.php" class="button tab-button">Lista de Médicos</a>
+                <a href="lista_colaboradores_medifarma.php" class="button tab-button">Lista Medifarma</a>
                 <a href="lista_excolaboradores.php" class="button tab-button active">Lista de Excolaboradores</a>
             </div>
 
@@ -58,9 +59,9 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
                         <table id="example" class="responsive-table" style="width:100%;">
                             <thead>
                                 <tr>
+                                    <th>N°</th>
                                     <th>CATEGORÍA</th>
                                     <th>TIPO DE EMPLEADO</th>
-                                    <th>N° EMPLEADO</th>
                                     <th>DNI</th>
                                     <th>NOMBRES</th>
                                     <th>APELLIDOS</th>

@@ -38,23 +38,13 @@ try {
     $estado = (isset($_GET['estado']) && $_GET['estado'] === '0') ? '0' : '1';
 
     // Filtro opcional por tipo de personal (whitelist de tablas de origen).
-    $tipoAllow = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services'];
+    $tipoAllow = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
     $tipo = trim((string) ($_GET['tipo'] ?? ''));
     $tipoFilter = in_array($tipo, $tipoAllow, true) ? " AND t.source_table = '" . $tipo . "'" : '';
 
     // Exclusión opcional (ej. la lista de colaboradores excluye médicos).
     $excluir = trim((string) ($_GET['excluir'] ?? ''));
     $excluirFilter = in_array($excluir, $tipoAllow, true) ? " AND t.source_table <> '" . $excluir . "'" : '';
-
-    /*
-     * Usuarios vinculados a ficha de médico: no deben aparecer en "Lista de Colaboradores"
-     * (excluir=doctor). Solo se listan como médico en "Lista de Médicos" (tipo=doctor).
-     * En excolaboradores (estado=0) se aplica la misma regla para evitar duplicados.
-     */
-    $usuarioMedicoFilter = '';
-    if ($estado === '0' || $excluir === 'doctor') {
-        $usuarioMedicoFilter = "AND u.id NOT IN ( SELECT id_user FROM doctor WHERE id_user IS NOT NULL AND id_user > 0 )";
-    }
 
     // UNION de las 4 tablas de personal con columnas normalizadas.
     $union = "
@@ -86,24 +76,13 @@ try {
                (url_contrato IS NOT NULL) AS tiene_contrato, state
         FROM staff_general_services
         UNION ALL
-        SELECT 'users' AS source_table, u.id AS id,
-               ue.num_empleado, u.cedula AS identificacion, u.name AS nombres, '' AS apellidos, u.sexo AS sexo,
-               ue.tipo_empleado, ue.id_departamento, ue.id_cargo, ue.id_salary_level, ue.salario, ue.cuenta_bac, ue.fecha_ingreso, ue.telefono,
-               ue.correo_personal, u.email AS correo_institucional, NULL AS fecha_nacimiento, u.rol AS especialidad,
-               u.uid_biometrico AS id_biometrico, ue.num_locker,
-               (ue.url_contrato IS NOT NULL) AS tiene_contrato, u.state
-        FROM users u
-        LEFT JOIN users_rrhh_extra ue ON ue.id_user = u.id
-        WHERE u.username NOT IN ('dev')
-          /* Ocultar la fila \"Usuario\" cuando ya existe como ficha de personal NO medica
-             (administrativo/enfermeria/servicios generales): evita verlo dos veces en la
-             MISMA lista (Colaboradores). El caso medico se maneja aparte mas abajo. */
-          AND u.id NOT IN (
-            SELECT id_user FROM staff_administrative WHERE id_user IS NOT NULL
-            UNION SELECT id_user FROM nurse WHERE id_user IS NOT NULL
-            UNION SELECT id_user FROM staff_general_services WHERE id_user IS NOT NULL
-        )
-          $usuarioMedicoFilter
+        SELECT 'staff_medifarma' AS source_table, idmf AS id,
+               num_empleado, numide AS identificacion, nommf AS nombres, apemf AS apellidos, sexmf AS sexo,
+               tipo_empleado, id_departamento, id_cargo, id_salary_level, salario, cuenta_bac, fecha_ingreso, telefono,
+               correo_personal, correo_institucional, nacmf AS fecha_nacimiento, NULL AS especialidad, id_biometrico, num_locker,
+               (url_contrato IS NOT NULL) AS tiene_contrato, state
+        FROM staff_medifarma
+
     ";
 
     $baseFrom = " FROM ( $union ) AS t WHERE t.state = :estado" . $tipoFilter . $excluirFilter;

@@ -18,12 +18,19 @@ try {
 } catch (Exception $e) {}
 
 $contexto = isset($_GET['contexto']) ? trim((string) $_GET['contexto']) : 'colaboradores';
-if (!in_array($contexto, ['colaboradores', 'medicos'], true)) {
+if (!in_array($contexto, ['colaboradores', 'medicos', 'medifarma'], true)) {
     $contexto = 'colaboradores';
 }
 $esMedico = ($contexto === 'medicos');
-$return_page = $esMedico ? 'lista_colaboradores_medicos.php' : 'lista_colaboradores.php';
-$form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
+$esMedifarma = ($contexto === 'medifarma');
+
+$return_page = 'lista_colaboradores.php';
+if ($esMedico) $return_page = 'lista_colaboradores_medicos.php';
+if ($esMedifarma) $return_page = 'lista_colaboradores_medifarma.php';
+
+$form_titulo = 'Nuevo Colaborador';
+if ($esMedico) $form_titulo = 'Nuevo Médico';
+if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
 
 ?>
 <!DOCTYPE html>
@@ -58,8 +65,9 @@ $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
         <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
         
         <div class="rrhh-tab-nav">
-            <a href="lista_colaboradores.php" class="button tab-button<?php echo $esMedico ? '' : ' active'; ?>">Lista de Colaboradores</a>
+            <a href="lista_colaboradores.php" class="button tab-button<?php echo ($contexto === 'colaboradores') ? ' active' : ''; ?>">Lista de Colaboradores</a>
             <a href="lista_colaboradores_medicos.php" class="button tab-button<?php echo $esMedico ? ' active' : ''; ?>">Lista de Médicos</a>
+            <a href="lista_colaboradores_medifarma.php" class="button tab-button<?php echo $esMedifarma ? ' active' : ''; ?>">Lista Medifarma</a>
             <a href="lista_excolaboradores.php" class="button tab-button">Lista de Excolaboradores</a>
         </div>
 
@@ -78,6 +86,9 @@ $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
                 <?php if ($esMedico): ?>
                 <input type="hidden" name="area_colaborador" value="doctor">
                 <input type="text" value="Médico" readonly style="background:#f5f5f5; cursor:not-allowed;">
+                <?php elseif ($esMedifarma): ?>
+                <input type="hidden" name="area_colaborador" value="staff_medifarma">
+                <input type="text" value="Medifarma" readonly style="background:#f5f5f5; cursor:not-allowed;">
                 <?php else: ?>
                 <select class="select2" name="area_colaborador" required>
                     <option value="">Seleccione un área...</option>
@@ -187,43 +198,43 @@ $form_titulo = $esMedico ? 'Nuevo Médico' : 'Nuevo Colaborador';
                 <h3>Documentos (Opcionales)</h3>
                 
                 <label>Solicitud de empleo</label>
-                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" >
                 
                 <label>Pruebas Psicométricas</label>
-                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" >
                 
                 <label>Copia de partida de nacimiento de hijos</label>
-                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" >
                 
                 <label>Foto (Para su Carnet)</label>
-                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" >
                 
                 <label>Documento de identidad (revés y derecho)</label>
-                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" >
                 
                 <label>Copia de recibo (agua, luz, teléfono)</label>
-                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" >
                 
                 <label>Antecedentes Penales</label>
-                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" >
                 
                 <label>Antecedentes Policiales</label>
-                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" >
                 
                 <label>2 Referencias personales</label>
-                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" >
                 
                 <label>2 Referencias profesionales</label>
-                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" >
                 
                 <label>Diplomas o títulos recibidos</label>
-                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
+                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" >
                 
                 <label>Croquis de vivienda</label>
-                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" style="padding:10px;">
+                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" >
                 
                 <label><b>Contrato Firmado</b></label>
-                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="padding:10px; border:1px solid #2980b9;">
+                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="border:1px solid #2980b9;">
                 <hr>
                 <button type="submit" name="add_colaborador" class="registerbtn">Guardar</button>
             </div>

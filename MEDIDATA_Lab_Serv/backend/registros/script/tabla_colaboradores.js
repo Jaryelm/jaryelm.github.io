@@ -26,33 +26,38 @@
         staff_administrative: {
             label: 'Administrativo', idcol: 'idadm',
             f_nombres: 'nomadm', f_apellidos: 'apeadm', f_sexo: 'sexadm', f_ident: 'numide', f_nac: 'nacadm',
-            edit: variant === 'usr' ? 'administrativo_editar_usr.php' : 'administrativo_editar.php'
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
         },
         doctor: {
             label: 'Médico', idcol: 'idodc',
             f_nombres: 'nodoc', f_apellidos: 'apdoc', f_sexo: 'sexd', f_ident: 'ceddoc', f_nac: 'nacd',
-            edit: variant === 'usr' ? '../medicos/editar_usr.php' : '../medicos/editar.php'
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
         },
         nurse: {
             label: 'Enfermería', idcol: 'idnur',
             f_nombres: 'nomnur', f_apellidos: 'apenur', f_sexo: 'sexnur', f_ident: 'numide', f_nac: 'nacinur',
-            edit: '../recursos/enfermera_editar.php'
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
         },
         staff_general_services: {
             label: 'Servicios Generales', idcol: 'idsg',
             f_nombres: 'nomsg', f_apellidos: 'apesg', f_sexo: 'sexsg', f_ident: 'numide', f_nac: 'nacsg',
-            edit: variant === 'usr' ? 'servicios_generales_editar_usr.php' : 'servicios_generales_editar.php'
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
+        },
+        staff_medifarma: {
+            label: 'Medifarma', idcol: 'idmf',
+            f_nombres: 'nommf', f_apellidos: 'apemf', f_sexo: 'sexmf', f_ident: 'numide', f_nac: 'nacmf',
+            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
         },
         // Cuentas de usuario (login): se muestran como SOLO LECTURA. Se gestionan en "Usuarios Registrados".
         users: {
             label: 'Usuario', idcol: 'id',
             f_nombres: 'name', f_apellidos: '', f_sexo: 'sexo', f_ident: 'cedula', f_nac: '',
-            edit: variant === 'usr' ? 'editar_colaborador_usr.php' : 'editar_colaborador.php'
+            edit: '../usuarios/editar_user.php'
         }
     };
 
     function isUser(row) { return row.source_table === 'users'; }
-
+    
     // Etiqueta de categoría para cuentas de usuario = su rol (guiones -> espacios, con acentos).
     function formatRol(rol) {
         if (!rol) { return 'Usuario'; }
@@ -82,8 +87,6 @@
 
     function editableCell(row, field, value, tag) {
         tag = tag || 'td';
-        // Las cuentas de usuario sin campo destino (ej. apellidos) quedan en solo lectura.
-        if (isUser(row) && !field) { return readonlyCell(value, tag); }
         var meta = FIELD_MAP[row.source_table];
         return '<' + tag + ' class="editable-cell" contenteditable="true"' +
             ' data-id="' + row.id + '" data-field="' + field + '"' +
@@ -115,7 +118,6 @@
     // Categoría a mostrar (solo visual). Para médicos se usa la especialidad (nomesp);
     // las especialidades no-médicas se reetiquetan a su área. No modifica datos.
     function categoriaLabel(row) {
-        if (isUser(row)) { return formatRol(row.especialidad); }
         if (row.source_table === 'doctor') {
             var esp = String(row.especialidad || '').toUpperCase();
             if (!esp) { return 'Médico'; }
@@ -133,13 +135,19 @@
     }
 
     var columns = [
-        { // 0 Categoria
+        { // 0 N° (Row counter)
+            data: null, orderable: false, searchable: false,
+            render: function (data, type, row, meta) {
+                return '<div style="text-align:center; font-weight:bold; color:#555;">' + (meta.row + meta.settings._iDisplayStart + 1) + '</div>';
+            }
+        },
+        { // 1 Categoria
             data: 'source_table', orderable: true,
             render: function (d, t, row) {
                 return '<span class="badge-primary" style="padding:4px; border-radius:4px; font-size:0.8rem;">' + esc(categoriaLabel(row)) + '</span>';
             }
         },
-        { // 1 Tipo de empleado
+        { // 2 Tipo de empleado
             data: null, orderable: true,
             render: function (data, type, row) {
                 var v = row.tipo_empleado || '';
@@ -150,7 +158,6 @@
                     '</select>';
             }
         },
-        { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, 'num_empleado', row.num_empleado); } }, // 2
         { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, FIELD_MAP[row.source_table].f_ident, row.identificacion, 'th'); } }, // 3 DNI
         { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, FIELD_MAP[row.source_table].f_nombres, row.nombres); } }, // 4 NOMBRES
         { data: null, orderable: true, render: function (d, t, row) { return editableCell(row, FIELD_MAP[row.source_table].f_apellidos, row.apellidos); } }, // 5 APELLIDOS
@@ -247,10 +254,7 @@
             data: null, orderable: false, searchable: false,
             render: function (d, t, row) {
                 var fieldMeta = FIELD_MAP[row.source_table];
-                if (isUser(row)) {
-                    return actionsCell('<a title="Editar usuario" href="' + fieldMeta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>');
-                }
-                var html = '<a title="Actualizar" href="' + fieldMeta.edit + '?id=' + row.id + '" class="fa fa-pencil tooltip"></a>';
+                var html = '<a title="Actualizar" href="' + fieldMeta.edit + '?id=' + row.id + '&table=' + escAttr(row.source_table) + '" class="fa fa-pencil tooltip"></a>';
                 if (cfg.allowDelete) {
                     html += ' <a title="Eliminar" href="#" class="fa fa-trash tooltip btn-delete-colab" data-id="' + row.id + '" data-table="' + escAttr(row.source_table) + '" data-idcol="' + fieldMeta.idcol + '"></a>';
                 }
@@ -291,7 +295,7 @@
             columnDefs: [
                 { targets: -1, className: 'rrhh-col-acciones', width: cfg.allowDelete ? '5.5rem' : '3.5rem' }
             ],
-            order: [[4, 'asc']],
+            order: [[5, 'asc']],
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             buttons: [
@@ -338,6 +342,7 @@
                 'nurse': '../../backend/php/toggle_nurse_state.php',
                 'staff_administrative': '../../backend/php/toggle_administrative_state.php',
                 'staff_general_services': '../../backend/php/toggle_general_services_state.php',
+                'staff_medifarma': '../../backend/php/toggle_medifarma_state.php',
                 'users': '../../backend/php/toggle_user_state.php'
             };
             var url = endpoints[table];
@@ -377,13 +382,15 @@
                 'doctor': '../../backend/php/delete_doctor.php',
                 'nurse': '../../backend/php/delete_nurse.php',
                 'staff_administrative': '../../backend/php/delete_administrative.php',
-                'staff_general_services': '../../backend/php/delete_general_services.php'
+                'staff_general_services': '../../backend/php/delete_general_services.php',
+                'staff_medifarma': '../../backend/php/delete_medifarma.php'
             };
             var deleteWarnings = {
                 'doctor': 'Se eliminarán también citas, eventos y registros vinculados.',
                 'nurse': 'El registro de enfermería se eliminará permanentemente.',
                 'staff_administrative': 'El registro administrativo se eliminará permanentemente.',
-                'staff_general_services': 'El registro de servicios generales se eliminará permanentemente.'
+                'staff_general_services': 'El registro de servicios generales se eliminará permanentemente.',
+                'staff_medifarma': 'El registro de medifarma se eliminará permanentemente.'
             };
             var url = deleteEndpoints[table];
             if (!url) {

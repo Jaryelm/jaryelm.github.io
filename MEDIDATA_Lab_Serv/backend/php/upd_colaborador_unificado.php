@@ -1,6 +1,28 @@
 <?php
-if (!isset($_POST['upd_doctors'])) {
+if (!isset($_POST['upd_colaborador_unificado'])) {
     return;
+}
+
+$table = $_POST['area_colaborador'] ?? '';
+$id_primary = (int)($_POST['id_primary'] ?? 0);
+
+$valid_areas = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
+if (!in_array($table, $valid_areas) || $id_primary <= 0) {
+    echo '<script>Swal.fire("Error", "Área o ID no válido.", "error");</script>';
+    return;
+}
+
+$col_id = ''; $col_numide = ''; $col_nombres = ''; $col_apellidos = ''; $col_nac = ''; $col_sexo = '';
+if ($table === 'staff_administrative') {
+    $col_id = 'idadm'; $col_numide = 'numide'; $col_nombres = 'nomadm'; $col_apellidos = 'apeadm'; $col_nac = 'nacadm'; $col_sexo = 'sexadm';
+} elseif ($table === 'staff_general_services') {
+    $col_id = 'idsg'; $col_numide = 'numide'; $col_nombres = 'nomsg'; $col_apellidos = 'apesg'; $col_nac = 'nacsg'; $col_sexo = 'sexsg';
+} elseif ($table === 'nurse') {
+    $col_id = 'idnur'; $col_numide = 'numide'; $col_nombres = 'nomnur'; $col_apellidos = 'apenur'; $col_nac = 'nacinur'; $col_sexo = 'sexnur';
+} elseif ($table === 'doctor') {
+    $col_id = 'idodc'; $col_numide = 'ceddoc'; $col_nombres = 'nodoc'; $col_apellidos = 'apdoc'; $col_nac = 'nacd'; $col_sexo = 'sexd';
+} elseif ($table === 'staff_medifarma') {
+    $col_id = 'idmf'; $col_numide = 'numide'; $col_nombres = 'nommf'; $col_apellidos = 'apemf'; $col_nac = 'nacmf'; $col_sexo = 'sexmf';
 }
 
 require_once __DIR__ . '/staff_colaborador_bootstrap.php';
@@ -8,13 +30,12 @@ require_once __DIR__ . '/../registros/rrhh_guard.php';
 
 medidata_staff_ensure_tables($connect);
 
-$idodc = (int) ($_POST['midp'] ?? 0);
-$ceddoc = strtoupper(trim((string) ($_POST['docce'] ?? '')));
-$nodoc = strtoupper(trim((string) ($_POST['docna'] ?? '')));
-$apdoc = strtoupper(trim((string) ($_POST['docap'] ?? '')));
-$nacd = trim((string) ($_POST['docda'] ?? ''));
-$sexd = trim((string) ($_POST['docge'] ?? ''));
-$idUser = medidata_staff_parse_id_user($_POST['docid_user'] ?? null);
+$numide = strtoupper(trim((string) ($_POST['identificacion'] ?? '')));
+$nombres = strtoupper(trim((string) ($_POST['nombres'] ?? '')));
+$apellidos = strtoupper(trim((string) ($_POST['apellidos'] ?? '')));
+$nacimiento = trim((string) ($_POST['fecha_nacimiento'] ?? ''));
+$sexo = trim((string) ($_POST['genero'] ?? ''));
+$idUser = medidata_staff_parse_id_user($_POST['id_user'] ?? null);
 
 // Nuevos campos
 $num_empleado = trim((string) ($_POST['num_empleado'] ?? ''));
@@ -34,20 +55,23 @@ $num_locker = trim((string) ($_POST['num_locker'] ?? ''));
 $id_biometrico = (int) ($_POST['id_biometrico'] ?? 0);
 
 try {
-    if ($idodc <= 0) {
-        throw new RuntimeException('Identificador no válido.');
-    }
-
     if ($idUser !== null) {
-        $linked = medidata_staff_id_user_linked($connect, $idUser, 'doctor', $idodc);
+        $linked = medidata_staff_id_user_linked($connect, $idUser, $table, $id_primary);
         if ($linked !== null) {
             throw new RuntimeException('Ese usuario ya está vinculado como colaborador de ' . $linked['label'] . '.');
         }
     }
 
+    // Comprobar que no exista otra persona en la MISMA tabla con el mismo DNI
+    $stmtCheck = $connect->prepare("SELECT {$col_id} FROM {$table} WHERE {$col_numide} = :numide AND {$col_id} != :id");
+    $stmtCheck->execute([':numide' => $numide, ':id' => $id_primary]);
+    if ($stmtCheck->fetchColumn()) {
+        throw new RuntimeException('Ya existe otro colaborador en esta área con el mismo documento.');
+    }
+
     // Obtener información actual
-    $stmtCurrent = $connect->prepare("SELECT ceddoc, id_candidate_rrhh FROM doctor WHERE idodc = ? LIMIT 1");
-    $stmtCurrent->execute([$idodc]);
+    $stmtCurrent = $connect->prepare("SELECT id_candidate_rrhh FROM {$table} WHERE {$col_id} = ? LIMIT 1");
+    $stmtCurrent->execute([$id_primary]);
     $currentRecord = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
     if (!$currentRecord) {
         throw new RuntimeException('El colaborador no existe.');
@@ -72,14 +96,12 @@ try {
     $id_candidate_rrhh = $currentRecord['id_candidate_rrhh'];
 
     if ($pdoRrhh) {
-        // Si no tiene candidato_rrhh, intentar encontrarlo por DNI o crearlo
         if (!$id_candidate_rrhh) {
             $stmtC = $pdoRrhh->prepare("SELECT id FROM candidates WHERE dni = :dni LIMIT 1");
-            $stmtC->execute([':dni' => $ceddoc]);
+            $stmtC->execute([':dni' => $numide]);
             $id_candidate_rrhh = $stmtC->fetchColumn();
 
             if (!$id_candidate_rrhh) {
-                // Obtener vacante dummy
                 $stmtV = $pdoRrhh->query("SELECT id FROM vacant_positions LIMIT 1");
                 $id_vacant = $stmtV->fetchColumn() ?: 1;
 
@@ -89,9 +111,9 @@ try {
                 ");
                 $stmtInsC->execute([
                     $id_vacant,
-                    $nodoc . ' ' . $apdoc,
-                    $ceddoc,
-                    $nacd !== '' ? $nacd : null,
+                    $nombres . ' ' . $apellidos,
+                    $numide,
+                    $nacimiento !== '' ? $nacimiento : null,
                     $telefono,
                     $correo_personal,
                     $_SESSION['name'] ?? 'System'
@@ -99,19 +121,17 @@ try {
                 $id_candidate_rrhh = $pdoRrhh->lastInsertId();
             }
         } else {
-            // Actualizar el nombre y datos básicos del candidato en RRHH
             $stmtUpdC = $pdoRrhh->prepare("UPDATE candidates SET fullname = ?, dni = ?, birthdate = ?, phonenumber = ?, email = ? WHERE id = ?");
             $stmtUpdC->execute([
-                $nodoc . ' ' . $apdoc,
-                $ceddoc,
-                $nacd !== '' ? $nacd : null,
+                $nombres . ' ' . $apellidos,
+                $numide,
+                $nacimiento !== '' ? $nacimiento : null,
                 $telefono,
                 $correo_personal,
                 $id_candidate_rrhh
             ]);
         }
 
-        // Subida de requisitos de contratación
         $uploadDir = __DIR__ . '/../../uploads/staff/';
         if (!is_dir($uploadDir)) {
             @mkdir($uploadDir, 0777, true);
@@ -135,7 +155,7 @@ try {
         foreach ($hr_docs as $fileInput => $dbCol) {
             if (isset($_FILES[$fileInput]) && $_FILES[$fileInput]['error'] === UPLOAD_ERR_OK) {
                 $ext = pathinfo($_FILES[$fileInput]['name'], PATHINFO_EXTENSION);
-                $filename = $dbCol . '_' . $ceddoc . '_' . time() . '.' . $ext;
+                $filename = $dbCol . '_' . $numide . '_' . time() . '.' . $ext;
                 if (move_uploaded_file($_FILES[$fileInput]['tmp_name'], $uploadDir . $filename)) {
                     $hr_updates[] = "$dbCol = ?";
                     $hr_params[] = '/uploads/staff/' . $filename;
@@ -156,10 +176,9 @@ try {
         }
     }
 
-    // Actualizar en la BD principal
     $updates = [
-        'id_user = :id_user', 'ceddoc = :ceddoc', 'nodoc = :nodoc', 'apdoc = :apdoc',
-        'nacd = :nacd', 'sexd = :sexd', 'num_empleado = :num_empleado',
+        'id_user = :id_user', "{$col_numide} = :numide", "{$col_nombres} = :nombres", "{$col_apellidos} = :apellidos",
+        "{$col_nac} = :nacimiento", "{$col_sexo} = :sexo", 'num_empleado = :num_empleado',
         'tipo_empleado = :tipo_empleado', 'duracion_contrato = :duracion_contrato',
         'fecha_ingreso = :fecha_ingreso', 'id_departamento = :id_departamento',
         'id_cargo = :id_cargo', 'id_horario = :id_horario', 'id_salary_level = :id_salary_level',
@@ -170,11 +189,11 @@ try {
     
     $params = [
         ':id_user' => $idUser,
-        ':ceddoc' => $ceddoc,
-        ':nodoc' => $nodoc,
-        ':apdoc' => $apdoc,
-        ':nacd' => $nacd,
-        ':sexd' => $sexd,
+        ':numide' => $numide,
+        ':nombres' => $nombres,
+        ':apellidos' => $apellidos,
+        ':nacimiento' => $nacimiento,
+        ':sexo' => $sexo,
         ':num_empleado' => $num_empleado,
         ':tipo_empleado' => $tipo_empleado,
         ':duracion_contrato' => $duracion_contrato,
@@ -190,7 +209,7 @@ try {
         ':correo_institucional' => $correo_institucional,
         ':num_locker' => $num_locker,
         ':id_biometrico' => $id_biometrico > 0 ? $id_biometrico : null,
-        ':idodc' => $idodc
+        ':id' => $id_primary
     ];
 
     if ($id_candidate_rrhh) {
@@ -210,20 +229,20 @@ try {
         $params[':url_psicometricas'] = $url_psicometricas;
     }
 
-    $sql = 'UPDATE doctor SET ' . implode(', ', $updates) . ' WHERE idodc = :idodc LIMIT 1';
+    $sql = "UPDATE {$table} SET " . implode(', ', $updates) . " WHERE {$col_id} = :id LIMIT 1";
     
     $stmt = $connect->prepare($sql);
     $ok = $stmt->execute($params);
 
     if ($ok) {
-        $returnPage = medidata_staff_return_page($_POST, 'administrativo.php');
+        $returnPage = medidata_staff_return_page($_POST, 'lista_colaboradores.php');
         echo '<script>Swal.fire("Actualizado", "Colaborador actualizado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';
     } else {
         echo '<script>Swal.fire("Error", "No se pudo actualizar", "error");</script>';
     }
     exit;
 } catch (Throwable $e) {
-    error_log('upd_doctors: ' . $e->getMessage());
+    error_log('upd_colaborador_unificado: ' . $e->getMessage());
     echo '<script>Swal.fire("Error", ' . json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE) . ', "error");</script>';
     exit;
 }
