@@ -346,11 +346,9 @@
                 checkbox.prop('checked', false); // revertir temporalmente
                 
                 var optionsHtml = '<select id="transfer-target" class="form-control form-select" style="display: block; width: 100%; font-size:1rem; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; background-color: #fff; color: #495057; cursor: pointer; outline: none;">' +
-                    '<option value="staff_administrative"' + (table==='staff_administrative'?' selected':'') + '>Colaboradores (Administrativos)</option>' +
-                    '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
                     '<option value="staff_medifarma"' + (table==='staff_medifarma'?' selected':'') + '>Medifarma</option>' +
-                    '<option value="nurse"' + (table==='nurse'?' selected':'') + '>Enfermería</option>' +
-                    '<option value="staff_general_services"' + (table==='staff_general_services'?' selected':'') + '>Servicios Generales</option>' +
+                    '<option value="staff_general_services"' + (['staff_administrative', 'nurse', 'staff_general_services'].indexOf(table) !== -1 ? ' selected' : '') + '>Medicasa</option>' +
+                    '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
                     '</select>';
 
                 Swal.fire({
@@ -484,11 +482,9 @@
             var table = btn.data('table');
 
             var optionsHtml = '<select id="transfer-target-btn" class="form-control form-select" style="display: block; width: 100%; font-size:1rem; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; background-color: #fff; color: #495057; cursor: pointer; outline: none;">' +
-                '<option value="staff_administrative"' + (table==='staff_administrative'?' selected':'') + '>Colaboradores (Administrativos)</option>' +
-                '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
                 '<option value="staff_medifarma"' + (table==='staff_medifarma'?' selected':'') + '>Medifarma</option>' +
-                '<option value="nurse"' + (table==='nurse'?' selected':'') + '>Enfermería</option>' +
-                '<option value="staff_general_services"' + (table==='staff_general_services'?' selected':'') + '>Servicios Generales</option>' +
+                '<option value="staff_general_services"' + (['staff_administrative', 'nurse', 'staff_general_services'].indexOf(table) !== -1 ? ' selected' : '') + '>Medicasa</option>' +
+                '<option value="doctor"' + (table==='doctor'?' selected':'') + '>Médicos</option>' +
                 '</select>';
 
             Swal.fire({
