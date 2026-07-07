@@ -5,7 +5,7 @@
  */
 
 require_once __DIR__ . '/../bd/Conexion.php';
-
+require_once __DIR__ . '/staff_user_link_lib.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -60,6 +60,7 @@ try {
         if ($new_state !== null) {
             $stmt = $connect->prepare("UPDATE `$source_table` SET state = :st WHERE `" . $sourceMeta['idcol'] . "` = :id");
             $stmt->execute([':st' => $new_state, ':id' => $id]);
+            medidata_link_user_state_from_staff($connect, $source_table, $sourceMeta['idcol'], $id, $new_state);
         }
         $connect->commit();
         echo json_encode(['success' => true, 'message' => 'Estado actualizado exitosamente.']);
@@ -86,7 +87,7 @@ try {
     $commonFields = [
         'num_empleado', 'tipo_empleado', 'id_departamento', 'id_cargo', 'id_salary_level', 
         'salario', 'cuenta_bac', 'fecha_ingreso', 'telefono', 'correo_personal', 
-        'correo_institucional', 'id_biometrico', 'num_locker', 'url_contrato', 'state'
+        'correo_institucional', 'id_biometrico', 'num_locker', 'url_contrato', 'state', 'id_user'
     ];
 
     $insertFields = [];
@@ -150,6 +151,13 @@ try {
     $sqlDelete = "DELETE FROM `$source_table` WHERE `" . $sourceMeta['idcol'] . "` = :id";
     $stmtDelete = $connect->prepare($sqlDelete);
     $stmtDelete->execute([':id' => $id]);
+
+    if ($new_state !== null) {
+        $newId = (int)$connect->lastInsertId();
+        if ($newId > 0) {
+            medidata_link_user_state_from_staff($connect, $target_table, $targetMeta['idcol'], $newId, $new_state);
+        }
+    }
 
     $connect->commit();
     echo json_encode(['success' => true, 'message' => 'Traslado realizado exitosamente.']);

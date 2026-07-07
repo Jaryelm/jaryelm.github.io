@@ -27,15 +27,9 @@ if (!function_exists('medidata_staff_tables_idcols')) {
 }
 
 if (!function_exists('medidata_link_user_state_from_staff')) {
-    /**
-     * Al cambiar el estado de una ficha de personal, si esta enlazada a un
-     * usuario (id_user) y se esta DESACTIVANDO, desactiva tambien el login.
-     */
     function medidata_link_user_state_from_staff(PDO $connect, string $staffTable, string $idCol, int $staffId, int $newState): void
     {
-        if ($newState !== 0) {
-            return; // solo se propaga la desactivacion
-        }
+        // Se propaga tanto la desactivación (0) como la reactivación (1) al usuario enlazado
         $tablas = medidata_staff_tables_idcols();
         if (!isset($tablas[$staffTable]) || $tablas[$staffTable] !== $idCol || $staffId <= 0) {
             return;
@@ -46,7 +40,7 @@ if (!function_exists('medidata_link_user_state_from_staff')) {
             $idUser = $sel->fetchColumn();
             if ($idUser !== false && $idUser !== null && (int) $idUser > 0) {
                 $upd = $connect->prepare('UPDATE users SET state = :state WHERE id = :id LIMIT 1');
-                $upd->execute([':state' => '0', ':id' => (int) $idUser]);
+                $upd->execute([':state' => (string) $newState, ':id' => (int) $idUser]);
             }
         } catch (Throwable $e) {
             error_log('medidata_link_user_state_from_staff: ' . $e->getMessage());

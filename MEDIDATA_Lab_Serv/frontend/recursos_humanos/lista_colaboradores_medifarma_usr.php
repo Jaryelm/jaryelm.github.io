@@ -124,7 +124,7 @@ require_once __DIR__ . '/_rrhh_colab_maps.php';
             allowDelete: true
         };
     </script>
-    <script src="../../backend/registros/script/tabla_colaboradores.js"></script>
+    <script src="../../backend/registros/script/tabla_colaboradores.js?v=<?php echo time(); ?>"></script>
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>
