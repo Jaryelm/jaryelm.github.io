@@ -1,7 +1,8 @@
-(function ($) {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    (function ($) {
+        'use strict';
 
-    $(function () {
         var cfg = window.MEDIDATA_ENTREVISTA || {};
         var $form = $('#rrhh-entrevista-form');
         if (!$form.length || !cfg.saveUrl) {
@@ -33,5 +34,5 @@
                 Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
             });
         });
-    });
-})(jQuery);
+    })(jQuery);
+});

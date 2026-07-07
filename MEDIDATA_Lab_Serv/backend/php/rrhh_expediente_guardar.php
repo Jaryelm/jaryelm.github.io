@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/rrhh_candidato_workflow_lib.php';
 
 header('Content-Type: application/json; charset=utf-8');

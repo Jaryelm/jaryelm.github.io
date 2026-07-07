@@ -56,6 +56,27 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
 <h1 class="title">Pruebas psicométricas</h1>
 <p style="margin:0 0 16px;color:#555;">Candidato: <strong><?php echo htmlspecialchars($candidato->fullname ?? ''); ?></strong></p>
 
+<style>
+.card-candidato-estado-form input[type="text"],
+.card-candidato-estado-form input[type="number"],
+.card-candidato-estado-form input[type="file"],
+.card-candidato-estado-form textarea {
+    height: 44px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: inherit;
+    width: 100%;
+    margin-bottom: 16px;
+}
+.card-candidato-estado-form textarea {
+    height: auto;
+    resize: vertical;
+}
+</style>
+
 <div class="data">
     <div class="content-data">
         <div class="head"><h3>Registrar pruebas aplicadas</h3></div>

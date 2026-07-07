@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../backend/bd/Conexion.php';
 require_once __DIR__ . '/../../backend/php/rrhh_candidato_workflow_lib.php';
 
 $token = trim((string) ($_GET['token'] ?? ''));
