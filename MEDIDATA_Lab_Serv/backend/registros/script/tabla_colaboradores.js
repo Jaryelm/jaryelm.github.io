@@ -233,7 +233,7 @@
                 var html = '<div class="doc-actions">';
                 if (row.tiene_contrato) {
                     html += '<div class="doc-row">';
-                    html += '<a class="doc-btn" href="' + viewUrl + '" target="_blank" title="Ver contrato"><i class="bx bx-show"></i> Ver</a>';
+                    html += '<a class="doc-btn" href="#" onclick="verPDF(\'' + viewUrl + '\', \'Ver Documento\'); return false;" title="Ver contrato"><i class="bx bx-show"></i> Ver</a>';
                     html += '<a class="doc-btn" href="#" title="Eliminar contrato" onclick="deleteContract(' + row.id + ', \'' + row.source_table + '\', \'' + meta.idcol + '\'); return false;"><i class="bx bx-trash"></i> Eliminar</a>';
                     html += '</div>';
                 } else {
