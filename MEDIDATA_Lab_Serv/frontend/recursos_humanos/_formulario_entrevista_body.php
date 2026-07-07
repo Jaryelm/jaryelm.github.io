@@ -62,6 +62,28 @@ function fe_int_val(array $answers, string $key): string
 <?php if ($rrhh_error): ?>
 <div class="data"><div class="content-data"><div class="alert"><strong>Error:</strong> <?php echo htmlspecialchars($rrhh_error); ?></div></div></div>
 <?php else: ?>
+<style>
+.fe-grid-inline { align-items: end; }
+.fe-grid-inline > div { display: flex; flex-direction: column; justify-content: flex-end; }
+.card-candidato-estado-form input[type="date"],
+.card-candidato-estado-form input[type="time"],
+.card-candidato-estado-form input[type="text"],
+.card-candidato-estado-form select,
+.card-candidato-estado-form textarea {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; 
+    font-size: .95rem; box-sizing: border-box; margin: 6px 0 16px 0; font-family: inherit; outline: none;
+}
+.card-candidato-estado-form input[type="date"],
+.card-candidato-estado-form input[type="time"],
+.card-candidato-estado-form input[type="text"],
+.card-candidato-estado-form select {
+    height: 44px; line-height: normal;
+}
+.fe-grid-inline input[type="date"],
+.fe-grid-inline input[type="time"] {
+    margin-bottom: 0;
+}
+</style>
 <h1 class="title">Formulario de entrevista</h1>
 <p style="margin:0 0 16px;color:#555;">Candidato: <strong><?php echo htmlspecialchars($candidato->fullname ?? ''); ?></strong> — DNI <?php echo htmlspecialchars($candidato->dni ?? ''); ?></p>
 

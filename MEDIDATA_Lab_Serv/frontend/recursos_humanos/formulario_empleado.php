@@ -41,11 +41,15 @@ function fe_val(array $prefill, string $key): string
         .fe-card { background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.08); padding: 24px; }
         .fe-card h1 { margin: 0 0 8px; color: #035c67; font-size: 1.5rem; }
         .fe-card p.lead { color: #555; margin: 0 0 20px; }
-        .fe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .fe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+        .fe-grid > div { display: flex; flex-direction: column; justify-content: flex-end; }
         .fe-grid .full { grid-column: 1 / -1; }
         .fe-grid label { display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: .9rem; }
         .fe-grid input, .fe-grid select, .fe-grid textarea {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem;
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; box-sizing: border-box; margin: 0; font-family: inherit; outline: none;
+        }
+        .fe-grid input, .fe-grid select {
+            height: 44px; line-height: normal;
         }
         .fe-actions { margin-top: 20px; text-align: center; }
         .registerbtn { background: #06adbf; color: #fff; border: none; padding: 12px 28px; border-radius: 6px; font-weight: 700; cursor: pointer; }
