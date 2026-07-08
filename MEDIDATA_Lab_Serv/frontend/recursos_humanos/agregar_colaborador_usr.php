@@ -2,6 +2,7 @@
 include_once '../../backend/registros/session_check.php';
 
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
+require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
 
 $prefillColab = [
