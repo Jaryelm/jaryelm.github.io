@@ -13,7 +13,7 @@ include_once '../../backend/registros/session_check.php'; // Archivo de sesión
     <!-- Include CSS de Select2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
-    <title>Registro de Servicios Hospitalarios</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 

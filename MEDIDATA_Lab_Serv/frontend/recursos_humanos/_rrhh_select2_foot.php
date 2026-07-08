@@ -54,6 +54,18 @@ function descargarPDFActual() {
     }
 }
 
+function verDocumentoStaff(url, titulo) {
+    if (!url) return;
+    var lower = String(url).toLowerCase();
+    var inlineOk = lower.indexOf('view_staff_doc.php') !== -1
+        || /\.(pdf|jpe?g|png|gif|webp)(\?|#|$)/.test(lower);
+    if (inlineOk && typeof verPDF === 'function') {
+        verPDF(url, titulo || 'Documento');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
 window.addEventListener('click', function(event) {
     const pdfModal = document.getElementById('pdfModal');
     if (event.target === pdfModal) {

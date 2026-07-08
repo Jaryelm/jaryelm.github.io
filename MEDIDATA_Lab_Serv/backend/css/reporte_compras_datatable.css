@@ -1,8 +1,8 @@
 /**
  * Estilos unificados para reportes de compras (ingresadas + detalladas)
  * y para los reportes de contabilidad que usan la clase
- * `.dt-reporte-compras-unificado` (Cuadre Caja, Detalle Pago,
- * Detalle Factura, Devoluciones).
+ * `.dt-reporte-compras-unificado` o `.dt-medidata-unificado`
+ * (Cuadre Caja, Detalle Pago, catálogo Servicios Hospitalarios, etc.).
  *
  * DEBE cargarse DESPUÉS de datatable.css y buttonsdataTables.css para
  * anular el modo "display" de DataTables (box-shadow en celdas que
@@ -15,29 +15,42 @@
  * un encabezado azul oscuro que cambia a teal al terminar la inicia-
  * lización, generando un parpadeo molesto.
  */
-.catalog-container table.dt-reporte-compras-unificado {
+.catalog-container table.dt-reporte-compras-unificado,
+.catalog-container table.dt-medidata-unificado {
   width: 100% !important;
   border-collapse: collapse !important;
 }
 
 /* Quitar overlays de DataTables .display (stripes, hover, columnas ordenadas) */
 .catalog-container table.dt-reporte-compras-unificado.display > tbody > tr > *,
+.catalog-container table.dt-medidata-unificado.display > tbody > tr > *,
 .catalog-container table.dt-reporte-compras-unificado.display > tbody > tr.odd > *,
+.catalog-container table.dt-medidata-unificado.display > tbody > tr.odd > *,
 .catalog-container table.dt-reporte-compras-unificado.display > tbody > tr.even > *,
+.catalog-container table.dt-medidata-unificado.display > tbody > tr.even > *,
 .catalog-container table.dt-reporte-compras-unificado.display > tbody > tr:hover > *,
+.catalog-container table.dt-medidata-unificado.display > tbody > tr:hover > *,
 .catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_1,
+.catalog-container table.dt-medidata-unificado.display tbody tr > .sorting_1,
 .catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_2,
+.catalog-container table.dt-medidata-unificado.display tbody tr > .sorting_2,
 .catalog-container table.dt-reporte-compras-unificado.display tbody tr > .sorting_3,
+.catalog-container table.dt-medidata-unificado.display tbody tr > .sorting_3,
 .catalog-container table.dt-reporte-compras-unificado.display tbody tr.odd > .sorting_1,
+.catalog-container table.dt-medidata-unificado.display tbody tr.odd > .sorting_1,
 .catalog-container table.dt-reporte-compras-unificado.display tbody tr.even > .sorting_1,
-.catalog-container table.dt-reporte-compras-unificado.display tbody tr:hover > .sorting_1 {
+.catalog-container table.dt-medidata-unificado.display tbody tr.even > .sorting_1,
+.catalog-container table.dt-reporte-compras-unificado.display tbody tr:hover > .sorting_1,
+.catalog-container table.dt-medidata-unificado.display tbody tr:hover > .sorting_1 {
   box-shadow: none !important;
 }
 
 /* Encabezado MEDIDATA (color teal definitivo, aplicado SIEMPRE,
    incluso antes de que DataTables agregue la clase .dataTable). */
 .catalog-container table.dt-reporte-compras-unificado thead th,
-.catalog-container table.dt-reporte-compras-unificado thead td {
+.catalog-container table.dt-medidata-unificado thead th,
+.catalog-container table.dt-reporte-compras-unificado thead td,
+.catalog-container table.dt-medidata-unificado thead td {
   background-color: var(--dark-blue, #035c67) !important;
   color: #fff !important;
   font-weight: bold !important;
@@ -50,12 +63,15 @@
 /* Celdas del cuerpo: anulan el borde azul oscuro de admin.css
    (.responsive-table tbody td/tr usa #1e2c4b) y dejan un borde
    gris claro coherente con el resto del layout. */
-.catalog-container table.dt-reporte-compras-unificado tbody tr {
+.catalog-container table.dt-reporte-compras-unificado tbody tr,
+.catalog-container table.dt-medidata-unificado tbody tr {
   border: none !important;
   margin-bottom: 0 !important;
 }
 .catalog-container table.dt-reporte-compras-unificado tbody th,
-.catalog-container table.dt-reporte-compras-unificado tbody td {
+.catalog-container table.dt-medidata-unificado tbody th,
+.catalog-container table.dt-reporte-compras-unificado tbody td,
+.catalog-container table.dt-medidata-unificado tbody td {
   padding: 10px !important;
   border: none !important;
   border-bottom: 1px solid #ddd !important;
@@ -67,25 +83,32 @@
    Antes de que DataTables agregue .odd/.even usamos :nth-child para que
    el patrón esté presente desde el inicio. Después, las clases .odd/.even
    que agrega DataTables siguen funcionando porque también las cubrimos. */
-.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(odd) {
+.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(odd),
+.catalog-container table.dt-medidata-unificado tbody tr:nth-child(odd) {
   background-color: #f2f2f2;
 }
-.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(even) {
+.catalog-container table.dt-reporte-compras-unificado tbody tr:nth-child(even),
+.catalog-container table.dt-medidata-unificado tbody tr:nth-child(even) {
   background-color: #fff;
 }
-.catalog-container table.dt-reporte-compras-unificado tbody tr.odd {
+.catalog-container table.dt-reporte-compras-unificado tbody tr.odd,
+.catalog-container table.dt-medidata-unificado tbody tr.odd {
   background-color: #f2f2f2 !important;
 }
-.catalog-container table.dt-reporte-compras-unificado tbody tr.even {
+.catalog-container table.dt-reporte-compras-unificado tbody tr.even,
+.catalog-container table.dt-medidata-unificado tbody tr.even {
   background-color: #fff !important;
 }
 
-.catalog-container table.dt-reporte-compras-unificado tbody tr:hover {
+.catalog-container table.dt-reporte-compras-unificado tbody tr:hover,
+.catalog-container table.dt-medidata-unificado tbody tr:hover {
   background-color: #e0f7fa !important;
 }
 
 .catalog-container table.dt-reporte-compras-unificado tbody tr:hover td,
-.catalog-container table.dt-reporte-compras-unificado tbody tr:hover th {
+.catalog-container table.dt-medidata-unificado tbody tr:hover td,
+.catalog-container table.dt-reporte-compras-unificado tbody tr:hover th,
+.catalog-container table.dt-medidata-unificado tbody tr:hover th {
   background-color: transparent !important;
 }
 
@@ -122,4 +145,80 @@
   border-color: var(--dark-blue, #035c67) !important;
   background: rgba(6, 173, 191, 0.15) !important;
   background-image: none !important;
+}
+
+/* Alineación numérica en tablas unificadas */
+.catalog-container table.dt-medidata-unificado thead th.dt-right,
+.catalog-container table.dt-reporte-compras-unificado thead th.dt-right,
+.catalog-container table.dt-medidata-unificado tbody td.dt-right,
+.catalog-container table.dt-reporte-compras-unificado tbody td.dt-right {
+  text-align: right !important;
+}
+
+.catalog-container .catalog-hint {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+/* Catálogo servicios hospitalarios — edición inline */
+.catalog-container table.dt-medidata-unificado .editable-cell,
+.catalog-container table.dt-reporte-compras-unificado .editable-cell {
+  cursor: pointer;
+  background-color: #f0f8ff !important;
+  transition: background-color 0.2s ease;
+}
+
+.catalog-container table.dt-medidata-unificado .editable-cell:hover,
+.catalog-container table.dt-reporte-compras-unificado .editable-cell:hover {
+  background-color: #e6f3ff !important;
+}
+
+.catalog-container table.dt-medidata-unificado .editable-cell.editing,
+.catalog-container table.dt-reporte-compras-unificado .editable-cell.editing {
+  background-color: #fff3cd !important;
+}
+
+.catalog-container table.dt-medidata-unificado .edit-input,
+.catalog-container table.dt-reporte-compras-unificado .edit-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 2px solid var(--blue, #06adbf);
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 13px;
+}
+
+.catalog-container table.dt-medidata-unificado .edit-input:focus,
+.catalog-container table.dt-reporte-compras-unificado .edit-input:focus {
+  outline: none;
+  border-color: var(--dark-blue, #035c67);
+}
+
+.catalog-container .btn-estado {
+  background-color: var(--dark-blue, #035c67);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.catalog-container .btn-estado:hover:not(:disabled) {
+  background-color: var(--blue, #06adbf);
+}
+
+.catalog-container .btn-estado:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.catalog-container .dataTables_wrapper .dataTables_processing {
+  color: var(--dark-blue, #035c67);
+  font-weight: 600;
 }

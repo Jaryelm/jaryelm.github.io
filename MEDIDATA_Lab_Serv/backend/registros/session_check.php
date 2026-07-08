@@ -18,9 +18,6 @@ if (!function_exists('medidata_session_json_api_script')) {
             'registrar_partida_manual.php',
             'get_partidas_manuales.php',
             'fetch_collaborators.php',
-            'fetch_collaborators_rrhh.php',
-            'save_colaborador_extra.php',
-            'upload_colaborador_contrato.php',
             'fetch_postulaciones_aplica.php',
             'fetch_biometric_marcas.php',
             'fetch_rrhh_vacantes_abiertas.php',
@@ -46,6 +43,7 @@ if (!function_exists('medidata_session_json_api_script')) {
             'get_reporte_detalle_pago_export.php',
             'get_reporte_cuadre_caja.php',
             'get_reporte_devoluciones_ventas.php',
+            'get_servicios_hospital.php',
             'get_cierres_caja.php',
         ];
         return in_array($base, $allowed, true) ? $base : null;
@@ -68,6 +66,7 @@ if (!function_exists('medidata_session_emit_json_db_unavailable')) {
             || $apiScript === 'get_reporte_detalle_pago.php'
             || $apiScript === 'get_reporte_cuadre_caja.php'
             || $apiScript === 'get_reporte_devoluciones_ventas.php'
+            || $apiScript === 'get_servicios_hospital.php'
             || $apiScript === 'get_cierres_caja.php'
             || $apiScript === 'get_colaboradores.php') {
             echo json_encode([
@@ -78,7 +77,6 @@ if (!function_exists('medidata_session_emit_json_db_unavailable')) {
                 'error' => $msg,
             ]);
         } elseif ($apiScript === 'fetch_collaborators.php'
-            || $apiScript === 'fetch_collaborators_rrhh.php'
             || $apiScript === 'tabla_puestos_trabajo.php'
             || $apiScript === 'tabla_vacantes_trabajo.php'
             || $apiScript === 'tabla_niveles_salariales.php') {

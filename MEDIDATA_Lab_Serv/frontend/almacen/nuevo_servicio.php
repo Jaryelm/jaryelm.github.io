@@ -14,7 +14,7 @@ include_once '../../backend/registros/session_check.php'; // Archivo de sesión
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
-    <title>Registro de Servicios Hospitalarios</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
 

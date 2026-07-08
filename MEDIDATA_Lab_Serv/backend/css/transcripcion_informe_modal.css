@@ -1,0 +1,326 @@
+/* Modal Transcripción de Informe — estilos aislados de admin.css */
+body.tx-modal-open,
+body.rx-modal-open {
+    overflow: hidden !important;
+}
+
+.swal2-container {
+    z-index: 10000 !important;
+}
+
+#transcriptionModal.tx-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(3, 60, 67, 0.55);
+    backdrop-filter: blur(2px);
+    padding: 16px;
+    overflow: hidden;
+}
+
+#transcriptionModal.tx-modal.is-open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#transcriptionModal .tx-modal-dialog {
+    width: 100%;
+    max-width: 1280px;
+    max-height: calc(100vh - 32px);
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#transcriptionModal .tx-modal-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #035c67 0%, #06adbf 100%);
+    color: #fff;
+}
+
+#transcriptionModal .tx-modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+#transcriptionModal .tx-modal-header p {
+    margin: 3px 0 0;
+    font-size: 0.82rem;
+    opacity: 0.92;
+}
+
+#transcriptionModal .tx-modal-close {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#transcriptionModal .tx-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#transcriptionModal .tx-modal-body {
+    flex: 1;
+    min-height: 0;
+    padding: 14px 16px 16px;
+    background: #f4f7f8;
+    overflow: hidden;
+}
+
+#transcriptionModal .tx-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.15fr);
+    gap: 14px;
+    height: 100%;
+    max-height: calc(100vh - 150px);
+    min-height: 0;
+}
+
+#transcriptionModal .tx-panel {
+    background: #fff;
+    border: 1px solid #e2eaec;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#transcriptionModal .tx-panel-title {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #035c67;
+    background: #eef7f8;
+    border-bottom: 1px solid #e2eaec;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#transcriptionModal .tx-panel-body {
+    flex: 1;
+    min-height: 0;
+    padding: 12px 14px 14px;
+    overflow-y: auto;
+}
+
+#transcriptionModal .tx-audio-wrap {
+    margin-bottom: 14px;
+    padding: 12px;
+    background: #f8fbfc;
+    border: 1px solid #e2eaec;
+    border-radius: 10px;
+}
+
+#transcriptionModal .tx-audio-wrap audio {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#transcriptionModal .tx-audio-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#transcriptionModal .tx-audio-btns button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.84rem;
+    cursor: pointer;
+    background: #035c67;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#transcriptionModal .tx-audio-btns button:hover {
+    background: #024a52;
+}
+
+#transcriptionModal .tx-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+}
+
+#transcriptionModal .tx-section {
+    border: 1px solid #e8eef0;
+    border-radius: 10px;
+    padding: 12px 12px 8px;
+    background: #fafcfd;
+}
+
+#transcriptionModal .tx-section-readonly {
+    background: #f5f8f9;
+}
+
+#transcriptionModal .tx-section-title {
+    margin: 0 0 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #06adbf;
+}
+
+#transcriptionModal .tx-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+#transcriptionModal .tx-field:last-child {
+    margin-bottom: 0;
+}
+
+#transcriptionModal .tx-field label,
+#transcriptionModal .tx-field > .tx-label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #2f3e46;
+    margin: 0;
+    display: block;
+    width: 100%;
+}
+
+#transcriptionModal .tx-field textarea,
+#transcriptionModal .tx-field input[type="text"] {
+    width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+    padding: 9px 11px !important;
+    border: 1px solid #cfd9dc !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: #1f2a30;
+    resize: vertical;
+    min-height: 38px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#transcriptionModal .tx-section-readonly textarea {
+    background: #eef2f3 !important;
+    color: #4a5560;
+    cursor: default;
+}
+
+#transcriptionModal .tx-field textarea:focus,
+#transcriptionModal .tx-field input[type="text"]:focus {
+    outline: none;
+    border-color: #06adbf !important;
+    box-shadow: 0 0 0 3px rgba(6, 173, 191, 0.18) !important;
+}
+
+#transcriptionModal .tx-field textarea#originalFindings,
+#transcriptionModal .tx-field textarea#findings {
+    min-height: 100px;
+}
+
+#transcriptionModal .tx-field textarea#originalClinicalHistory,
+#transcriptionModal .tx-field textarea#clinicalHistory {
+    min-height: 64px;
+}
+
+#transcriptionModal .tx-field textarea#originalImpression,
+#transcriptionModal .tx-field textarea#impression {
+    min-height: 72px;
+}
+
+#transcriptionModal .tx-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 4px;
+    margin-top: auto;
+    border-top: 1px solid #e8eef0;
+}
+
+#transcriptionModal .tx-actions button {
+    flex: 1 1 180px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.84rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+#transcriptionModal .tx-btn-draft {
+    background: #6c757d;
+    color: #fff;
+}
+
+#transcriptionModal .tx-btn-complete {
+    background: #06adbf;
+    color: #fff;
+}
+
+#transcriptionModal .tx-btn-complete:hover {
+    background: #0595a5;
+}
+
+#transcriptionModal .tx-no-audio {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    margin: 0;
+}
+
+@media (max-width: 1100px) {
+    #transcriptionModal .tx-layout {
+        grid-template-columns: 1fr;
+        max-height: calc(100vh - 140px);
+    }
+
+    #transcriptionModal .tx-panel {
+        max-height: 48vh;
+    }
+}
+
+@media (max-width: 600px) {
+    #transcriptionModal.tx-modal {
+        padding: 8px;
+    }
+
+    #transcriptionModal .tx-actions button {
+        flex: 1 1 100%;
+    }
+}

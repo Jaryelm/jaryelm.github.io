@@ -11,6 +11,7 @@ $rol_usuario = $_SESSION['rol'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/informe_radiologico_modal.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
@@ -45,9 +46,11 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
+<?php if ($rol_usuario !== 'Radiologo'): ?>
 <button class="button" onclick="cambiarColor(this, '../../frontend/radiologiaeimagen/worklist_tecnico.php')">Tecnico Radiólogo</button>
 <button class="button" onclick="cambiarColor(this, '../../frontend/radiologiaeimagen/lista_estudios_medico.php')">Médico Radiólogo</button>
 <button class="button" onclick="cambiarColor(this, '../../frontend/radiologiaeimagen/lista_transcripciones_user.php')">Transcriptores</button>
+<?php endif; ?>
 
             <h1 class="title">Estudios Pendientes de Interpretación</h1>
 
@@ -91,9 +94,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
                 <select id="statusFilter">
                     <option value="">Todos los Estados</option>
-                    <option value="pending">Pendientes</option>
-                    <option value="draft">Borradores</option>
-                    <option value="completed">Completados</option>
+                    <option value="pending">Pendientes de interpretar</option>
+                    <option value="pending_transcription">En transcripción</option>
+                    <option value="completed">Transcripción lista / finalizados</option>
                 </select>
 
                 <input type="date" id="dateFilter" />
@@ -124,74 +127,85 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Modal de Informe -->
-            <div id="reportModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Informe Radiológico</h2>
-                    <div class="report-container">
-                        <!-- Sección de Visor DICOM -->
-                        <div class="dicom-viewer">
-                            <iframe id="orthancViewer" src="" frameborder="0"></iframe>
+            <div id="reportModal" class="rx-modal">
+                <div class="rx-modal-dialog">
+                    <div class="rx-modal-header">
+                        <div>
+                            <h2>Informe Radiológico</h2>
+                            <p>Redacte el informe del estudio asignado. Puede guardar borrador o finalizar cuando esté listo.</p>
                         </div>
-
-                        <!-- Sección de Informe -->
-                        <div class="report-form">
-                            <form id="reportForm">
-                                <input type="hidden" id="studyId" name="studyId">
-                                <input type="hidden" id="patientId" name="patientId">
-                                
-                                <div class="form-group">
-                                    <label>Historia Clínica:</label>
-                                    <textarea id="clinicalHistory" rows="3" required></textarea>
+                        <button type="button" class="rx-modal-close" id="reportModalClose" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="rx-modal-body">
+                        <div class="rx-report-layout">
+                            <div class="rx-dicom-panel">
+                                <h3 class="rx-panel-title"><i class="bx bx-image-alt"></i> Visor DICOM</h3>
+                                <div class="rx-dicom-viewer">
+                                    <iframe id="orthancViewer" src="" title="Visor DICOM"></iframe>
                                 </div>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Hallazgos:</label>
-                                    <textarea id="findings" rows="6" required></textarea>
-                                </div>
+                            <div class="rx-form-panel">
+                                <h3 class="rx-panel-title"><i class="bx bx-file"></i> Formulario del informe</h3>
+                                <form id="reportForm" class="rx-report-form">
+                                    <input type="hidden" id="studyId" name="studyId">
+                                    <input type="hidden" id="patientId" name="patientId">
 
-                                <div class="form-group">
-                                    <label>Impresión Diagnóstica:</label>
-                                    <textarea id="impression" rows="4" required></textarea>
-                                </div>
+                                    <section class="rx-form-section">
+                                        <h4 class="rx-form-section-title">Contenido clínico</h4>
+                                        <div class="rx-field">
+                                            <label for="clinicalHistory">Historia clínica</label>
+                                            <textarea id="clinicalHistory" rows="3" required placeholder="Antecedentes y motivo del estudio..."></textarea>
+                                        </div>
+                                        <div class="rx-field">
+                                            <label for="findings">Hallazgos</label>
+                                            <textarea id="findings" rows="6" required placeholder="Describa los hallazgos radiológicos..."></textarea>
+                                        </div>
+                                        <div class="rx-field">
+                                            <label for="impression">Impresión diagnóstica</label>
+                                            <textarea id="impression" rows="4" required placeholder="Conclusión e impresión diagnóstica..."></textarea>
+                                        </div>
+                                    </section>
 
-                                <div class="form-group">
-                                    <label>
-                                        <input type="checkbox" id="isCritical">
-                                        Hallazgo Crítico
-                                    </label>
-                                </div>
+                                    <section class="rx-form-section">
+                                        <h4 class="rx-form-section-title">Alertas y dictado</h4>
+                                        <div class="rx-field">
+                                            <label class="rx-check-row" for="isCritical">
+                                                <input type="checkbox" id="isCritical">
+                                                <span>Hallazgo crítico</span>
+                                            </label>
+                                        </div>
+                                        <div id="criticalSection" style="display: none;">
+                                            <div class="rx-field">
+                                                <label for="urgencyLevel">Nivel de urgencia</label>
+                                                <select id="urgencyLevel">
+                                                    <option value="high">Alto</option>
+                                                    <option value="medium">Medio</option>
+                                                    <option value="low">Bajo</option>
+                                                </select>
+                                            </div>
+                                            <div class="rx-field">
+                                                <label for="notifyTo">Notificar a</label>
+                                                <input type="text" id="notifyTo" placeholder="Médico o área a notificar">
+                                            </div>
+                                        </div>
+                                        <div class="rx-field">
+                                            <span class="rx-label">Dictado de voz</span>
+                                            <div class="rx-audio-controls" id="audio-controls">
+                                                <button type="button" id="startRecord"><i class="bx bx-microphone"></i> Grabar</button>
+                                                <button type="button" id="stopRecord" disabled><i class="bx bx-stop"></i> Detener</button>
+                                            </div>
+                                            <audio id="audioPlayback" controls style="display:none;"></audio>
+                                        </div>
+                                    </section>
 
-                                <div id="criticalSection" style="display: none;">
-                                    <div class="form-group">
-                                        <label>Nivel de Urgencia:</label>
-                                        <select id="urgencyLevel">
-                                            <option value="high">Alto</option>
-                                            <option value="medium">Medio</option>
-                                            <option value="low">Bajo</option>
-                                        </select>
+                                    <div class="rx-actions">
+                                        <button type="button" class="rx-btn-draft" onclick="saveAsDraft()"><i class="bx bx-save"></i> Guardar borrador</button>
+                                        <button type="button" class="rx-btn-transcription" onclick="sendToTranscription()"><i class="bx bx-transfer"></i> Enviar a transcripción</button>
+                                        <button type="button" class="rx-btn-final" onclick="finalizeReport()"><i class="bx bx-check-circle"></i> Finalizar informe</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Notificar a:</label>
-                                        <input type="text" id="notifyTo">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Dictado de voz:</label>
-                                    <div id="audio-controls">
-                                        <button type="button" id="startRecord">Grabar</button>
-                                        <button type="button" id="stopRecord" disabled>Detener</button>
-                                        <audio id="audioPlayback" controls style="display:none;"></audio>
-                                    </div>
-                                </div>
-
-                                <div class="button-group">
-                                    <button type="button" onclick="saveAsDraft()">Guardar Borrador</button>
-                                    <button type="button" onclick="sendToTranscription()">Enviar a Transcripción</button>
-                                    <button type="button" onclick="finalizeReport()">Finalizar Informe</button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -254,6 +268,33 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                             <button type="button" onclick="saveDraft()">Guardar Borrador</button>
                             <button type="button" onclick="completeTranscription()">Completar Transcripción</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Seguimiento -->
+            <div id="seguimientoModal" class="modal">
+                <div class="modal-content" style="max-width:900px;">
+                    <span class="close" onclick="document.getElementById('seguimientoModal').style.display='none'">&times;</span>
+                    <h2>Seguimiento Detallado del Estudio</h2>
+                    <div id="seguimientoDetalle"></div>
+                </div>
+            </div>
+
+            <!-- Modal visualización PDF -->
+            <div id="pdfModal" class="modal-pdf" style="z-index:10050;">
+                <div class="modal-pdf-content">
+                    <div class="modal-pdf-header">
+                        <h2 id="pdfModalTitle">Informe radiológico</h2>
+                        <span class="close-pdf-btn" onclick="cerrarPDFModal()" aria-label="Cerrar">&times;</span>
+                    </div>
+                    <div class="modal-pdf-body">
+                        <iframe id="pdfFrame" src="" frameborder="0" title="Vista previa del informe PDF"></iframe>
+                    </div>
+                    <div class="modal-pdf-footer">
+                        <button type="button" class="btn-descargar-pdf" onclick="descargarPDFActual()">
+                            <i class="bx bx-download"></i> Descargar PDF
+                        </button>
                     </div>
                 </div>
             </div>
@@ -351,7 +392,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         background-color: rgba(0,0,0,0.5);
     }
 
-    .modal-content {
+    #viewerModal .modal-content,
+    #transcriptionModal .modal-content {
         background-color: #fefefe;
         margin: 2% auto;
         padding: 20px;
@@ -362,78 +404,37 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         overflow-y: auto;
     }
 
-    .report-container {
+    #transcriptionModal .report-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-top: 20px;
     }
 
-    .dicom-viewer {
-        background: #000;
-        border-radius: 4px;
-        min-height: 500px;
-    }
-
-    .dicom-viewer iframe {
-        width: 100%;
-        height: 100%;
-        min-height: 500px;
-    }
-
-    .report-form {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 4px;
-    }
-
-    .form-group {
+    #transcriptionModal .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
         margin-bottom: 15px;
     }
 
-    .form-group label {
+    #transcriptionModal .form-group label {
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
     }
 
-    .form-group textarea, .form-group input, .form-group select {
+    #transcriptionModal .form-group textarea,
+    #transcriptionModal .form-group input {
         width: 100%;
         padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .button-group button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .button-group button:first-child {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .button-group button:nth-child(2) {
-        background-color: #efc25b;
-        color: white;
-    }
-
-    .button-group button:last-child {
-        background-color: #06adbf;
-        color: white;
+        margin: 0;
     }
 
     @media (max-width: 1200px) {
-        .report-container {
+        #transcriptionModal .report-container {
             grid-template-columns: 1fr;
         }
     }
@@ -467,6 +468,80 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
     .btn-report:hover {
         background-color: #023a43;
+    }
+    .btn-seguimiento {
+        background-color: #efc25b;
+        color: #fff;
+    }
+    .btn-seguimiento:hover {
+        background-color: #e0b44a;
+    }
+    .btn-history {
+        background-color: #035c67;
+        color: white;
+    }
+    .btn-history:hover {
+        background-color: #023a43;
+    }
+    .seguimiento-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+    .seguimiento-table th, .seguimiento-table td {
+        border: 1px solid #e0e0e0;
+        padding: 8px 10px;
+        text-align: left;
+    }
+    .seguimiento-table th {
+        background: #06adbf;
+        color: #fff;
+        font-weight: 600;
+    }
+    .seguimiento-table tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+    #seguimientoModal h3 {
+        color: #035c67;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        border-left: 4px solid #06adbf;
+        padding-left: 8px;
+    }
+    #seguimientoModal .modal-content {
+        background: #f7fafd;
+    }
+    .transcripcion-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+        margin-bottom: 18px;
+        padding: 16px 18px;
+        border-left: 5px solid #06adbf;
+    }
+    .transcripcion-header {
+        font-size: 1em;
+        color: #035c67;
+        margin-bottom: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .transcripcion-estado {
+        background: #efc25b;
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.95em;
+    }
+    .transcripcion-body > div {
+        margin-bottom: 6px;
     }
     .action-buttons button:active {
         opacity: 0.9;
@@ -531,6 +606,34 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             } else {
                 noStudiesMsg.style.display = 'none';
                 data.forEach(study => {
+                    const reportId = study.id || '';
+                    const studyId = study.study_id || '';
+                    const txStatus = study.transcription_status || '';
+                    const sentToTranscription = ['pending_transcription', 'final', 'transcribed', 'reviewed'].includes(study.status);
+                    const showSeguimiento = sentToTranscription || !!txStatus;
+                    const showPdf = txStatus === 'completed';
+
+                    let actionsHtml = `
+                        <button onclick="downloadStudy('${studyId}')" class="btn-download">
+                            <i class='bx bx-download'></i> DICOM
+                        </button>
+                        <button onclick="openReport('${studyId}', '${study.series_id || ''}', '${study.patient_id}')" class="btn-report">
+                            <i class='bx bx-file'></i> Informe
+                        </button>`;
+
+                    if (showSeguimiento && reportId) {
+                        actionsHtml += `
+                        <button onclick="verSeguimiento('${reportId}', '${studyId}')" class="btn-seguimiento">
+                            <i class='bx bx-list-ul'></i> Seguimiento
+                        </button>`;
+                    }
+                    if (showPdf && reportId) {
+                        actionsHtml += `
+                        <button onclick="downloadPDF('${reportId}')" class="btn-history">
+                            <i class='bx bx-download'></i> PDF
+                        </button>`;
+                    }
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${study.patient_id}</td>
@@ -538,15 +641,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <td>${study.modality}</td>
                         <td>${study.study_description || 'Sin descripción'}</td>
                         <td>${formatDateTime(study.study_date)}</td>
-                        <td>${formatStatus(study.status)}</td>
+                        <td>${formatStatus(study.status, txStatus)}</td>
                         <td>
                             <div class="action-buttons">
-                                <button onclick="downloadStudy('${study.study_id}')" class="btn-download">
-                                    <i class='bx bx-download'></i> Descargar
-                                </button>
-                                <button onclick="openReport('${study.study_id}', '${study.series_id}', '${study.patient_id}')" class="btn-report">
-                                    <i class='bx bx-file'></i> Informe
-                                </button>
+                                ${actionsHtml}
                             </div>
                         </td>
                     `;
@@ -612,7 +710,17 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 }
             }
         });
-        document.getElementById('reportModal').style.display = 'block';
+        openReportModal();
+    }
+
+    function openReportModal() {
+        document.getElementById('reportModal').classList.add('is-open');
+        document.body.classList.add('rx-modal-open');
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModal').classList.remove('is-open');
+        document.body.classList.remove('rx-modal-open');
     }
 
     // Manejar checkbox de hallazgo crítico
@@ -663,16 +771,39 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire('Éxito', 'Informe guardado correctamente', 'success');
-                document.getElementById('reportModal').style.display = 'none';
+        .then(async function (response) {
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = { success: false, message: 'Respuesta inválida del servidor.' };
+            }
+            if (response.ok && data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: data.message || 'Informe guardado correctamente',
+                    confirmButtonColor: '#06adbf'
+                });
+                closeReportModal();
                 loadStudies();
                 loadStats();
             } else {
-                Swal.fire('Error', 'Error al guardar el informe', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Error al guardar el informe',
+                    confirmButtonColor: '#035c67'
+                });
             }
+        })
+        .catch(function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                confirmButtonColor: '#035c67'
+            });
         });
     }
 
@@ -688,12 +819,17 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         return `${day}/${month}/${year}`;
     }
 
-    // Formatear estado
-    function formatStatus(status) {
+    function formatStatus(status, transcriptionStatus) {
+        if (transcriptionStatus === 'completed') {
+            return 'Transcripción lista';
+        }
+        if (transcriptionStatus === 'in_progress') {
+            return 'Transcripción en progreso';
+        }
         const statuses = {
             'pending': 'Pendiente',
             'draft': 'Borrador',
-            'pending_transcription': 'En Transcripción',
+            'pending_transcription': 'En transcripción',
             'transcribed': 'Transcrito',
             'reviewed': 'Revisado',
             'final': 'Finalizado'
@@ -701,10 +837,159 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         return statuses[status] || status;
     }
 
-    // Cerrar modal
-    document.querySelector('.close').onclick = function() {
-        document.getElementById('reportModal').style.display = 'none';
+    let pdfUrlActual = '';
+    let pdfBlobUrl = '';
+    let pdfNombreActual = 'informe_radiologico.pdf';
+
+    function rxParsePdfFilename(response, fallback) {
+        const cd = response.headers.get('Content-Disposition') || '';
+        const utfMatch = /filename\*=UTF-8''([^;\n]+)/i.exec(cd);
+        if (utfMatch && utfMatch[1]) {
+            try {
+                return decodeURIComponent(utfMatch[1].trim());
+            } catch (e) {
+                return utfMatch[1].trim();
+            }
+        }
+        const plainMatch = /filename="([^"]+)"/i.exec(cd);
+        if (plainMatch && plainMatch[1]) {
+            return plainMatch[1].trim();
+        }
+        return fallback || 'informe_radiologico.pdf';
     }
+
+    function downloadPDF(reportId) {
+        const url = 'generar_pdf_informe.php?report_id=' + encodeURIComponent(reportId);
+        verPDFInforme(url, 'Informe radiológico');
+    }
+
+    function verPDFInforme(url, titulo) {
+        const inlineUrl = url + (url.includes('?') ? '&' : '?') + 'view=inline';
+        fetch(inlineUrl, { credentials: 'same-origin' })
+            .then(async function (response) {
+                const contentType = response.headers.get('Content-Type') || '';
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || 'No se pudo generar el PDF.');
+                }
+                const blob = await response.blob();
+                if (!contentType.includes('pdf') && blob.type && !blob.type.includes('pdf')) {
+                    const text = await blob.text();
+                    throw new Error(text || 'El servidor no devolvió un PDF válido.');
+                }
+                if (pdfBlobUrl) {
+                    URL.revokeObjectURL(pdfBlobUrl);
+                }
+                pdfBlobUrl = URL.createObjectURL(blob);
+                pdfUrlActual = url;
+                pdfNombreActual = rxParsePdfFilename(response, 'informe_radiologico.pdf');
+                document.getElementById('pdfModalTitle').textContent = titulo;
+                document.getElementById('pdfFrame').src = pdfBlobUrl;
+                document.getElementById('pdfModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(function (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF no disponible',
+                    text: (error && error.message) ? error.message.trim() : 'No se pudo generar el informe PDF.',
+                    confirmButtonColor: '#035c67'
+                });
+            });
+    }
+
+    function cerrarPDFModal() {
+        document.getElementById('pdfModal').style.display = 'none';
+        document.getElementById('pdfFrame').src = '';
+        pdfUrlActual = '';
+        pdfNombreActual = 'informe_radiologico.pdf';
+        if (pdfBlobUrl) {
+            URL.revokeObjectURL(pdfBlobUrl);
+            pdfBlobUrl = '';
+        }
+        document.body.style.overflow = '';
+    }
+
+    function descargarPDFActual() {
+        if (pdfBlobUrl) {
+            const link = document.createElement('a');
+            link.href = pdfBlobUrl;
+            link.download = pdfNombreActual || 'informe_radiologico.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+        }
+        if (!pdfUrlActual) {
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = pdfUrlActual;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    document.getElementById('pdfModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            cerrarPDFModal();
+        }
+    });
+
+    function verSeguimiento(reportId, studyId) {
+        fetch(`get_full_study_details.php?${reportId ? 'report_id=' + reportId : 'study_id=' + studyId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire('Error', data.message || 'No se pudo cargar el seguimiento', 'error');
+                    return;
+                }
+                let html = '';
+                if (data.worklist) {
+                    html += `<h3>Datos del Estudio</h3><table class='seguimiento-table'><tr><td><b>ID Paciente:</b></td><td>${data.worklist.patient_id || ''}</td></tr><tr><td><b>Nombre:</b></td><td>${data.worklist.patient_name || ''}</td></tr><tr><td><b>Modalidad:</b></td><td>${data.worklist.modality || ''}</td></tr><tr><td><b>Descripción:</b></td><td>${data.worklist.study_description || ''}</td></tr><tr><td><b>Fecha:</b></td><td>${data.worklist.study_date || ''}</td></tr><tr><td><b>Técnico asignado:</b></td><td>${data.worklist.technician_name || ''}</td></tr><tr><td><b>Radiólogo asignado:</b></td><td>${data.worklist.radiologist_name || ''}</td></tr></table>`;
+                }
+                if (data.report) {
+                    html += `<h3>Informe Radiológico</h3><table class='seguimiento-table'><tr><td><b>Historia Clínica:</b></td><td>${data.report.clinical_history || ''}</td></tr><tr><td><b>Hallazgos:</b></td><td>${data.report.findings || ''}</td></tr><tr><td><b>Impresión:</b></td><td>${data.report.impression || ''}</td></tr><tr><td><b>Radiólogo:</b></td><td>${data.report.radiologist_name || ''}</td></tr><tr><td><b>Estado:</b></td><td>${data.report.status || ''}</td></tr><tr><td><b>Fecha creación:</b></td><td>${data.report.created_at || ''}</td></tr></table>`;
+                }
+                if (data.transcriptions && data.transcriptions.length > 0) {
+                    html += `<h3>Transcripciones</h3>`;
+                    data.transcriptions.forEach(t => {
+                        const estadoLabel = t.status === 'completed' ? 'Completada' : (t.status === 'in_progress' ? 'En progreso' : (t.status || ''));
+                        html += `<div class='transcripcion-card'>
+                            <div class='transcripcion-header'>
+                                <b>Transcriptor:</b> ${t.transcriber_name || ''}
+                                <span class='transcripcion-estado'>${estadoLabel}</span>
+                                <span class='transcripcion-fecha'>${t.completed_at || t.created_at || ''}</span>
+                            </div>
+                            <div class='transcripcion-body'>
+                                <div><b>Título:</b><br>${t.report_title || ''}</div>
+                                <div><b>Historia Clínica:</b><br>${t.clinical_history || ''}</div>
+                                <div><b>Hallazgos:</b><br>${t.findings || ''}</div>
+                                <div><b>Impresión:</b><br>${t.impression || ''}</div>
+                                <div><b>Comentarios:</b><br>${t.comments || ''}</div>
+                            </div>
+                        </div>`;
+                    });
+                } else if (data.report && data.report.status === 'pending_transcription') {
+                    html += `<p style="color:#035c67;margin-top:12px;"><i class='bx bx-time-five'></i> El informe fue enviado a transcripción. Aún no hay transcripción registrada.</p>`;
+                }
+                document.getElementById('seguimientoDetalle').innerHTML = html;
+                document.getElementById('seguimientoModal').style.display = 'block';
+            })
+            .catch(function () {
+                Swal.fire('Error', 'No se pudo cargar el seguimiento del estudio', 'error');
+            });
+    }
+
+    document.getElementById('reportModalClose').onclick = closeReportModal;
+
+    document.getElementById('reportModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeReportModal();
+        }
+    });
 
     // Cargar datos iniciales
     document.addEventListener('DOMContentLoaded', function() {
@@ -738,16 +1023,22 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     // Cerrar modal del visor DICOM
-    document.querySelector('.close').onclick = function() {
+    document.querySelector('#viewerModal .close').onclick = function() {
         document.getElementById('viewerModal').style.display = 'none';
     }
 
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
+    // Cerrar modal al hacer clic fuera (visor / transcripción / seguimiento)
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal') && event.target.id !== 'reportModal') {
             event.target.style.display = 'none';
         }
-    }
+    });
+
+    document.querySelectorAll('#seguimientoModal .close, #viewerModal .close, #transcriptionModal .close').forEach(function (closeBtn) {
+        closeBtn.onclick = function () {
+            this.closest('.modal').style.display = 'none';
+        };
+    });
 
     function openTranscription(reportId) {
         fetch(`get_report.php?report_id=${reportId}`)

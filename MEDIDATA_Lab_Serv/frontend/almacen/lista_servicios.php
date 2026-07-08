@@ -114,22 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 include_once '../../backend/registros/session_check.php';
-
-// Verificar y crear columna estado si no existe
-try {
-    $sql_check = "SHOW COLUMNS FROM servicios_hospital LIKE 'estado'";
-    $stmt_check = $connect->prepare($sql_check);
-    $stmt_check->execute();
-    $column_exists = $stmt_check->fetch();
-    
-    if (!$column_exists) {
-        $sql_create = "ALTER TABLE servicios_hospital ADD COLUMN estado ENUM('habilitado', 'deshabilitado') DEFAULT 'habilitado'";
-        $stmt_create = $connect->prepare($sql_create);
-        $stmt_create->execute();
-    }
-} catch (Exception $e) {
-    // Si hay error, continuar sin la funcionalidad de estado
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -144,98 +128,9 @@ try {
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-
-    <style>
-        /* Color de fondo para la columna principal */
-        .codigo-column {
-            background-color: #06adbf;
-            color: #ffffff;
-            padding: 10px;
-        }
-        
-        /* Estilos generales para las celdas */
-        #example tbody td {
-            padding: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        /* Alternar colores de las filas */
-        #example tbody tr:nth-child(even) {
-            background-color: #e6f7f8;
-        }
-
-        #example tbody tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-
-        /* Botón de detalles */
-        .btn_ver_detalles {
-            background-color: #035c67;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn_ver_detalles:hover {
-            background-color: #06adbf;
-        }
-        
-        /* Estilos para celdas editables */
-        .editable-cell {
-            cursor: pointer;
-            position: relative;
-            background-color: #f0f8ff;
-            transition: background-color 0.3s ease;
-        }
-        
-        .editable-cell:hover {
-            background-color: #e6f3ff;
-        }
-        
-        .editable-cell.editing {
-            background-color: #fff3cd;
-        }
-        
-        .edit-input {
-            width: 100%;
-            padding: 4px;
-            border: 2px solid #06adbf;
-            border-radius: 3px;
-            background-color: white;
-            font-size: 13px;
-        }
-        
-        .edit-input:focus {
-            outline: none;
-            border-color: #035c67;
-        }
-        
-        /* Estilos para botón de estado */
-        .btn-estado {
-            background-color: #035c67;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .btn-estado:hover {
-            background-color: #06adbf;
-            transform: scale(1.05);
-        }
-        
-        .btn-estado:active {
-            transform: scale(0.95);
-        }
-    </style>
+    <title>MEDIDATA</title>
 </head>
 <body>
 
@@ -275,81 +170,33 @@ include_once '../admin/menu.php';
         <button class="button" onclick="cambiarColor(this, 'lista_solicitud_reorden_admin.php')">Autorización Compras Almacen</button>
         <button class="button" onclick="cambiarColor(this, 'lista_requisiciones.php')">Requisiciones</button>
 
-        <!-- Título centrado -->
-        <div class="table-title">
-            <h1>Lista de Servicios Hospitalarios</h1>
-        </div>
+        <div class="catalog-container">
+            <h2 class="catalog-title">Lista de Servicios Hospitalarios</h2>
+            <p class="catalog-hint">Haga clic en <strong>Nombre del Servicio</strong>, <strong>Precio Costo</strong> o <strong>Margen</strong> para editar. Use <strong>Acciones</strong> para habilitar o deshabilitar.</p>
 
-        <!-- Tabla para mostrar los datos -->
-        <div class="table-container">
-            <table id="example" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th class="codigo-column">Código de Servicio</th>
-                        <th class="codigo-column">Cuenta del Servicio</th>
-                        <th class="codigo-column">Nombre del Servicio</th>
-                        <th class="codigo-column">Categoria</th>
-                        <th class="codigo-column">Uso Servicio</th>
-                        <th class="codigo-column">Precio Costo</th>
-                        <th class="codigo-column">Margen de Ganancia (%)</th>
-                        <th class="codigo-column">Impuesto</th>
-                        <th class="codigo-column">Precio de Venta</th>
-                        <th class="codigo-column">Total</th>
-                        <th class="codigo-column">Fecha de Registro</th>
-                        <th class="codigo-column">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-<?php
-$stmt = $connect->prepare("SELECT *, COALESCE(estado, 'habilitado') as estado FROM servicios_hospital ORDER BY fecha_creacion DESC");
-$stmt->execute();
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    echo "<tr data-id='" . htmlspecialchars($row['id']) . "'>";
-    echo "<td>" . htmlspecialchars($row['codigo_servicio']) . "</td>";
-    
-    echo "<td>" . htmlspecialchars($row['nombre_servicio']) . "</td>";
-    // Nombre del Servicio (nomservicio) - EDITABLE
-    echo "<td class='editable-cell editable-cell-text' data-campo='nomservicio' data-valor='" . htmlspecialchars($row['nomservicio'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($row['nomservicio']) . "</td>";
-    
-    echo "<td>" . htmlspecialchars($row['categoria_servicio']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['uso_servicio']) . "</td>";
-
-    // Precio Costo - EDITABLE
-    echo "<td class='editable-cell' data-campo='precio_costo' data-valor='" . $row['precio_costo'] . "'>" . formatNumber($row['precio_costo']) . "</td>";
-    
-    // Margen de Ganancia - EDITABLE  
-    echo "<td class='editable-cell' data-campo='margen_ganancia' data-valor='" . $row['margen_ganancia'] . "'>" . formatNumber($row['margen_ganancia'], '%') . "</td>";
-    
-    echo "<td>" . htmlspecialchars($row['impuesto']) . "</td>";
-    echo "<td class='precio-venta'>" . formatNumber($row['precio_venta']) . "</td>";
-    echo "<td class='total'>" . formatNumber($row['total']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['fecha_creacion']) . "</td>";
-    
-    // Columna de Acciones
-    $estado = $row['estado'];
-    $boton_texto = ($estado === 'deshabilitado') ? 'Habilitar' : 'Deshabilitar';
-    $boton_color = '#035c67';
-    
-    echo "<td>";
-    echo "<button class='btn-estado' data-id='" . $row['id'] . "' data-estado='" . $estado . "'>";
-    echo $boton_texto;
-    echo "</button>";
-    echo "</td>";
-    
-    echo "</tr>";
-}
-
-// Función para formatear números
-function formatNumber($value, $suffix = '') {
-    if (is_numeric($value)) {
-        return number_format((float)$value, 2) . $suffix;
-    }
-    return 'N/A'; // Valor por defecto si no es numérico
-}
-?>
-</tbody>
-            </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table id="example" class="display responsive-table dt-medidata-unificado">
+                        <thead>
+                            <tr>
+                                <th>Código de Servicio</th>
+                                <th>Cuenta del Servicio</th>
+                                <th>Nombre del Servicio</th>
+                                <th>Categoria</th>
+                                <th>Uso Servicio</th>
+                                <th>Precio Costo</th>
+                                <th>Margen de Ganancia (%)</th>
+                                <th>Impuesto</th>
+                                <th>Precio de Venta</th>
+                                <th>Total</th>
+                                <th>Fecha de Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 </section>
@@ -365,204 +212,210 @@ function formatNumber($value, $suffix = '') {
 <script src="../../backend/js/vfs_fonts.js"></script>
 <script src="../../backend/js/buttonshtml5.js"></script>
 <script src="../../backend/js/buttonsprint.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
     $('#example').DataTable({
+        processing: true,
+        serverSide: true,
         pageLength: 10,
+        lengthChange: false,
         dom: 'Bfrtip',
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']], // Orden descendente en la primera columna
-        language: {
-            "sProcessing": "Procesando...",
-            "sLengthMenu": "Mostrar _MENU_ registros",
-            "sZeroRecords": "No se encontraron resultados",
-            "sInfo": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            "sInfoEmpty": "Mostrando 0 a 0 de 0 registros",
-            "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
-            "sSearch": "Buscar:",
-            "oPaginate": {
-                "sFirst": "Primero",
-                "sLast": "Último",
-                "sNext": "Siguiente",
-                "sPrevious": "Anterior"
+        ajax: {
+            url: '../../backend/registros/get_servicios_hospital.php',
+            type: 'GET',
+            data: function(d) { d.layout = 'full'; }
+        },
+        order: [[10, 'desc']],
+        columns: [
+            { data: 'codigo_servicio' },
+            { data: 'nombre_servicio' },
+            {
+                data: 'nomservicio',
+                render: function(data, type) {
+                    if (type !== 'display') return data;
+                    var esc = $('<div>').text(data).html();
+                    return '<span class="editable-cell editable-cell-text" data-campo="nomservicio" data-valor="' + esc + '">' + esc + '</span>';
+                }
+            },
+            { data: 'categoria_servicio' },
+            { data: 'uso_servicio' },
+            {
+                data: 'precio_costo',
+                render: function(data, type, row) {
+                    if (type !== 'display') return data;
+                    return '<span class="editable-cell" data-campo="precio_costo" data-valor="' + data + '">' + row.precio_costo_fmt + '</span>';
+                }
+            },
+            {
+                data: 'margen_ganancia',
+                render: function(data, type, row) {
+                    if (type !== 'display') return data;
+                    return '<span class="editable-cell" data-campo="margen_ganancia" data-valor="' + data + '">' + row.margen_ganancia_fmt + '</span>';
+                }
+            },
+            { data: 'impuesto' },
+            {
+                data: 'precio_venta',
+                className: 'precio-venta',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.precio_venta_fmt : data;
+                }
+            },
+            {
+                data: 'total',
+                className: 'total',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.total_fmt : data;
+                }
+            },
+            { data: 'fecha_creacion' },
+            {
+                data: 'estado',
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    if (type !== 'display') return data;
+                    return '<button type="button" class="btn-estado" data-id="' + row.id + '" data-estado="' + data + '">' + row.btn_estado_texto + '</button>';
+                }
             }
+        ],
+        createdRow: function(row, data) {
+            $(row).attr('data-id', data.id);
+        },
+        language: {
+            sProcessing: 'Procesando...',
+            sLengthMenu: 'Mostrar _MENU_ registros',
+            sZeroRecords: 'No se encontraron resultados',
+            sInfo: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            sInfoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            sInfoFiltered: '(filtrado de _MAX_ registros totales)',
+            sSearch: 'Buscar:',
+            oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
         }
     });
-    
-    // Funcionalidad de edición inline
-    let celdaEditando = null;
-    
-    // Evento click en celdas editables
+
+    var celdaEditando = null;
+
+    function fmtNum(n, dec) { return parseFloat(n).toFixed(dec); }
+
+    function restaurarCelda($celda, valor, campo) {
+        if (campo === 'nomservicio') {
+            $celda.text(valor);
+        } else {
+            var suf = campo === 'margen_ganancia' ? '%' : '';
+            $celda.html(fmtNum(valor, 2) + suf);
+        }
+        $celda.removeClass('editing');
+        celdaEditando = null;
+    }
+
     $(document).on('click', '.editable-cell', function() {
-        // Si ya hay una celda en edición, no hacer nada
         if (celdaEditando) return;
-        
-        const $celda = $(this);
-        const valorActual = $celda.data('valor');
-        const campo = $celda.data('campo');
-        const esTexto = (campo === 'nomservicio');
-        
-        // Marcar como editando
+
+        var $celda = $(this);
+        var valorActual = $celda.data('valor');
+        var campo = $celda.data('campo');
+        var esTexto = (campo === 'nomservicio');
+
         $celda.addClass('editing');
         celdaEditando = $celda;
-        
-        // Crear input: texto para nombre, número para precio/margen
-        const $input = esTexto
+
+        var $input = esTexto
             ? $('<input type="text" class="edit-input" />').val(valorActual)
             : $('<input type="number" class="edit-input" step="0.01" min="0" />').val(valorActual);
-        
-        // Reemplazar contenido
+
         $celda.html($input);
         $input.focus().select();
-        
-        // Función para guardar cambios
+
         function guardarCambios() {
-            const nuevoValor = esTexto ? $.trim($input.val()) : (parseFloat($input.val()) || 0);
-            if (esTexto && nuevoValor === String(valorActual)) {
-                cancelarEdicion();
+            var nuevoValor = esTexto ? $.trim($input.val()) : (parseFloat($input.val()) || 0);
+            if (String(nuevoValor) === String(valorActual)) {
+                restaurarCelda($celda, valorActual, campo);
                 return;
             }
-            if (!esTexto && nuevoValor === valorActual) {
-                cancelarEdicion();
-                return;
-            }
-            
-            const rowId = $celda.closest('tr').data('id');
-            
+
             $.ajax({
-                url: '',
+                url: window.location.href,
                 method: 'POST',
+                dataType: 'json',
                 data: {
                     action: 'update_servicio',
-                    id: rowId,
+                    id: $celda.closest('tr').data('id'),
                     campo: campo,
                     valor: nuevoValor
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $celda.data('valor', nuevoValor);
-                        
-                        if (esTexto) {
-                            $celda.text(nuevoValor);
-                        } else {
-                            const sufijo = campo === 'margen_ganancia' ? '%' : '';
-                            $celda.html(number_format(nuevoValor, 2) + sufijo);
-                        }
-                        
-                        if (response.nuevo_precio_venta) {
-                            $celda.closest('tr').find('.precio-venta').html(response.nuevo_precio_venta);
-                        }
-                        if (response.nuevo_total) {
-                            $celda.closest('tr').find('.total').html(response.nuevo_total);
-                        }
-                        
-                        Swal.fire("¡Actualizado!", response.message, "success");
-                    } else {
-                        Swal.fire("Error", response.message, "error");
-                        cancelarEdicion();
-                    }
-                },
-                error: function() {
-                    Swal.fire("Error", "No se pudo conectar con el servidor", "error");
-                    cancelarEdicion();
-                },
-                complete: function() {
-                    $celda.removeClass('editing');
-                    celdaEditando = null;
                 }
+            }).done(function(response) {
+                if (response.success) {
+                    $celda.data('valor', nuevoValor);
+                    restaurarCelda($celda, nuevoValor, campo);
+                    if (response.nuevo_precio_venta) {
+                        $celda.closest('tr').find('.precio-venta').html(response.nuevo_precio_venta);
+                    }
+                    if (response.nuevo_total) {
+                        $celda.closest('tr').find('.total').html(response.nuevo_total);
+                    }
+                    Swal.fire('¡Actualizado!', response.message, 'success');
+                } else {
+                    Swal.fire('Error', response.message || 'No se pudo actualizar', 'error');
+                    restaurarCelda($celda, valorActual, campo);
+                }
+            }).fail(function() {
+                Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+                restaurarCelda($celda, valorActual, campo);
             });
         }
-        
-        function cancelarEdicion() {
-            if (esTexto) {
-                $celda.text(valorActual);
-            } else {
-                const sufijo = campo === 'margen_ganancia' ? '%' : '';
-                $celda.html(number_format(valorActual, 2) + sufijo);
-            }
-            $celda.removeClass('editing');
-            celdaEditando = null;
-        }
-        
+
         $input.on('blur', guardarCambios);
         $input.on('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                guardarCambios();
-            } else if (e.key === 'Escape') {
-                cancelarEdicion();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); guardarCambios(); }
+            if (e.key === 'Escape') { restaurarCelda($celda, valorActual, campo); }
         });
     });
-    
-    // Función auxiliar para formatear números
-    function number_format(number, decimals) {
-        return parseFloat(number).toFixed(decimals);
-    }
-    
-    // Manejar cambio de estado de servicios
+
     $(document).on('click', '.btn-estado', function() {
-        const $boton = $(this);
-        const servicioId = $boton.data('id');
-        const estadoActual = $boton.data('estado');
-        const nuevoEstado = (estadoActual === 'habilitado') ? 'deshabilitado' : 'habilitado';
-        const accion = (nuevoEstado === 'habilitado') ? 'habilitar' : 'deshabilitar';
-        
+        var $boton = $(this);
+        var servicioId = $boton.data('id');
+        var estadoActual = $boton.data('estado');
+        var nuevoEstado = (estadoActual === 'habilitado') ? 'deshabilitado' : 'habilitado';
+        var accion = (nuevoEstado === 'habilitado') ? 'habilitar' : 'deshabilitar';
+        var textoOriginal = $boton.text();
+
         Swal.fire({
-            title: `¿${accion.charAt(0).toUpperCase() + accion.slice(1)} servicio?`,
-            text: `¿Estás seguro de que deseas ${accion} este servicio?`,
-            icon: "warning",
-            buttons: {
-                cancel: {
-                    text: "Cancelar",
-                    value: false,
-                    visible: true
-                },
-                confirm: {
-                    text: `Sí, ${accion}`,
-                    value: true,
-                    visible: true
+            title: accion.charAt(0).toUpperCase() + accion.slice(1) + ' servicio',
+            text: '¿Está seguro de que desea ' + accion + ' este servicio?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#035c67',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, ' + accion,
+            cancelButtonText: 'Cancelar'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            $boton.prop('disabled', true).text('Procesando...');
+            $.ajax({
+                url: window.location.href,
+                method: 'POST',
+                dataType: 'json',
+                data: { action: 'cambiar_estado', id: servicioId, nuevo_estado: nuevoEstado }
+            }).done(function(response) {
+                if (response.success) {
+                    $boton.data('estado', nuevoEstado);
+                    $boton.text((nuevoEstado === 'habilitado') ? 'Deshabilitar' : 'Habilitar');
+                    Swal.fire('¡Actualizado!', response.message, 'success');
+                } else {
+                    Swal.fire('Error', response.message || 'No se pudo actualizar', 'error');
+                    $boton.text(textoOriginal);
                 }
-            }
-        }).then((isConfirm) => {
-            if (isConfirm) {
-                $.ajax({
-                    url: window.location.href,
-                    method: 'POST',
-                    data: {
-                        action: 'cambiar_estado',
-                        id: servicioId,
-                        nuevo_estado: nuevoEstado
-                    },
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $boton.prop('disabled', true).text('Procesando...');
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const nuevoTexto = (nuevoEstado === 'habilitado') ? 'Deshabilitar' : 'Habilitar';
-                            $boton.text(nuevoTexto);
-                            $boton.data('estado', nuevoEstado);
-                            $boton.prop('disabled', false);
-                            
-                            Swal.fire("¡Actualizado!", response.message, "success");
-                        } else {
-                            $boton.prop('disabled', false);
-                            const textoOriginal = (estadoActual === 'habilitado') ? 'Deshabilitar' : 'Habilitar';
-                            $boton.text(textoOriginal);
-                            Swal.fire("Error", response.message, "error");
-                        }
-                    },
-                    error: function() {
-                        $boton.prop('disabled', false);
-                        const textoOriginal = (estadoActual === 'habilitado') ? 'Deshabilitar' : 'Habilitar';
-                        $boton.text(textoOriginal);
-                        Swal.fire("Error", "No se pudo conectar con el servidor", "error");
-                    }
-                });
-            }
+            }).fail(function() {
+                Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+                $boton.text(textoOriginal);
+            }).always(function() {
+                $boton.prop('disabled', false);
+            });
         });
     });
 });
@@ -571,7 +424,6 @@ $(document).ready(function() {
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
-<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
 
 </body>
 </html>

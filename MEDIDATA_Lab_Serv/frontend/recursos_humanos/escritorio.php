@@ -332,13 +332,13 @@ try {
                 }
             }
 
-            $('.rrhh-close-event-modal').on('click', function (e) {
+            $(document).on('click', '.rrhh-close-event-modal', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 closeRrhhModal('eventModal');
             });
 
-            $('.rrhh-close-custom-modal').on('click', function (e) {
+            $(document).on('click', '.rrhh-close-custom-modal', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 closeRrhhModal('addCustomEventModal');
@@ -350,8 +350,8 @@ try {
                 }
             });
 
-            $('#eventModal .modal-content, #addCustomEventModal .modal-content').on('click', function (e) {
-                if ($(e.target).closest('.close-btn').length) {
+            $(document).on('click', '#eventModal .modal-content, #addCustomEventModal .modal-content', function (e) {
+                if ($(e.target).closest('.rrhh-close-event-modal, .rrhh-close-custom-modal').length) {
                     return;
                 }
                 e.stopPropagation();

@@ -1906,6 +1906,321 @@ main .btn-send:hover {
   background-color: white;
 }
 
+/* ---- Formulario personal RRHH (alta y edición) ---- */
+main .containerss.staff-form,
+main .containerss.staff-edit-form {
+  width: calc(100% - 24px);
+  max-width: 1360px;
+  margin: 0 auto 24px;
+  padding: 24px 28px 28px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+main .containerss.staff-form .staff-form-alert,
+main .containerss.staff-edit-form .staff-form-alert {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  background: #fff8e6;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: 6px;
+  color: #6b5600;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+main .containerss.staff-form .staff-form-readonly,
+main .containerss.staff-edit-form .staff-form-readonly {
+  background: #f5f7f8 !important;
+  cursor: not-allowed;
+  color: #555;
+}
+
+main .containerss.staff-form .staff-area-help,
+main .containerss.staff-edit-form .staff-area-help {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  background: #f4fafb;
+  border: 1px solid rgba(3, 92, 103, 0.2);
+  border-radius: 8px;
+  color: #444;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+main .containerss.staff-form .staff-area-help p,
+main .containerss.staff-edit-form .staff-area-help p {
+  margin: 0 0 8px;
+}
+
+main .containerss.staff-form .staff-area-help ul,
+main .containerss.staff-edit-form .staff-area-help ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+main .containerss.staff-form .staff-area-help li,
+main .containerss.staff-edit-form .staff-area-help li {
+  margin-bottom: 6px;
+}
+
+main .containerss.staff-form .staff-area-help a,
+main .containerss.staff-edit-form .staff-area-help a {
+  color: var(--dark-blue, #035c67);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+main .containerss.staff-form > h1,
+main .containerss.staff-edit-form > h1 {
+  margin: 0 0 12px;
+  color: var(--dark-blue, #035c67);
+  font-size: 1.45rem;
+}
+
+main .containerss.staff-form .staff-form-section,
+main .containerss.staff-edit-form .staff-form-section {
+  margin-bottom: 28px;
+}
+
+main .containerss.staff-form .staff-form-section__title,
+main .containerss.staff-edit-form .staff-form-section__title {
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(3, 92, 103, 0.15);
+  color: var(--dark-blue, #035c67);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+main .containerss.staff-form .staff-form-section__hint,
+main .containerss.staff-edit-form .staff-form-section__hint {
+  margin: 0 0 16px;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+main .containerss.staff-form .staff-form-grid,
+main .containerss.staff-edit-form .staff-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+}
+
+main .containerss.staff-form .staff-form-grid--single,
+main .containerss.staff-edit-form .staff-form-grid--single {
+  grid-template-columns: 1fr;
+}
+
+main .containerss.staff-form .staff-form-grid > .staff-form-field--full,
+main .containerss.staff-edit-form .staff-form-grid > .staff-form-field--full {
+  grid-column: 1 / -1;
+}
+
+main .containerss.staff-form .staff-form-grid label b,
+main .containerss.staff-edit-form .staff-form-grid label b {
+  color: #333;
+}
+
+main .containerss.staff-form .staff-form-grid input[type="text"],
+main .containerss.staff-edit-form .staff-form-grid input[type="text"],
+main .containerss.staff-form .staff-form-grid input[type="email"],
+main .containerss.staff-edit-form .staff-form-grid input[type="email"],
+main .containerss.staff-form .staff-form-grid input[type="date"],
+main .containerss.staff-edit-form .staff-form-grid input[type="date"],
+main .containerss.staff-form .staff-form-grid input[type="number"],
+main .containerss.staff-edit-form .staff-form-grid input[type="number"],
+main .containerss.staff-form .staff-form-grid input[type="file"],
+main .containerss.staff-edit-form .staff-form-grid input[type="file"],
+main .containerss.staff-form .staff-form-grid select,
+main .containerss.staff-edit-form .staff-form-grid select,
+main .containerss.staff-form .staff-form-grid .select2-container,
+main .containerss.staff-edit-form .staff-form-grid .select2-container {
+  margin-top: 6px !important;
+  margin-bottom: 14px !important;
+}
+
+main .containerss.staff-form .staff-form-check,
+main .containerss.staff-edit-form .staff-form-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 16px;
+  padding: 12px 14px;
+  background: #f4fafb;
+  border: 1px solid rgba(3, 92, 103, 0.15);
+  border-radius: 6px;
+}
+
+main .containerss.staff-form .staff-form-check input[type="checkbox"],
+main .containerss.staff-edit-form .staff-form-check input[type="checkbox"] {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+main .containerss.staff-form .staff-form-actions,
+main .containerss.staff-edit-form .staff-form-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e8ecef;
+}
+
+main .containerss.staff-form .staff-doc-grid,
+main .containerss.staff-edit-form .staff-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+main .containerss.staff-form .staff-doc-card,
+main .containerss.staff-edit-form .staff-doc-card {
+  border: 1px solid #e3e8eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #fafbfc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+main .containerss.staff-form .staff-doc-card--uploaded,
+main .containerss.staff-edit-form .staff-doc-card--uploaded {
+  border-color: rgba(3, 92, 103, 0.35);
+  background: #f4fafb;
+}
+
+main .containerss.staff-form .staff-doc-card--highlight,
+main .containerss.staff-edit-form .staff-doc-card--highlight {
+  border-color: rgba(3, 92, 103, 0.5);
+}
+
+main .containerss.staff-form .staff-doc-card__head,
+main .containerss.staff-edit-form .staff-doc-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+main .containerss.staff-form .staff-doc-card__label,
+main .containerss.staff-edit-form .staff-doc-card__label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+main .containerss.staff-form .staff-doc-card__status,
+main .containerss.staff-edit-form .staff-doc-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+main .containerss.staff-form .staff-doc-card__status--ok,
+main .containerss.staff-edit-form .staff-doc-card__status--ok {
+  color: #1e6f4e;
+  background: rgba(129, 212, 58, 0.18);
+}
+
+main .containerss.staff-form .staff-doc-card__status--pending,
+main .containerss.staff-edit-form .staff-doc-card__status--pending {
+  color: #7a6a00;
+  background: rgba(255, 193, 7, 0.18);
+}
+
+main .containerss.staff-form .staff-doc-card__actions,
+main .containerss.staff-edit-form .staff-doc-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn {
+  min-width: 88px;
+  margin: 0;
+}
+
+main .containerss.staff-form .staff-doc-card__actions button.doc-btn,
+main .containerss.staff-edit-form .staff-doc-card__actions button.doc-btn {
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn--upload,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn--upload {
+  background: #fff;
+  color: #035c67 !important;
+  border: 1px dashed rgba(3, 92, 103, 0.45) !important;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn--upload:hover,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn--upload:hover {
+  background: #f4fafb;
+  color: #02434c !important;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn--delete,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn--delete {
+  background: #fff !important;
+  color: #c0392b !important;
+  border: 1px solid rgba(192, 57, 43, 0.45) !important;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn--delete:hover,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn--delete:hover {
+  background: #fdf2f2 !important;
+  color: #962d22 !important;
+}
+
+main .containerss.staff-form .staff-doc-card__actions .doc-btn--upload i,
+main .containerss.staff-edit-form .staff-doc-card__actions .doc-btn--upload i {
+  color: inherit;
+}
+
+main .containerss.staff-form .staff-doc-card__file,
+main .containerss.staff-edit-form .staff-doc-card__file {
+  display: none !important;
+}
+
+main .containerss.staff-form .staff-doc-card__filename,
+main .containerss.staff-edit-form .staff-doc-card__filename {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: #888;
+  font-style: italic;
+  word-break: break-all;
+}
+
+main .containerss.staff-form .staff-doc-card__filename.is-selected,
+main .containerss.staff-edit-form .staff-doc-card__filename.is-selected {
+  color: #035c67;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  main .containerss.staff-form,
+  main .containerss.staff-edit-form {
+    padding: 18px 16px 20px;
+  }
+  main .containerss.staff-form .staff-form-grid,
+  main .containerss.staff-edit-form .staff-form-grid {
+    grid-template-columns: 1fr;
+  }
+  main .containerss.staff-form .staff-doc-grid,
+  main .containerss.staff-edit-form .staff-doc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 select {
 	width: 100%;
   padding: 15px;
@@ -1957,7 +2272,7 @@ main .containerss .select2-container--default.select2-container--open .select2-s
 main .containerss .select2-container--default .select2-selection--single .select2-selection__placeholder {
   color: #666;
 }
-input[type=text], input[type=password], input[type=email], input[type=date], input[type=datetime-local], input[type=file], input[type=number], input[type=tel], input[type=radio], textarea {
+input[type=text], input[type=password], input[type=email], input[type=date], input[type=time], input[type=datetime-local], input[type=file], input[type=number], input[type=tel], input[type=radio], textarea {
   width: 100%;
   padding: 15px;
   margin: 20px 0 22px 0;
@@ -1973,9 +2288,25 @@ input[type=number] {
 }
 
 /* Mejorar el foco para todos los campos de entrada */
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=date]:focus, input[type=datetime-local]:focus, input[type=file]:focus, input[type=number]:focus, input[type=tel]:focus {
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=date]:focus, input[type=time]:focus, input[type=datetime-local]:focus, input[type=file]:focus, input[type=number]:focus, input[type=tel]:focus {
   background-color: #ddd;
   outline: none;
+}
+
+/* Formularios RRHH/MEDIDATA: 2 columnas en desktop, 1 en móvil */
+main .containerss .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  align-items: end;
+}
+main .containerss .form-grid-2 > div {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  main .containerss .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Opcional: Si deseas alinear los botones de radio */
@@ -2007,11 +2338,22 @@ input[type=radio] {
   opacity: 0.9;
 }
 
-a.registerbtn {
+a.registerbtn,
+a.pabtn {
   display: block;
   box-sizing: border-box;
   text-decoration: none;
   text-align: center;
+}
+
+a.button.form-secondary-btn {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  margin: 8px 0;
+  padding: 16px 20px;
+  text-decoration: none;
 }
 
 .registerbtn-secondary-link {

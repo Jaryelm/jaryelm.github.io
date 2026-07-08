@@ -106,6 +106,9 @@ if (!function_exists('medidata_rrhh_aplica_bridge_ensure_schema')) {
                 if (!in_array('fecha_gestion_rrhh', $cols, true)) {
                     $pdoPost->exec('ALTER TABLE aplica ADD COLUMN fecha_gestion_rrhh DATETIME NULL DEFAULT NULL AFTER motivo_descarte');
                 }
+                if (!in_array('id_vacant_position', $cols, true)) {
+                    $pdoPost->exec('ALTER TABLE aplica ADD COLUMN id_vacant_position INT NULL DEFAULT NULL AFTER puesto_aspirado');
+                }
                 $pdoPost->exec(
                     "UPDATE aplica SET estado_rrhh = 'Incorporado'
                      WHERE seleccionado = 1 AND estado_rrhh = 'Pendiente'"
@@ -277,16 +280,104 @@ if (!function_exists('medidata_rrhh_fetch_vacantes_abiertas')) {
         }
         try {
             $mainDb = defined('dbname') ? (string) dbname : 'medic9ue_medi_data';
-            $sql = "SELECT v.id, p.name AS position_name, v.priority, v.end_date
+            $sql = "SELECT v.id, p.name AS position_name,
+                           COALESCE(NULLIF(TRIM(d.name), ''), NULLIF(TRIM(pd.department), ''), '') AS department_name,
+                           v.priority, v.end_date, v.available_slots
                     FROM vacant_positions v
                     INNER JOIN positions_details pd ON v.id_position = pd.id
                     INNER JOIN {$mainDb}.positions p ON pd.id_positions = p.id
+                    LEFT JOIN departaments d ON pd.id_departament = d.id
                     WHERE v.deleted = 0 AND v.status = 'Abierta' AND v.end_date >= CURDATE()
-                    ORDER BY p.name ASC, v.id DESC";
+                    ORDER BY
+                        FIELD(v.priority, 'Urgente', 'Alta', 'Media', 'Baja'),
+                        p.name ASC,
+                        v.id DESC";
             return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         } catch (Throwable $e) {
             error_log('medidata_rrhh_fetch_vacantes_abiertas: ' . $e->getMessage());
             return [];
+        }
+    }
+}
+
+if (!function_exists('medidata_rrhh_vacante_web_label')) {
+    function medidata_rrhh_vacante_web_label(array $row): string
+    {
+        $name = trim((string) ($row['position_name'] ?? 'Vacante'));
+        $dept = trim((string) ($row['department_name'] ?? ''));
+        $priority = trim((string) ($row['priority'] ?? ''));
+        $label = $name;
+        if ($dept !== '') {
+            $label .= ' (' . $dept . ')';
+        }
+        if ($priority !== '') {
+            $label .= ' — ' . $priority;
+        }
+        return $label;
+    }
+}
+
+if (!function_exists('medidata_rrhh_public_cat_vacantes_web')) {
+    /** @return array<int, array<string, mixed>> */
+    function medidata_rrhh_public_cat_vacantes_web(): array
+    {
+        $rows = medidata_rrhh_fetch_vacantes_abiertas();
+        $data = [];
+        foreach ($rows as $row) {
+            $positionName = trim((string) ($row['position_name'] ?? ''));
+            if ($positionName === '') {
+                continue;
+            }
+            $data[] = [
+                'id' => (int) ($row['id'] ?? 0),
+                'label' => medidata_rrhh_vacante_web_label($row),
+                'position_name' => $positionName,
+                'department_name' => (string) ($row['department_name'] ?? ''),
+                'priority' => (string) ($row['priority'] ?? ''),
+                'end_date' => (string) ($row['end_date'] ?? ''),
+                'available_slots' => (int) ($row['available_slots'] ?? 0),
+            ];
+        }
+        return $data;
+    }
+}
+
+if (!function_exists('medidata_rrhh_vacante_abierta_por_id')) {
+    /** @return array<string, mixed>|null */
+    function medidata_rrhh_vacante_abierta_por_id(int $idVacante): ?array
+    {
+        if ($idVacante <= 0) {
+            return null;
+        }
+        $pdo = medidata_rrhh_pdo();
+        if (!$pdo) {
+            return null;
+        }
+        try {
+            $mainDb = defined('dbname') ? (string) dbname : 'medic9ue_medi_data';
+            $sql = "SELECT v.id, p.name AS position_name,
+                           COALESCE(NULLIF(TRIM(d.name), ''), NULLIF(TRIM(pd.department), ''), '') AS department_name,
+                           v.priority, v.end_date, v.available_slots
+                    FROM vacant_positions v
+                    INNER JOIN positions_details pd ON v.id_position = pd.id
+                    INNER JOIN {$mainDb}.positions p ON pd.id_positions = p.id
+                    LEFT JOIN departaments d ON pd.id_departament = d.id
+                    WHERE v.id = ?
+                      AND v.deleted = 0
+                      AND v.status = 'Abierta'
+                      AND v.end_date >= CURDATE()
+                    LIMIT 1";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$idVacante]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row) {
+                return null;
+            }
+            $row['label'] = medidata_rrhh_vacante_web_label($row);
+            return $row;
+        } catch (Throwable $e) {
+            error_log('medidata_rrhh_vacante_abierta_por_id: ' . $e->getMessage());
+            return null;
         }
     }
 }
@@ -347,6 +438,9 @@ if (!function_exists('medidata_rrhh_incorporar_aplica')) {
             return ['success' => false, 'message' => 'Esta postulación está descartada. Restaure desde descarte antes de incorporar.'];
         }
 
+        if ($idVacante <= 0) {
+            $idVacante = (int) ($aplica['id_vacant_position'] ?? 0);
+        }
         if ($idVacante <= 0) {
             return ['success' => false, 'message' => 'Debe seleccionar una vacante válida.'];
         }
@@ -587,19 +681,37 @@ if (!function_exists('medidata_postulaciones_enriquecer_fila')) {
     /** @param array<string, mixed> $row */
     function medidata_postulaciones_enriquecer_fila(array $row): array
     {
-        $puesto = (string) ($row['puesto_aspirado'] ?? '');
-        $match = medidata_rrhh_match_aplica_a_vacante($puesto);
         $estado = $row['estado_rrhh'] ?? 'Pendiente';
         if ($estado === '' || $estado === null) {
             $estado = ((int) ($row['seleccionado'] ?? 0) === 1) ? 'Incorporado' : 'Pendiente';
         }
 
         $row['estado_rrhh'] = $estado;
+        $row['id_candidate_rrhh'] = isset($row['id_candidate_rrhh']) ? (int) $row['id_candidate_rrhh'] : 0;
+
+        $idVacantWeb = (int) ($row['id_vacant_position'] ?? 0);
+        if ($idVacantWeb > 0) {
+            $vacante = medidata_rrhh_vacante_abierta_por_id($idVacantWeb);
+            if ($vacante) {
+                $row['vacante_sugerida_id'] = $idVacantWeb;
+                $row['vacante_sugerida'] = (string) ($vacante['label'] ?? $vacante['position_name'] ?? '');
+                $row['match_type'] = 'web_form';
+                $row['vacantes_match'] = [[
+                    'id' => $idVacantWeb,
+                    'position_name' => (string) ($vacante['position_name'] ?? ''),
+                    'priority' => (string) ($vacante['priority'] ?? ''),
+                    'end_date' => (string) ($vacante['end_date'] ?? ''),
+                ]];
+                return $row;
+            }
+        }
+
+        $puesto = (string) ($row['puesto_aspirado'] ?? '');
+        $match = medidata_rrhh_match_aplica_a_vacante($puesto);
         $row['vacante_sugerida'] = $match['suggested_label'];
         $row['vacante_sugerida_id'] = $match['suggested_vacante_id'];
         $row['match_type'] = $match['match_type'];
         $row['vacantes_match'] = $match['vacantes'];
-        $row['id_candidate_rrhh'] = isset($row['id_candidate_rrhh']) ? (int) $row['id_candidate_rrhh'] : 0;
 
         return $row;
     }

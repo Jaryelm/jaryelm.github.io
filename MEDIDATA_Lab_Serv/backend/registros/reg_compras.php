@@ -8,6 +8,7 @@ if (!isset($_POST['add_medicine'])) {
 }
 
 require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/cuentas_compra_inventario_lib.php';
 
 // compras_seg.php y formularios sin line_mode → solo detalle (sin tocar stock)
 if (!isset($_POST['line_mode'])) {
@@ -361,10 +362,12 @@ try {
             ]);
         }
 
+        $ctaLinea = medidata_validar_cuenta_compra_inventario((string) ($cat_cuenta[$i] ?? ''), $i + 1);
+
         $stmt_detalle->execute([
             ':id_compra' => $id_compra,
             ':product_id' => $pid,
-            ':cat_cuenta' => $cat_cuenta[$i] ?? '',
+            ':cat_cuenta' => $ctaLinea,
             ':codigo_producto' => $codigo_producto[$i] ?? '',
             ':cantidad' => $qty,
             ':unidad' => $unidad[$i] ?? '',

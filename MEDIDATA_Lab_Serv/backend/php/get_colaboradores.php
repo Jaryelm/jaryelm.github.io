@@ -12,6 +12,7 @@
 
 require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/users_rrhh_extra_lib.php';
+require_once __DIR__ . '/staff_areas_lib.php';
 header('Content-Type: application/json; charset=utf-8');
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -38,7 +39,7 @@ try {
     $estado = (isset($_GET['estado']) && $_GET['estado'] === '0') ? '0' : '1';
 
     // Filtro opcional por tipo de personal (whitelist de tablas de origen).
-    $tipoAllow = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
+    $tipoAllow = medidata_staff_area_keys();
     $tipo = trim((string) ($_GET['tipo'] ?? ''));
     $tipoFilter = in_array($tipo, $tipoAllow, true) ? " AND t.source_table = '" . $tipo . "'" : '';
 

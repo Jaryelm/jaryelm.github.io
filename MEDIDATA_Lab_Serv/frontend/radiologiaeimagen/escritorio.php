@@ -1,5 +1,9 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+if (($_SESSION['rol'] ?? '') === 'Radiologo') {
+    require __DIR__ . '/escritorio_radiologo.php';
+    exit;
+}
 // incuir el archivo de sesion login
 ?>
 <?php

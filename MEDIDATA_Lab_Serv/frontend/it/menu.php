@@ -12,6 +12,13 @@
                 <li><a href="../usuarios/crear_user.php"><span>CREAR USUARIO</span></a></li>
             </ul>
         </li>
+        <li>
+            <a href="#"><i class='bx bxs-box icon'></i><span>INVENTARIO</span><i class='bx bx-chevron-right icon-right'></i></a>
+            <ul class="side-dropdown">
+                <li><a href="../it/nuevo_servicio_user.php"><span>REGISTRAR SERVICIOS</span></a></li>
+                <li><a href="../it/lista_servicios_user.php"><span>LISTA DE SERVICIOS</span></a></li>
+            </ul>
+        </li>
 
         <li>
             <a href="../it/acerca.php"><i class='bx bxs-help-circle icon'></i><span>ACERCA DE MEDIDATA</span></a>

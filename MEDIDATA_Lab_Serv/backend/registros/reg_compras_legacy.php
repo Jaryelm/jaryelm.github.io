@@ -7,6 +7,7 @@ if (!isset($_POST['add_medicine'])) {
 date_default_timezone_set('America/Tegucigalpa');
 $currentDateTime = date('Y-m-d H:i:s');
 require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../php/cuentas_compra_inventario_lib.php';
 
 if (!function_exists('medidata_parse_precio_unitario_compra')) {
     function medidata_parse_precio_unitario_compra($raw): float
@@ -138,9 +139,10 @@ try {
         $gravado = ($isvVal > 0.00001) ? 1 : 0;
         $exento = $gravado ? 0 : 1;
         $puLine = medidata_parse_precio_unitario_compra($precio_unitario[$i] ?? '0');
+        $ctaValidada = medidata_validar_cuenta_compra_inventario((string) ($cat_cuenta[$i] ?? ''), $i + 1);
         $params = [
             ':id_compra' => $id_compra,
-            ':cat_cuenta' => $cat_cuenta[$i],
+            ':cat_cuenta' => $ctaValidada,
             ':codigo_producto' => $codigo_producto[$i],
             ':cantidad' => $cantidad[$i],
             ':unidad' => $unidad[$i],

@@ -4,6 +4,8 @@ if (!isset($_POST['add_colaborador'])) {
 }
 
 require_once __DIR__ . '/staff_colaborador_bootstrap.php';
+require_once __DIR__ . '/staff_areas_lib.php';
+require_once __DIR__ . '/staff_doctor_fields_lib.php';
 require_once __DIR__ . '/../registros/rrhh_guard.php';
 
 medidata_staff_ensure_tables($connect);
@@ -38,7 +40,7 @@ if ($area_colaborador === '' || $numide === '' || $nombres === '') {
 }
 
 $lista_contexto = trim((string) ($_POST['lista_contexto'] ?? 'colaboradores'));
-if (!in_array($lista_contexto, ['colaboradores', 'medicos', 'medifarma'], true)) {
+if (!in_array($lista_contexto, medidata_staff_lista_contextos(), true)) {
     $lista_contexto = 'colaboradores';
 }
 if ($lista_contexto === 'medicos' && $area_colaborador !== 'doctor') {
@@ -50,51 +52,32 @@ if ($lista_contexto === 'colaboradores' && $area_colaborador === 'doctor') {
     return;
 }
 
-$valid_areas = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
-if (!in_array($area_colaborador, $valid_areas)) {
+$valid_areas = medidata_staff_area_keys();
+if (!medidata_staff_area_is_valid($area_colaborador)) {
     echo '<script>Swal.fire("Área no válida", "El área seleccionada no es válida.", "error");</script>';
     return;
 }
 
-// Configurar columnas según el área
-$col_numide = 'numide';
-$col_nombres = '';
-$col_apellidos = '';
-$col_nacimiento = '';
-$col_genero = '';
-$label_area = '';
+$areaCols = medidata_staff_area_columns($area_colaborador);
+if (!$areaCols) {
+    echo '<script>Swal.fire("Error", "No se pudo resolver el área del colaborador.", "error");</script>';
+    return;
+}
 
-if ($area_colaborador === 'staff_administrative') {
-    $col_nombres = 'nomadm';
-    $col_apellidos = 'apeadm';
-    $col_nacimiento = 'nacadm';
-    $col_genero = 'sexadm';
-    $label_area = 'Administrativo';
-} elseif ($area_colaborador === 'staff_general_services') {
-    $col_nombres = 'nomsg';
-    $col_apellidos = 'apesg';
-    $col_nacimiento = 'nacsg';
-    $col_genero = 'sexsg';
-    $label_area = 'Servicios Generales';
-} elseif ($area_colaborador === 'nurse') {
-    $col_nombres = 'nomnur';
-    $col_apellidos = 'apenur';
-    $col_nacimiento = 'nacinur';
-    $col_genero = 'sexnur';
-    $label_area = 'Enfermería';
-} elseif ($area_colaborador === 'doctor') {
-    $col_numide = 'ceddoc';
-    $col_nombres = 'nodoc';
-    $col_apellidos = 'apdoc';
-    $col_nacimiento = 'nacd';
-    $col_genero = 'sexd';
-    $label_area = 'Médico';
-} elseif ($area_colaborador === 'staff_medifarma') {
-    $col_nombres = 'nommf';
-    $col_apellidos = 'apemf';
-    $col_nacimiento = 'nacmf';
-    $col_genero = 'sexmf';
-    $label_area = 'Medifarma';
+$col_numide = $areaCols['numide'];
+$col_nombres = $areaCols['nombres'];
+$col_apellidos = $areaCols['apellidos'];
+$col_nacimiento = $areaCols['nacimiento'];
+$col_genero = $areaCols['genero'];
+$label_area = $areaCols['label'];
+
+$doctorLegacy = null;
+if ($area_colaborador === 'doctor') {
+    $doctorLegacy = medidata_staff_doctor_legacy_from_post($_POST, $telefono, $correo_personal, $correo_institucional);
+    if ($doctorLegacy['nomesp'] === '') {
+        echo '<script>Swal.fire("Especialidad requerida", "Indique la especialidad o categoría del médico.", "warning");</script>';
+        return;
+    }
 }
 
 try {
@@ -211,10 +194,10 @@ try {
     }
 
     $extraCols = '';
-    $extraVals = '';
-    if ($area_colaborador === 'doctor') {
-        $extraCols = ', nomesp, direcd, phd, corr';
-        $extraVals = ", '', '', '', ''";
+    $extraPlaceholders = '';
+    if ($area_colaborador === 'doctor' && $doctorLegacy) {
+        $extraCols = ', nomesp, direcd, phd, corr, comisiona';
+        $extraPlaceholders = ', :nomesp, :direcd, :phd, :corr, :comisiona';
     }
 
     // Insertar en la BD principal
@@ -230,11 +213,11 @@ try {
             :num_empleado, :tipo_empleado, :duracion_contrato, :fecha_ingreso,
             :id_departamento, :id_cargo, :id_horario, :id_salary_level, :salario,
             :cuenta_bac, :telefono, :correo_personal, :correo_institucional,
-            :num_locker, :id_biometrico, :url_contrato, :url_solicitud, :url_psicometricas, :id_candidate_rrhh{$extraVals}
+            :num_locker, :id_biometrico, :url_contrato, :url_solicitud, :url_psicometricas, :id_candidate_rrhh{$extraPlaceholders}
         )
     ");
-    
-    $ok = $stmt->execute([
+
+    $executeParams = [
         ':id_user' => $idUser,
         ':numide' => $numide,
         ':nombres' => $nombres,
@@ -259,13 +242,20 @@ try {
         ':url_contrato' => $url_contrato,
         ':url_solicitud' => $url_solicitud,
         ':url_psicometricas' => $url_psicometricas,
-        ':id_candidate_rrhh' => $id_candidate_rrhh
-    ]);
+        ':id_candidate_rrhh' => $id_candidate_rrhh,
+    ];
+    if ($area_colaborador === 'doctor' && $doctorLegacy) {
+        $executeParams[':nomesp'] = $doctorLegacy['nomesp'];
+        $executeParams[':direcd'] = $doctorLegacy['direcd'];
+        $executeParams[':phd'] = $doctorLegacy['phd'];
+        $executeParams[':corr'] = $doctorLegacy['corr'];
+        $executeParams[':comisiona'] = $doctorLegacy['comisiona'];
+    }
+
+    $ok = $stmt->execute($executeParams);
 
     if ($ok) {
-        $defaultReturn = 'lista_colaboradores.php';
-        if ($lista_contexto === 'medicos') $defaultReturn = 'lista_colaboradores_medicos.php';
-        if ($lista_contexto === 'medifarma') $defaultReturn = 'lista_colaboradores_medifarma.php';
+        $defaultReturn = medidata_staff_return_page_for_context($lista_contexto, true);
 
         $returnPage = medidata_staff_return_page($_POST, $defaultReturn);
         echo '<script>Swal.fire("Agregado", "Colaborador de ' . $label_area . ' registrado correctamente", "success").then(function(){ window.location=' . json_encode($returnPage, JSON_UNESCAPED_UNICODE) . '; });</script>';

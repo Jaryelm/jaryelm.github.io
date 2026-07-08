@@ -6,6 +6,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'Administrador') {
     exit;
 }
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
+require_once '../../backend/php/staff_areas_lib.php';
 medidata_staff_ensure_tables($connect);
 
 $staffUsers = medidata_staff_fetch_users_for_select($connect);
@@ -18,15 +19,14 @@ try {
 } catch (Exception $e) {}
 
 $contexto = isset($_GET['contexto']) ? trim((string) $_GET['contexto']) : 'colaboradores';
-if (!in_array($contexto, ['colaboradores', 'medicos', 'medifarma'], true)) {
+if (!in_array($contexto, medidata_staff_lista_contextos(), true)) {
     $contexto = 'colaboradores';
 }
 $esMedico = ($contexto === 'medicos');
 $esMedifarma = ($contexto === 'medifarma');
 
-$return_page = 'lista_colaboradores.php';
-if ($esMedico) $return_page = 'lista_colaboradores_medicos.php';
-if ($esMedifarma) $return_page = 'lista_colaboradores_medifarma.php';
+$return_page = medidata_staff_return_page_for_context($contexto, true);
+$staffFormIsAdmin = true;
 
 $form_titulo = 'Nuevo Colaborador';
 if ($esMedico) $form_titulo = 'Nuevo Médico';
@@ -74,176 +74,12 @@ if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
         <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
             <input type="hidden" name="return_page" value="<?php echo htmlspecialchars($return_page); ?>">
             <input type="hidden" name="lista_contexto" value="<?php echo htmlspecialchars($contexto); ?>">
-            <div class="containerss">
+            <div class="containerss staff-form">
                 <h1><?php echo htmlspecialchars($form_titulo); ?></h1>
-                <div class="alert-danger">
-                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                    <strong>Importante:</strong> Complete los campos marcados con <span class="badge-warning">*</span>
+                <?php include __DIR__ . '/_staff_colaborador_form_fields.php'; ?>
+                <div class="staff-form-actions">
+                    <button type="submit" name="add_colaborador" class="registerbtn">Guardar</button>
                 </div>
-                <hr>
-                
-                <label><b>Área o Tipo de Colaborador</b></label><span class="badge-warning">*</span>
-                <?php if ($esMedico): ?>
-                <input type="hidden" name="area_colaborador" value="doctor">
-                <input type="text" value="Médico" readonly style="background:#f5f5f5; cursor:not-allowed;">
-                <?php elseif ($esMedifarma): ?>
-                <input type="hidden" name="area_colaborador" value="staff_medifarma">
-                <input type="text" value="Medifarma" readonly style="background:#f5f5f5; cursor:not-allowed;">
-                <?php else: ?>
-                <select class="select2" name="area_colaborador" required>
-                    <option value="">Seleccione un área...</option>
-                    <option value="nurse">Enfermería</option>
-                    <option value="staff_administrative">Administrativo</option>
-                    <option value="staff_general_services">Servicios Generales</option>
-                </select>
-                <?php endif; ?>
-
-                <hr>
-
-                <label><b>N° de Empleado (Institucional)</b></label>
-                <input type="text" name="num_empleado" placeholder="ejm: EMP-001 (o dejar en blanco para automático)">
-
-                <label><b>N° de identificación (DNI)</b></label><span class="badge-warning">*</span>
-                <input type="text" name="identificacion" maxlength="14" placeholder="ejm: 0801199012345" required>
-                
-                <label><b>Nombres</b></label><span class="badge-warning">*</span>
-                <input type="text" name="nombres" placeholder="ejm: Juan Raúl" required>
-                
-                <label><b>Apellidos</b></label><span class="badge-warning">*</span>
-                <input type="text" name="apellidos" placeholder="ejm: Ramírez Requena" required>
-                
-                <label><b>Fecha de nacimiento</b></label><span class="badge-warning">*</span>
-                <input type="date" name="fecha_nacimiento" required>
-                
-                <label><b>Género</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="genero" required>
-                    <option value="">Seleccione</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
-                </select>
-
-                <hr>
-                <h3>Información Laboral</h3>
-                
-                <label><b>Tipo de Empleado</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="tipo_empleado" id="tipo_empleado" required onchange="document.getElementById('duracion_contrato_div').style.display = (this.value === 'Temporal' || this.value === 'Tiempo parcial') ? 'block' : 'none';">
-                    <option value="Permanente">Permanente</option>
-                    <option value="Temporal">Temporal</option>
-                    <option value="Tiempo parcial">Tiempo parcial</option>
-                </select>
-
-                <div id="duracion_contrato_div" style="display:none; margin-top:10px;">
-                    <label><b>Duración de Contrato</b></label>
-                    <input type="text" name="duracion_contrato" placeholder="Ej: 6 meses">
-                </div>
-
-                <label><b>Fecha de Ingreso</b></label><span class="badge-warning">*</span>
-                <input type="date" name="fecha_ingreso" required>
-
-                <label><b>Departamento</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_departamento" id="id_departament" required>
-                    <option value="" disabled selected>Seleccione...</option>
-                </select>
-
-                <label><b>Cargo / Posición</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_cargo" required>
-                    <option value="" disabled selected>Seleccione...</option>
-                    <?php foreach ($cargos as $cargo): ?>
-                        <option value="<?php echo $cargo['id']; ?>"><?php echo htmlspecialchars($cargo['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label><b>Horario</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_horario" id="id_schedule" required>
-                    <option value="" disabled selected>Seleccione...</option>
-                </select>
-
-                <div style="margin-bottom: 10px;">
-                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#2980b9;">
-                        <input type="checkbox" name="por_honorarios" id="por_honorarios" value="1" style="width:auto; height:auto; margin:0;">
-                        <b>Pago por honorarios</b>
-                    </label>
-                </div>
-
-                <label><b>Nivel Salarial</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_salary_level" id="id_salary_level" required>
-                    <option value="" disabled selected>Seleccione...</option>
-                </select>
-
-                <label><b>Salario Base</b></label>
-                <input type="number" step="0.01" name="salario" placeholder="Ej: 15000.00">
-
-                <label><b>N° Cuenta de BAC</b></label>
-                <input type="text" name="cuenta_bac" placeholder="Número de cuenta de banco BAC">
-
-                <hr>
-                <h3>Información de Contacto y Accesos</h3>
-
-                <label><b>Teléfono Celular</b></label>
-                <input type="text" name="telefono" placeholder="Ej: 99887766">
-
-                <label><b>Correo Personal</b></label>
-                <input type="email" name="correo_personal" placeholder="Correo electrónico personal">
-
-                <label><b>Correo Institucional</b></label>
-                <input type="email" name="correo_institucional" placeholder="Correo electrónico de Medicasa">
-
-                <label><b>N° de Locker Asignado</b></label>
-                <input type="text" name="num_locker" placeholder="Ej: L-10">
-
-                <label><b>ID Empleado (Reloj Biométrico)</b></label>
-                <input type="number" name="id_biometrico" placeholder="Ej: 123">
-
-                <label><b>Usuario del Sistema (Opcional)</b></label>
-                <?php
-                $staffUserFieldName = 'id_user';
-                $staffSelectedUserId = 0;
-                include '_staff_user_select.php';
-                ?>
-                
-                <hr>
-                <h3>Documentos (Opcionales)</h3>
-                
-                <label>Solicitud de empleo</label>
-                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" >
-                
-                <label>Pruebas Psicométricas</label>
-                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" >
-                
-                <label>Copia de partida de nacimiento de hijos</label>
-                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" >
-                
-                <label>Foto (Para su Carnet)</label>
-                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" >
-                
-                <label>Documento de identidad (revés y derecho)</label>
-                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" >
-                
-                <label>Copia de recibo (agua, luz, teléfono)</label>
-                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" >
-                
-                <label>Antecedentes Penales</label>
-                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" >
-                
-                <label>Antecedentes Policiales</label>
-                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" >
-                
-                <label>2 Referencias personales</label>
-                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" >
-                
-                <label>2 Referencias profesionales</label>
-                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" >
-                
-                <label>Diplomas o títulos recibidos</label>
-                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" >
-                
-                <label>Croquis de vivienda</label>
-                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" >
-                
-                <label><b>Contrato Firmado</b></label>
-                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="border:1px solid #2980b9;">
-                <hr>
-                <button type="submit" name="add_colaborador" class="registerbtn">Guardar</button>
             </div>
         </form>
     </main>

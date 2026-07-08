@@ -6,26 +6,28 @@ if (!isset($_POST['upd_colaborador_unificado'])) {
 $table = $_POST['area_colaborador'] ?? '';
 $id_primary = (int)($_POST['id_primary'] ?? 0);
 
-$valid_areas = ['doctor', 'nurse', 'staff_administrative', 'staff_general_services', 'staff_medifarma'];
-if (!in_array($table, $valid_areas) || $id_primary <= 0) {
+require_once __DIR__ . '/staff_areas_lib.php';
+
+if (!medidata_staff_area_is_valid($table) || $id_primary <= 0) {
     echo '<script>Swal.fire("Error", "Área o ID no válido.", "error");</script>';
     return;
 }
 
-$col_id = ''; $col_numide = ''; $col_nombres = ''; $col_apellidos = ''; $col_nac = ''; $col_sexo = '';
-if ($table === 'staff_administrative') {
-    $col_id = 'idadm'; $col_numide = 'numide'; $col_nombres = 'nomadm'; $col_apellidos = 'apeadm'; $col_nac = 'nacadm'; $col_sexo = 'sexadm';
-} elseif ($table === 'staff_general_services') {
-    $col_id = 'idsg'; $col_numide = 'numide'; $col_nombres = 'nomsg'; $col_apellidos = 'apesg'; $col_nac = 'nacsg'; $col_sexo = 'sexsg';
-} elseif ($table === 'nurse') {
-    $col_id = 'idnur'; $col_numide = 'numide'; $col_nombres = 'nomnur'; $col_apellidos = 'apenur'; $col_nac = 'nacinur'; $col_sexo = 'sexnur';
-} elseif ($table === 'doctor') {
-    $col_id = 'idodc'; $col_numide = 'ceddoc'; $col_nombres = 'nodoc'; $col_apellidos = 'apdoc'; $col_nac = 'nacd'; $col_sexo = 'sexd';
-} elseif ($table === 'staff_medifarma') {
-    $col_id = 'idmf'; $col_numide = 'numide'; $col_nombres = 'nommf'; $col_apellidos = 'apemf'; $col_nac = 'nacmf'; $col_sexo = 'sexmf';
+$areaCols = medidata_staff_area_columns($table);
+if (!$areaCols) {
+    echo '<script>Swal.fire("Error", "Área de empleado no válida.", "error");</script>';
+    return;
 }
 
+$col_id = $areaCols['pk'];
+$col_numide = $areaCols['numide'];
+$col_nombres = $areaCols['nombres'];
+$col_apellidos = $areaCols['apellidos'];
+$col_nac = $areaCols['nacimiento'];
+$col_sexo = $areaCols['genero'];
+
 require_once __DIR__ . '/staff_colaborador_bootstrap.php';
+require_once __DIR__ . '/staff_doctor_fields_lib.php';
 require_once __DIR__ . '/../registros/rrhh_guard.php';
 
 medidata_staff_ensure_tables($connect);
@@ -53,6 +55,15 @@ $correo_personal = trim((string) ($_POST['correo_personal'] ?? ''));
 $correo_institucional = trim((string) ($_POST['correo_institucional'] ?? ''));
 $num_locker = trim((string) ($_POST['num_locker'] ?? ''));
 $id_biometrico = (int) ($_POST['id_biometrico'] ?? 0);
+
+$doctorLegacy = null;
+if ($table === 'doctor') {
+    $doctorLegacy = medidata_staff_doctor_legacy_from_post($_POST, $telefono, $correo_personal, $correo_institucional);
+    if ($doctorLegacy['nomesp'] === '') {
+        echo '<script>Swal.fire("Especialidad requerida", "Indique la especialidad o categoría del médico.", "warning");</script>';
+        return;
+    }
+}
 
 try {
     if ($idUser !== null) {
@@ -211,6 +222,19 @@ try {
         ':id_biometrico' => $id_biometrico > 0 ? $id_biometrico : null,
         ':id' => $id_primary
     ];
+
+    if ($table === 'doctor' && $doctorLegacy) {
+        $updates[] = 'nomesp = :nomesp';
+        $updates[] = 'direcd = :direcd';
+        $updates[] = 'phd = :phd';
+        $updates[] = 'corr = :corr';
+        $updates[] = 'comisiona = :comisiona';
+        $params[':nomesp'] = $doctorLegacy['nomesp'];
+        $params[':direcd'] = $doctorLegacy['direcd'];
+        $params[':phd'] = $doctorLegacy['phd'];
+        $params[':corr'] = $doctorLegacy['corr'];
+        $params[':comisiona'] = $doctorLegacy['comisiona'];
+    }
 
     if ($id_candidate_rrhh) {
         $updates[] = 'id_candidate_rrhh = :id_candidate_rrhh';

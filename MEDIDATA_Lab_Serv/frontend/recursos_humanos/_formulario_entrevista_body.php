@@ -60,76 +60,63 @@ function fe_int_val(array $answers, string $key): string
 }
 ?>
 <?php if ($rrhh_error): ?>
-<div class="data"><div class="content-data"><div class="alert"><strong>Error:</strong> <?php echo htmlspecialchars($rrhh_error); ?></div></div></div>
-<?php else: ?>
-<style>
-.fe-grid-inline { align-items: end; }
-.fe-grid-inline > div { display: flex; flex-direction: column; justify-content: flex-end; }
-.card-candidato-estado-form input[type="date"],
-.card-candidato-estado-form input[type="time"],
-.card-candidato-estado-form input[type="text"],
-.card-candidato-estado-form select,
-.card-candidato-estado-form textarea {
-    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; 
-    font-size: .95rem; box-sizing: border-box; margin: 6px 0 16px 0; font-family: inherit; outline: none;
-}
-.card-candidato-estado-form input[type="date"],
-.card-candidato-estado-form input[type="time"],
-.card-candidato-estado-form input[type="text"],
-.card-candidato-estado-form select {
-    height: 44px; line-height: normal;
-}
-.fe-grid-inline input[type="date"],
-.fe-grid-inline input[type="time"] {
-    margin-bottom: 0;
-}
-</style>
-<h1 class="title">Formulario de entrevista</h1>
-<p style="margin:0 0 16px;color:#555;">Candidato: <strong><?php echo htmlspecialchars($candidato->fullname ?? ''); ?></strong> — DNI <?php echo htmlspecialchars($candidato->dni ?? ''); ?></p>
-
-<div class="data">
-    <div class="content-data">
-        <div class="head"><h3>Agendar y registrar entrevista</h3></div>
-        <form id="rrhh-entrevista-form" class="card-candidato-estado-form" autocomplete="off">
-            <input type="hidden" name="candidate_id" value="<?php echo (int) $candidato->id; ?>">
-
-            <div class="fe-grid-inline" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-                <div>
-                    <label for="date_interview"><b>Fecha de entrevista</b></label>
-                    <input type="date" name="date_interview" id="date_interview" required value="<?php echo htmlspecialchars((string) $dateVal); ?>">
-                </div>
-                <div>
-                    <label for="time_interview"><b>Hora de entrevista</b></label>
-                    <input type="time" name="time_interview" id="time_interview" required value="<?php echo htmlspecialchars((string) $timeVal); ?>">
-                </div>
-            </div>
-
-            <p style="color:#666;font-size:.9rem;margin:0 0 12px;">Complete las notas al momento de entrevistar. Este registro se anexará al expediente del candidato.</p>
-
-            <?php foreach ($questions as $key => $label): ?>
-            <label for="<?php echo htmlspecialchars($key); ?>"><b><?php echo htmlspecialchars($label); ?></b></label>
-            <?php if ($key === 'observaciones'): ?>
-            <textarea name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>" rows="4"><?php echo fe_int_val($answers, $key); ?></textarea>
-            <?php elseif ($key === 'resultado'): ?>
-            <select class="select2" name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>">
-                <option value="">Seleccione...</option>
-                <?php foreach (['Apto', 'No apto', 'Pendiente', 'En proceso'] as $opt): ?>
-                <option value="<?php echo htmlspecialchars($opt); ?>" <?php echo fe_int_val($answers, $key) === $opt ? 'selected' : ''; ?>><?php echo htmlspecialchars($opt); ?></option>
-                <?php endforeach; ?>
-            </select>
-            <?php else: ?>
-            <input type="text" name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>" value="<?php echo fe_int_val($answers, $key); ?>">
-            <?php endif; ?>
-            <?php endforeach; ?>
-
-            <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
-                <button type="submit" class="registerbtn">Guardar entrevista</button>
-                <a href="<?php echo htmlspecialchars($volverUrl); ?>" class="pabtn">Volver al detalle</a>
-                <a href="<?php echo htmlspecialchars($calendarioUrl); ?>" class="button">Ver calendario</a>
-            </div>
-        </form>
-    </div>
+<div class="containerss">
+    <div class="alert"><strong>Error:</strong> <?php echo htmlspecialchars($rrhh_error); ?></div>
 </div>
+<?php else: ?>
+<?php
+$hora = (int) date('H');
+$saludo = ($hora >= 6 && $hora < 12) ? 'Buenos Días' : (($hora >= 12 && $hora < 18) ? 'Buenas Tardes' : 'Buenas Noches');
+$nameSafe = htmlspecialchars((string) ($name ?? 'Usuario'), ENT_QUOTES, 'UTF-8');
+?>
+<h1 class="title"><?php echo $saludo . ', <strong>' . $nameSafe . '</strong>'; ?></h1>
+
+<form id="rrhh-entrevista-form" autocomplete="off">
+    <input type="hidden" name="candidate_id" value="<?php echo (int) $candidato->id; ?>">
+    <div class="containerss">
+        <h1>Formulario de entrevista</h1>
+        <div class="alert-danger">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Candidato:</strong>
+            <?php echo htmlspecialchars($candidato->fullname ?? ''); ?>
+            — DNI <?php echo htmlspecialchars($candidato->dni ?? ''); ?>
+        </div>
+        <p class="rrhh-panel-hint">Complete las notas al momento de entrevistar. Este registro se anexará al expediente del candidato.</p>
+        <hr>
+
+        <div class="form-grid-2">
+            <div>
+                <label for="date_interview"><b>Fecha de entrevista</b></label>
+                <input type="date" name="date_interview" id="date_interview" required value="<?php echo htmlspecialchars((string) $dateVal); ?>">
+            </div>
+            <div>
+                <label for="time_interview"><b>Hora de entrevista</b></label>
+                <input type="time" name="time_interview" id="time_interview" required value="<?php echo htmlspecialchars((string) $timeVal); ?>">
+            </div>
+        </div>
+
+        <?php foreach ($questions as $key => $label): ?>
+        <label for="<?php echo htmlspecialchars($key); ?>"><b><?php echo htmlspecialchars($label); ?></b></label>
+        <?php if ($key === 'observaciones'): ?>
+        <textarea name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>" rows="4"><?php echo fe_int_val($answers, $key); ?></textarea>
+        <?php elseif ($key === 'resultado'): ?>
+        <select class="select2" name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>">
+            <option value="">Seleccione...</option>
+            <?php foreach (['Apto', 'No apto', 'Pendiente', 'En proceso'] as $opt): ?>
+            <option value="<?php echo htmlspecialchars($opt); ?>" <?php echo fe_int_val($answers, $key) === $opt ? 'selected' : ''; ?>><?php echo htmlspecialchars($opt); ?></option>
+            <?php endforeach; ?>
+        </select>
+        <?php else: ?>
+        <input type="text" name="<?php echo htmlspecialchars($key); ?>" id="<?php echo htmlspecialchars($key); ?>" value="<?php echo fe_int_val($answers, $key); ?>">
+        <?php endif; ?>
+        <?php endforeach; ?>
+
+        <hr>
+        <button type="submit" class="registerbtn">Guardar entrevista</button>
+        <a href="<?php echo htmlspecialchars($volverUrl); ?>" class="pabtn">Volver al detalle</a>
+        <a href="<?php echo htmlspecialchars($calendarioUrl); ?>" class="button form-secondary-btn">Ver calendario</a>
+    </div>
+</form>
 
 <script>
 window.__rrhh_entrevista_ready || function(){})();
