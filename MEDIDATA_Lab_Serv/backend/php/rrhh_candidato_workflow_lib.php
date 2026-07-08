@@ -12,14 +12,20 @@ if (!function_exists('medidata_rrhh_psychometric_tests_catalog')) {
     function medidata_rrhh_psychometric_tests_catalog(): array
     {
         return [
-            '16PF' => '16PF',
-            'Cleaver' => 'Cleaver',
-            'DISC' => 'DISC',
-            'MMPI' => 'MMPI',
-            'Zavic' => 'Zavic',
-            'Terman' => 'Terman-Merrill',
-            'Raven' => 'Raven',
-            'Otros' => 'Otras pruebas',
+            'Inteligencia_OTIS' => 'Test de Inteligencia OTIS',
+            'Inteligencia_WONDERLIC_PHM' => 'Test de Inteligencia WONDERLIC PHM',
+            'Inteligencia_BARSIT' => 'Test de Inteligencia BARSIT',
+            'Instrucciones_Complejas' => 'Test de Instrucciones Complejas',
+            'IPV_Ventas' => 'Test IPV Ventas',
+            'Personalidad_Servicio_Cliente_IPER' => 'Test de Personalidad para Servicio al Cliente IPER',
+            'VRP' => 'Test VRP',
+            'Colores' => 'Test de Colores',
+            'Estilos_Direccion_LEAD' => 'Test de Estilos de Direccion LEAD',
+            'Intereses_Valores_IVAL' => 'Test de Intereses y Valores IVAL',
+            'Habilidades_Juicio_MOSS' => 'Test Habilidades de Juicio social y Supervision MOSS',
+            'Rasgos_Conductuales_DISC' => 'Test de Rasgos Conductuales DISC',
+            'Estilo_Manejo_Conflictos' => 'Test Estilo de Manejo de conflictos',
+            'Inteligencia_Emocional' => 'Test de Inteligencia Emocional',
         ];
     }
 }

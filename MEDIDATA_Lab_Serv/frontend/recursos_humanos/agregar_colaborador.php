@@ -158,6 +158,13 @@ if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
                     <option value="" disabled selected>Seleccione...</option>
                 </select>
 
+                <div style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#2980b9;">
+                        <input type="checkbox" name="por_honorarios" id="por_honorarios" value="1" style="width:auto; height:auto; margin:0;">
+                        <b>Pago por honorarios</b>
+                    </label>
+                </div>
+
                 <label><b>Nivel Salarial</b></label><span class="badge-warning">*</span>
                 <select class="select2" name="id_salary_level" id="id_salary_level" required>
                     <option value="" disabled selected>Seleccione...</option>
@@ -251,6 +258,30 @@ if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
 <script src="../../backend/js/cat_departaments.js"></script>
 <script src="../../backend/js/cat_salary_levels.js"></script>
 <script src="../../backend/js/cat_schedules.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery === 'undefined') return;
+    (function ($) {
+        'use strict';
+        var $chkHonorarios = $('#por_honorarios');
+        var $idSalaryLevel = $('#id_salary_level');
+        var $salario = $('input[name="salario"]');
+
+        function toggleHonorarios() {
+            var isChecked = $chkHonorarios.is(':checked');
+            if (isChecked) {
+                $idSalaryLevel.prop('required', false).prop('disabled', true).val('').trigger('change');
+                $salario.prop('disabled', true).val('');
+            } else {
+                $idSalaryLevel.prop('required', true).prop('disabled', false);
+                $salario.prop('disabled', false);
+            }
+        }
+        $chkHonorarios.on('change', toggleHonorarios);
+        setTimeout(toggleHonorarios, 100);
+    })(jQuery);
+});
+</script>
 </body>
 </html>
 

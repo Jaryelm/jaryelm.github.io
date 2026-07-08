@@ -85,12 +85,12 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
 
             <label><b>Pruebas aplicadas</b></label>
             <p style="color:#666;font-size:.9rem;margin:0 0 8px;">Seleccione las pruebas que realizó al candidato.</p>
-            <div class="rrhh-psico-tests" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:16px;">
+            <div class="rrhh-psico-tests" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:20px;">
                 <?php foreach ($testsCatalog as $key => $label): ?>
-                <label style="display:flex;align-items:center;gap:8px;font-weight:500;">
-                    <input type="checkbox" name="tests[]" value="<?php echo htmlspecialchars($key); ?>"
+                <label style="display:flex;align-items:flex-start;gap:10px;font-weight:500;background:#f9f9f9;border:1px solid #eaeaea;border-radius:6px;padding:12px;height:100%;box-sizing:border-box;cursor:pointer;transition:background 0.2s;">
+                    <input type="checkbox" name="tests[]" value="<?php echo htmlspecialchars($key); ?>" style="margin-top:2px;width:16px;height:16px;cursor:pointer;"
                         <?php echo in_array($key, $selectedTests, true) ? 'checked' : ''; ?>>
-                    <?php echo htmlspecialchars($label); ?>
+                    <span style="line-height:1.4;flex:1;"><?php echo htmlspecialchars($label); ?></span>
                 </label>
                 <?php endforeach; ?>
             </div>
