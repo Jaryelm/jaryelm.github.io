@@ -12,6 +12,7 @@ $rol_usuario = $_SESSION['rol'] ?? '';
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/informe_radiologico_modal.css">
+    <link rel="stylesheet" href="../../backend/css/mhpacs_filters.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
@@ -83,25 +84,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Filtros -->
-            <div class="filters">
-                <select id="modalityFilter">
-                    <option value="">Todas las Modalidades</option>
-                    <option value="CR">Radiografía Computarizada</option>
-                    <option value="CT">Tomografía Computarizada</option>
-                    <option value="MR">Resonancia Magnética</option>
-                    <option value="US">Ultrasonido</option>
-                </select>
-
-                <select id="statusFilter">
-                    <option value="">Todos los Estados</option>
-                    <option value="pending">Pendientes de interpretar</option>
-                    <option value="pending_transcription">En transcripción</option>
-                    <option value="completed">Transcripción lista / finalizados</option>
-                </select>
-
-                <input type="date" id="dateFilter" />
-                <button onclick="applyFilters()" class="filter-btn">Aplicar Filtros</button>
-            </div>
+            <?php $mhpacs_filter_mode = 'studies_medico'; include __DIR__ . '/_mhpacs_filters.inc.php'; ?>
 
             <!-- Tabla de Estudios -->
             <div class="table-container">
@@ -121,6 +104,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
+                <div id="studiesPagination" class="mhpacs-pagination"></div>
                 <div id="noStudiesMsg" style="display:none; text-align:center; color:#035c67; font-size:18px; margin:30px 0; font-weight:600;">
                     <span id="noStudiesText"></span>
                 </div>
@@ -330,29 +314,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         color: #06adbf;
     }
 
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .filters select, .filters input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        min-width: 150px;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
     .table-container {
         background: white;
         padding: 20px;
@@ -559,6 +520,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="mhpacs_filters_core.js"></script>
+    <script src="studies_list_core.js"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {
@@ -574,84 +537,52 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         });
     }
 
-    // Cargar estudios
+    const rolUsuarioMedico = '<?php echo htmlspecialchars($rol_usuario, ENT_QUOTES, 'UTF-8'); ?>';
+
+    function renderStudyRowMedico(study) {
+        const reportId = study.id || '';
+        const studyId = study.study_id || '';
+        const txStatus = study.transcription_status || '';
+        const sentToTranscription = ['pending_transcription', 'final', 'transcribed', 'reviewed'].includes(study.status);
+        const showSeguimiento = sentToTranscription || !!txStatus;
+        const showPdf = txStatus === 'completed';
+
+        let actionsHtml = `
+            <button onclick="downloadStudy('${studyId}')" class="btn-download">
+                <i class='bx bx-download'></i> DICOM
+            </button>
+            <button onclick="openReport('${studyId}', '${study.series_id || ''}', '${study.patient_id}')" class="btn-report">
+                <i class='bx bx-file'></i> Informe
+            </button>`;
+
+        if (showSeguimiento && reportId) {
+            actionsHtml += `
+            <button onclick="verSeguimiento('${reportId}', '${studyId}')" class="btn-seguimiento">
+                <i class='bx bx-list-ul'></i> Seguimiento
+            </button>`;
+        }
+        if (showPdf && reportId) {
+            actionsHtml += `
+            <button onclick="downloadPDF('${reportId}')" class="btn-history">
+                <i class='bx bx-download'></i> PDF
+            </button>`;
+        }
+
+        return `
+            <td>${study.patient_id}</td>
+            <td>${study.patient_name}</td>
+            <td>${study.modality}</td>
+            <td>${study.study_description || 'Sin descripción'}</td>
+            <td>${formatDateTime(study.study_date)}</td>
+            <td>${formatStatus(study.status, txStatus)}</td>
+            <td><div class="action-buttons">${actionsHtml}</div></td>
+        `;
+    }
+
     function loadStudies() {
-        const filters = {
-            modality: document.getElementById('modalityFilter').value,
-            status: document.getElementById('statusFilter').value,
-            date: document.getElementById('dateFilter').value
-        };
-
-        fetch('get_completed_studies.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(filters)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('studiesBody');
-            tbody.innerHTML = '';
-            const noStudiesMsg = document.getElementById('noStudiesMsg');
-            const noStudiesText = document.getElementById('noStudiesText');
-            const rolUsuario = '<?php echo $rol_usuario; ?>';
-            if (!data || data.length === 0) {
-                noStudiesMsg.style.display = 'block';
-                if (rolUsuario !== 'Radiologo') {
-                    noStudiesText.textContent = 'No tienes permisos para ver este apartado. Solo los médicos radiólogos pueden acceder.';
-                } else {
-                    noStudiesText.textContent = 'No tienes estudios asignados actualmente. Espera a que se te asignen nuevos estudios.';
-                }
-            } else {
-                noStudiesMsg.style.display = 'none';
-                data.forEach(study => {
-                    const reportId = study.id || '';
-                    const studyId = study.study_id || '';
-                    const txStatus = study.transcription_status || '';
-                    const sentToTranscription = ['pending_transcription', 'final', 'transcribed', 'reviewed'].includes(study.status);
-                    const showSeguimiento = sentToTranscription || !!txStatus;
-                    const showPdf = txStatus === 'completed';
-
-                    let actionsHtml = `
-                        <button onclick="downloadStudy('${studyId}')" class="btn-download">
-                            <i class='bx bx-download'></i> DICOM
-                        </button>
-                        <button onclick="openReport('${studyId}', '${study.series_id || ''}', '${study.patient_id}')" class="btn-report">
-                            <i class='bx bx-file'></i> Informe
-                        </button>`;
-
-                    if (showSeguimiento && reportId) {
-                        actionsHtml += `
-                        <button onclick="verSeguimiento('${reportId}', '${studyId}')" class="btn-seguimiento">
-                            <i class='bx bx-list-ul'></i> Seguimiento
-                        </button>`;
-                    }
-                    if (showPdf && reportId) {
-                        actionsHtml += `
-                        <button onclick="downloadPDF('${reportId}')" class="btn-history">
-                            <i class='bx bx-download'></i> PDF
-                        </button>`;
-                    }
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${study.patient_id}</td>
-                        <td>${study.patient_name}</td>
-                        <td>${study.modality}</td>
-                        <td>${study.study_description || 'Sin descripción'}</td>
-                        <td>${formatDateTime(study.study_date)}</td>
-                        <td>${formatStatus(study.status, txStatus)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                ${actionsHtml}
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-        });
+        if (typeof StudiesListCore !== 'undefined') {
+            StudiesListCore.reload();
+        }
     }
 
     // Abrir informe
@@ -994,7 +925,23 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     // Cargar datos iniciales
     document.addEventListener('DOMContentLoaded', function() {
         loadStats();
-        loadStudies();
+        if (rolUsuarioMedico !== 'Radiologo') {
+            document.querySelector('.table-container').style.display = 'none';
+            if (document.querySelector('.mhpacs-filters')) {
+                document.querySelector('.mhpacs-filters').style.display = 'none';
+            }
+            document.getElementById('noStudiesMsg').style.display = 'block';
+            document.getElementById('noStudiesText').textContent =
+                'No tienes permisos para ver este apartado. Solo los médicos radiólogos pueden acceder.';
+            return;
+        }
+        StudiesListCore.init({
+            renderRow: renderStudyRowMedico,
+            canLoad: function () { return rolUsuarioMedico === 'Radiologo'; },
+            onEmpty: function () {
+                return 'No tienes estudios asignados con los filtros seleccionados.';
+            },
+        });
     });
 
     function formatAvgTime(minutes) {

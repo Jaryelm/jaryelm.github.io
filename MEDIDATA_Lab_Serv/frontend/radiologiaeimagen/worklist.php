@@ -17,6 +17,7 @@ $rol_usuario = $_SESSION['rol'] ?? '';
     <title>MEDIDATA</title>
     <!-- Select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../backend/css/mhpacs_filters.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 </head>
 <body>
@@ -89,35 +90,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Filtros -->
-            <div class="filters">
-                <input type="text" id="searchBar" placeholder="Buscar por nombre, ID o descripción..." />
-                <select id="modalityFilter">
-                    <option value="">Todas las Modalidades</option>
-                    <option value="DX">Radiografía (DX)</option>
-                    <option value="CR">Radiografía Computarizada</option>
-                    <option value="CT">Tomografía Computarizada</option>
-                    <option value="MR">Resonancia Magnética</option>
-                    <option value="US">Ultrasonido</option>
-                </select>
-
-                <select id="priorityFilter">
-                    <option value="">Todas las Prioridades</option>
-                    <option value="routine">Rutina</option>
-                    <option value="urgent">Urgente</option>
-                    <option value="emergency">Emergencia</option>
-                </select>
-
-                <select id="statusFilter">
-                    <option value="">Todos los Estados</option>
-                    <option value="pending">Pendiente</option>
-                    <option value="in_progress">En Progreso</option>
-                    <option value="completed">Completado</option>
-                    <option value="cancelled">Cancelado</option>
-                </select>
-
-                <input type="date" id="dateFilter" />
-                <button onclick="applyFilters()" class="filter-btn">Aplicar Filtros</button>
-            </div>
+            <?php $mhpacs_filter_mode = 'worklist'; include __DIR__ . '/_mhpacs_filters.inc.php'; ?>
 
             <!-- Tabla de Lista de Trabajo -->
             <div id="noWorklistMsg" style="display:none; text-align:center; color:#035c67; font-size:18px; margin:30px 0; font-weight:600;">
@@ -475,7 +448,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             <div id="assignRadiologistModal" class="modal">
                 <div class="modal-content" style="max-width: 1200px;">
                     <span class="close" onclick="closeAssignModal()">&times;</span>
-                    <h2>Finalizar Estudio y Asignar Médico</h2>
+                    <h2 id="assignModalTitle">Finalizar Estudio y Asignar Médico</h2>
+                    <div id="assignCurrentDoctorBanner" style="display:none; background:#fff3cd; border-left:4px solid #fd7e14; padding:12px 15px; border-radius:6px; margin-bottom:15px; color:#856404;"></div>
                     
                     <!-- Información del estudio -->
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -499,12 +473,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label for="radiologistSelect"><strong>Seleccionar Médico Radiólogo:</strong></label>
                             <select id="radiologistSelect" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-                                <option value="">Seleccione un radiólogo...</option>
+                                <option value="">Seleccionar</option>
                             </select>
                         </div>
 
                         <!-- Selección de Factura para Honorarios -->
-                        <div class="form-group" style="margin-bottom: 20px;">
+                        <div class="form-group assign-factura-section" style="margin-bottom: 20px;">
                             <label for="facturaSelect"><strong>Vincular con Factura (Para Honorarios):</strong></label>
                             <select id="facturaSelect" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
                                 <option value="">No vincular con factura (sin honorarios)</option>
@@ -518,7 +492,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         </div>
 
                         <!-- Mostrar información de la factura seleccionada -->
-                        <div id="facturaInfo" style="display: none; background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                        <div id="facturaInfo" class="assign-factura-section" style="display: none; background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
                             <h4 style="margin-top: 0; color: #155724;">Factura Seleccionada:</h4>
                             <div class="factura-resumen">
                                 <div>
@@ -537,7 +511,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         </div>
 
                         <!-- Notas adicionales -->
-                        <div class="form-group" style="margin-bottom: 20px;">
+                        <div class="form-group assign-factura-section" style="margin-bottom: 20px;">
                             <label for="assignmentNotes"><strong>Notas adicionales (opcional):</strong></label>
                             <textarea id="assignmentNotes" rows="3" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px;" 
                                       placeholder="Comentarios sobre la asignación..."></textarea>
@@ -547,7 +521,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                             <button type="button" onclick="closeAssignModal()" style="background: #035c67; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer;">
                                 Cancelar
                             </button>
-                            <button type="submit" style="background: #06adbf; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                            <button type="submit" id="assignSubmitBtn" style="background: #06adbf; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
                                 Asignar y Finalizar
                             </button>
                         </div>
@@ -565,7 +539,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <!-- La información se cargará dinámicamente -->
                     </div>
                     
-                    <div class="button-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <div id="assignmentInfoFooter" class="button-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                         <button onclick="closeAssignmentInfoModal()" class="btn-cerrar-modal">
                             Cerrar
                         </button>
@@ -603,29 +577,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         color: #06adbf;
         font-size: 24px;
         font-weight: bold;
-    }
-
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .filters select, .filters input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        min-width: 150px;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
     }
 
     .table-container {
@@ -744,14 +695,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     @media (max-width: 768px) {
-        .filters {
-            flex-direction: column;
-        }
-
-        .filters select, .filters input {
-            width: 100%;
-        }
-
         .modal-content {
             width: 95%;
             margin: 5% auto;
@@ -974,6 +917,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="mhpacs_filters_core.js"></script>
     <script src="worklist_core.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1426,7 +1370,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             buttons += `<button onclick="showCancelDetail('${studyId}')" class="btn-cancel"><i class='bx bx-x-circle'></i> Ver motivo</button>`;
             actionsCell.innerHTML = buttons;
         } else if (status === 'completed') {
-            // Solo mostrar el botón Ver
+            buttons += `<button onclick="openReassignModal('${studyId}')" class="btn-reassign" style="background-color:#fd7e14;"><i class='bx bx-transfer'></i> Reasignar</button>`;
             actionsCell.innerHTML = buttons;
         } else {
             // Para otros estados, solo el botón Ver
@@ -1600,8 +1544,100 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         return `${day}/${month}/${year}`;
     }
 
+    function resetRadiologistSelect(data) {
+        const select = document.getElementById('radiologistSelect');
+        const $select = $(select);
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+        select.innerHTML = '<option value="">Seleccionar</option>';
+        (data || []).forEach(function (user) {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.name;
+            select.appendChild(option);
+        });
+        $select.select2({
+            dropdownParent: $('#assignRadiologistModal'),
+            width: '100%',
+            placeholder: 'Seleccionar médico radiólogo',
+            allowClear: true
+        });
+        $select.val('').trigger('change');
+    }
+
+    let assignModalMode = 'assign';
+
+    function setAssignModalUi() {
+        const isReassign = assignModalMode === 'reassign';
+        document.getElementById('assignModalTitle').textContent = isReassign
+            ? 'Reasignar médico radiólogo'
+            : 'Finalizar Estudio y Asignar Médico';
+        document.getElementById('assignSubmitBtn').textContent = isReassign
+            ? 'Confirmar reasignación'
+            : 'Asignar y Finalizar';
+
+        const banner = document.getElementById('assignCurrentDoctorBanner');
+        if (banner) {
+            banner.style.display = isReassign && banner.dataset.currentDoctor ? 'block' : 'none';
+        }
+
+        document.querySelectorAll('.assign-factura-section').forEach(function (el) {
+            el.style.display = isReassign ? 'none' : '';
+        });
+    }
+
+    function updateAssignmentInfoFooter(studyId, assignment) {
+        const footer = document.getElementById('assignmentInfoFooter');
+        let html = '';
+
+        if (assignment.can_reassign) {
+            html += `<button type="button" onclick="closeAssignmentInfoModal(); openReassignModal('${studyId}')" class="btn-reassign" style="background:#fd7e14;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;"><i class='bx bx-transfer'></i> Reasignar médico</button>`;
+        } else if (assignment.radiologist_id && assignment.report_status_code) {
+            html += `<span style="color:#856404;font-size:13px;margin-right:auto;">Reasignación no disponible: informe en estado "${assignment.report_status_code}".</span>`;
+        }
+
+        html += `<button onclick="closeAssignmentInfoModal()" class="btn-cerrar-modal">Cerrar</button>`;
+        footer.innerHTML = html;
+    }
+
+    function openReassignModal(studyId) {
+        fetch(`get_assignment_info.php?study_id=${studyId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success || !data.assignment) {
+                    Swal.fire('Error', 'No se pudo cargar la asignación actual', 'error');
+                    return;
+                }
+                if (!data.assignment.can_reassign) {
+                    Swal.fire('Aviso', 'Este estudio ya no puede reasignarse porque el informe avanzó en el flujo.', 'warning');
+                    return;
+                }
+
+                assignModalMode = 'reassign';
+                const banner = document.getElementById('assignCurrentDoctorBanner');
+                banner.innerHTML = `<strong>Médico actual:</strong> ${data.assignment.radiologist_name || 'N/A'}`;
+                banner.dataset.currentDoctor = data.assignment.radiologist_name || '';
+                openAssignModal(studyId, { keepMode: true });
+            })
+            .catch(function () {
+                Swal.fire('Error', 'No se pudo cargar la asignación actual', 'error');
+            });
+    }
+
     // Función para abrir el modal y cargar radiólogos
-    function openAssignModal(studyId) {
+    function openAssignModal(studyId, options) {
+        options = options || {};
+        if (!options.keepMode) {
+            assignModalMode = 'assign';
+            const banner = document.getElementById('assignCurrentDoctorBanner');
+            if (banner) {
+                banner.style.display = 'none';
+                banner.dataset.currentDoctor = '';
+            }
+        }
+
+        setAssignModalUi();
         document.getElementById('assignStudyId').value = studyId;
         
         // Buscar información del estudio
@@ -1624,28 +1660,35 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         fetch('get_radiologists.php')
             .then(response => response.json())
             .then(data => {
-                const select = document.getElementById('radiologistSelect');
-                select.innerHTML = '<option value="">Seleccione un radiólogo...</option>';
-                data.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = user.name;
-                    select.appendChild(option);
-                });
-                // Activar select2
-                $(select).select2({
-                    dropdownParent: $('#assignRadiologistModal'),
-                    width: '100%',
-                    placeholder: 'Selecciona un radiólogo',
-                    allowClear: true
-                });
+                resetRadiologistSelect(Array.isArray(data) ? data : []);
+            })
+            .catch(function () {
+                resetRadiologistSelect([]);
+                Swal.fire('Error', 'No se pudo cargar la lista de radiólogos', 'error');
             });
             
         // Cargar facturas disponibles
-        cargarFacturasDisponibles(study);
+        if (assignModalMode !== 'reassign') {
+            cargarFacturasDisponibles(study);
+        }
     }
     function closeAssignModal() {
+        assignModalMode = 'assign';
+        const banner = document.getElementById('assignCurrentDoctorBanner');
+        if (banner) {
+            banner.style.display = 'none';
+            banner.dataset.currentDoctor = '';
+        }
+        document.querySelectorAll('.assign-factura-section').forEach(function (el) {
+            el.style.display = '';
+        });
+        const select = document.getElementById('radiologistSelect');
+        if ($(select).hasClass('select2-hidden-accessible')) {
+            $(select).select2('destroy');
+        }
+        select.innerHTML = '<option value="">Seleccionar</option>';
         document.getElementById('assignRadiologistModal').style.display = 'none';
+        setAssignModalUi();
     }
     
     // Función para cargar facturas disponibles
@@ -1789,20 +1832,22 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         const notes = document.getElementById('assignmentNotes').value;
         
         if (!radiologistId) {
-            Swal.fire('Error', 'Debe seleccionar un médico radiólogo', 'error');
+            Swal.fire('Aviso', 'Debe seleccionar un médico radiólogo antes de continuar.', 'warning');
             return;
         }
+
+        const isReassign = assignModalMode === 'reassign';
         
         // Preparar datos para enviar
         const requestData = {
             study_id: studyId,
             radiologist_id: radiologistId,
-            factura_id: facturaId || null,
-            assignment_notes: notes,
-            technician_id: <?php echo $_SESSION['id'] ?? 'null'; ?> // Agregar technician_id desde la sesión PHP
+            factura_id: isReassign ? null : (facturaId || null),
+            assignment_notes: isReassign ? '' : notes,
+            technician_id: <?php echo $_SESSION['id'] ?? 'null'; ?>
         };
         
-        fetch('assign_radiologist_with_factura.php', {
+        fetch(isReassign ? 'reassign_radiologist.php' : 'assign_radiologist_with_factura.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData)
@@ -1810,6 +1855,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                if (isReassign) {
+                    const message = data.previous_radiologist
+                        ? `Estudio reasignado de ${data.previous_radiologist} a ${data.radiologist_name}.`
+                        : `Estudio reasignado a ${data.radiologist_name}.`;
+                    Swal.fire('Reasignación exitosa', message, 'success');
+                } else {
                 let mensaje = 'Estudio finalizado exitosamente\n\n';
                 mensaje += '🩺 Radiólogo: ' + (data.radiologist_name || 'Médico seleccionado') + '\n';
                 
@@ -1839,6 +1890,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     icon: 'success',
                     button: 'Entendido'
                 });
+                }
                 closeAssignModal();
                 refreshWorklistAndStats();
             } else {
@@ -1930,6 +1982,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         </div>
                         ` : ''}
                     `;
+                    updateAssignmentInfoFooter(studyId, assignment);
                 } else {
                     content.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: #666;">
@@ -1938,6 +1991,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                             <p>Este estudio no ha sido asignado a ningún médico radiólogo.</p>
                         </div>
                     `;
+                    document.getElementById('assignmentInfoFooter').innerHTML =
+                        `<button onclick="closeAssignmentInfoModal()" class="btn-cerrar-modal">Cerrar</button>`;
                 }
                 
                 document.getElementById('assignmentInfoModal').style.display = 'block';

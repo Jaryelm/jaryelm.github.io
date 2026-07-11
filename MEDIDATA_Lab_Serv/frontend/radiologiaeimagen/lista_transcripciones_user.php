@@ -9,6 +9,7 @@ include_once '../../backend/registros/session_check.php';
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/transcripcion_informe_modal.css">
+    <link rel="stylesheet" href="../../backend/css/mhpacs_filters.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
@@ -75,25 +76,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Filtros -->
-            <div class="filters">
-                <select id="modalityFilter">
-                    <option value="">Todas las Modalidades</option>
-                    <option value="CR">Radiografía Computarizada</option>
-                    <option value="CT">Tomografía Computarizada</option>
-                    <option value="MR">Resonancia Magnética</option>
-                    <option value="US">Ultrasonido</option>
-                </select>
-
-                <select id="statusFilter">
-                    <option value="">Todos los Estados</option>
-                    <option value="pending_transcription">Pendientes</option>
-                    <option value="in_progress">En Progreso</option>
-                    <option value="completed">Completados</option>
-                </select>
-
-                <input type="date" id="dateFilter" />
-                <button onclick="applyFilters()" class="filter-btn">Aplicar Filtros</button>
-            </div>
+            <?php $mhpacs_filter_mode = 'transcriptions'; include __DIR__ . '/_mhpacs_filters.inc.php'; ?>
 
             <!-- Mensaje de acceso restringido -->
             <div id="noTranscriptionMsg" style="display:none; text-align:center; color:#035c67; font-size:18px; margin:30px 0; font-weight:600;">
@@ -119,6 +102,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
+                <div id="transcriptionsPagination" class="mhpacs-pagination"></div>
             </div>
 
             <!-- Modal de Transcripción -->
@@ -284,29 +268,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         color: #06adbf;
     }
 
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .filters select, .filters input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        min-width: 150px;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
     .table-container {
         background: white;
         padding: 20px;
@@ -447,6 +408,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="mhpacs_filters_core.js"></script>
+    <script src="transcriptions_list_core.js"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {
@@ -461,58 +424,29 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         });
     }
 
-    // Cargar transcripciones
-    function loadTranscriptions() {
-        const filters = {
-            modality: document.getElementById('modalityFilter').value,
-            status: document.getElementById('statusFilter').value,
-            date: document.getElementById('dateFilter').value
-        };
-
-        fetch('get_transcriptions.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(filters)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('transcriptionsBody');
-            tbody.innerHTML = '';
-
-            if (Array.isArray(data)) {
-                data.forEach(transcription => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${transcription.patient_id}</td>
-                        <td>${transcription.patient_name}</td>
-                        <td>${transcription.radiologist_name || '—'}</td>
-                        <td>${transcription.modality}</td>
-                        <td>${transcription.description}</td>
-                        <td>${formatDateTime(transcription.study_date)}</td>
-                        <td>${formatStatus(transcription.status)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button onclick="openTranscription('${transcription.report_id}')" class="btn-transcribe">
-                                    <i class='bx bx-edit'></i> Transcribir
-                                </button>
-                                <button onclick="verSeguimiento('${transcription.report_id}', '${transcription.study_id || ''}')" class="btn-report">
-                                    <i class='bx bx-file'></i> Ver Informe
-                                </button>
-                                <button onclick="downloadPDF('${transcription.report_id}')" class="btn-history">
-                                    <i class='bx bx-download'></i> PDF
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } else {
-                // Muestra un mensaje de error si la respuesta no es un array
-                tbody.innerHTML = `<tr><td colspan=\"7\" style=\"text-align:center;color:red;\">${data.error || 'Error al cargar transcripciones'}</td></tr>`;
-            }
-        });
+    function renderTranscriptionRow(transcription) {
+        return `
+            <td>${transcription.patient_id}</td>
+            <td>${transcription.patient_name}</td>
+            <td>${transcription.radiologist_name || '—'}</td>
+            <td>${transcription.modality}</td>
+            <td>${transcription.description}</td>
+            <td>${formatDateTime(transcription.study_date)}</td>
+            <td>${formatStatus(transcription.status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="openTranscription('${transcription.report_id}')" class="btn-transcribe">
+                        <i class='bx bx-edit'></i> Transcribir
+                    </button>
+                    <button onclick="verSeguimiento('${transcription.report_id}', '${transcription.study_id || ''}')" class="btn-report">
+                        <i class='bx bx-file'></i> Ver Informe
+                    </button>
+                    <button onclick="downloadPDF('${transcription.report_id}')" class="btn-history">
+                        <i class='bx bx-download'></i> PDF
+                    </button>
+                </div>
+            </td>
+        `;
     }
 
     // Función para ver el informe original
@@ -690,10 +624,11 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     // Formatear estado
     function formatStatus(status) {
         const statuses = {
-            'pending_transcription': 'En Transcripción',
+            'pending_transcription': 'Pendiente',
             'final': 'Finalizado',
             'completed': 'Completado',
-            'in_progress': 'En Progreso'
+            'in_progress': 'En progreso',
+            'needs_review': 'Requiere revisión'
         };
         return statuses[status] || status;
     }
@@ -710,22 +645,26 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         }
     });
 
-    // Bloqueo de acceso para el rol Radiologo
     document.addEventListener('DOMContentLoaded', function() {
-        const rolUsuario = '<?php echo isset($_SESSION['rol']) ? $_SESSION['rol'] : ''; ?>';
+        const rolUsuario = '<?php echo isset($_SESSION['rol']) ? htmlspecialchars($_SESSION['rol'], ENT_QUOTES, 'UTF-8') : ''; ?>';
         if (rolUsuario === 'Radiologo') {
-            // Oculta la tabla, filtros y paginación
             document.querySelector('.table-container').style.display = 'none';
-            if(document.querySelector('.filters')) document.querySelector('.filters').style.display = 'none';
-            // Si tienes paginación, ocúltala aquí también
-            if(document.getElementById('pagination')) document.getElementById('pagination').style.display = 'none';
+            if (document.querySelector('.mhpacs-filters')) {
+                document.querySelector('.mhpacs-filters').style.display = 'none';
+            }
+            if (document.getElementById('transcriptionsPagination')) {
+                document.getElementById('transcriptionsPagination').style.display = 'none';
+            }
             document.getElementById('noTranscriptionMsg').style.display = 'block';
-            document.getElementById('noTranscriptionText').textContent = 'No tienes permisos para ver este apartado. Solo los técnicos radiólogos pueden acceder.';
-            return; // No sigas cargando nada más
+            document.getElementById('noTranscriptionText').textContent =
+                'No tienes permisos para ver este apartado. Solo los transcriptores pueden acceder.';
+            return;
         }
-        // Si no es radiologo, carga la tabla normalmente
         loadStats();
-        loadTranscriptions();
+        TranscriptionsListCore.init({
+            renderRow: renderTranscriptionRow,
+            canLoad: function () { return rolUsuario !== 'Radiologo'; },
+        });
     });
 
     function formatAvgTime(minutes) {

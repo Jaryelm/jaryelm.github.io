@@ -3,6 +3,11 @@ include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/rrhh_candidato_workflow_lib.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($id <= 0 && isset($_GET['candidate_id'])) {
+    $id = (int) $_GET['candidate_id'];
+    header('Location: formulario_entrevista.php?id=' . $id);
+    exit;
+}
 $volverUrl = 'detalle_postulante.php?id=' . $id;
 $saveUrl = '../../backend/php/rrhh_entrevista_guardar.php';
 $calendarioUrl = 'entrevista.php';
@@ -38,5 +43,9 @@ $calendarioUrl = 'entrevista.php';
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<?php if (!empty($rrhh_entrevista_footer)): ?>
+<script>window.MEDIDATA_ENTREVISTA = <?php echo json_encode($rrhh_entrevista_footer, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;</script>
+<script src="../../backend/registros/script/rrhh_formulario_entrevista.js"></script>
+<?php endif; ?>
 </body>
 </html>

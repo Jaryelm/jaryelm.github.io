@@ -283,9 +283,8 @@ li {
 	transition: all .15s ease;
 }
 #sidebar .side-dropdown.show {
-	max-height: min(1000px, 70vh);
-	overflow-y: auto;
-	overscroll-behavior: contain;
+	max-height: 2000px;
+	overflow: visible;
 }
 #sidebar .side-dropdown a:hover {
 	color: #035c67;
@@ -2981,9 +2980,8 @@ input:checked + .slider:before {
 }
 
 .new-side-dropdown.show {
-  max-height: min(700px, 65vh);
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  max-height: 2000px;
+  overflow: visible;
 }
 
 .new-side-dropdown a {

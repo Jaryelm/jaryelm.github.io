@@ -64,7 +64,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             
 <div class="form-container">
     <form id="laboratorio-form" action="procesar_laboratorio.php" method="POST" class="laboratorio-form">
-        <h2>Orden Radiología e Imagen Externo</h2>
+        <h2>ORDEN RADIOLOGÍA E IMAGEN EXTERNO</h2>
 
         <div class="form-group">
             <label for="dni_estudios">DNI:</label>

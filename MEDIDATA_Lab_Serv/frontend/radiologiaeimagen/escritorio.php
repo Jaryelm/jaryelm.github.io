@@ -382,7 +382,7 @@ $totalPendientesRequisiciones = $connect->query("
 <body>
     <div class="dashboard-container">
         <header>
-            <h1>Radiología e Imagen</h1>
+            <h1>RADIOLOGÍA E IMAGEN</h1>
         </header>
         <div class="dashboard">
 

@@ -151,8 +151,8 @@ try {
                     <?php endforeach; ?>
                 </select>
 
-                <label><b>Horario</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_horario" id="id_schedule" required>
+                <label><b>Horario</b></label>
+                <select class="select2" name="id_horario" id="id_schedule">
                     <option value="<?php echo (int)($d->id_horario ?? 0); ?>" selected>Cargando...</option>
                 </select>
 

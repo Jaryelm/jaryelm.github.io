@@ -11,16 +11,16 @@ $rxEsRadiologo = ($rxMenuRol === 'Radiologo');
 
         <?php if ($rxEsRadiologo): ?>
         <li>
-            <a href="../radiologiaeimagen/lista_estudios_medico.php"><i class='bx bx-file-find icon'></i> Mis estudios</a>
+            <a href="../radiologiaeimagen/lista_estudios_medico.php"><i class='bx bx-file-find icon'></i> MIS ESTUDIOS</a>
         </li>
         <?php else: ?>
         <li>
             <a href="#"><i class='bx bxs-clinic icon'></i>ÁREAS DE ATENCIÓN<i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li><a href="../radiologiaeimagen/tabladeestudios_user.php">MH-PACS</a></li>
-                <li><a href="../radiologiaeimagen/worklist_tecnico.php">Lista de Trabajo - MH-PACS</a></li>
-                <li><a href="../radiologiaeimagen/lista_estudios_medico.php">Lista de Estudios - MH-PACS</a></li>
-                <li><a href="../radiologiaeimagen/lista_transcripciones_user.php">Lista de Transcripciones - MH-PACS</a></li>
+                <li><a href="../radiologiaeimagen/worklist_tecnico.php">LISTA DE TRABAJO - MH-PACS</a></li>
+                <li><a href="../radiologiaeimagen/lista_estudios_medico.php">LISTA DE ESTUDIOS - MH-PACS</a></li>
+                <li><a href="../radiologiaeimagen/lista_transcripciones_user.php">LISTA DE TRANSCRIPCIONES - MH-PACS</a></li>
             </ul>
         </li>
         <?php endif; ?>

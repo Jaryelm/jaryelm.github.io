@@ -299,7 +299,7 @@
             columnDefs: [
                 { targets: -1, className: 'rrhh-col-acciones', width: cfg.allowDelete ? '5.5rem' : '3.5rem' }
             ],
-            order: [[5, 'asc']],
+            order: [[5, 'asc'], [4, 'asc']],
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             buttons: [

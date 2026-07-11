@@ -7,6 +7,16 @@ require_once __DIR__ . '/../registros/rrhh_guard.php';
 require_once __DIR__ . '/../registros/rrhh_aplica_bridge.php';
 require_once __DIR__ . '/rrhh_employee_form_lib.php';
 
+if (!function_exists('medidata_rrhh_upload_mime_type')) {
+    function medidata_rrhh_upload_mime_type(string $tmp): string
+    {
+        if ($tmp === '' || !is_uploaded_file($tmp) || !class_exists('finfo')) {
+            return '';
+        }
+        return (string) (new finfo(FILEINFO_MIME_TYPE))->file($tmp);
+    }
+}
+
 if (!function_exists('medidata_rrhh_psychometric_tests_catalog')) {
     /** @return array<string, string> */
     function medidata_rrhh_psychometric_tests_catalog(): array
@@ -108,40 +118,9 @@ if (!function_exists('medidata_rrhh_send_notification_email')) {
         }
 
         require_once __DIR__ . '/../vendor/phpmailer/autoload.php';
-        require_once __DIR__ . '/medidata_mailer_config.php';
+        require_once __DIR__ . '/medidata_mailer_lib.php';
 
-        $cfg = medidata_mailer_config();
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host = $cfg['host'];
-            $mail->SMTPAuth = true;
-            $mail->Username = $cfg['username'];
-            $mail->Password = $cfg['password'];
-            $secure = strtolower((string) ($cfg['secure'] ?? 'tls'));
-            $mail->SMTPSecure = ($secure === 'ssl')
-                ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
-                : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = (int) $cfg['port'];
-            $mail->CharSet = 'UTF-8';
-            $mail->SMTPDebug = (int) ($cfg['debug_level'] ?? 0);
-
-            $mail->setFrom($cfg['from_email'], $cfg['from_name']);
-            $mail->addReplyTo($cfg['reply_to_email'], $cfg['reply_to_name']);
-            $mail->addAddress($toEmail, $recipientName !== '' ? $recipientName : $toEmail);
-
-            $mail->isHTML(true);
-            $mail->Subject = $subject;
-            $mail->Body = $bodyHtml;
-            $mail->AltBody = $bodyText;
-            $mail->send();
-
-            return ['success' => true, 'message' => 'Correo enviado a ' . $toEmail . '.'];
-        } catch (Throwable $e) {
-            error_log('medidata_rrhh_send_notification_email: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'No se pudo enviar el correo. Copie el enlace manualmente.'];
-        }
+        return medidata_rrhh_send_email($toEmail, $subject, $bodyHtml, $bodyText, $recipientName);
     }
 }
 
@@ -324,14 +303,7 @@ if (!function_exists('medidata_rrhh_expediente_upload_pdf')) {
         }
 
         $tmp = (string) ($file['tmp_name'] ?? '');
-        $mime = '';
-        if ($tmp !== '' && is_uploaded_file($tmp)) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = $finfo ? (string) finfo_file($finfo, $tmp) : '';
-            if ($finfo) {
-                finfo_close($finfo);
-            }
-        }
+        $mime = medidata_rrhh_upload_mime_type($tmp);
 
         $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
         if ($mime !== 'application/pdf' && $ext !== 'pdf') {
@@ -512,8 +484,8 @@ if (!function_exists('medidata_rrhh_psychometric_upload_dir')) {
     function medidata_rrhh_psychometric_upload_dir(): string
     {
         $dir = dirname(__DIR__) . '/uploads/rrhh/psicometricas';
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0755, true);
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            error_log('medidata_rrhh_psychometric_upload_dir: no se pudo crear ' . $dir);
         }
         return $dir;
     }
@@ -544,23 +516,23 @@ if (!function_exists('medidata_rrhh_save_psychometric_form')) {
 
         if ($file && ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
             $tmp = (string) ($file['tmp_name'] ?? '');
-            $mime = '';
-            if ($tmp !== '' && is_uploaded_file($tmp)) {
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime = $finfo ? (string) finfo_file($finfo, $tmp) : '';
-                if ($finfo) {
-                    finfo_close($finfo);
-                }
-            }
+            $mime = medidata_rrhh_upload_mime_type($tmp);
             $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
             if ($mime !== 'application/pdf' && $ext !== 'pdf') {
                 return ['success' => false, 'message' => 'El documento debe ser PDF.'];
             }
 
             $destName = 'psico_' . $candidateId . '_' . date('YmdHis') . '.pdf';
-            $destPath = medidata_rrhh_psychometric_upload_dir() . DIRECTORY_SEPARATOR . $destName;
+            $uploadDir = medidata_rrhh_psychometric_upload_dir();
+            if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
+                return [
+                    'success' => false,
+                    'message' => 'No se pudo guardar el documento. La carpeta de archivos no está disponible en el servidor (contacte a Soporte TI).',
+                ];
+            }
+            $destPath = $uploadDir . DIRECTORY_SEPARATOR . $destName;
             if (!move_uploaded_file($tmp, $destPath)) {
-                return ['success' => false, 'message' => 'No se pudo guardar el documento.'];
+                return ['success' => false, 'message' => 'No se pudo guardar el documento PDF. Verifique permisos de la carpeta uploads/rrhh/psicometricas.'];
             }
             $payload['document'] = $destName;
             $payload['document_original'] = (string) ($file['name'] ?? '');

@@ -118,11 +118,10 @@ try {
     $stmtFiltered->execute();
     $recordsFiltered = (int) $stmtFiltered->fetchColumn();
 
-    // Ordenamiento (whitelist por indice de columna de DataTables).
+    // Ordenamiento (índices alineados con columnas DataTables en tabla_colaboradores.js).
     $orderable = [
-        0 => 't.source_table',
-        1 => 't.tipo_empleado',
-        2 => 't.num_empleado',
+        1 => 't.source_table',
+        2 => 't.tipo_empleado',
         3 => 't.identificacion',
         4 => 't.nombres',
         5 => 't.apellidos',
@@ -134,10 +133,19 @@ try {
         17 => 't.id_biometrico',
         18 => 't.num_locker',
     ];
-    $orderColIdx = intval($_GET['order'][0]['column'] ?? 4);
+    $orderColIdx = intval($_GET['order'][0]['column'] ?? 5);
     $orderDir = strtoupper((string) ($_GET['order'][0]['dir'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
-    $orderBy = $orderable[$orderColIdx] ?? 't.nombres';
-    $orderClause = " ORDER BY $orderBy $orderDir, t.nombres ASC";
+    $orderField = $orderable[$orderColIdx] ?? 't.apellidos';
+
+    if ($orderField === 't.apellidos') {
+        $orderClause = " ORDER BY UPPER(t.apellidos) $orderDir, UPPER(t.nombres) ASC";
+    } elseif ($orderField === 't.nombres') {
+        $orderClause = " ORDER BY UPPER(t.nombres) $orderDir, UPPER(t.apellidos) ASC";
+    } elseif (in_array($orderField, ['t.source_table', 't.tipo_empleado', 't.identificacion', 't.sexo'], true)) {
+        $orderClause = " ORDER BY UPPER($orderField) $orderDir, UPPER(t.apellidos) ASC, UPPER(t.nombres) ASC";
+    } else {
+        $orderClause = " ORDER BY $orderField $orderDir, UPPER(t.apellidos) ASC, UPPER(t.nombres) ASC";
+    }
 
     $dataQuery = "SELECT * $baseFrom $whereSearch $orderClause LIMIT :start, :length";
     $stmt = $connect->prepare($dataQuery);

@@ -716,3 +716,94 @@ if (!function_exists('medidata_postulaciones_enriquecer_fila')) {
         return $row;
     }
 }
+
+if (!function_exists('medidata_rrhh_crear_candidato_manual')) {
+    /**
+     * Alta de candidato captado fuera del sitio web (correo, presencial, etc.).
+     *
+     * @return array{success:bool, message:string, candidate_id?:int}
+     */
+    function medidata_rrhh_crear_candidato_manual(
+        int $idVacante,
+        string $fullname,
+        string $dni,
+        string $phone,
+        string $email,
+        string $usuario,
+        string $referralSource = 'Captación manual'
+    ): array {
+        $pdo = medidata_rrhh_pdo();
+        if (!$pdo) {
+            return ['success' => false, 'message' => 'Base de datos de Recursos Humanos no disponible.'];
+        }
+        if ($idVacante <= 0) {
+            return ['success' => false, 'message' => 'Seleccione una vacante.'];
+        }
+
+        $fullname = trim($fullname);
+        $dni = trim($dni);
+        $phone = trim($phone);
+        $email = trim($email);
+        $referralSource = trim($referralSource) !== '' ? trim($referralSource) : 'Captación manual';
+
+        if ($fullname === '') {
+            return ['success' => false, 'message' => 'El nombre completo es obligatorio.'];
+        }
+        if ($dni === '') {
+            return ['success' => false, 'message' => 'El número de identidad es obligatorio.'];
+        }
+        if ($phone === '') {
+            return ['success' => false, 'message' => 'El teléfono es obligatorio.'];
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['success' => false, 'message' => 'Ingrese un correo electrónico válido.'];
+        }
+
+        $stmtVac = $pdo->prepare('SELECT id FROM vacant_positions WHERE id = ? AND deleted = 0 LIMIT 1');
+        $stmtVac->execute([$idVacante]);
+        if (!$stmtVac->fetchColumn()) {
+            return ['success' => false, 'message' => 'La vacante seleccionada no existe.'];
+        }
+
+        $stmtDup = $pdo->prepare(
+            'SELECT id FROM candidates WHERE dni = ? AND id_vacant_position = ? AND deleted = 0 LIMIT 1'
+        );
+        $stmtDup->execute([$dni, $idVacante]);
+        $existingId = (int) $stmtDup->fetchColumn();
+        if ($existingId > 0) {
+            return [
+                'success' => false,
+                'message' => 'Ya existe un candidato con ese DNI en la vacante (ID ' . $existingId . ').',
+            ];
+        }
+
+        try {
+            $stmtIns = $pdo->prepare(
+                'INSERT INTO candidates (
+                    id_vacant_position, id_aplica, fullname, dni, phonenumber, email, direction,
+                    referral_source, status, created_by
+                ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)'
+            );
+            $stmtIns->execute([
+                $idVacante,
+                $fullname,
+                $dni,
+                $phone,
+                $email,
+                'Pendiente de completar',
+                $referralSource,
+                'En Espera',
+                $usuario,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Candidato registrado correctamente.',
+                'candidate_id' => (int) $pdo->lastInsertId(),
+            ];
+        } catch (Throwable $e) {
+            error_log('medidata_rrhh_crear_candidato_manual: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'No se pudo registrar el candidato.'];
+        }
+    }
+}

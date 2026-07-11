@@ -172,9 +172,9 @@
             <ul class="side-dropdown">
                 <li><a href="#"><span>CATALOGO DE SERVICIOS</span></a></li>
                 <li><a href="../radiologiaeimagen/tabladeestudios.php"><span>MH-PACS</span></a></li>
-                <li><a href="../radiologiaeimagen/worklist.php"><span>Lista de Trabajo - MH-PACS</span></a></li>
-                <li><a href="../radiologiaeimagen/lista_estudios.php"><span>Lista de Estudios - MH-PACS</span></a></li>
-                <li><a href="../radiologiaeimagen/lista_transcripciones.php"><span>Lista de Transcripciones - MH-PACS</span></a></li>
+                <li><a href="../radiologiaeimagen/worklist.php"><span>LISTA DE TRABAJO - MH-PACS</span></a></li>
+                <li><a href="../radiologiaeimagen/lista_estudios.php"><span>LISTA DE ESTUDIOS - MH-PACS</span></a></li>
+                <li><a href="../radiologiaeimagen/lista_transcripciones.php"><span>LISTA DE TRANSCRIPCIONES - MH-PACS</span></a></li>
                 <li><a href="#"><span>LABORATORIO CLINICO</span></a></li>
                 <li><a href="#"><span>EMERGENCIA</span></a></li>
                 <li><a href="#"><span>PROCEDIMIENTOS</span></a></li>

@@ -115,7 +115,7 @@ include_once '../almacen/menu.php'; // Menú principal
     <option value="Unidad Digestiva">Unidad Digestiva</option>
     <option value="Neurología">Neurología</option>
     <option value="Salud Dental">Salud Dental</option>
-    <option value="Radiología e Imagen">Radiología e Imagen</option>
+    <option value="Radiología e Imagen">RADIOLOGÍA E IMAGEN</option>
     <option value="Arrendamientos">Arrendamientos</option>
     <option value="Servicios de Enfermeria">Servicios de Enfermeria</option>
     <option value="Servicios de Hospitalización">Servicios de Hospitalización</option>

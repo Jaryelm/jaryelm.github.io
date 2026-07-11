@@ -23,6 +23,7 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
 
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
 </head>
 <body>
@@ -75,6 +76,9 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
             <div class="content-data">
                 <div class="head">
                     <h3>Listado de Postulantes (En Espera)</h3>
+                    <?php if ($rrhh_disponible): ?>
+                    <button type="button" class="button" id="btn-agregar-candidato-manual">Agregar candidato manual</button>
+                    <?php endif; ?>
                 </div>
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
@@ -126,6 +130,48 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
         </main>
     </section>
 
+    <div id="modal-candidato-manual" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:10px;max-width:520px;width:100%;padding:24px;max-height:90vh;overflow-y:auto;">
+            <h3 style="margin:0 0 16px;color:#035c67;">Registrar candidato (captación manual)</h3>
+            <p style="font-size:.9rem;color:#555;margin:0 0 16px;">Para candidatos captados por correo, presencial u otro medio fuera del sitio web.</p>
+            <form id="form-candidato-manual">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="cm_vacante"><b>Vacante *</b></label>
+                    <select class="select2" name="id_vacante" id="cm_vacante" required style="width:100%;">
+                        <option value="">Seleccione...</option>
+                        <?php foreach ($vacantes as $v): ?>
+                        <option value="<?php echo (int) $v['id']; ?>"><?php echo htmlspecialchars($v['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="cm_fullname"><b>Nombre completo *</b></label>
+                    <input type="text" name="fullname" id="cm_fullname" required style="width:100%;padding:10px;box-sizing:border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="cm_dni"><b>No. identidad *</b></label>
+                    <input type="text" name="dni" id="cm_dni" required style="width:100%;padding:10px;box-sizing:border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="cm_phone"><b>Teléfono *</b></label>
+                    <input type="text" name="phonenumber" id="cm_phone" required style="width:100%;padding:10px;box-sizing:border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="cm_email"><b>Correo *</b></label>
+                    <input type="email" name="email" id="cm_email" required style="width:100%;padding:10px;box-sizing:border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label for="cm_referral"><b>Origen / medio</b></label>
+                    <input type="text" name="referral_source" id="cm_referral" value="Captación manual" style="width:100%;padding:10px;box-sizing:border-box;">
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="submit" class="registerbtn">Guardar candidato</button>
+                    <button type="button" class="pabtn" id="btn-cerrar-candidato-manual">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../../backend/js/jquery.min.js"></script>
 <?php include __DIR__ . '/_rrhh_select2_foot.php'; ?>
 
@@ -141,6 +187,7 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
     <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
         $('#example').DataTable({
@@ -150,6 +197,41 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
             }
+        });
+
+        var $modal = $('#modal-candidato-manual');
+        $('#btn-agregar-candidato-manual').on('click', function () {
+            $modal.css('display', 'flex');
+        });
+        $('#btn-cerrar-candidato-manual').on('click', function () {
+            $modal.hide();
+        });
+        $('#form-candidato-manual').on('submit', function (e) {
+            e.preventDefault();
+            var $btn = $(this).find('button[type="submit"]');
+            $btn.prop('disabled', true);
+            $.ajax({
+                type: 'POST',
+                url: '../../backend/php/rrhh_candidato_crear.php',
+                data: $(this).serialize(),
+                dataType: 'json'
+            }).done(function (res) {
+                if (res.success) {
+                    Swal.fire('Registrado', res.message, 'success').then(function () {
+                        if (res.candidate_id) {
+                            window.location.href = 'detalle_postulante_usr.php?id=' + res.candidate_id;
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire('Aviso', res.message || 'No se pudo registrar.', 'warning');
+                    $btn.prop('disabled', false);
+                }
+            }).fail(function () {
+                Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
+                $btn.prop('disabled', false);
+            });
         });
     });
     </script>

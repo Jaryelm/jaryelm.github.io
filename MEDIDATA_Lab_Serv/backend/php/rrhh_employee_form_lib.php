@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../bd/medidata_paths.php';
 require_once __DIR__ . '/../registros/rrhh_guard.php';
 require_once __DIR__ . '/../registros/rrhh_aplica_bridge.php';
+require_once __DIR__ . '/rrhh_employee_form_fields_lib.php';
 
 if (!function_exists('medidata_rrhh_ensure_employee_form_schema')) {
     function medidata_rrhh_ensure_employee_form_schema(PDO $pdo): void
@@ -147,8 +148,7 @@ if (!function_exists('medidata_rrhh_employee_form_send_email')) {
             return ['success' => false, 'message' => 'Correo del candidato no válido.'];
         }
 
-        require_once __DIR__ . '/../vendor/phpmailer/autoload.php';
-        require_once __DIR__ . '/medidata_mailer_config.php';
+        require_once __DIR__ . '/medidata_mailer_lib.php';
 
         $nombre = trim($candidateName) !== '' ? trim($candidateName) : 'Candidato/a';
         $urlEscaped = htmlspecialchars($formUrl, ENT_QUOTES, 'UTF-8');
@@ -174,44 +174,7 @@ if (!function_exists('medidata_rrhh_employee_form_send_email')) {
             . "Cualquier duda, comuníquese con Recursos Humanos.\n\n"
             . "Atentamente,\nTalento Humano — Hospital MEDICASA";
 
-        $cfg = medidata_mailer_config();
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host = $cfg['host'];
-            $mail->SMTPAuth = true;
-            $mail->Username = $cfg['username'];
-            $mail->Password = $cfg['password'];
-            $secure = strtolower((string) ($cfg['secure'] ?? 'tls'));
-            if ($secure === 'ssl') {
-                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-            } else {
-                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-            }
-            $mail->Port = (int) $cfg['port'];
-            $mail->CharSet = 'UTF-8';
-            $mail->SMTPDebug = (int) ($cfg['debug_level'] ?? 0);
-
-            $mail->setFrom($cfg['from_email'], $cfg['from_name']);
-            $mail->addReplyTo($cfg['reply_to_email'], $cfg['reply_to_name']);
-            $mail->addAddress($toEmail, $nombre);
-
-            $mail->isHTML(true);
-            $mail->Subject = $subject;
-            $mail->Body = $bodyHtml;
-            $mail->AltBody = $bodyText;
-
-            $mail->send();
-
-            return ['success' => true, 'message' => 'Correo enviado a ' . $toEmail . '.'];
-        } catch (\Throwable $e) {
-            error_log('medidata_rrhh_employee_form_send_email: ' . $e->getMessage() . ' | ' . ($mail->ErrorInfo ?? ''));
-            return [
-                'success' => false,
-                'message' => 'No se pudo enviar el correo. Copie el enlace y envíelo manualmente.',
-            ];
-        }
+        return medidata_rrhh_send_email($toEmail, $subject, $bodyHtml, $bodyText, $nombre);
     }
 }
 
@@ -286,28 +249,8 @@ if (!function_exists('medidata_rrhh_employee_form_save_public')) {
              WHERE id = ?"
         )->execute([$payload, $formId]);
 
-        $birthdate = trim((string) ($fields['birthdate'] ?? ''));
-        $marital = trim((string) ($fields['marital_status'] ?? ''));
-        $direction = trim((string) ($fields['direction'] ?? ''));
+        medidata_rrhh_employee_form_sync_candidate($pdo, $candidateId, $fields);
 
-        $sql = 'UPDATE candidates SET updated_at = NOW()';
-        $params = [];
-        if ($birthdate !== '') {
-            $sql .= ', birthdate = ?';
-            $params[] = $birthdate;
-        }
-        if ($marital !== '') {
-            $sql .= ', marital_status = ?';
-            $params[] = $marital;
-        }
-        if ($direction !== '') {
-            $sql .= ', direction = ?';
-            $params[] = $direction;
-        }
-        $sql .= ' WHERE id = ?';
-        $params[] = $candidateId;
-        $pdo->prepare($sql)->execute($params);
-
-        return ['success' => true, 'message' => 'Formulario enviado correctamente. Gracias.'];
+        return ['success' => true, 'message' => 'Solicitud de empleo enviada correctamente. Gracias.'];
     }
 }

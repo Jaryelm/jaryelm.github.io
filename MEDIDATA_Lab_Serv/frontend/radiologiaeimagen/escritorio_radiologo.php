@@ -319,7 +319,7 @@ if (($_SESSION['rol'] ?? '') !== 'Radiologo') {
         })
             .then(function (r) { return r.json(); })
             .then(function (data) {
-                const studies = Array.isArray(data) ? data : [];
+                const studies = Array.isArray(data) ? data : (data.data || []);
                 const pending = studies.filter(function (s) {
                     return s.status === 'pending' || s.status === 'draft';
                 });
