@@ -7,6 +7,9 @@
 /** @var bool $isUsr */
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($id <= 0 && isset($_GET['candidate_id'])) {
+    $id = (int) $_GET['candidate_id'];
+}
 $candidato = null;
 $rrhh_error = null;
 $interviewForm = null;
@@ -71,7 +74,7 @@ $nameSafe = htmlspecialchars((string) ($name ?? 'Usuario'), ENT_QUOTES, 'UTF-8')
 ?>
 <h1 class="title"><?php echo $saludo . ', <strong>' . $nameSafe . '</strong>'; ?></h1>
 
-<form id="rrhh-entrevista-form" autocomplete="off">
+<form id="rrhh-entrevista-form" method="post" action="#" autocomplete="off">
     <input type="hidden" name="candidate_id" value="<?php echo (int) $candidato->id; ?>">
     <div class="containerss">
         <h1>Formulario de entrevista</h1>
@@ -117,13 +120,10 @@ $nameSafe = htmlspecialchars((string) ($name ?? 'Usuario'), ENT_QUOTES, 'UTF-8')
         <a href="<?php echo htmlspecialchars($calendarioUrl); ?>" class="button form-secondary-btn">Ver calendario</a>
     </div>
 </form>
-
-<script>
-window.__rrhh_entrevista_ready || function(){})();
-window.MEDIDATA_ENTREVISTA = {
-    saveUrl: <?php echo json_encode($saveUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES); ?>,
-    volverUrl: <?php echo json_encode($volverUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES); ?>
-};
-</script>
-<script src="../../backend/registros/script/rrhh_formulario_entrevista.js"></script>
+<?php
+$rrhh_entrevista_footer = [
+    'saveUrl' => $saveUrl,
+    'volverUrl' => $volverUrl,
+];
+?>
 <?php endif; ?>

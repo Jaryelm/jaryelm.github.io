@@ -4,6 +4,9 @@
 /** @var string $saveUrl */
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($id <= 0 && isset($_GET['candidate_id'])) {
+    $id = (int) $_GET['candidate_id'];
+}
 $candidato = null;
 $rrhh_error = null;
 $psyForm = null;
@@ -80,7 +83,7 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
 <div class="data">
     <div class="content-data">
         <div class="head"><h3>Registrar pruebas aplicadas</h3></div>
-        <form id="rrhh-psico-form" enctype="multipart/form-data" class="card-candidato-estado-form" autocomplete="off">
+        <form id="rrhh-psico-form" method="post" action="#" enctype="multipart/form-data" class="card-candidato-estado-form" autocomplete="off">
             <input type="hidden" name="candidate_id" value="<?php echo (int) $candidato->id; ?>">
 
             <label><b>Pruebas aplicadas</b></label>
@@ -114,12 +117,10 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
         </form>
     </div>
 </div>
-
-<script>
-window.MEDIDATA_PSICO = {
-    saveUrl: <?php echo json_encode($saveUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES); ?>,
-    volverUrl: <?php echo json_encode($volverUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES); ?>
-};
-</script>
-<script src="../../backend/registros/script/rrhh_prueba_psicometrica.js"></script>
+<?php
+$rrhh_psico_footer = [
+    'saveUrl' => $saveUrl,
+    'volverUrl' => $volverUrl,
+];
+?>
 <?php endif; ?>

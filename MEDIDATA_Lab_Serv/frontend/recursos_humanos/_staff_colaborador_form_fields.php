@@ -119,9 +119,9 @@ $staffHelpContext = $esMedico ? 'medicos' : ($esMedifarma ? 'medifarma' : 'colab
             </select>
         </div>
         <div>
-            <label><b>Horario</b></label><span class="badge-warning">*</span>
-            <select class="select2" name="id_horario" id="id_schedule" required>
-                <option value="" disabled selected>Seleccione...</option>
+            <label><b>Horario</b></label>
+            <select class="select2" name="id_horario" id="id_schedule">
+                <option value="">Seleccione...</option>
             </select>
         </div>
         <div class="staff-form-field--full">
