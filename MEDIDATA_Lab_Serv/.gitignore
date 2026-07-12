@@ -1,5 +1,7 @@
-/agents
-.agents
+.gemini/
+.agents/
 *.md
 .clinerules
 .antigravity/
+graphify-out/
+.graphify*
