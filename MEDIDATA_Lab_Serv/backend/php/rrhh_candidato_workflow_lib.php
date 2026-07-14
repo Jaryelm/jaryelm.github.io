@@ -542,7 +542,7 @@ if (!function_exists('medidata_rrhh_save_psychometric_form')) {
                 return ['success' => false, 'message' => 'El documento debe ser PDF.'];
             }
 
-            $destName = 'psico_' . $candidateId . '_' . date('YmdHis') . '.pdf';
+            $destName = 'psico_' . $candidateId . '.pdf';
             $uploadDir = medidata_rrhh_psychometric_upload_dir();
             if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
                 return [
@@ -565,12 +565,6 @@ if (!function_exists('medidata_rrhh_save_psychometric_form')) {
                 if (empty($payload['document']) && !empty($prev['document'])) {
                     $payload['document'] = $prev['document'];
                     $payload['document_original'] = $prev['document_original'] ?? '';
-                } elseif (!empty($payload['document']) && !empty($prev['document']) && $payload['document'] !== $prev['document']) {
-                    // NEW FILE UPLOADED, DELETE OLD FILE
-                    $oldPath = medidata_rrhh_psychometric_upload_dir() . DIRECTORY_SEPARATOR . $prev['document'];
-                    if (file_exists($oldPath) && is_file($oldPath)) {
-                        @unlink($oldPath);
-                    }
                 }
             }
         }

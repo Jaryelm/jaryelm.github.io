@@ -142,7 +142,7 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
 var currentPsicoDocUrl = '';
 function openPsicoModal(filename) {
     if (!filename) return;
-    currentPsicoDocUrl = '../../backend/uploads/rrhh/psicometricas/' + filename;
+    currentPsicoDocUrl = '../../backend/uploads/rrhh/psicometricas/' + filename + '?v=' + new Date().getTime();
     var container = document.getElementById('psicoDocContainer');
     container.innerHTML = '<iframe src="' + currentPsicoDocUrl + '"></iframe>';
     var modal = document.getElementById('psicoDocModal');
