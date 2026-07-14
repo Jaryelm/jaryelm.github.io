@@ -256,7 +256,11 @@
 
                 reverseButtons: true,
 
-                focusConfirm: false
+                focusConfirm: false,
+
+                didOpen: function() {
+                    $('.swal2-actions').append('<a href="formulario_empleado_ver' + suffix + '.php?id=' + cfg.candidateId + '" class="swal2-confirm swal2-styled" style="background-color: #17a2b8; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; margin: .3125em;" target="_blank">Ver</a>');
+                }
 
             }).then(function (result) {
 
