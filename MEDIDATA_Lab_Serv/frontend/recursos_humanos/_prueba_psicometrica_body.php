@@ -133,7 +133,7 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
         <div id="psicoDocContainer" class="modal-pdf-body"></div>
         <div class="modal-pdf-footer" style="text-align: center;">
             <button id="psicoPdfDownload" type="button" class="btn-descargar-pdf">
-                <i class="bx bx-download"></i> Descargar / Abrir
+                <i class="bx bx-download"></i> Descargar
             </button>
         </div>
     </div>
