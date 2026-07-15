@@ -5340,3 +5340,20 @@ main .containerss .demo-flujo-step-num {
         text-align: center;
     }
 }
+/* Formularios - Grupo de botones de radio (Alineacion) */
+.radio-group { height: 44px; display: flex; align-items: center; gap: 15px; }
+.radio-group label {
+    margin-bottom: 0 !important;
+    font-weight: normal !important;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+.radio-group input[type="radio"],
+.radio-group input[type="checkbox"] {
+    margin: 0 !important;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
