@@ -395,7 +395,10 @@ if (!function_exists('medidata_biometric_datatables')) {
         try {
             $start = max(0, (int) ($request['start'] ?? 0));
             $lengthRaw = (int) ($request['length'] ?? 10);
-            $length = ($lengthRaw <= 0) ? 100 : min($lengthRaw, 100);
+            // export_all=1: permite traer todo el resultado filtrado (reportes Excel/CSV/PDF).
+            $exportAll = isset($request['export_all']) && (string) $request['export_all'] === '1';
+            $maxLength = $exportAll ? 10000 : 100;
+            $length = ($lengthRaw <= 0) ? $maxLength : min($lengthRaw, $maxLength);
             $searchValue = trim((string) ($request['search']['value'] ?? ''));
             $fechaDesde = trim((string) ($request['fechaDesde'] ?? ''));
             $fechaHasta = trim((string) ($request['fechaHasta'] ?? ''));

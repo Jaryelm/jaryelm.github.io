@@ -322,7 +322,7 @@ window.MEDIDATA_RELOJBIO = {
     dbOk: <?php echo !empty($dbOk) ? 'true' : 'false'; ?>
 };
 </script>
-<script src="../../backend/registros/script/tabla_relojbio.js?v=20260531b"></script>
+<script src="../../backend/registros/script/tabla_relojbio.js?v=20260716export"></script>
 
 </body>
 </html>
