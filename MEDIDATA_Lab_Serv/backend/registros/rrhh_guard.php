@@ -51,15 +51,44 @@ if (!function_exists('medidata_rrhh_ensure_recurrence_columns')) {
         }
         $done = true;
         try {
-            $stmt = $pdo->query("SHOW COLUMNS FROM `rrhh_custom_events` LIKE 'recurrence'");
-            if (!$stmt || !$stmt->fetch(PDO::FETCH_ASSOC)) {
-                $pdo->exec("ALTER TABLE `rrhh_custom_events`
-                    ADD COLUMN `recurrence` VARCHAR(20) NOT NULL DEFAULT 'none' AFTER `is_public`");
+            $stmt = $pdo->query("SHOW COLUMNS FROM `rrhh_custom_events`");
+            $cols = [];
+            if ($stmt) {
+                foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                    $cols[] = $row['Field'];
+                }
             }
-            $stmt2 = $pdo->query("SHOW COLUMNS FROM `rrhh_custom_events` LIKE 'recurrence_until'");
-            if (!$stmt2 || !$stmt2->fetch(PDO::FETCH_ASSOC)) {
-                $pdo->exec("ALTER TABLE `rrhh_custom_events`
-                    ADD COLUMN `recurrence_until` DATE NULL DEFAULT NULL AFTER `recurrence`");
+            if (!empty($cols)) {
+                if (!in_array('id_event_type', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `id_event_type` INT NULL AFTER `id`");
+                }
+                if (!in_array('start_date', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `start_date` DATE NULL AFTER `title`");
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `start_time` TIME NULL AFTER `start_date`");
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `end_date` DATE NULL AFTER `start_time`");
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `end_time` TIME NULL AFTER `end_date`");
+                    if (in_array('start_datetime', $cols)) {
+                        // $pdo->exec("UPDATE `rrhh_custom_events` SET start_date=DATE(start_datetime), start_time=TIME(start_datetime), end_date=DATE(end_datetime), end_time=TIME(end_datetime) WHERE start_datetime IS NOT NULL AND start_date IS NULL");
+                    }
+                }
+                if (!in_array('description', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `description` TEXT NULL AFTER `end_time`");
+                }
+                if (!in_array('all_day', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `all_day` TINYINT(1) DEFAULT 0 AFTER `color`");
+                }
+                if (!in_array('id_user', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `id_user` INT NULL AFTER `all_day`");
+                }
+                if (!in_array('is_public', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `is_public` TINYINT(1) DEFAULT 0 AFTER `id_user`");
+                }
+                if (!in_array('recurrence', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `recurrence` VARCHAR(20) NOT NULL DEFAULT 'none'");
+                }
+                if (!in_array('recurrence_until', $cols)) {
+                    // $pdo->exec("ALTER TABLE `rrhh_custom_events` ADD COLUMN `recurrence_until` DATE NULL DEFAULT NULL");
+                }
             }
         } catch (Throwable $e) {
             error_log('medidata_rrhh_ensure_recurrence_columns: ' . $e->getMessage());
@@ -212,7 +241,8 @@ if (!function_exists('medidata_rrhh_fetch_postulantes')) {
         }
 
         try {
-            $query = "SELECT p.*, p2.name AS vacancy_name
+            $query = "SELECT p.*, p2.name AS vacancy_name,
+                             (SELECT COUNT(*) FROM employees_form ef WHERE ef.id_candidate = p.id AND ef.status = 'Enviado' AND ef.deleted = 0) > 0 AS has_filled_application
                       FROM postulantes p
                       LEFT JOIN vacant_positions v ON p.id_vacant_position = v.id
                       LEFT JOIN positions_details pd ON v.id_position = pd.id

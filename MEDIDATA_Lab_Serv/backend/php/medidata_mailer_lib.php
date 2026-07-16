@@ -21,12 +21,12 @@ if (!function_exists('medidata_send_email')) {
             return ['success' => false, 'message' => 'Correo del destinatario no válido.'];
         }
 
+        require_once __DIR__ . '/../vendor/phpmailer/autoload.php';
+        require_once __DIR__ . '/medidata_mailer_config.php';
+
         if (!in_array($profile, medidata_mailer_profile_keys(), true)) {
             $profile = 'rrhh';
         }
-
-        require_once __DIR__ . '/../vendor/phpmailer/autoload.php';
-        require_once __DIR__ . '/medidata_mailer_config.php';
 
         $cfg = medidata_mailer_config($profile);
         if (trim((string) ($cfg['password'] ?? '')) === '') {

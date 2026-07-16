@@ -25,11 +25,11 @@ if (!function_exists('medidata_rrhh_employee_form_field_keys')) {
             'lang_english_speak', 'lang_english_read', 'lang_english_write', 'lang_english_years',
             'lang_other_name', 'lang_other_speak', 'lang_other_read', 'lang_other_write', 'lang_other_years',
             'job1_company', 'job1_address', 'job1_phone', 'job1_start', 'job1_end', 'job1_salary_start', 'job1_salary_end',
-            'job1_role', 'job1_people', 'job1_boss', 'job1_leave_reason',
+            'job1_role', 'job1_people', 'job1_boss', 'job1_leave_reason', 'job1_current',
             'job2_company', 'job2_address', 'job2_phone', 'job2_start', 'job2_end', 'job2_salary_start', 'job2_salary_end',
-            'job2_role', 'job2_people', 'job2_boss', 'job2_leave_reason',
+            'job2_role', 'job2_people', 'job2_boss', 'job2_leave_reason', 'job2_current',
             'job3_company', 'job3_address', 'job3_phone', 'job3_start', 'job3_end', 'job3_salary_start', 'job3_salary_end',
-            'job3_role', 'job3_people', 'job3_boss', 'job3_leave_reason',
+            'job3_role', 'job3_people', 'job3_boss', 'job3_leave_reason', 'job3_current',
             'can_contact_last_job', 'no_contact_reason',
             'ref1_name', 'ref1_occupation', 'ref1_workplace', 'ref1_address', 'ref1_phone', 'ref1_known_since',
             'ref2_name', 'ref2_occupation', 'ref2_workplace', 'ref2_address', 'ref2_phone', 'ref2_known_since',
@@ -43,7 +43,7 @@ if (!function_exists('medidata_rrhh_employee_form_field_keys')) {
             'owns_home', 'home_value', 'pays_rent', 'rent_amount', 'other_income', 'other_income_amount',
             'declaration_city_date', 'observations',
             'bank_name', 'bank_account', 'dependents_names',
-            'direction',
+            'direction', 'disclaimer_agreed',
         ];
     }
 }

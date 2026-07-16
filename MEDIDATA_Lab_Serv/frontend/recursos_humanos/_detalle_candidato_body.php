@@ -6,7 +6,26 @@
 /** @var string|null $rrhh_error */
 
 require_once __DIR__ . '/../../backend/registros/rrhh_aplica_bridge.php';
+require_once __DIR__ . '/../../backend/php/rrhh_candidato_workflow_lib.php';
 $rrhhEstados = medidata_rrhh_estados_candidato();
+
+$payloadAnswers = [];
+try {
+    $pdoRrhh = medidata_rrhh_pdo();
+    if ($pdoRrhh && isset($candidato->id)) {
+        $stmtPayload = $pdoRrhh->prepare("SELECT payload FROM rrhh_questions_form WHERE id_candidate = ? ORDER BY id DESC LIMIT 1");
+        $stmtPayload->execute([(int)$candidato->id]);
+        $rowPayload = $stmtPayload->fetch(PDO::FETCH_ASSOC);
+        if ($rowPayload && !empty($rowPayload['payload'])) {
+            $decoded = json_decode((string)$rowPayload['payload'], true);
+            if (is_array($decoded)) {
+                $payloadAnswers = $decoded;
+            }
+        }
+    }
+} catch (Throwable $e) {
+    error_log('Error fetching payload: ' . $e->getMessage());
+}
 
 $estadoActual = $candidato->status ?? 'N/A';
 $badgeEstado = 'badge-rrhh badge-rrhh-pending';
@@ -19,10 +38,28 @@ if ($estadoActual === 'Contratado') {
 $puntajeTexto = (isset($candidato->overall_score) && $candidato->overall_score !== null)
     ? htmlspecialchars((string) $candidato->overall_score) . '%'
     : 'Pendiente';
-$salarioTexto = (isset($candidato->salary_expectation) && $candidato->salary_expectation !== null)
-    ? 'L ' . htmlspecialchars((string) $candidato->salary_expectation)
+
+$salario = $payloadAnswers['expectativa_salarial'] ?? ($candidato->salary_expectation ?? null);
+$salarioTexto = ($salario !== null && $salario !== '')
+    ? (strpos((string)$salario, 'L') !== false ? htmlspecialchars((string) $salario) : 'L. ' . htmlspecialchars((string) $salario))
     : 'N/A';
+
+$nivelAcademico = $payloadAnswers['nivel_academico'] ?? ($candidato->academic_level ?? 'N/A');
+if ($nivelAcademico === '') $nivelAcademico = 'N/A';
+
+$profesion = $payloadAnswers['profesion'] ?? ($candidato->profession ?? 'N/A');
+if ($profesion === '') $profesion = 'N/A';
+
+$experienciaPrevia = $payloadAnswers['experiencia'] ?? ($candidato->previous_experience ?? 'N/A');
+if ($experienciaPrevia === '') $experienciaPrevia = 'N/A';
+
+$debugInfo = "Candidate ID: " . ($candidato->id ?? 'null') . "\n";
+$debugInfo .= "Payload fetched: " . ($rowPayload['payload'] ?? 'null') . "\n";
+$debugInfo .= "Decoded answers count: " . count($payloadAnswers) . "\n";
 ?>
+<!-- DEBUG RRHH: 
+<?php echo htmlspecialchars($debugInfo); ?>
+-->
 <h1 class="title">Detalle del candidato</h1>
 
 <button class="button" type="button" id="btn-volver-candidato" data-return-url="<?php echo htmlspecialchars($volverUrl, ENT_QUOTES, 'UTF-8'); ?>">Volver</button>
@@ -108,15 +145,15 @@ $salarioTexto = (isset($candidato->salary_expectation) && $candidato->salary_exp
                     </div>
                     <div class="info-item">
                         <i class="fa fa-graduation-cap"></i>
-                        <strong>Nivel académico:</strong>&nbsp;<span><?php echo htmlspecialchars($candidato->academic_level ?? 'N/A'); ?></span>
+                        <strong>Nivel académico:</strong>&nbsp;<span><?php echo htmlspecialchars($nivelAcademico); ?></span>
                     </div>
                     <div class="info-item">
                         <i class="fa fa-certificate"></i>
-                        <strong>Profesión:</strong>&nbsp;<span><?php echo htmlspecialchars($candidato->profession ?? 'N/A'); ?></span>
+                        <strong>Profesión:</strong>&nbsp;<span><?php echo htmlspecialchars($profesion); ?></span>
                     </div>
                     <div class="info-item">
                         <i class="fa fa-history"></i>
-                        <strong>Experiencia previa:</strong>&nbsp;<span><?php echo htmlspecialchars($candidato->previous_experience ?? 'N/A'); ?></span>
+                        <strong>Experiencia previa:</strong>&nbsp;<span><?php echo htmlspecialchars($experienciaPrevia); ?></span>
                     </div>
                     <div class="info-item">
                         <i class="fa fa-money-bill-wave"></i>

@@ -41,12 +41,14 @@ $selectedTests = [];
 $notes = '';
 $score = '';
 $docName = '';
+$docFile = '';
 if ($psyForm && !empty($psyForm['payload'])) {
     $payload = json_decode((string) $psyForm['payload'], true);
     if (is_array($payload)) {
         $selectedTests = $payload['tests'] ?? [];
         $notes = (string) ($payload['notes'] ?? '');
-        $docName = (string) ($payload['document_original'] ?? ($payload['document'] ?? ''));
+        $docFile = (string) ($payload['document'] ?? '');
+        $docName = (string) ($payload['document_original'] ?? $docFile);
     }
 }
 if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyForm['score'] !== '') {
@@ -106,7 +108,11 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
 
             <label for="document"><b>Documento de resultados (PDF)</b></label>
             <?php if ($docName !== ''): ?>
-            <p style="font-size:.9rem;color:#035c67;margin:0 0 6px;">Archivo actual: <?php echo htmlspecialchars($docName); ?></p>
+            <p style="font-size:.9rem;color:#035c67;margin:0 0 6px;">Archivo actual: 
+                <a href="javascript:void(0)" onclick="openPsicoModal('<?php echo htmlspecialchars($docFile); ?>')" style="color:#06adbf;text-decoration:underline;">
+                    <?php echo htmlspecialchars($docName); ?>
+                </a>
+            </p>
             <?php endif; ?>
             <input type="file" name="document" id="document" accept="application/pdf,.pdf">
 
@@ -117,6 +123,42 @@ if ($psyForm && isset($psyForm['score']) && $psyForm['score'] !== null && $psyFo
         </form>
     </div>
 </div>
+
+<div id="psicoDocModal" class="modal-pdf">
+    <div class="modal-pdf-content">
+        <div class="modal-pdf-header">
+            <h2>Documento de Resultados</h2>
+            <span class="close-pdf-btn" onclick="closePsicoModal()">&times;</span>
+        </div>
+        <div id="psicoDocContainer" class="modal-pdf-body"></div>
+        <div class="modal-pdf-footer" style="text-align: center;">
+            <button id="psicoPdfDownload" type="button" class="btn-descargar-pdf">
+                <i class="bx bx-download"></i> Descargar
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+var currentPsicoDocUrl = '';
+function openPsicoModal(filename) {
+    if (!filename) return;
+    currentPsicoDocUrl = '../../backend/uploads/rrhh/psicometricas/' + filename + '?v=' + new Date().getTime();
+    var container = document.getElementById('psicoDocContainer');
+    container.innerHTML = '<iframe src="' + currentPsicoDocUrl + '"></iframe>';
+    var modal = document.getElementById('psicoDocModal');
+    modal.style.display = 'flex';
+}
+function closePsicoModal() {
+    document.getElementById('psicoDocModal').style.display = 'none';
+    document.getElementById('psicoDocContainer').innerHTML = '';
+}
+document.getElementById('psicoPdfDownload').addEventListener('click', function() {
+    if (currentPsicoDocUrl) {
+        window.open(currentPsicoDocUrl, '_blank');
+    }
+});
+</script>
+
 <?php
 $rrhh_psico_footer = [
     'saveUrl' => $saveUrl,

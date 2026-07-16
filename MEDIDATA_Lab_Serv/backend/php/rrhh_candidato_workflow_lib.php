@@ -343,6 +343,8 @@ if (!function_exists('medidata_rrhh_interview_questions_default')) {
     function medidata_rrhh_interview_questions_default(): array
     {
         return [
+            'nivel_academico' => 'Nivel académico',
+            'profesion' => 'Profesión',
             'motivacion' => 'Motivación para el puesto',
             'experiencia' => 'Experiencia relevante',
             'fortalezas' => 'Fortalezas',
@@ -386,78 +388,96 @@ if (!function_exists('medidata_rrhh_save_interview_form')) {
      */
     function medidata_rrhh_save_interview_form(int $candidateId, array $answers, string $usuario, ?string $dateInterview = null, ?string $timeInterview = null): array
     {
-        $pdo = medidata_rrhh_pdo();
-        if (!$pdo || $candidateId <= 0) {
-            return ['success' => false, 'message' => 'RRHH no disponible.'];
-        }
-
-        $dateInterview = trim((string) $dateInterview);
-        $timeInterview = trim((string) $timeInterview);
-        if ($dateInterview === '' || $timeInterview === '') {
-            return ['success' => false, 'message' => 'Indique fecha y hora de la entrevista.'];
-        }
-
-        $interviewId = 0;
-        $stmtIv = $pdo->prepare(
-            'SELECT id FROM interviews WHERE id_candidate = ? AND deleted = 0 ORDER BY id DESC LIMIT 1'
-        );
-        $stmtIv->execute([$candidateId]);
-        $interviewId = (int) $stmtIv->fetchColumn();
-
-        $status = 'Programada';
-        if (!empty($answers['resultado'])) {
-            $res = strtolower((string) $answers['resultado']);
-            if (strpos($res, 'termin') !== false || strpos($res, 'apto') !== false) {
-                $status = 'Terminada';
-            } elseif (strpos($res, 'proceso') !== false) {
-                $status = 'En Proceso';
+        try {
+            $pdo = medidata_rrhh_pdo();
+            if (!$pdo || $candidateId <= 0) {
+                return ['success' => false, 'message' => 'RRHH no disponible.'];
             }
-        }
 
-        $userId = (int) ($_SESSION['id'] ?? 0);
+            $dateInterview = trim((string) $dateInterview);
+            $timeInterview = trim((string) $timeInterview);
+            if ($dateInterview === '' || $timeInterview === '') {
+                return ['success' => false, 'message' => 'Indique fecha y hora de la entrevista.'];
+            }
 
-        if ($interviewId > 0) {
-            $pdo->prepare(
-                'UPDATE interviews SET date_interview = ?, time_interview = ?, status = ?, updated_by = ?, updated_at = NOW() WHERE id = ?'
-            )->execute([$dateInterview, $timeInterview, $status, $usuario, $interviewId]);
-        } else {
-            $ivCols = $pdo->query('SHOW COLUMNS FROM interviews')->fetchAll(PDO::FETCH_COLUMN);
-            if (in_array('id_interviewer', $ivCols, true)) {
+            $interviewId = 0;
+            try {
+                $stmtIv = $pdo->prepare('SELECT id FROM interviews WHERE id_candidate = ? AND deleted = 0 ORDER BY id DESC LIMIT 1');
+                $stmtIv->execute([$candidateId]);
+                $interviewId = (int) $stmtIv->fetchColumn();
+            } catch (Throwable $e) {
+                // If interviews table doesn't exist or is missing columns, just log and ignore to allow saving payload
+                error_log("Interviews check failed: " . $e->getMessage());
+            }
+
+            $status = 'Programada';
+            if (!empty($answers['resultado'])) {
+                $res = strtolower((string) $answers['resultado']);
+                if (strpos($res, 'termin') !== false || strpos($res, 'apto') !== false) {
+                    $status = 'Terminada';
+                } elseif (strpos($res, 'proceso') !== false) {
+                    $status = 'En Proceso';
+                }
+            }
+
+            $userId = (int) ($_SESSION['id'] ?? 0);
+
+            try {
+                if ($interviewId > 0) {
+                    $pdo->prepare('UPDATE interviews SET date_interview = ?, time_interview = ?, status = ?, updated_by = ?, updated_at = NOW() WHERE id = ?')
+                        ->execute([$dateInterview, $timeInterview, $status, $usuario, $interviewId]);
+                } else {
+                    $ivCols = $pdo->query('SHOW COLUMNS FROM interviews')->fetchAll(PDO::FETCH_COLUMN);
+                    if (in_array('id_interviewer', $ivCols, true)) {
+                        $pdo->prepare('INSERT INTO interviews (id_candidate, date_interview, time_interview, status, id_interviewer, created_by) VALUES (?,?,?,?,?,?)')
+                            ->execute([$candidateId, $dateInterview, $timeInterview, $status, $userId ?: null, $usuario]);
+                    } else {
+                        $pdo->prepare('INSERT INTO interviews (id_candidate, date_interview, time_interview, status, created_by) VALUES (?,?,?,?,?)')
+                            ->execute([$candidateId, $dateInterview, $timeInterview, $status, $usuario]);
+                    }
+                    $interviewId = (int) $pdo->lastInsertId();
+                }
+            } catch (Throwable $e) {
+                error_log("Interviews insert/update failed: " . $e->getMessage());
+            }
+
+            $payload = json_encode($answers, JSON_UNESCAPED_UNICODE);
+            if ($payload === false) {
+                return ['success' => false, 'message' => 'Datos de entrevista no válidos.'];
+            }
+
+            $existingId = 0;
+            try {
+                $stmt = $pdo->prepare("SELECT id FROM rrhh_questions_form WHERE id_candidate = ? ORDER BY id DESC LIMIT 1");
+                $stmt->execute([$candidateId]);
+                $existingId = (int) $stmt->fetchColumn();
+            } catch (Throwable $e) {
+                return ['success' => false, 'message' => 'Error consultando form: ' . $e->getMessage()];
+            }
+
+            if ($existingId > 0) {
                 $pdo->prepare(
-                    'INSERT INTO interviews (id_candidate, date_interview, time_interview, status, id_interviewer, created_by) VALUES (?,?,?,?,?,?)'
-                )->execute([$candidateId, $dateInterview, $timeInterview, $status, $userId ?: null, $usuario]);
+                    "UPDATE rrhh_questions_form SET payload = ?, status = 'Completado', id_interview = ?, updated_by = ?, updated_at = NOW() WHERE id = ?"
+                )->execute([$payload, $interviewId > 0 ? $interviewId : null, $usuario, $existingId]);
             } else {
                 $pdo->prepare(
-                    'INSERT INTO interviews (id_candidate, date_interview, time_interview, status, created_by) VALUES (?,?,?,?,?)'
-                )->execute([$candidateId, $dateInterview, $timeInterview, $status, $usuario]);
+                    "INSERT INTO rrhh_questions_form (id_candidate, id_interview, payload, status, created_by) VALUES (?,?,?,'Completado',?)"
+                )->execute([$candidateId, $interviewId > 0 ? $interviewId : null, $payload, $usuario]);
             }
-            $interviewId = (int) $pdo->lastInsertId();
+
+            if (function_exists('medidata_rrhh_cambiar_estado_candidato')) {
+                medidata_rrhh_cambiar_estado_candidato(
+                    $candidateId,
+                    'Entrevista',
+                    $usuario,
+                    'Formulario de entrevista registrado.'
+                );
+            }
+
+            return ['success' => true, 'message' => 'Entrevista guardada.', 'interview_id' => $interviewId];
+        } catch (Throwable $e) {
+            return ['success' => false, 'message' => 'Error interno: ' . $e->getMessage()];
         }
-
-        $payload = json_encode($answers, JSON_UNESCAPED_UNICODE);
-        if ($payload === false) {
-            return ['success' => false, 'message' => 'Datos de entrevista no válidos.'];
-        }
-
-        $existing = medidata_rrhh_fetch_interview_form($candidateId);
-        if ($existing && !empty($existing['id'])) {
-            $pdo->prepare(
-                "UPDATE rrhh_questions_form SET payload = ?, status = 'Completado', id_interview = ?, updated_by = ?, updated_at = NOW() WHERE id = ?"
-            )->execute([$payload, $interviewId, $usuario, (int) $existing['id']]);
-        } else {
-            $pdo->prepare(
-                "INSERT INTO rrhh_questions_form (id_candidate, id_interview, payload, status, created_by) VALUES (?,?,?,'Completado',?)"
-            )->execute([$candidateId, $interviewId, $payload, $usuario]);
-        }
-
-        medidata_rrhh_cambiar_estado_candidato(
-            $candidateId,
-            'Entrevista',
-            $usuario,
-            'Formulario de entrevista registrado.'
-        );
-
-        return ['success' => true, 'message' => 'Entrevista guardada. Aparecerá en el calendario de entrevistas.', 'interview_id' => $interviewId];
     }
 }
 
@@ -522,7 +542,7 @@ if (!function_exists('medidata_rrhh_save_psychometric_form')) {
                 return ['success' => false, 'message' => 'El documento debe ser PDF.'];
             }
 
-            $destName = 'psico_' . $candidateId . '_' . date('YmdHis') . '.pdf';
+            $destName = 'psico_' . $candidateId . '.pdf';
             $uploadDir = medidata_rrhh_psychometric_upload_dir();
             if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
                 return [
@@ -541,9 +561,11 @@ if (!function_exists('medidata_rrhh_save_psychometric_form')) {
         $existing = medidata_rrhh_fetch_psychometric_form($candidateId);
         if ($existing && !empty($existing['payload'])) {
             $prev = json_decode((string) $existing['payload'], true);
-            if (is_array($prev) && empty($payload['document']) && !empty($prev['document'])) {
-                $payload['document'] = $prev['document'];
-                $payload['document_original'] = $prev['document_original'] ?? '';
+            if (is_array($prev)) {
+                if (empty($payload['document']) && !empty($prev['document'])) {
+                    $payload['document'] = $prev['document'];
+                    $payload['document_original'] = $prev['document_original'] ?? '';
+                }
             }
         }
 

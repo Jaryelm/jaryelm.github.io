@@ -100,13 +100,83 @@ try {
     $stmtTotal->execute();
     $recordsTotal = (int) $stmtTotal->fetchColumn();
 
-    // Filtro de busqueda sobre campos de texto principales.
+    // Filtro de busqueda sobre campos de texto y IDs.
     $whereSearch = '';
     $searchParams = [];
     if ($searchValue !== '') {
-        $whereSearch = " AND (t.nombres LIKE :s0 OR t.apellidos LIKE :s1 OR t.identificacion LIKE :s2 OR t.num_empleado LIKE :s3)";
+        // Mapeo de IDs (Departamentos, Cargos, Niveles Salariales)
+        $depto_ids = [];
+        $cargo_ids = [];
+        $sl_ids = [];
+
+        try {
+            global $connect_rrhh;
+            if (isset($connect_rrhh) && $connect_rrhh instanceof PDO) {
+                $stmt = $connect_rrhh->query("SELECT id, name FROM departaments");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if (stripos($row['name'], $searchValue) !== false) {
+                        $depto_ids[] = $row['id'];
+                    }
+                }
+                $stmt = $connect_rrhh->query("SELECT id, level_name, position_category FROM salary_levels");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if (stripos($row['level_name'] . ' ' . $row['position_category'], $searchValue) !== false) {
+                        $sl_ids[] = $row['id'];
+                    }
+                }
+            }
+
+            $stmt = $connect->query("SELECT id, name FROM positions");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (stripos($row['name'], $searchValue) !== false) {
+                    $cargo_ids[] = $row['id'];
+                }
+            }
+        } catch (Exception $e) {}
+
+        // Tipos de empleado (mapeo inverso para source_table)
+        $source_tables = [];
+        if (stripos('Médico', $searchValue) !== false || stripos('Medico', $searchValue) !== false) $source_tables[] = 'doctor';
+        if (stripos('Enfermería', $searchValue) !== false || stripos('Enfermeria', $searchValue) !== false) $source_tables[] = 'nurse';
+        if (stripos('Administrativo', $searchValue) !== false) $source_tables[] = 'staff_administrative';
+        if (stripos('Servicios Generales', $searchValue) !== false) $source_tables[] = 'staff_general_services';
+        if (stripos('Medifarma', $searchValue) !== false) $source_tables[] = 'staff_medifarma';
+
+        $whereSearch = " AND (t.nombres LIKE :s0 
+                            OR t.apellidos LIKE :s1 
+                            OR t.identificacion LIKE :s2 
+                            OR t.num_empleado LIKE :s3
+                            OR t.tipo_empleado LIKE :s4
+                            OR t.sexo LIKE :s5
+                            OR t.telefono LIKE :s6
+                            OR t.cuenta_bac LIKE :s7
+                            OR t.correo_personal LIKE :s8
+                            OR t.correo_institucional LIKE :s9
+                            OR t.num_locker LIKE :s10
+                            OR t.especialidad LIKE :s11";
+
         $like = '%' . $searchValue . '%';
-        $searchParams = [':s0' => $like, ':s1' => $like, ':s2' => $like, ':s3' => $like];
+        $searchParams = [
+            ':s0' => $like, ':s1' => $like, ':s2' => $like, ':s3' => $like,
+            ':s4' => $like, ':s5' => $like, ':s6' => $like, ':s7' => $like,
+            ':s8' => $like, ':s9' => $like, ':s10' => $like, ':s11' => $like
+        ];
+
+        if (count($depto_ids) > 0) {
+            $whereSearch .= " OR t.id_departamento IN (" . implode(',', array_map('intval', $depto_ids)) . ")";
+        }
+        if (count($cargo_ids) > 0) {
+            $whereSearch .= " OR t.id_cargo IN (" . implode(',', array_map('intval', $cargo_ids)) . ")";
+        }
+        if (count($sl_ids) > 0) {
+            $whereSearch .= " OR t.id_salary_level IN (" . implode(',', array_map('intval', $sl_ids)) . ")";
+        }
+        if (count($source_tables) > 0) {
+            $source_tables_quoted = array_map(function($st) use ($connect) { return $connect->quote($st); }, $source_tables);
+            $whereSearch .= " OR t.source_table IN (" . implode(',', $source_tables_quoted) . ")";
+        }
+
+        $whereSearch .= ")";
     }
 
     // Conteo filtrado.

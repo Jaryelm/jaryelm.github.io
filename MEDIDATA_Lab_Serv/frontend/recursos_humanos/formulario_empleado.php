@@ -28,14 +28,14 @@ $prefill = $ctx ? medidata_rrhh_employee_form_prefill($ctx) : [];
         .fe-subsection { margin: 16px 0; padding: 12px; background: #fafafa; border-radius: 8px; }
         .fe-subsection h3 { margin: 0 0 10px; font-size: 1rem; color: #333; }
         .fe-hint { color: #666; font-size: .88rem; margin: 0 0 12px; }
-        .fe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
-        .fe-grid > div { display: flex; flex-direction: column; }
+        .fe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+        .fe-grid > div { display: flex; flex-direction: column; justify-content: flex-start; }
         .fe-grid .full { grid-column: 1 / -1; }
         .fe-grid label { font-weight: 600; margin-bottom: 4px; color: #333; font-size: .9rem; }
-        .fe-grid input, .fe-grid select, .fe-grid textarea {
+        .fe-grid input:not([type="radio"]):not([type="checkbox"]), .fe-grid select, .fe-grid textarea {
             width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; box-sizing: border-box; font-family: inherit;
         }
-        .fe-grid input, .fe-grid select { height: 44px; }
+        .fe-grid input:not([type="radio"]):not([type="checkbox"]), .fe-grid select { height: 44px; }
         .fe-actions { margin-top: 24px; text-align: center; position: sticky; bottom: 0; background: #fff; padding: 16px 0; }
         .registerbtn { background: #06adbf; color: #fff; border: none; padding: 12px 28px; border-radius: 6px; font-weight: 700; cursor: pointer; }
         .registerbtn:hover { background: #035c67; }
