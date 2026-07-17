@@ -26,8 +26,10 @@ try {
             w.technician_id,
             w.technician_name,
             w.status,
+            w.updated_at as completion_date,
+            rr.id AS report_id,
+            rr.status AS report_status,
             rr.created_at as assignment_date,
-            w.created_at as completion_date,
             CASE 
                 WHEN w.radiologist_id IS NOT NULL AND w.radiologist_id > 0 THEN 'asignado'
                 ELSE 'no_asignado'
@@ -35,12 +37,23 @@ try {
         FROM worklist w
         LEFT JOIN radiology_reports rr ON w.study_id = rr.study_id
         WHERE w.id = ?
+        ORDER BY rr.id DESC
+        LIMIT 1
     ");
     
     $stmt->execute([$study_id]);
     $assignment = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($assignment) {
+        $statusCode = (string) ($assignment['status'] ?? '');
+        $reportStatus = (string) ($assignment['report_status'] ?? '');
+        $blockedReassign = ['pending_transcription', 'final', 'transcribed', 'reviewed'];
+        $assignment['status_code'] = $statusCode;
+        $assignment['report_status_code'] = $reportStatus;
+        $assignment['can_reassign'] = $statusCode !== 'cancelled'
+            && (int) ($assignment['radiologist_id'] ?? 0) > 0
+            && ($reportStatus === '' || !in_array($reportStatus, $blockedReassign, true));
+
         // Formatear fechas solo si realmente se asignó un médico
         if ($assignment['assignment_status'] === 'asignado' && $assignment['assignment_date']) {
             $assignment['assignment_date'] = date('d/m/Y H:i', strtotime($assignment['assignment_date']));

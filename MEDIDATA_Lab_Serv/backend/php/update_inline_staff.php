@@ -50,18 +50,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Allowlist de campos y tablas para seguridad
-    $allowed_tables = ['staff_administrative', 'staff_general_services', 'nurse', 'doctor'];
+    $allowed_tables = ['staff_administrative', 'staff_general_services', 'nurse', 'doctor', 'staff_medifarma'];
     $allowed_fields = [
         'id_biometrico', 'num_locker', 
         'num_empleado', 'numide', 'nomadm', 'apeadm', 
         'salario', 'cuenta_bac', 'telefono', 'fecha_ingreso',
-        'tipo_empleado', 'sexadm', 'id_departamento', 'id_salary_level',
+        'tipo_empleado', 'sexadm', 'id_departamento', 'id_cargo', 'id_salary_level',
+        'correo_personal', 'correo_institucional', 'nacadm',
         // Nurse fields
-        'nomnur', 'apenur', 'sexnur',
+        'nomnur', 'apenur', 'sexnur', 'nacinur',
         // Doctor fields
-        'ceddoc', 'nodoc', 'apdoc', 'sexd',
+        'ceddoc', 'nodoc', 'apdoc', 'sexd', 'nacd',
         // SG fields
-        'nomsg', 'apesg', 'sexsg'
+        'nomsg', 'apesg', 'sexsg', 'nacsg',
+        // Medifarma fields
+        'nommf', 'apemf', 'sexmf', 'nacmf'
     ];
 
     if (!in_array($table, $allowed_tables) || !in_array($field, $allowed_fields)) {

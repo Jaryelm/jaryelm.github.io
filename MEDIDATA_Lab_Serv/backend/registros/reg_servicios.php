@@ -8,7 +8,14 @@ if (isset($_POST['add_service'])) {
 
     // Obtener y limpiar datos del formulario
     $nombre_servicio = strtoupper(trim($_POST['service_name']));
-    $nomservicio = strtoupper(trim($_POST['nomservicio']));
+    $nomservicio = strtoupper(trim($_POST['nomservicio'] ?? ''));
+    if ($nomservicio === '') {
+        $nomservicio = $nombre_servicio;
+    }
+    $return_page = basename(trim((string) ($_POST['return_page'] ?? 'nuevo_servicio.php')));
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+\.php$/', $return_page)) {
+        $return_page = 'nuevo_servicio.php';
+    }
     $codigo_servicio = strtoupper(trim($_POST['service_code']));
     $uso_servicio = strtoupper(trim($_POST['uso_servicio'])); // Nuevo campo: Uso del Servicio
     $categoria_servicio = strtoupper(trim($_POST['categoria_servicio'])); // Nuevo campo: Categoría del Servicio
@@ -21,9 +28,9 @@ if (isset($_POST['add_service'])) {
     // Validar el valor del impuesto
     if (!in_array($impuesto, ['G', 'E'], true)) {
         echo '<script>
-            swal("ERROR!", "Impuesto seleccionado no es válido", "error")
+            Swal.fire("ERROR!", "Impuesto seleccionado no es válido", "error")
             .then(function() {
-                window.location = "nuevo_servicio.php";
+                window.location = "' . htmlspecialchars($return_page, ENT_QUOTES, 'UTF-8') . '";
             });
             </script>';
         exit;
@@ -33,9 +40,9 @@ if (isset($_POST['add_service'])) {
         // Validar campos vacíos
         if (empty($nombre_servicio) || empty($nomservicio) || empty($codigo_servicio) || empty($uso_servicio) || empty($categoria_servicio) || $precio_costo <= 0 || $precio_venta <= 0 || $total <= 0) {
             echo '<script>
-                swal("ERROR!", "POR FAVOR COMPLETE TODOS LOS CAMPOS CORRECTAMENTE", "error")
+                Swal.fire("ERROR!", "POR FAVOR COMPLETE TODOS LOS CAMPOS CORRECTAMENTE", "error")
                 .then(function() {
-                    window.location = "nuevo_servicio.php";
+                    window.location = "' . htmlspecialchars($return_page, ENT_QUOTES, 'UTF-8') . '";
                 });
                 </script>';
             exit;
@@ -64,24 +71,24 @@ if (isset($_POST['add_service'])) {
 
         if ($stmt->execute()) {
             echo '<script>
-                swal("Agregado!", "Servicio Agregado", "success")
+                Swal.fire("Agregado!", "Servicio Agregado", "success")
                 .then(function() {
-                    window.location = "nuevo_servicio.php";
+                    window.location = "' . htmlspecialchars($return_page, ENT_QUOTES, 'UTF-8') . '";
                 });
                 </script>';
         } else {
             echo '<script>
-                swal("Error!", "Hubo Problemas al Registrar el Servicio", "error")
+                Swal.fire("Error!", "Hubo Problemas al Registrar el Servicio", "error")
                 .then(function() {
-                    window.location = "nuevo_servicio.php";
+                    window.location = "' . htmlspecialchars($return_page, ENT_QUOTES, 'UTF-8') . '";
                 });
                 </script>';
         }
     } catch (PDOException $e) {
         echo '<script>
-            swal("Error!", "Error: ' . strtoupper($e->getMessage()) . '", "error")
+            Swal.fire("Error!", "Error: ' . strtoupper(addslashes($e->getMessage())) . '", "error")
             .then(function() {
-                window.location = "nuevo_servicio.php";
+                window.location = "' . htmlspecialchars($return_page, ENT_QUOTES, 'UTF-8') . '";
             });
             </script>';
     }

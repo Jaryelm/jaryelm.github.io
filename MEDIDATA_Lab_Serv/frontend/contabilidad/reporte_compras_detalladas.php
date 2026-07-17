@@ -1,11 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-
-/** Formato lempiras: miles con coma, decimales con punto (ej. L. 2,836.27) */
-function fmt_lempiras_reporte($valor) {
-    $n = (float)($valor ?? 0);
-    return 'L. ' . number_format($n, 2, '.', ',');
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,7 +13,20 @@ function fmt_lempiras_reporte($valor) {
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <title>MEDIDATA</title>
+    <style>
+        .acciones-wrap { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+        .btn-editar-compra, .btn-eliminar-compra {
+            background-color: #035c67; color: #fff; border: none; padding: 5px 10px;
+            border-radius: 5px; cursor: pointer; font-size: 12px;
+        }
+        .btn-eliminar-compra { background-color: #c0392b; }
+        .btn-editar-compra:hover { background-color: #06adbf; }
+        .btn-eliminar-compra:hover { background-color: #e74c3c; }
+        #modalEditarCompra .modal-content { max-width: 520px; width: 95%; }
+        #avisoCompraPagos { display: none; color: #856404; background: #fff3cd; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+    </style>
 </head>
 <body>
 <div id="page-loading-overlay">
@@ -53,18 +60,18 @@ function fmt_lempiras_reporte($valor) {
         <div class="catalog-container">
             <h2 class="catalog-title">Compras Detalladas</h2>
 
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
-                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
+                    <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? date('Y-m-01')); ?>">
                 </div>
                 <div class="filter-group">
                     <label for="fechaHasta">Hasta:</label>
-                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
+                    <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? date('Y-m-t')); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
+                <button type="submit" class="btn-filter">Buscar</button>
                 <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-            </div>
+            </form>
 
             <div class="table-container">
                 <div class="table-responsive">
@@ -80,67 +87,61 @@ function fmt_lempiras_reporte($valor) {
                                 <th>Gravada</th>
                                 <th>SubTotal</th>
                                 <th>Total</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $desde = $_GET['desde'] ?? '';
-                            $hasta = $_GET['hasta'] ?? '';
-
-                            $sql = "SELECT c.fecha_emision, c.prov_datos, c.dato_fac, c.isv_global, c.sub_total, c.total,
-                                COALESCE(d.sum_exenta, 0) AS sum_exenta,
-                                COALESCE(d.sum_gravada, 0) AS sum_gravada
-                                FROM compras c
-                                LEFT JOIN (
-                                    SELECT id_compra,
-                                        SUM(CASE WHEN COALESCE(exento,0) = 1 THEN COALESCE(subtotal,0) ELSE 0 END) AS sum_exenta,
-                                        SUM(CASE WHEN COALESCE(gravado,0) = 1
-                                            OR (COALESCE(exento,0) = 0 AND COALESCE(gravado,0) = 0)
-                                            THEN COALESCE(subtotal,0) ELSE 0 END) AS sum_gravada
-                                    FROM detalle_compras
-                                    GROUP BY id_compra
-                                ) d ON d.id_compra = c.id_compra";
-
-                            $params = [];
-                            if ($desde && $hasta) {
-                                $sql .= " WHERE DATE(c.fecha_emision) BETWEEN :desde AND :hasta";
-                                $params[':desde'] = $desde;
-                                $params[':hasta'] = $hasta;
-                            } elseif ($desde) {
-                                $sql .= " WHERE DATE(c.fecha_emision) >= :desde";
-                                $params[':desde'] = $desde;
-                            } elseif ($hasta) {
-                                $sql .= " WHERE DATE(c.fecha_emision) <= :hasta";
-                                $params[':hasta'] = $hasta;
-                            }
-                            $sql .= " ORDER BY c.fecha_registro DESC";
-
-                            $stmt = $connect->prepare($sql);
-                            $stmt->execute($params);
-                            while ($row = $stmt->fetchObject()):
-                                $fecha_raw = $row->fecha_emision ?? '';
-                                $fecha = $fecha_raw ? date('d-m-Y', strtotime($fecha_raw)) : '-';
-                                $retencion_txt = 'L. -';
-                            ?>
-                            <tr>
-                                <td data-order="<?php echo htmlspecialchars($fecha_raw); ?>"><?php echo htmlspecialchars($fecha); ?></td>
-                                <td><?php echo htmlspecialchars($row->prov_datos ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row->dato_fac ?? '-'); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->isv_global); ?></td>
-                                <td><?php echo $retencion_txt; ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->sum_exenta); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->sum_gravada); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->sub_total); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($row->total); ?></td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 </section>
+
+<div id="modalEditarCompra" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 style="margin:0;">Corregir compra</h2>
+            <span class="close-btn" onclick="cerrarModalEditarCompra()" title="Cerrar">&times;</span>
+        </div>
+        <form id="formEditarCompra">
+            <input type="hidden" id="editCompraId" name="id_compra">
+            <div id="avisoCompraPagos">Esta compra ya tiene pagos. Solo puede corregir fecha, proveedor o número de factura.</div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraFecha">Fecha de emisión</label>
+                <input type="date" id="editCompraFecha" name="fecha_emision" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraProveedor">Proveedor</label>
+                <input type="text" id="editCompraProveedor" name="prov_datos" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraFactura">Número de factura</label>
+                <input type="text" id="editCompraFactura" name="dato_fac" class="filter-input" style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraSubtotal">Subtotal</label>
+                <input type="number" step="0.01" min="0" id="editCompraSubtotal" name="sub_total" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraIsv">Impuesto (ISV)</label>
+                <input type="number" step="0.01" min="0" id="editCompraIsv" name="isv_global" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraTotal">Total</label>
+                <input type="number" step="0.01" min="0" id="editCompraTotal" name="total" class="filter-input" required style="width:100%;">
+            </div>
+            <div class="filter-group" style="margin-bottom:10px;">
+                <label for="editCompraMotivo">Motivo de corrección</label>
+                <textarea id="editCompraMotivo" name="motivo" rows="3" maxlength="255" class="filter-input" required style="width:100%;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                <button type="button" class="btn-filter btn-reset" onclick="cerrarModalEditarCompra()">Cancelar</button>
+                <button type="submit" class="btn-filter">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/registros/script/botones_color.js"></script>
@@ -153,45 +154,22 @@ function fmt_lempiras_reporte($valor) {
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
+<script src="../../backend/registros/script/gestion_compra_reporte.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#tablaReporteCompras').DataTable({
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']],
-        language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando 0 a 0 de 0 registros",
-            sInfoFiltered: "(filtrado de _MAX_ registros totales)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        }
-    });
+    medidataReporteComprasSS.initDetalladas();
+    medidataComprasReporte.init({ pagina: 'reporte_compras_detalladas.php' });
 });
 
 function aplicarFiltros() {
-    var desde = document.getElementById('fechaDesde').value;
-    var hasta = document.getElementById('fechaHasta').value;
-    var params = [];
-    if (desde) params.push('desde=' + encodeURIComponent(desde));
-    if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_compras_detalladas.php';
-    if (params.length) url += '?' + params.join('&');
-    window.location.href = url;
+    medidataReporteComprasSS.recargar();
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_compras_detalladas.php';
+    medidataComprasReporte.limpiarFiltros();
 }
 </script>
 </body>

@@ -14,46 +14,9 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="../../backend/css/reporte_compras_datatable.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
-
-    <style>
-        /* Color de fondo para la columna principal */
-        .codigo-column {
-            background-color: #06adbf;
-            color: #ffffff;
-            padding: 10px;
-        }
-        
-        /* Estilos generales para las celdas */
-        #example tbody td {
-            padding: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        /* Alternar colores de las filas */
-        #example tbody tr:nth-child(even) {
-            background-color: #e6f7f8;
-        }
-
-        #example tbody tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-
-        /* Botón de detalles */
-        .btn_ver_detalles {
-            background-color: #035c67;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn_ver_detalles:hover {
-            background-color: #06adbf;
-        }
-    </style>
+    <title>MEDIDATA</title>
 </head>
 <body>
 
@@ -88,62 +51,31 @@ include_once '../almacen/menu.php';
         <button class="button" onclick="cambiarColor(this, 'lista_solicitud_reorden.php')">Autorización Compras Almacen</button>
         <button class="button" onclick="cambiarColor(this, 'lista_requisiciones_user.php')">Requisiciones</button>
 
-        <!-- Título centrado -->
-        <div class="table-title">
-            <h1>Lista de Servicios Hospitalarios</h1>
-        </div>
+        <div class="catalog-container">
+            <h2 class="catalog-title">Lista de Servicios Hospitalarios</h2>
 
-        <!-- Tabla para mostrar los datos -->
-        <div class="table-container">
-            <table id="example" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th class="codigo-column">Código de Servicio</th>
-                        <th class="codigo-column">Cuenta del Servicio</th>
-                        <th class="codigo-column">Nombre del Servicio</th>
-                        <th class="codigo-column">Categoria</th>
-                        <th class="codigo-column">Uso Servicio</th>
-                        <th class="codigo-column">Precio Costo</th>
-                        <th class="codigo-column">Margen de Ganancia (%)</th>
-                        <th class="codigo-column">Impuesto</th>
-                        <th class="codigo-column">Precio de Venta</th>
-                        <th class="codigo-column">Total</th>
-                        <th class="codigo-column">Fecha de Registro</th>
-                    </tr>
-                </thead>
-                <tbody>
-<?php
-$stmt = $connect->prepare("SELECT * FROM servicios_hospital ORDER BY fecha_creacion DESC");
-$stmt->execute();
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    echo "<tr>";
-    echo "<td>" . htmlspecialchars($row['codigo_servicio']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['nombre_servicio']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['nomservicio']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['categoria_servicio']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['uso_servicio']) . "</td>";
-
-    // Formateo condicional para campos numéricos
-    echo "<td>" . formatNumber($row['precio_costo']) . "</td>";
-    echo "<td>" . formatNumber($row['margen_ganancia'], '%') . "</td>";
-    echo "<td>" . htmlspecialchars($row['impuesto']) . "</td>";
-    echo "<td>" . formatNumber($row['precio_venta']) . "</td>";
-    echo "<td>" . formatNumber($row['total']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['fecha_creacion']) . "</td>";
-    echo "</tr>";
-}
-
-// Función para formatear números
-function formatNumber($value, $suffix = '') {
-    if (is_numeric($value)) {
-        return number_format((float)$value, 2) . $suffix;
-    }
-    return 'N/A'; // Valor por defecto si no es numérico
-}
-?>
-</tbody>
-            </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table id="example" class="display responsive-table dt-medidata-unificado">
+                        <thead>
+                            <tr>
+                                <th>Código de Servicio</th>
+                                <th>Cuenta del Servicio</th>
+                                <th>Nombre del Servicio</th>
+                                <th>Categoria</th>
+                                <th>Uso Servicio</th>
+                                <th>Precio Costo</th>
+                                <th>Margen de Ganancia (%)</th>
+                                <th>Impuesto</th>
+                                <th>Precio de Venta</th>
+                                <th>Total</th>
+                                <th>Fecha de Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 </section>
@@ -163,24 +95,60 @@ function formatNumber($value, $suffix = '') {
 <script type="text/javascript">
 $(document).ready(function() {
     $('#example').DataTable({
+        processing: true,
+        serverSide: true,
         pageLength: 10,
+        lengthChange: false,
         dom: 'Bfrtip',
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']], // Orden descendente en la primera columna
+        ajax: {
+            url: '../../backend/registros/get_servicios_hospital.php',
+            type: 'GET',
+            data: function(d) { d.layout = 'full'; }
+        },
+        order: [[10, 'desc']],
+        columns: [
+            { data: 'codigo_servicio' },
+            { data: 'nombre_servicio' },
+            { data: 'nomservicio' },
+            { data: 'categoria_servicio' },
+            { data: 'uso_servicio' },
+            {
+                data: 'precio_costo',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.precio_costo_fmt : data;
+                }
+            },
+            {
+                data: 'margen_ganancia',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.margen_ganancia_fmt : data;
+                }
+            },
+            { data: 'impuesto' },
+            {
+                data: 'precio_venta',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.precio_venta_fmt : data;
+                }
+            },
+            {
+                data: 'total',
+                render: function(data, type, row) {
+                    return type === 'display' ? row.total_fmt : data;
+                }
+            },
+            { data: 'fecha_creacion' }
+        ],
         language: {
-            "sProcessing": "Procesando...",
-            "sLengthMenu": "Mostrar _MENU_ registros",
-            "sZeroRecords": "No se encontraron resultados",
-            "sInfo": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            "sInfoEmpty": "Mostrando 0 a 0 de 0 registros",
-            "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
-            "sSearch": "Buscar:",
-            "oPaginate": {
-                "sFirst": "Primero",
-                "sLast": "Último",
-                "sNext": "Siguiente",
-                "sPrevious": "Anterior"
-            }
+            sProcessing: 'Procesando...',
+            sLengthMenu: 'Mostrar _MENU_ registros',
+            sZeroRecords: 'No se encontraron resultados',
+            sInfo: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            sInfoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            sInfoFiltered: '(filtrado de _MAX_ registros totales)',
+            sSearch: 'Buscar:',
+            oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
         }
     });
 });

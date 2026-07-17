@@ -1,6 +1,9 @@
 /**
  * DataTable server-side: marcaciones biométricas.
  * Requiere window.MEDIDATA_RELOJBIO = { ajaxUrl, dbOk }
+ *
+ * Los botones de exportación piden TODOS los registros del filtro actual
+ * (no solo la página visible).
  */
 (function ($) {
     'use strict';
@@ -15,6 +18,75 @@
         var fromInput = document.getElementById('rb-date-from');
         var toInput = document.getElementById('rb-date-to');
 
+        /**
+         * Exporta con serverSide: recarga temporalmente todos los filtrados,
+         * ejecuta el botón nativo y restaura la paginación.
+         */
+        function exportFilteredAll(e, dt, button, config, originalAction) {
+            var info = dt.page.info();
+            var totalFiltered = info.recordsDisplay || 0;
+            var oldStart = dt.settings()[0]._iDisplayStart || 0;
+            var oldLength = dt.page.len() || 10;
+
+            if (totalFiltered <= 0) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire('Aviso', 'No hay registros para exportar con el filtro actual.', 'info');
+                }
+                return;
+            }
+
+            // Ya están todos los filtrados en la página visible.
+            if (info.start === 0 && info.end >= totalFiltered) {
+                originalAction.call(this, e, dt, button, config);
+                return;
+            }
+
+            var self = this;
+            var $processing = $(dt.table().container()).find('.dataTables_processing');
+            $processing.show();
+
+            dt.one('preXhr.dt.rbexport', function (ev, settings, data) {
+                data.start = 0;
+                data.length = totalFiltered;
+                data.export_all = 1;
+            });
+
+            dt.one('draw.dt.rbexport', function () {
+                dt.off('preXhr.dt.rbexport');
+                try {
+                    originalAction.call(self, e, dt, button, config);
+                } finally {
+                    dt.one('preXhr.dt.rbrestore', function (ev, settings, data) {
+                        data.start = oldStart;
+                        data.length = oldLength;
+                        data.export_all = 0;
+                    });
+                    dt.one('draw.dt.rbrestore', function () {
+                        dt.off('preXhr.dt.rbrestore');
+                        $processing.hide();
+                    });
+                    dt.ajax.reload(null, false);
+                }
+            });
+
+            dt.ajax.reload();
+        }
+
+        function makeExportButton(extendKey, actionKey) {
+            var original = $.fn.dataTable.ext.buttons[actionKey]
+                || $.fn.dataTable.ext.buttons[extendKey];
+            if (!original || typeof original.action !== 'function') {
+                return extendKey;
+            }
+            return {
+                extend: extendKey,
+                title: 'MEDIDATA',
+                action: function (e, dt, button, config) {
+                    exportFilteredAll.call(this, e, dt, button, config, original.action);
+                },
+            };
+        }
+
         var dt = $table.DataTable({
             processing: true,
             serverSide: true,
@@ -24,7 +96,13 @@
             responsive: true,
             autoWidth: false,
             dom: 'Blfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            buttons: [
+                makeExportButton('copy', 'copyHtml5'),
+                makeExportButton('csv', 'csvHtml5'),
+                makeExportButton('excel', 'excelHtml5'),
+                makeExportButton('pdf', 'pdfHtml5'),
+                makeExportButton('print', 'print'),
+            ],
             ajax: {
                 url: cfg.ajaxUrl,
                 type: 'GET',

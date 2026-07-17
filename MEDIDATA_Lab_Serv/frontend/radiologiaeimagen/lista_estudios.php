@@ -11,6 +11,8 @@ $rol_usuario = $_SESSION['rol'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/informe_radiologico_modal.css">
+    <link rel="stylesheet" href="../../backend/css/mhpacs_filters.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
@@ -80,25 +82,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Filtros -->
-            <div class="filters">
-                <select id="modalityFilter">
-                    <option value="">Todas las Modalidades</option>
-                    <option value="CR">Radiografía Computarizada</option>
-                    <option value="CT">Tomografía Computarizada</option>
-                    <option value="MR">Resonancia Magnética</option>
-                    <option value="US">Ultrasonido</option>
-                </select>
-
-                <select id="statusFilter">
-                    <option value="">Todos los Estados</option>
-                    <option value="pending">Pendientes</option>
-                    <option value="draft">Borradores</option>
-                    <option value="completed">Completados</option>
-                </select>
-
-                <input type="date" id="dateFilter" />
-                <button onclick="applyFilters()" class="filter-btn">Aplicar Filtros</button>
-            </div>
+            <?php $mhpacs_filter_mode = 'studies'; include __DIR__ . '/_mhpacs_filters.inc.php'; ?>
 
             <!-- Tabla de Estudios -->
             <div class="table-container">
@@ -118,80 +102,92 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
+                <div id="studiesPagination" class="mhpacs-pagination"></div>
                 <div id="noStudiesMsg" style="display:none; text-align:center; color:#035c67; font-size:18px; margin:30px 0; font-weight:600;">
                     <span id="noStudiesText"></span>
                 </div>
             </div>
 
             <!-- Modal de Informe -->
-            <div id="reportModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Informe Radiológico</h2>
-                    <div class="report-container">
-                        <!-- Sección de Visor DICOM -->
-                        <div class="dicom-viewer">
-                            <iframe id="orthancViewer" src="" frameborder="0"></iframe>
+            <div id="reportModal" class="rx-modal">
+                <div class="rx-modal-dialog">
+                    <div class="rx-modal-header">
+                        <div>
+                            <h2>Informe Radiológico</h2>
+                            <p>Redacte el informe del estudio asignado. Puede guardar borrador o finalizar cuando esté listo.</p>
                         </div>
-
-                        <!-- Sección de Informe -->
-                        <div class="report-form">
-                            <form id="reportForm">
-                                <input type="hidden" id="studyId" name="studyId">
-                                <input type="hidden" id="patientId" name="patientId">
-                                
-                                <div class="form-group">
-                                    <label>Historia Clínica:</label>
-                                    <textarea id="clinicalHistory" rows="3" required></textarea>
+                        <button type="button" class="rx-modal-close" id="reportModalClose" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="rx-modal-body">
+                        <div class="rx-report-layout">
+                            <div class="rx-dicom-panel">
+                                <h3 class="rx-panel-title"><i class="bx bx-image-alt"></i> Visor DICOM</h3>
+                                <div class="rx-dicom-viewer">
+                                    <iframe id="orthancViewer" src="" title="Visor DICOM"></iframe>
                                 </div>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Hallazgos:</label>
-                                    <textarea id="findings" rows="6" required></textarea>
-                                </div>
+                            <div class="rx-form-panel">
+                                <h3 class="rx-panel-title"><i class="bx bx-file"></i> Formulario del informe</h3>
+                                <form id="reportForm" class="rx-report-form">
+                                    <input type="hidden" id="studyId" name="studyId">
+                                    <input type="hidden" id="patientId" name="patientId">
 
-                                <div class="form-group">
-                                    <label>Impresión Diagnóstica:</label>
-                                    <textarea id="impression" rows="4" required></textarea>
-                                </div>
+                                    <section class="rx-form-section">
+                                        <h4 class="rx-form-section-title">Contenido clínico</h4>
+                                        <div class="rx-field">
+                                            <label for="clinicalHistory">Historia clínica</label>
+                                            <textarea id="clinicalHistory" rows="3" required placeholder="Antecedentes y motivo del estudio..."></textarea>
+                                        </div>
+                                        <div class="rx-field">
+                                            <label for="findings">Hallazgos</label>
+                                            <textarea id="findings" rows="6" required placeholder="Describa los hallazgos radiológicos..."></textarea>
+                                        </div>
+                                        <div class="rx-field">
+                                            <label for="impression">Impresión diagnóstica</label>
+                                            <textarea id="impression" rows="4" required placeholder="Conclusión e impresión diagnóstica..."></textarea>
+                                        </div>
+                                    </section>
 
-                                <div class="form-group">
-                                    <label>
-                                        <input type="checkbox" id="isCritical">
-                                        Hallazgo Crítico
-                                    </label>
-                                </div>
+                                    <section class="rx-form-section">
+                                        <h4 class="rx-form-section-title">Alertas y dictado</h4>
+                                        <div class="rx-field">
+                                            <label class="rx-check-row" for="isCritical">
+                                                <input type="checkbox" id="isCritical">
+                                                <span>Hallazgo crítico</span>
+                                            </label>
+                                        </div>
+                                        <div id="criticalSection" style="display: none;">
+                                            <div class="rx-field">
+                                                <label for="urgencyLevel">Nivel de urgencia</label>
+                                                <select id="urgencyLevel">
+                                                    <option value="high">Alto</option>
+                                                    <option value="medium">Medio</option>
+                                                    <option value="low">Bajo</option>
+                                                </select>
+                                            </div>
+                                            <div class="rx-field">
+                                                <label for="notifyTo">Notificar a</label>
+                                                <input type="text" id="notifyTo" placeholder="Médico o área a notificar">
+                                            </div>
+                                        </div>
+                                        <div class="rx-field">
+                                            <span class="rx-label">Dictado de voz</span>
+                                            <div class="rx-audio-controls" id="audio-controls">
+                                                <button type="button" id="startRecord"><i class="bx bx-microphone"></i> Grabar</button>
+                                                <button type="button" id="stopRecord" disabled><i class="bx bx-stop"></i> Detener</button>
+                                            </div>
+                                            <audio id="audioPlayback" controls style="display:none;"></audio>
+                                        </div>
+                                    </section>
 
-                                <div id="criticalSection" style="display: none;">
-                                    <div class="form-group">
-                                        <label>Nivel de Urgencia:</label>
-                                        <select id="urgencyLevel">
-                                            <option value="high">Alto</option>
-                                            <option value="medium">Medio</option>
-                                            <option value="low">Bajo</option>
-                                        </select>
+                                    <div class="rx-actions">
+                                        <button type="button" class="rx-btn-draft" onclick="saveAsDraft()"><i class="bx bx-save"></i> Guardar borrador</button>
+                                        <button type="button" class="rx-btn-transcription" onclick="sendToTranscription()"><i class="bx bx-transfer"></i> Enviar a transcripción</button>
+                                        <button type="button" class="rx-btn-final" onclick="finalizeReport()"><i class="bx bx-check-circle"></i> Finalizar informe</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Notificar a:</label>
-                                        <input type="text" id="notifyTo">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Dictado de voz:</label>
-                                    <div id="audio-controls">
-                                        <button type="button" id="startRecord">Grabar</button>
-                                        <button type="button" id="stopRecord" disabled>Detener</button>
-                                        <audio id="audioPlayback" controls style="display:none;"></audio>
-                                    </div>
-                                </div>
-
-                                <div class="button-group">
-                                    <button type="button" onclick="saveAsDraft()">Guardar Borrador</button>
-                                    <button type="button" onclick="sendToTranscription()">Enviar a Transcripción</button>
-                                    <button type="button" onclick="finalizeReport()">Finalizar Informe</button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -289,29 +285,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         color: #06adbf;
     }
 
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .filters select, .filters input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        min-width: 150px;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
     .table-container {
         background: white;
         padding: 20px;
@@ -351,7 +324,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         background-color: rgba(0,0,0,0.5);
     }
 
-    .modal-content {
+    #viewerModal .modal-content,
+    #transcriptionModal .modal-content {
         background-color: #fefefe;
         margin: 2% auto;
         padding: 20px;
@@ -362,78 +336,37 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         overflow-y: auto;
     }
 
-    .report-container {
+    #transcriptionModal .report-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-top: 20px;
     }
 
-    .dicom-viewer {
-        background: #000;
-        border-radius: 4px;
-        min-height: 500px;
-    }
-
-    .dicom-viewer iframe {
-        width: 100%;
-        height: 100%;
-        min-height: 500px;
-    }
-
-    .report-form {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 4px;
-    }
-
-    .form-group {
+    #transcriptionModal .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
         margin-bottom: 15px;
     }
 
-    .form-group label {
+    #transcriptionModal .form-group label {
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
     }
 
-    .form-group textarea, .form-group input, .form-group select {
+    #transcriptionModal .form-group textarea,
+    #transcriptionModal .form-group input {
         width: 100%;
         padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .button-group button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .button-group button:first-child {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .button-group button:nth-child(2) {
-        background-color: #efc25b;
-        color: white;
-    }
-
-    .button-group button:last-child {
-        background-color: #06adbf;
-        color: white;
+        margin: 0;
     }
 
     @media (max-width: 1200px) {
-        .report-container {
+        #transcriptionModal .report-container {
             grid-template-columns: 1fr;
         }
     }
@@ -484,6 +417,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="mhpacs_filters_core.js"></script>
+    <script src="studies_list_core.js"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {
@@ -499,61 +434,32 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         });
     }
 
-    // Cargar estudios
-    function loadStudies() {
-        const filters = {
-            modality: document.getElementById('modalityFilter').value,
-            status: document.getElementById('statusFilter').value,
-            date: document.getElementById('dateFilter').value
-        };
+    // Cargar estudios vía StudiesListCore (filtros + paginación servidor)
+    function renderStudyRow(study) {
+        return `
+            <td>${study.patient_id}</td>
+            <td>${study.patient_name}</td>
+            <td>${study.modality}</td>
+            <td>${study.study_description || 'Sin descripción'}</td>
+            <td>${formatDateTime(study.study_date)}</td>
+            <td>${formatStatus(study.status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="downloadStudy('${study.study_id}')" class="btn-download">
+                        <i class='bx bx-download'></i> Descargar
+                    </button>
+                    <button onclick="openReport('${study.study_id}', '${study.series_id}', '${study.patient_id}')" class="btn-report">
+                        <i class='bx bx-file'></i> Informe
+                    </button>
+                </div>
+            </td>
+        `;
+    }
 
-        fetch('get_completed_studies.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(filters)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('studiesBody');
-            tbody.innerHTML = '';
-            const noStudiesMsg = document.getElementById('noStudiesMsg');
-            const noStudiesText = document.getElementById('noStudiesText');
-            const rolUsuario = '<?php echo $rol_usuario; ?>';
-            if (!data || data.length === 0) {
-                noStudiesMsg.style.display = 'block';
-                if (rolUsuario !== 'Radiologo') {
-                    noStudiesText.textContent = 'No tienes permisos para ver este apartado. Solo los médicos radiólogos pueden acceder.';
-                } else {
-                    noStudiesText.textContent = 'No tienes estudios asignados actualmente. Espera a que se te asignen nuevos estudios.';
-                }
-            } else {
-                noStudiesMsg.style.display = 'none';
-                data.forEach(study => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${study.patient_id}</td>
-                        <td>${study.patient_name}</td>
-                        <td>${study.modality}</td>
-                        <td>${study.study_description || 'Sin descripción'}</td>
-                        <td>${formatDateTime(study.study_date)}</td>
-                        <td>${formatStatus(study.status)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button onclick="downloadStudy('${study.study_id}')" class="btn-download">
-                                    <i class='bx bx-download'></i> Descargar
-                                </button>
-                                <button onclick="openReport('${study.study_id}', '${study.series_id}', '${study.patient_id}')" class="btn-report">
-                                    <i class='bx bx-file'></i> Informe
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-        });
+    function loadStudies() {
+        if (typeof StudiesListCore !== 'undefined') {
+            StudiesListCore.reload();
+        }
     }
 
     // Abrir informe
@@ -612,7 +518,17 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 }
             }
         });
-        document.getElementById('reportModal').style.display = 'block';
+        openReportModal();
+    }
+
+    function openReportModal() {
+        document.getElementById('reportModal').classList.add('is-open');
+        document.body.classList.add('rx-modal-open');
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModal').classList.remove('is-open');
+        document.body.classList.remove('rx-modal-open');
     }
 
     // Manejar checkbox de hallazgo crítico
@@ -663,16 +579,39 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire('Éxito', 'Informe guardado correctamente', 'success');
-                document.getElementById('reportModal').style.display = 'none';
+        .then(async function (response) {
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = { success: false, message: 'Respuesta inválida del servidor.' };
+            }
+            if (response.ok && data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: data.message || 'Informe guardado correctamente',
+                    confirmButtonColor: '#06adbf'
+                });
+                closeReportModal();
                 loadStudies();
                 loadStats();
             } else {
-                Swal.fire('Error', 'Error al guardar el informe', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Error al guardar el informe',
+                    confirmButtonColor: '#035c67'
+                });
             }
+        })
+        .catch(function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                confirmButtonColor: '#035c67'
+            });
         });
     }
 
@@ -695,15 +634,24 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         return statuses[status] || status;
     }
 
-    // Cerrar modal
-    document.querySelector('.close').onclick = function() {
-        document.getElementById('reportModal').style.display = 'none';
-    }
+    document.getElementById('reportModalClose').onclick = closeReportModal;
+
+    document.getElementById('reportModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeReportModal();
+        }
+    });
 
     // Cargar datos iniciales
     document.addEventListener('DOMContentLoaded', function() {
         loadStats();
-        loadStudies();
+        StudiesListCore.init({
+            renderRow: renderStudyRow,
+            canLoad: function () { return true; },
+            onEmpty: function () {
+                return 'No hay estudios que coincidan con los filtros seleccionados.';
+            },
+        });
     });
 
     function formatAvgTime(minutes) {
@@ -732,16 +680,16 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     }
 
     // Cerrar modal del visor DICOM
-    document.querySelector('.close').onclick = function() {
+    document.querySelector('#viewerModal .close').onclick = function() {
         document.getElementById('viewerModal').style.display = 'none';
     }
 
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
+    // Cerrar modal al hacer clic fuera (visor / transcripción)
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal') && event.target.id !== 'reportModal') {
             event.target.style.display = 'none';
         }
-    }
+    });
 
     function openTranscription(reportId) {
         fetch(`get_report.php?report_id=${reportId}`)

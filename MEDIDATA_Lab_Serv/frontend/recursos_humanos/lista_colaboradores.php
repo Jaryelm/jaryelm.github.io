@@ -4,21 +4,7 @@ require_once '../../backend/php/staff_colaborador_bootstrap.php';
 require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
 
-$depto_map = [];
-$salary_level_map = [];
-$pdoRrhh = medidata_rrhh_pdo();
-if ($pdoRrhh) {
-    try {
-        $stmt_dept = $pdoRrhh->query("SELECT id, name FROM departaments");
-        while ($row = $stmt_dept->fetch(PDO::FETCH_ASSOC)) {
-            $depto_map[$row['id']] = $row['name'];
-        }
-        $stmt_sl = $pdoRrhh->query("SELECT id, level_name, position_category FROM salary_levels WHERE deleted = 0");
-        while ($row = $stmt_sl->fetch(PDO::FETCH_ASSOC)) {
-            $salary_level_map[$row['id']] = $row['level_name'] . ' - ' . $row['position_category'];
-        }
-    } catch (Exception $e) {}
-}
+require_once __DIR__ . '/_rrhh_colab_maps.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -59,33 +45,40 @@ if ($pdoRrhh) {
             <div class="rrhh-tab-nav">
                 <a href="lista_colaboradores.php" class="button tab-button active">Lista de Colaboradores</a>
                 <a href="lista_colaboradores_medicos.php" class="button tab-button">Lista de Médicos</a>
+                <a href="lista_colaboradores_medifarma.php" class="button tab-button">Lista Medifarma</a>
                 <a href="lista_excolaboradores.php" class="button tab-button">Lista de Excolaboradores</a>
             </div>
 
             <div class="data">
                 <div class="content-data">
-                    <div class="table-title">
-                        <h1>Lista Colaboradores</h1>
-                    </div>
+                    <?php
+                    $rrhh_lista_titulo = 'Lista Colaboradores';
+                    $rrhh_lista_add_url = 'agregar_colaborador.php?contexto=colaboradores';
+                    $rrhh_lista_add_label = 'Agregar colaborador';
+                    include __DIR__ . '/_rrhh_lista_titulo_toolbar.php';
+                    ?>
 
                     <div class="table-responsive">
                         <table id="example" class="responsive-table" style="width:100%;">
                             <thead>
                                 <tr>
+                                    <th>N°</th>
                                     <th>CATEGORÍA</th>
                                     <th>TIPO DE EMPLEADO</th>
-                                    <th>N° EMPLEADO</th>
                                     <th>DNI</th>
                                     <th>NOMBRES</th>
                                     <th>APELLIDOS</th>
                                     <th>SEXO</th>
                                     <th>ÁREA/DEPTO</th>
+                                    <th>CARGO</th>
                                     <th>NIVEL SALARIAL</th>
                                     <th>SALARIO</th>
                                     <th>N° CUENTA</th>
                                     <th>FECHA DE INGRESO</th>
                                     <th>TELÉFONO</th>
-                                    <th>CORREO</th>
+                                    <th>CORREO PERSONAL</th>
+                                    <th>CORREO INSTITUCIONAL</th>
+                                    <th>FECHA NACIMIENTO</th>
                                     <th>MARCAJE</th>
                                     <th>LOKER</th>
                                     <th>CONTRATO</th>
@@ -123,12 +116,14 @@ if ($pdoRrhh) {
             ajaxUrl: '../../backend/php/get_colaboradores.php',
             estado: '1',
             variant: '',
-            excluir: 'doctor',
+            excluir: 'doctor,staff_medifarma',
             deptoMap: <?php echo json_encode($depto_map, JSON_UNESCAPED_UNICODE); ?>,
-            salaryMap: <?php echo json_encode($salary_level_map, JSON_UNESCAPED_UNICODE); ?>
+            salaryMap: <?php echo json_encode($salary_level_map, JSON_UNESCAPED_UNICODE); ?>,
+            cargoMap: <?php echo json_encode($cargo_map, JSON_UNESCAPED_UNICODE); ?>,
+            allowDelete: true
         };
     </script>
-    <script src="../../backend/registros/script/tabla_colaboradores.js"></script>
+    <script src="../../backend/registros/script/tabla_colaboradores.js?v=<?php echo time(); ?>"></script>
 
     <!-- SubMenu -->
     <script src='../../backend/js/submenu.js'></script>

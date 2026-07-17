@@ -18,6 +18,7 @@ $tablas_permitidas = [
     'staff_general_services' => 'idsg',
     'nurse'                  => 'idnur',
     'doctor'                 => 'idodc',
+    'staff_medifarma'        => 'idmf',
 ];
 $table = $_GET['table'] ?? 'staff_administrative';
 

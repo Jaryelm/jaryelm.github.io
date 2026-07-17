@@ -67,6 +67,7 @@ if (!function_exists('medidata_postulaciones_resolver_ruta_cv')) {
         $uploadDirs = [
             dirname(__DIR__, 2) . '/uploads/Postulantes_CV/',
             dirname(__DIR__, 2) . '/uploads/',
+            '/home/medicasa/websites/medicasa/uploads/',
         ];
         foreach ($uploadDirs as $dir) {
             $candidates[] = rtrim($dir, '/') . '/' . $fileName;
@@ -193,7 +194,7 @@ if (!function_exists('medidata_postulaciones_datatables')) {
             ];
             $orderBy = $columns[$orderColumn] ?? 'fecha_registro';
 
-            $sql = "SELECT id, numero_id, nombre_completo, puesto_aspirado, whatsapp, correo,
+            $sql = "SELECT id, numero_id, nombre_completo, puesto_aspirado, id_vacant_position, whatsapp, correo,
                            fecha_registro, CONVERT(cv USING utf8) AS cv,
                            COALESCE(estado_rrhh, IF(seleccionado = 1, 'Incorporado', 'Pendiente')) AS estado_rrhh,
                            COALESCE(id_candidate_rrhh, 0) AS id_candidate_rrhh,

@@ -89,7 +89,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <hr>
 
     <label for="email"><b>Nombre</b></label><span class="badge-warning">*</span>
-    <input type="text" placeholder="ejm: Radiología e Imagen" name="labname" required>
+    <input type="text" placeholder="ejm: RADIOLOGÍA E IMAGEN" name="labname" required>
 
    
 

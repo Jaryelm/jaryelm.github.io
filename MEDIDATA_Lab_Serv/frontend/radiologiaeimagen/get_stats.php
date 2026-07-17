@@ -19,7 +19,7 @@ try {
     $stmt->execute([$user_id]);
     $listados = $stmt->fetch(PDO::FETCH_ASSOC)['listados'] ?? 0;
 
-    // Pendientes: estudios con status 'pending' o 'draft'
+    // Pendientes de interpretación
     $stmt = $connect->prepare("
         SELECT COUNT(*) as pending
         FROM radiology_reports
@@ -28,6 +28,16 @@ try {
     ");
     $stmt->execute([$user_id]);
     $pending = $stmt->fetch(PDO::FETCH_ASSOC)['pending'] ?? 0;
+
+    // Enviados a transcripción
+    $stmt = $connect->prepare("
+        SELECT COUNT(*) as in_transcription
+        FROM radiology_reports
+        WHERE user_id = ?
+        AND status = 'pending_transcription'
+    ");
+    $stmt->execute([$user_id]);
+    $inTranscription = $stmt->fetch(PDO::FETCH_ASSOC)['in_transcription'] ?? 0;
 
     // Interpretados hoy: estudios con status 'final' y fecha de hoy
     $stmt = $connect->prepare("
@@ -61,12 +71,12 @@ try {
     $stmt->execute([$user_id, $today]);
     $avg_time = round($stmt->fetch(PDO::FETCH_ASSOC)['avg_time'] ?? 0);
 
-    // Completados globales: estudios en radiology_reports con status 'final' (sin importar la fecha)
+    // Completados globales
     $stmt = $connect->prepare("
         SELECT COUNT(*) as completed_global
         FROM radiology_reports
-        WHERE status = 'final'
-        AND user_id = ?
+        WHERE user_id = ?
+        AND status IN ('final', 'transcribed', 'reviewed')
     ");
     $stmt->execute([$user_id]);
     $completed_global = $stmt->fetch(PDO::FETCH_ASSOC)['completed_global'] ?? 0;
@@ -74,6 +84,7 @@ try {
     echo json_encode([
         'listados' => $listados,
         'pending' => $pending,
+        'in_transcription' => (int) $inTranscription,
         'today' => $today,
         'completed_global' => (int)$completed_global,
         'avgTime' => $avg_time,

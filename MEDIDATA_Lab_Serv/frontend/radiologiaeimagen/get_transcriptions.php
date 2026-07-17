@@ -1,106 +1,154 @@
 <?php
-require_once('../../backend/bd/Conexion.php');
+declare(strict_types=1);
+
+date_default_timezone_set('America/Tegucigalpa');
+
+require_once __DIR__ . '/../../backend/bd/Conexion.php';
+require_once __DIR__ . '/transcription_queue_lib.php';
+require_once __DIR__ . '/mhpacs_filters_lib.php';
+
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-// Definir $today al inicio
-$today = date('Y-m-d');
-
-// Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['id'])) {
-    http_response_code(401); // No autorizado
-    echo json_encode(['error' => 'Acceso no autorizado. Inicia sesión para continuar.']);
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Acceso no autorizado. Inicia sesión para continuar.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 try {
-    $data = json_decode(file_get_contents('php://input'), true);
-    // $technician_id = $_SESSION['id']; // Ya no lo necesitas aquí
+    medidata_sync_transcription_queue($connect);
 
-    // Construir la consulta base
+    $payload = json_decode((string) file_get_contents('php://input'), true);
+    if (!is_array($payload)) {
+        $payload = [];
+    }
+
+    $filters = mhpacs_filters_parse_payload($payload);
+    $page = $filters['page'];
+    $limit = $filters['limit'];
+    $offset = $filters['offset'];
+
+    $params = [];
+    $where = "
+        WHERE (
+            r.status IN ('pending_transcription', 'final', 'transcribed', 'reviewed')
+            OR rt.id IS NOT NULL
+        )
+    ";
+
+    if (!empty($filters['modality'])) {
+        $where .= ' AND w.modality = ?';
+        $params[] = $filters['modality'];
+    }
+    if (!empty($filters['priority'])) {
+        $where .= ' AND w.priority = ?';
+        $params[] = $filters['priority'];
+    }
+
+    $statusFilter = $filters['status'];
+    if ($statusFilter === 'pending_transcription') {
+        $where .= " AND (rt.id IS NULL OR rt.status = 'pending')";
+    } elseif ($statusFilter === 'in_progress') {
+        $where .= " AND rt.status = 'in_progress'";
+    } elseif ($statusFilter === 'completed') {
+        $where .= " AND rt.status = 'completed'";
+    } elseif ($statusFilter === 'needs_review') {
+        $where .= " AND rt.status = 'needs_review'";
+    }
+
+    $where .= mhpacs_sql_date_range('w.study_date', $filters['date_from'], $filters['date_to'], $params);
+    $where .= mhpacs_sql_search(
+        ['w.patient_name', 'w.patient_id', 'w.study_description', 'w.study_id', 'r.radiologist_name'],
+        $filters['search'],
+        $params
+    );
+
+    $fromSql = "
+        FROM worklist w
+        INNER JOIN (
+            SELECT r1.*
+            FROM radiology_reports r1
+            INNER JOIN (
+                SELECT study_id, MAX(updated_at) AS max_updated
+                FROM radiology_reports
+                GROUP BY study_id
+            ) latest ON latest.study_id = r1.study_id AND latest.max_updated = r1.updated_at
+        ) r ON w.study_id = r.study_id
+        LEFT JOIN quality_control qc ON w.id = qc.study_id
+        LEFT JOIN (
+            SELECT rt1.*
+            FROM report_transcriptions rt1
+            INNER JOIN (
+                SELECT report_id, MAX(id) AS max_id
+                FROM report_transcriptions
+                GROUP BY report_id
+            ) rt_latest ON rt_latest.max_id = rt1.id
+        ) rt ON r.id = rt.report_id
+        {$where}
+    ";
+
+    $countStmt = $connect->prepare('SELECT COUNT(DISTINCT r.id)' . $fromSql);
+    $countStmt->execute($params);
+    $total = (int) $countStmt->fetchColumn();
+
     $query = "
-        SELECT 
-            w.*,
+        SELECT
+            w.id AS worklist_id,
+            w.study_id,
+            w.series_id,
+            w.patient_id,
             COALESCE(w.patient_name, 'N/A') AS patient_name,
+            w.study_date,
+            w.modality,
+            w.priority,
             COALESCE(w.study_description, 'Sin descripción') AS description,
-            w.study_id AS study_id,
             CASE WHEN qc.study_id IS NOT NULL THEN 1 ELSE 0 END AS has_quality_control,
             r.radiologist_name,
             r.status AS report_status,
             r.id AS report_id,
             rt.status AS transcription_status,
             rt.completed_at
-        FROM worklist w
-        LEFT JOIN quality_control qc ON w.id = qc.study_id
-        INNER JOIN radiology_reports r ON w.study_id = r.study_id
-        LEFT JOIN report_transcriptions rt ON r.id = rt.report_id
-        WHERE 1=1
+        {$fromSql}
+        ORDER BY
+            FIELD(w.priority, 'emergency', 'urgent', 'routine'),
+            w.study_date DESC,
+            r.updated_at DESC
+        LIMIT {$limit} OFFSET {$offset}
     ";
-    $params = [];
-
-    // Filtros dinámicos (solo modalidad, prioridad, fecha y búsqueda)
-    if (!empty($data['modality'])) {
-        $query .= " AND w.modality = ?";
-        $params[] = $data['modality'];
-    }
-    if (!empty($data['priority'])) {
-        $query .= " AND w.priority = ?";
-        $params[] = $data['priority'];
-    }
-    if (!empty($data['status'])) {
-        if ($data['status'] === 'pending') {
-            $query .= " AND (rt.status IS NULL OR rt.status IN ('pending', 'in_progress'))";
-        } elseif ($data['status'] === 'completed') {
-            $query .= " AND rt.status = 'completed'";
-        }
-    } else {
-        // Si no hay filtro, mostrar todos los estudios pendientes, en progreso y completados
-        $query .= " AND (rt.status IS NULL OR rt.status IN ('pending', 'in_progress', 'completed'))";
-    }
-    if (!empty($data['date'])) {
-        $query .= " AND DATE(w.study_date) = ?";
-        $params[] = $data['date'];
-    }
-    if (!empty($data['search'])) {
-        $query .= " AND (w.patient_name LIKE ? OR w.patient_id LIKE ? OR w.study_description LIKE ?)";
-        $searchTerm = '%' . $data['search'] . '%';
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-    }
-    // Ordenar por prioridad y fecha
-    $query .= " ORDER BY 
-        FIELD(w.priority, 'emergency', 'urgent', 'routine'),
-        w.study_date DESC";
 
     $stmt = $connect->prepare($query);
     $stmt->execute($params);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Transformar los resultados para mostrar el estado correcto
     foreach ($results as &$row) {
-        $row['id'] = $row['report_id'] ?? $row['id'] ?? null;
+        $row['id'] = $row['report_id'] ?? $row['worklist_id'] ?? null;
         $row['series_id'] = $row['series_id'] ?? null;
         $row['patient_id'] = $row['patient_id'] ?? 'N/A';
         $row['modality'] = $row['modality'] ?? 'N/A';
         $row['description'] = $row['description'] ?? 'Sin descripción';
         $row['priority'] = $row['priority'] ?? 'routine';
-        // Estado visual
-        if ($row['transcription_status'] === 'completed' && $row['completed_at'] && substr($row['completed_at'], 0, 10) === $today) {
+
+        $txStatus = (string) ($row['transcription_status'] ?? '');
+        if ($txStatus === 'completed') {
             $row['status'] = 'completed';
-        } elseif (empty($row['transcription_status']) || in_array($row['transcription_status'], ['pending', 'in_progress'])) {
+        } elseif ($txStatus === 'in_progress') {
+            $row['status'] = 'in_progress';
+        } elseif ($txStatus === 'needs_review') {
+            $row['status'] = 'needs_review';
+        } elseif ($txStatus === '' || $txStatus === 'pending') {
             $row['status'] = 'pending_transcription';
         } else {
-            $row['status'] = $row['transcription_status'] ?? 'pending_transcription';
+            $row['status'] = $txStatus;
         }
-        $row['has_quality_control'] = $row['has_quality_control'] ?? 0;
+
+        $row['has_quality_control'] = (int) ($row['has_quality_control'] ?? 0);
     }
+    unset($row);
 
-    echo json_encode($results);
-    exit;
-
-} catch (Exception $e) {
-    http_response_code(500); // Error interno del servidor
-    echo json_encode(['error' => 'Error al cargar la lista de trabajo: ' . $e->getMessage()]);
+    mhpacs_json_paginated($results, $total, $page, $limit);
+} catch (Throwable $e) {
+    error_log('get_transcriptions.php: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Error al cargar transcripciones.'], JSON_UNESCAPED_UNICODE);
 }
-?>

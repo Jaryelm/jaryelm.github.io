@@ -14,15 +14,19 @@
     const studiesPerPage = 10;
 
     function getFiltersPayload(page) {
-        return {
-            page: page || currentPage,
-            limit: studiesPerPage,
-            modality: document.getElementById('modalityFilter')?.value || '',
-            priority: document.getElementById('priorityFilter')?.value || '',
-            status: document.getElementById('statusFilter')?.value || '',
-            date: document.getElementById('dateFilter')?.value || '',
-            search: (document.getElementById('searchBar')?.value || '').trim(),
-        };
+        const base = typeof MhpacsFilters !== 'undefined'
+            ? MhpacsFilters.getPayload({ page: page || currentPage, limit: studiesPerPage })
+            : {
+                page: page || currentPage,
+                limit: studiesPerPage,
+                modality: document.getElementById('modalityFilter')?.value || '',
+                priority: document.getElementById('priorityFilter')?.value || '',
+                radiologist_id: document.getElementById('radiologistFilter')?.value || '',
+                date_from: document.getElementById('dateFromFilter')?.value || document.getElementById('dateFilter')?.value || '',
+                date_to: document.getElementById('dateToFilter')?.value || document.getElementById('dateFilter')?.value || '',
+                search: (document.getElementById('searchBar')?.value || '').trim(),
+            };
+        return base;
     }
 
     function formatAvgTime(minutes) {
@@ -222,7 +226,8 @@
             document.querySelector('.table-container').style.display = 'none';
             const pag = document.getElementById('pagination');
             if (pag) pag.style.display = 'none';
-            document.querySelector('.filters').style.display = 'none';
+            const filtersPanel = document.querySelector('.mhpacs-filters');
+            if (filtersPanel) filtersPanel.style.display = 'none';
             document.getElementById('noWorklistMsg').style.display = 'block';
             document.getElementById('noWorklistText').textContent =
                 'No tienes permisos para ver este apartado. Solo los técnicos radiólogos pueden acceder.';
@@ -233,6 +238,15 @@
         if (searchBar) {
             searchBar.removeAttribute('oninput');
             searchBar.addEventListener('input', onSearchInput);
+        }
+
+        if (typeof MhpacsFilters !== 'undefined') {
+            MhpacsFilters.bindClear(
+                ['searchBar', 'modalityFilter', 'priorityFilter', 'radiologistFilter', 'dateFromFilter', 'dateToFilter'],
+                function () {
+                    loadWorklist(1);
+                }
+            );
         }
 
         loadStats().catch((err) => {

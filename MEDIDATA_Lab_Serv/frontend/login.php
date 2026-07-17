@@ -29,6 +29,10 @@ include_once '../backend/php/login.php';
             <button class="btn submit-btn span-2" name='login' type="submit">Iniciar sesión</button>
         </form>
 
+        <p class="btm-line" style="margin-top:14px;">
+            <a href="usuarios/recuperar_password.php" style="color:#035c67;font-weight:600;">¿Olvidó su contraseña?</a>
+        </p>
+
         <p class="btm-line">
             Al unirte, aceptas nuestros Términos de servicio y Política de privacidad
         </p>

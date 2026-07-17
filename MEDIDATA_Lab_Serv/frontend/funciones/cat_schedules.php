@@ -13,7 +13,7 @@ try {
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo '<option value="" disabled selected>Seleccione un horario...</option>';
+    echo '<option value="">Seleccione un horario...</option>';
     foreach ($rows as $row) {
         echo '<option value="' . (int)$row['id'] . '">' . htmlspecialchars($row['name']) . '</option>';
     }

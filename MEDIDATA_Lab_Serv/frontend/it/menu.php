@@ -12,12 +12,11 @@
                 <li><a href="../usuarios/crear_user.php"><span>CREAR USUARIO</span></a></li>
             </ul>
         </li>
-
         <li>
-            <a href="#"><i class='bx bxs-shield icon'></i> <span>ACCESOS Y SEGURIDAD</span><i class='bx bx-chevron-right icon-right'></i></a>
+            <a href="#"><i class='bx bxs-box icon'></i><span>INVENTARIO</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
-                <li><a href="../usuarios/mostrar.php"><span>ESTADO DE CUENTAS</span></a></li>
-                <li><a href="../usuarios/firma_user.php"><span>FIRMA DIGITAL</span></a></li>
+                <li><a href="../it/nuevo_servicio_user.php"><span>REGISTRAR SERVICIOS</span></a></li>
+                <li><a href="../it/lista_servicios_user.php"><span>LISTA DE SERVICIOS</span></a></li>
             </ul>
         </li>
 

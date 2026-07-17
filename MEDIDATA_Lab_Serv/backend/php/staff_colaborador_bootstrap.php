@@ -23,7 +23,7 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             PRIMARY KEY (`idadm`),
             UNIQUE KEY `uq_staff_administrative_numide` (`numide`),
             KEY `idx_staff_administrative_user` (`id_user`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         $connect->exec("CREATE TABLE IF NOT EXISTS `staff_general_services` (
             `idsg` int(11) NOT NULL AUTO_INCREMENT,
@@ -40,13 +40,54 @@ if (!function_exists('medidata_staff_ensure_tables')) {
             PRIMARY KEY (`idsg`),
             UNIQUE KEY `uq_staff_general_services_numide` (`numide`),
             KEY `idx_staff_general_services_user` (`id_user`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $connect->exec("CREATE TABLE IF NOT EXISTS `staff_medifarma` (
+            `idmf` int(11) NOT NULL AUTO_INCREMENT,
+            `id_user` int(11) DEFAULT NULL,
+            `numide` char(14) COLLATE utf8_unicode_ci NOT NULL,
+            `nommf` varchar(35) COLLATE utf8_unicode_ci NOT NULL,
+            `apemf` varchar(35) COLLATE utf8_unicode_ci NOT NULL,
+            `nacmf` date NOT NULL,
+            `sexmf` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+            
+            `num_empleado` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `tipo_empleado` varchar(50) COLLATE utf8_unicode_ci DEFAULT 'Permanente',
+            `duracion_contrato` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `fecha_ingreso` date DEFAULT NULL,
+            `id_departamento` int(11) DEFAULT NULL,
+            `id_cargo` int(11) DEFAULT NULL,
+            `id_horario` int(11) DEFAULT NULL,
+            `id_salary_level` int(11) DEFAULT NULL,
+            `salario` decimal(10,2) DEFAULT NULL,
+            `cuenta_bac` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            
+            `telefono` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `correo_personal` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `correo_institucional` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `num_locker` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `id_biometrico` int(11) DEFAULT NULL,
+            `id_candidate_rrhh` int(11) DEFAULT NULL,
+            
+            `url_contrato` longblob DEFAULT NULL,
+            `url_solicitud` longblob DEFAULT NULL,
+            `url_psicometricas` longblob DEFAULT NULL,
+            
+            `area` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `state` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+            `fere` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`idmf`),
+            UNIQUE KEY `uq_staff_medifarma_numide` (`numide`),
+            KEY `idx_staff_medifarma_user` (`id_user`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
         medidata_staff_ensure_id_user_column($connect, 'staff_administrative');
         medidata_staff_ensure_id_user_column($connect, 'staff_general_services');
+        medidata_staff_ensure_id_user_column($connect, 'staff_medifarma');
 
         medidata_staff_ensure_fecha_ingreso_column($connect, 'staff_administrative');
         medidata_staff_ensure_fecha_ingreso_column($connect, 'staff_general_services');
+        medidata_staff_ensure_fecha_ingreso_column($connect, 'staff_medifarma');
 
         $done = true;
     }
@@ -55,7 +96,7 @@ if (!function_exists('medidata_staff_ensure_tables')) {
 if (!function_exists('medidata_staff_ensure_id_user_column')) {
     function medidata_staff_ensure_id_user_column(PDO $connect, string $table): void
     {
-        $allowed = ['staff_administrative', 'staff_general_services'];
+        $allowed = ['staff_administrative', 'staff_general_services', 'staff_medifarma'];
         if (!in_array($table, $allowed, true)) {
             return;
         }
@@ -65,8 +106,13 @@ if (!function_exists('medidata_staff_ensure_id_user_column')) {
             return;
         }
 
+        $pk = 'id';
+        if ($table === 'staff_administrative') $pk = 'idadm';
+        if ($table === 'staff_general_services') $pk = 'idsg';
+        if ($table === 'staff_medifarma') $pk = 'idmf';
+
         $connect->exec("ALTER TABLE `$table`
-            ADD COLUMN `id_user` int(11) DEFAULT NULL AFTER `" . ($table === 'staff_administrative' ? 'idadm' : 'idsg') . "`,
+            ADD COLUMN `id_user` int(11) DEFAULT NULL AFTER `" . $pk . "`,
             ADD KEY `idx_{$table}_user` (`id_user`)");
     }
 }
@@ -74,7 +120,7 @@ if (!function_exists('medidata_staff_ensure_id_user_column')) {
 if (!function_exists('medidata_staff_ensure_fecha_ingreso_column')) {
     function medidata_staff_ensure_fecha_ingreso_column(PDO $connect, string $table): void
     {
-        $allowed = ['staff_administrative', 'staff_general_services'];
+        $allowed = ['staff_administrative', 'staff_general_services', 'staff_medifarma'];
         if (!in_array($table, $allowed, true)) {
             return;
         }
@@ -84,7 +130,11 @@ if (!function_exists('medidata_staff_ensure_fecha_ingreso_column')) {
             return;
         }
 
-        $after = $table === 'staff_administrative' ? 'nacadm' : 'nacsg';
+        $after = 'nac';
+        if ($table === 'staff_administrative') $after = 'nacadm';
+        if ($table === 'staff_general_services') $after = 'nacsg';
+        if ($table === 'staff_medifarma') $after = 'nacmf';
+
         $connect->exec("ALTER TABLE `$table`
             ADD COLUMN `fecha_ingreso` date DEFAULT NULL AFTER `$after`");
     }
@@ -104,7 +154,11 @@ if (!function_exists('medidata_staff_parse_id_user')) {
 if (!function_exists('medidata_staff_id_user_in_use')) {
     function medidata_staff_id_user_in_use(PDO $connect, int $idUser, string $table, int $excludeId = 0): bool
     {
-        $pk = $table === 'staff_administrative' ? 'idadm' : 'idsg';
+        $pk = 'id';
+        if ($table === 'staff_administrative') $pk = 'idadm';
+        if ($table === 'staff_general_services') $pk = 'idsg';
+        if ($table === 'staff_medifarma') $pk = 'idmf';
+
         $sql = "SELECT COUNT(*) FROM `$table` WHERE id_user = :id_user";
         $params = [':id_user' => $idUser];
         if ($excludeId > 0) {
@@ -132,6 +186,7 @@ if (!function_exists('medidata_staff_id_user_linked')) {
         $map = [
             'staff_administrative' => ['pk' => 'idadm', 'label' => 'administrativo'],
             'staff_general_services' => ['pk' => 'idsg', 'label' => 'servicios generales'],
+            'staff_medifarma' => ['pk' => 'idmf', 'label' => 'medifarma'],
         ];
 
         foreach ($map as $table => $meta) {
@@ -161,6 +216,8 @@ if (!function_exists('medidata_staff_linked_user_ids_subquery')) {
     {
         return "SELECT id_user FROM staff_administrative WHERE id_user IS NOT NULL
                 UNION
-                SELECT id_user FROM staff_general_services WHERE id_user IS NOT NULL";
+                SELECT id_user FROM staff_general_services WHERE id_user IS NOT NULL
+                UNION
+                SELECT id_user FROM staff_medifarma WHERE id_user IS NOT NULL";
     }
 }

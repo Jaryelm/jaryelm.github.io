@@ -111,7 +111,7 @@ include_once '../../backend/registros/session_check.php';
                         <option value="Atencion al Cliente">Atención al Cliente</option>
                         <option value="Procedimiento">Procedimiento</option>
                         <option value="Odontologia">Odontología</option>
-                        <option value="Radiología e Imagen">Radiología e Imagen</option>
+                        <option value="Radiología e Imagen">RADIOLOGÍA E IMAGEN</option>
                         <option value="Radiodiagnóstico Dental">Radiodiagnóstico Dental</option>
                         <option value="Tomografia">Tomografía</option>
                         <option value="Ultrasonido">Ultrasonido</option>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/user_role_guard.php';
 
 if (!function_exists('medidata_ensure_users_name_varchar50')) {
     function medidata_ensure_users_name_varchar50(PDO $connect): void
@@ -100,6 +101,13 @@ if (isset($_POST['actualizar_user'])) {
                 header('Location: ../../frontend/usuarios/editar_user.php?id=' . $id);
                 exit;
             }
+        }
+
+        if (medidata_user_rol_bloqueado_autoedicion($id)) {
+            $stmtRolActual = $connect->prepare('SELECT rol FROM users WHERE id = ? LIMIT 1');
+            $stmtRolActual->execute([$id]);
+            $rolDb = $stmtRolActual->fetchColumn();
+            $rol = is_string($rolDb) && $rolDb !== '' ? $rolDb : $rol;
         }
 
         $stmt = $connect->prepare("UPDATE users SET username = :username, name = :name, cedula = :cedula, sexo = :sexo, email = :email, rol = :rol, uid_biometrico = :uid_biometrico WHERE id = :id");

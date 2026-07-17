@@ -24,18 +24,40 @@
             .replace(/"/g, '&quot;');
     }
 
-    /** Ruta en BD tipo uploads/adj_foto/archivo.jpg → URL absoluta (local o mismo origen). */
-    function resolveFotoUrl(safePath) {
-        if (!safePath) {
+    /** URL pública de foto: prioriza adj_foto_url del servidor; respaldo local si falta. */
+    function resolveFotoUrl(row) {
+        if (!row) {
             return '';
         }
-        var p = String(safePath).replace(/^\//, '');
-        if (/^https?:\/\//i.test(p)) {
-            return p;
+        if (row.adj_foto_url) {
+            return String(row.adj_foto_url);
         }
-        var a = document.createElement('a');
-        a.href = '../../' + p;
-        return a.href;
+        var raw = row.adj_foto ? String(row.adj_foto).trim().replace(/\\/g, '/') : '';
+        if (!raw) {
+            return '';
+        }
+        if (/^https?:\/\//i.test(raw)) {
+            return raw;
+        }
+        raw = raw.replace(/^\/+/, '');
+        if (raw.indexOf('..') !== -1) {
+            return '';
+        }
+        var base =
+            typeof window.MEDIDATA_WEB_BASE !== 'undefined' && window.MEDIDATA_WEB_BASE != null
+                ? String(window.MEDIDATA_WEB_BASE).replace(/\/$/, '')
+                : '';
+        if (!base) {
+            var path = window.location.pathname || '';
+            var idx = path.indexOf('/frontend/');
+            if (idx > 0) {
+                base = path.substring(0, idx);
+            }
+        }
+        var segments = raw.split('/').filter(function (s) {
+            return s !== '';
+        });
+        return (base ? base : '') + '/' + segments.map(encodeURIComponent).join('/');
     }
 
     function categoriaCell(row) {
@@ -46,10 +68,7 @@
     }
 
     function buildRow(row) {
-        var safePath = row.adj_foto
-            ? String(row.adj_foto).replace(/^\//, '').replace(/[^a-zA-Z0-9._\-\/]/g, '')
-            : '';
-        var imageUrl = resolveFotoUrl(safePath);
+        var imageUrl = resolveFotoUrl(row);
         var urlAttr = imageUrl ? escAttr(imageUrl) : '';
         var fotoTd = imageUrl
             ? '<img class="foto-thumb" src="' +

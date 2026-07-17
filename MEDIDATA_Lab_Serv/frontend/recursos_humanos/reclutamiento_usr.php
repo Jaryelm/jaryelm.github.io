@@ -79,7 +79,7 @@ $rrhh_disponible = medidata_rrhh_pdo() !== null;
                 <div class="table-responsive" style="overflow-x:auto;">
                     <?php
                     $data = medidata_rrhh_fetch_postulantes(
-                        "p.status IN ('En Espera', 'Entrevista', 'Pruebas Psicometricas')",
+                        "p.status IN ('En Espera', 'Formulario Empleados', 'Entrevista', 'Agendado', 'Entrevistado', 'Pruebas Psicometricas', 'Llenando Expediente')",
                         $id_vacante
                     );
                     ?>

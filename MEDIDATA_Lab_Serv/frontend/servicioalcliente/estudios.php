@@ -64,7 +64,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             
 <div class="form-container">
     <form id="radiologia-imagen-form" action="procesar_radiologia.php" method="POST" class="radiologia-form">
-        <h2>Estudios de Radiología e Imagen</h2>
+        <h2>ESTUDIOS DE RADIOLOGÍA E IMAGEN</h2>
 
         <!-- Nombre y Cuenta Hosp -->
         <div class="form-group">

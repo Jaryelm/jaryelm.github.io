@@ -332,13 +332,13 @@ try {
                 }
             }
 
-            $('.rrhh-close-event-modal').on('click', function (e) {
+            $(document).on('click', '.rrhh-close-event-modal', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 closeRrhhModal('eventModal');
             });
 
-            $('.rrhh-close-custom-modal').on('click', function (e) {
+            $(document).on('click', '.rrhh-close-custom-modal', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 closeRrhhModal('addCustomEventModal');
@@ -350,8 +350,8 @@ try {
                 }
             });
 
-            $('#eventModal .modal-content, #addCustomEventModal .modal-content').on('click', function (e) {
-                if ($(e.target).closest('.close-btn').length) {
+            $(document).on('click', '#eventModal .modal-content, #addCustomEventModal .modal-content', function (e) {
+                if ($(e.target).closest('.rrhh-close-event-modal, .rrhh-close-custom-modal').length) {
                     return;
                 }
                 e.stopPropagation();
@@ -409,6 +409,16 @@ try {
                     $('#calendar').fullCalendar('unselect');
                 },
                 events: rrhhCalendarEvents,
+                eventRender: function(event, element) {
+                    if (event.title) {
+                        var titleText = event.title;
+                        var prefix = '';
+                        if (event.type === 'custom' && event.event_type_name && event.event_type_name !== 'General') {
+                            prefix = '<strong>' + event.event_type_name + ':</strong> ';
+                        }
+                        element.find('.fc-title').html(prefix + titleText);
+                    }
+                },
                 eventClick: function (event) {
                     showEventDetails(event);
                 },
@@ -793,6 +803,7 @@ try {
                     }
 
                     $('#event-details tbody').append(`
+                        <tr><th>Título</th><td>${event.title || '(sin título)'}</td></tr>
                         <tr><th>Tipo</th><td>${event.event_type_name || 'Evento General'}</td></tr>
                         <tr><th>Inicio</th><td>${event.start ? event.start.format(formatStr) : ''}</td></tr>
                         <tr><th>Fin</th><td>${endStr}</td></tr>

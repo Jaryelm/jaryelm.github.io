@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'staff_general_services' => 'idsg',
         'nurse'                  => 'idnur',
         'doctor'                 => 'idodc',
+        'staff_medifarma'        => 'idmf',
     ];
 
     if (!array_key_exists($table, $tablas_permitidas)) {

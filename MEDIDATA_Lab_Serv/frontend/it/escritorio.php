@@ -38,25 +38,90 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <title>MEDIDATA</title>
     <style>
-        .it-dashboard-container { width: 100%; max-width: 1500px; margin: 0 auto; padding: 20px; }
-        .it-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .it-card { background-color: #06adbf; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: #fff; transition: transform 0.3s ease; }
-        .it-card:hover { transform: translateY(-5px); }
-        .it-card h2 { margin: 0 0 8px; font-size: 16px; color: #fff; font-weight: 600; }
-        .it-card .it-num { font-size: 34px; font-weight: 700; }
-        .it-card.alt { background-color: #035c67; }
-        .it-card.warn { background-color: #c0392b; }
-        .it-quick { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 8px; }
-        .it-quick a { display: inline-flex; align-items: center; gap: 8px; background-color: #035c67; color: #fff; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background-color 0.3s ease; }
-        .it-quick a:hover { background-color: #06adbf; }
-        .it-table { width: 100%; border-collapse: collapse; margin-top: 12px; background:#fff; color:#000; font-size: 14px; }
-        .it-table th, .it-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        .it-table th { background-color: #06adbf; color: #fff; }
-        .it-table tr:nth-child(even) { background-color: #f9f9f9; }
-        .it-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .it-badge.on { background:#e3f9e5; color:#1b7d2b; }
-        .it-badge.off { background:#fde8e8; color:#b91c1c; }
-        .it-section-title { color:#035c67; margin: 26px 0 6px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #000;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #06adbf;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.alt {
+            background-color: #035c67;
+        }
+
+        .card.warn {
+            background-color: #c0392b;
+        }
+
+        .it-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .it-badge.on {
+            background: #e3f9e5;
+            color: #1b7d2b;
+        }
+
+        .it-badge.off {
+            background: #fde8e8;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
@@ -74,37 +139,35 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         <main>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name) . '</strong>'; ?></h1>
 
-            <div class="it-dashboard-container">
-                <header style="text-align:center; margin-bottom: 10px;">
+            <div class="dashboard-container">
+                <header>
                     <h1 style="margin:0;">Panel de IT</h1>
                     <p style="margin:4px 0 0; color:#555;">Gestión de usuarios y accesos del sistema MEDIDATA</p>
                 </header>
 
-                <div class="it-cards">
-                    <div class="it-card">
+                <div class="dashboard">
+                    <div class="card">
                         <h2>Usuarios Totales</h2>
-                        <div class="it-num"><?php echo $totalUsuarios; ?></div>
+                        <p><?php echo $totalUsuarios; ?></p>
                     </div>
-                    <div class="it-card alt">
+                    <div class="card alt">
                         <h2>Usuarios Activos</h2>
-                        <div class="it-num"><?php echo $usuariosActivos; ?></div>
+                        <p><?php echo $usuariosActivos; ?></p>
                     </div>
-                    <div class="it-card warn">
+                    <div class="card warn">
                         <h2>Usuarios Desactivados</h2>
-                        <div class="it-num"><?php echo $usuariosInactivos; ?></div>
+                        <p><?php echo $usuariosInactivos; ?></p>
                     </div>
-                    <div class="it-card alt">
+                    <div class="card alt">
                         <h2>Roles Distintos</h2>
-                        <div class="it-num"><?php echo count($usuariosPorRol); ?></div>
+                        <p><?php echo count($usuariosPorRol); ?></p>
                     </div>
                 </div>
 
-                <div class="it-quick">
-                    <a href="../usuarios/crear_user.php"><i class='bx bx-user-plus'></i> Crear usuario</a>
-                    <a href="../usuarios/mostrar.php"><i class='bx bx-list-ul'></i> Lista de usuarios</a>
-                </div>
-
-                <h3 class="it-section-title">Usuarios por Rol</h3>
+                <br>
+                <header style="text-align:center; margin-bottom:10px;">
+                    <h1 style="margin:0;">Usuarios por Rol</h1>
+                </header>
                 <div class="table-responsive">
                     <table id="tabla_roles" class="responsive-table" style="width:100%;">
                         <thead>
@@ -121,7 +184,10 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     </table>
                 </div>
 
-                <h3 class="it-section-title">Accesos de Usuarios</h3>
+                <br>
+                <header style="text-align:center; margin-bottom:10px;">
+                    <h1 style="margin:0;">Accesos de Usuarios</h1>
+                </header>
                 <div class="table-responsive">
                     <table id="tabla_accesos" class="responsive-table" style="width:100%;">
                         <thead>

@@ -102,7 +102,7 @@ try {
 
 <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="return_page" value="enfermera.php">
-            <div class="containerss">
+            <div class="containerss staff-edit-form">
                 <h1>Actualizar enfermero(a)</h1>
                 <input type="hidden" name="nuridp" value="<?php echo (int) $d->idnur; ?>">
                 <hr>
@@ -159,8 +159,8 @@ try {
                     <?php endforeach; ?>
                 </select>
 
-                <label><b>Horario</b></label><span class="badge-warning">*</span>
-                <select class="select2" name="id_horario" id="id_schedule" required>
+                <label><b>Horario</b></label>
+                <select class="select2" name="id_horario" id="id_schedule">
                     <option value="<?php echo (int)($d->id_horario ?? 0); ?>" selected>Cargando...</option>
                 </select>
 
@@ -193,90 +193,26 @@ try {
                 <label><b>ID Empleado (Reloj Biométrico)</b></label>
                 <input type="number" name="id_biometrico" value="<?php echo htmlspecialchars($d->id_biometrico ?? ''); ?>" placeholder="Ej: 123">
 
-                <label><b>Usuario del Sistema (Opcional)</b></label>
                 <?php
                 $staffUserFieldName = 'nurid_user';
                 $staffSelectedUserId = isset($d->id_user) ? (int) $d->id_user : 0;
                 include '../recursos_humanos/_staff_user_select.php';
                 ?>
                 
-                <hr>
-                <h3>Documentos (Opcionales)</h3>
-                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Subir un documento nuevo reemplazará al anterior.</p>
-                
                 <?php
-                function _showDocLink($label, $url) {
-                    if (!empty($url)) {
-                        echo '<p style="margin-top:0; margin-bottom:10px; font-size:0.85rem;"><a href="'.htmlspecialchars($url).'" target="_blank"><i class="bx bx-link-external"></i> Ver '.$label.' actual</a></p>';
-                    }
-                }
+                $staffDocId = (int) $d->idnur;
+                $staffDocTable = 'nurse';
+                $staffDocIdcol = 'idnur';
+                $staffDocRow = $d;
+                $staffDocRrhh = $rrhh_docs ?? null;
+                include __DIR__ . '/../recursos_humanos/_staff_edit_documentos_section.php';
                 ?>
 
-                <label>Solicitud de empleo (Ya guardada)</label>
-                <input type="file" name="doc_solicitud" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
-                <?php if ($d->has_solicitud): ?>
-                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idnur; ?>&doc=solicitud" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver solicitud actual</a>
-                <?php endif; ?>
-                <br><br>
-                
-                <label>Pruebas Psicométricas (Ya guardadas)</label>
-                <input type="file" name="doc_psicometricas" accept=".pdf,.doc,.docx,.jpg,.png" style="padding:10px;">
-                <?php if ($d->has_psicometricas): ?>
-                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idnur; ?>&doc=psicometricas" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver pruebas actuales</a>
-                <?php endif; ?>
-                <br><br>
-
-                <label>Copia de partida de nacimiento de hijos</label>
-                <input type="file" name="doc_birth_cert_children" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('partida', $rrhh_docs['birth_cert_children'] ?? null); ?>
-                
-                <label>Foto (Para su Carnet)</label>
-                <input type="file" name="doc_photo_id_card" accept=".jpg,.png" style="padding:10px;">
-                <?php _showDocLink('foto', $rrhh_docs['photo_id_card'] ?? null); ?>
-                
-                <label>Documento de identidad (revés y derecho)</label>
-                <input type="file" name="doc_id_document" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('documento de identidad', $rrhh_docs['id_document'] ?? null); ?>
-                
-                <label>Copia de recibo (agua, luz, teléfono)</label>
-                <input type="file" name="doc_utility_bill" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('recibo', $rrhh_docs['utility_bill'] ?? null); ?>
-                
-                <label>Antecedentes Penales</label>
-                <input type="file" name="doc_criminal_record" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('antecedentes penales', $rrhh_docs['criminal_record'] ?? null); ?>
-                
-                <label>Antecedentes Policiales</label>
-                <input type="file" name="doc_police_record" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('antecedentes policiales', $rrhh_docs['police_record'] ?? null); ?>
-                
-                <label>2 Referencias personales</label>
-                <input type="file" name="doc_personal_references" accept=".pdf,.zip,.rar" style="padding:10px;">
-                <?php _showDocLink('referencias personales', $rrhh_docs['personal_references'] ?? null); ?>
-                
-                <label>2 Referencias profesionales</label>
-                <input type="file" name="doc_professional_references" accept=".pdf,.zip,.rar" style="padding:10px;">
-                <?php _showDocLink('referencias profesionales', $rrhh_docs['professional_references'] ?? null); ?>
-                
-                <label>Diplomas o títulos recibidos</label>
-                <input type="file" name="doc_diplomas" accept=".pdf,.zip,.rar" style="padding:10px;">
-                <?php _showDocLink('diplomas', $rrhh_docs['diplomas'] ?? null); ?>
-                
-                <label>Croquis de vivienda</label>
-                <input type="file" name="doc_home_sketch" accept=".pdf,.jpg,.png" style="padding:10px;">
-                <?php _showDocLink('croquis', $rrhh_docs['home_sketch'] ?? null); ?>
-                
-                <label><b>Contrato Firmado (Ya guardado)</b></label>
-                <input type="file" name="doc_contrato" accept=".pdf,.jpg,.png" style="padding:10px; border:1px solid #2980b9;">
-                <?php if ($d->has_contrato): ?>
-                    <br><a href="../../backend/php/view_staff_doc.php?id=<?php echo $d->idnur; ?>&doc=contrato" target="_blank" class="badge-success" style="padding:5px; text-decoration:none;"><i class="bx bx-link-external"></i> Ver contrato actual</a>
-                <?php endif; ?>
-                <br><br>
-
-                <hr>
+                <div class="staff-form-actions">
                 <button type="submit" name="upd_nurse" class="registerbtn">Guardar Cambios</button>
                 <button type="button" class="registerbtn btn-delete-staff" style="background:#c0392b;margin-top:10px;"
                     data-id="<?php echo (int) $d->idnur; ?>">Eliminar colaborador</button>
+                </div>
             </div>
         </form>
 

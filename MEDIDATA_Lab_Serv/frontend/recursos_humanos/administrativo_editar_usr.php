@@ -44,7 +44,7 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
 <?php if (count($data) > 0): foreach ($data as $d): ?>
         <form action="" method="POST" autocomplete="off">
                 <input type="hidden" name="return_page" value="lista_colaboradores_usr.php">
-            <div class="containerss">
+            <div class="containerss staff-edit-form">
                 <h1>Actualizar colaborador administrativo</h1>
                 <input type="hidden" name="admidp" value="<?php echo (int) $d->idadm; ?>">
                 <hr>

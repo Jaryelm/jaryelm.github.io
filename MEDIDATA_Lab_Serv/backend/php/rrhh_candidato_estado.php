@@ -14,7 +14,13 @@ $nuevoEstado = trim((string) ($_POST['status'] ?? ''));
 $observaciones = trim((string) ($_POST['observaciones'] ?? ''));
 $usuario = trim((string) ($name ?? 'sistema'));
 
-echo json_encode(
-    medidata_rrhh_cambiar_estado_candidato($candidateId, $nuevoEstado, $usuario, $observaciones),
-    JSON_UNESCAPED_UNICODE
-);
+$result = medidata_rrhh_cambiar_estado_candidato($candidateId, $nuevoEstado, $usuario, $observaciones);
+
+if ($result['success'] && $nuevoEstado === 'Contratado') {
+    $isUsr = strpos((string) ($_SERVER['HTTP_REFERER'] ?? ''), '_usr.php') !== false
+        || strpos((string) ($_SERVER['SCRIPT_NAME'] ?? ''), '_usr') !== false;
+    $suffix = $isUsr ? '_usr' : '';
+    $result['redirect_url'] = 'lista_colaboradores' . $suffix . '.php';
+}
+
+echo json_encode($result, JSON_UNESCAPED_UNICODE);

@@ -1,0 +1,342 @@
+/**
+ * MH-PACS — estilos del panel de filtros y paginación.
+ * Archivo dedicado (NO admin.css). Cargar después de admin.css en vistas radiología.
+ */
+.mhpacs-filters {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
+    border: 1px solid #d4dde5;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(3, 92, 103, 0.08);
+    overflow: hidden;
+    box-sizing: border-box;
+    isolation: isolate;
+}
+
+.mhpacs-filters *,
+.mhpacs-filters *::before,
+.mhpacs-filters *::after {
+    box-sizing: border-box;
+}
+
+.mhpacs-filters__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #035c67;
+    color: #fff;
+}
+
+.mhpacs-filters__header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.mhpacs-filters__header-text h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-transform: none;
+}
+
+.mhpacs-filters__header-text p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 400;
+}
+
+.mhpacs-filters__body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* —— Búsqueda por paciente / ID / acceso —— */
+.mhpacs-filters__search {
+    width: 100%;
+}
+
+.mhpacs-filters__search-label {
+    display: block;
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #035c67;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.mhpacs-filters__search-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.mhpacs-filters__search-input i {
+    position: absolute;
+    left: 12px;
+    font-size: 18px;
+    color: #06adbf;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.mhpacs-filters__search-input input[type="search"] {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px 10px 40px;
+    border: 1px solid #b8c5ce;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.35;
+    background: #fff;
+    color: #1f2933;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mhpacs-filters__search-input input[type="search"]::placeholder {
+    color: #8a96a3;
+    font-size: 13px;
+}
+
+.mhpacs-filters__search-input input[type="search"]:hover {
+    border-color: #06adbf;
+}
+
+.mhpacs-filters__search-input input[type="search"]:focus {
+    outline: none;
+    border-color: #06adbf;
+    box-shadow: 0 0 0 3px rgba(6, 173, 191, 0.2);
+}
+
+.mhpacs-filters__search-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #6b7785;
+}
+
+.mhpacs-filters__search-hint strong {
+    color: #035c67;
+    font-weight: 600;
+}
+
+.mhpacs-filters__field-hint {
+    margin: 4px 0 0;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #6b7785;
+}
+
+.mhpacs-filters__field-hint strong {
+    color: #035c67;
+    font-weight: 600;
+}
+
+/* —— Grid criterios (modalidad, prioridad, estado, fechas) —— */
+.mhpacs-filters__row {
+    display: grid;
+    gap: 12px 14px;
+    width: 100%;
+}
+
+.mhpacs-filters__row--main {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mhpacs-filters__row--main.mhpacs-filters__row--no-priority {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mhpacs-filters__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+}
+
+.mhpacs-filters__field label {
+    display: block;
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #035c67;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.mhpacs-filters__field input[type="date"],
+.mhpacs-filters__field select {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 1px solid #c8d1da;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.3;
+    background: #fff;
+    color: #1f2933;
+    margin: 0;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mhpacs-filters__field input:hover,
+.mhpacs-filters__field select:hover {
+    border-color: #9ab4bb;
+}
+
+.mhpacs-filters__field input:focus,
+.mhpacs-filters__field select:focus {
+    outline: none;
+    border-color: #06adbf;
+    box-shadow: 0 0 0 3px rgba(6, 173, 191, 0.18);
+}
+
+.mhpacs-filters__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #eef3f5;
+    border-top: 1px solid #dde4ea;
+}
+
+.mhpacs-filters__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.mhpacs-filters__btn:active {
+    transform: translateY(1px);
+}
+
+.mhpacs-filters__btn--primary {
+    background: #06adbf;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(6, 173, 191, 0.25);
+}
+
+.mhpacs-filters__btn--primary:hover {
+    background: #0595a5;
+}
+
+.mhpacs-filters__btn--secondary {
+    background: #fff;
+    color: #035c67;
+    border: 1px solid #c5cdd6;
+}
+
+.mhpacs-filters__btn--secondary:hover {
+    background: #f4f9fa;
+    border-color: #06adbf;
+}
+
+/* Paginación MH-PACS */
+.mhpacs-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 10px 0;
+}
+
+.mhpacs-pagination button {
+    padding: 6px 12px;
+    border: 1px solid #c5cdd6;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.mhpacs-pagination button:hover:not(:disabled) {
+    background: #eef6f7;
+    border-color: #06adbf;
+}
+
+.mhpacs-pagination button.active {
+    background: #06adbf;
+    color: #fff;
+    border-color: #06adbf;
+}
+
+.mhpacs-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mhpacs-pagination__info {
+    margin-right: 8px;
+    font-size: 13px;
+    color: #5a6570;
+}
+
+@media (max-width: 1200px) {
+    .mhpacs-filters__row--main,
+    .mhpacs-filters__row--main.mhpacs-filters__row--no-priority {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .mhpacs-filters__row--main,
+    .mhpacs-filters__row--main.mhpacs-filters__row--no-priority {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .mhpacs-filters__header {
+        padding: 12px 14px;
+    }
+
+    .mhpacs-filters__body {
+        padding: 14px;
+    }
+
+    .mhpacs-filters__row--main,
+    .mhpacs-filters__row--main.mhpacs-filters__row--no-priority {
+        grid-template-columns: 1fr;
+    }
+
+    .mhpacs-filters__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .mhpacs-filters__btn {
+        width: 100%;
+    }
+}

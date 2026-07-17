@@ -577,6 +577,57 @@ main .select2-container--default .select2-selection--single .select2-selection__
     min-width: 0 !important;
 }
 
+/* Formulario horario laboral — evita label/select/ayuda en fila (admin.css flex) */
+main .containerss .rrhh-horario-field-block {
+    display: block !important;
+    width: 100%;
+    margin-bottom: 28px;
+    grid-gap: unset !important;
+}
+
+main .containerss .rrhh-horario-field-block > label {
+    display: block;
+    margin-bottom: 10px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: #333;
+}
+
+main .containerss .rrhh-horario-field-block .rrhh-horario-input {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #fff;
+    box-sizing: border-box;
+    margin: 0 !important;
+}
+
+main .containerss .rrhh-horario-break-wrap {
+    display: block;
+    max-width: 320px;
+}
+
+main .containerss .rrhh-horario-field-hint {
+    display: block;
+    margin-top: 14px;
+    padding: 12px 14px;
+    max-width: 100%;
+    line-height: 1.55;
+    color: #555;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    border-left: 3px solid #06adbf;
+    border-radius: 0 6px 6px 0;
+}
+
+main .containerss #horario-resumen {
+    margin-top: 8px;
+}
+
 .rrhh-filter-actions {
     display: inline-flex;
     align-items: center;
@@ -1300,14 +1351,28 @@ body.rrhh-modal-open {
     height: 42px;
 }
 
+.card-candidato-detalle .info-item {
+    align-items: flex-start;
+    line-height: 1.45;
+}
+
+.card-candidato-detalle .info-item i {
+    margin-top: 2px;
+}
+
+.card-candidato-detalle .info-item span {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
 .card-candidato-detalle .info-item.info-item-block {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
 }
 
 .card-candidato-detalle .info-item.info-item-block span {
-    margin-top: 4px;
-    line-height: 1.45;
+    margin-top: 0;
 }
 
 @media (max-width: 992px) {

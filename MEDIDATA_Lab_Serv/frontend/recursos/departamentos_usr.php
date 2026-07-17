@@ -1,5 +1,9 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+require_once '../../backend/php/departament_schema.php';
+if (isset($connect_rrhh) && $connect_rrhh instanceof PDO) {
+    medidata_ensure_departament_phone_ext($connect_rrhh);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,7 +21,7 @@ include_once '../../backend/registros/session_check.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
-    <title>MEDIDATA - Departamentos</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
     
@@ -76,6 +80,7 @@ if($sentencia){
                     <th scope="col">Jefe</th>
                     <th scope="col">Correo</th>
                     <th scope="col">Teléfono</th>
+                    <th scope="col">Ext</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -87,7 +92,8 @@ if($sentencia){
                         <td><?php echo $d->name ?></td>
                         <td><?php echo $d->head_departament ?></td>
                         <td><?php echo $d->email ?></td>
-                        <td><?php echo $d->phone ?></td>
+                        <td><?php echo htmlspecialchars($d->phone ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($d->phone_ext ?? ''); ?></td>
                         <td>
                             <label class="switch">
                                 <input type="checkbox" class="state-toggle" data-id="<?php echo $d->id; ?>" <?php echo ($d->status == 'Activo') ? 'checked' : ''; ?>>
@@ -95,7 +101,7 @@ if($sentencia){
                             </label>
                         </td>
                         <td>
-                            <a title="Editar" href="departamentos_editar.php?id=<?php echo $d->id ?>" class="fa fa-edit" style="color:#06adbf; background:none; border:none; cursor:pointer; font-size: 1.2rem; margin-right: 10px; text-decoration:none;"></a>
+                            <a title="Editar" href="departamentos_editar_usr.php?id=<?php echo $d->id ?>" class="fa fa-edit" style="color:#06adbf; background:none; border:none; cursor:pointer; font-size: 1.2rem; margin-right: 10px; text-decoration:none;"></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -59,6 +59,7 @@ if (function_exists('session_write_close')) {
             echo '<div class="containerss"><p class="alert alert-warning">Usuario no encontrado.</p><a href="mostrar.php">Volver a la lista</a></div>';
             exit;
         }
+        $esPropioPerfil = ((int) $user->id === (int) ($_SESSION['id'] ?? 0));
         ?>
 
         <form action="../../backend/php/actualizar_user.php" method="POST" autocomplete="off">
@@ -90,6 +91,11 @@ if (function_exists('session_write_close')) {
                 <input type="email" name="email" maxlength="35" value="<?php echo htmlspecialchars($user->email); ?>" required>
 
                 <label for="rol"><b>Rol del Usuario</b></label><span class="badge-warning">*</span>
+                <?php if ($esPropioPerfil): ?>
+                <input type="hidden" name="rol" value="<?php echo htmlspecialchars((string) $user->rol, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="text" class="form-control" value="<?php echo htmlspecialchars((string) $user->rol, ENT_QUOTES, 'UTF-8'); ?>" readonly style="background:#f3f4f6;cursor:not-allowed;">
+                <p style="color:#666;font-size:13px;margin-top:6px;"><i class='bx bx-lock-alt'></i> No puede cambiar su propio rol. Solicite a un administrador si requiere un ajuste.</p>
+                <?php else: ?>
                 <select name="rol" id="rol" class="select2" data-placeholder="Seleccione un rol..." required>
                     <option value="">Seleccione...</option>
                     <option value="Administrador" <?php echo ($user->rol === 'Administrador') ? 'selected' : ''; ?>>Administrador</option>
@@ -118,6 +124,7 @@ if (function_exists('session_write_close')) {
                     <option value="Odontologo" <?php echo ($user->rol === 'Odontologo') ? 'selected' : ''; ?>>Odontólogo</option>
                     <option value="Servicios Generales" <?php echo ($user->rol === 'Servicios Generales') ? 'selected' : ''; ?>>Servicios Generales</option>
                 </select>
+                <?php endif; ?>
 
                 <label for="uid_biometrico"><b>ID Biométrico (MB360)</b></label>
                 <input type="text" name="uid_biometrico" value="<?php echo htmlspecialchars((string)($user->uid_biometrico ?? '')); ?>" maxlength="20">

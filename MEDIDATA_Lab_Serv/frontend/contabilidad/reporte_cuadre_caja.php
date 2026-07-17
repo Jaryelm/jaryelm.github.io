@@ -1,12 +1,5 @@
 <?php
 include_once '../../backend/registros/session_check.php';
-require_once '../../backend/php/funciones_cuadre_caja.php';
-
-/** Formato lempiras: miles con coma, decimales con punto (ej. L. 2,836.27) */
-function fmt_lempiras_reporte($valor) {
-    $n = (float)($valor ?? 0);
-    return 'L. ' . number_format($n, 2, '.', ',');
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -49,6 +42,7 @@ function fmt_lempiras_reporte($valor) {
         <button class="button" onclick="cambiarColor(this, 'reporte_cuadre_caja.php')">Cuadre Caja</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_pago.php')">Detalle Pago</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_detalle_factura.php')">Detalle Factura</button>
+        <button class="button" onclick="cambiarColor(this, 'dashboard_ventas.php')">Dashboard Ventas</button>
         <button class="button" onclick="cambiarColor(this, 'reporte_devoluciones_ventas.php')">Devoluciones</button>
 
         <br>
@@ -56,7 +50,7 @@ function fmt_lempiras_reporte($valor) {
         <div class="catalog-container">
             <h2 class="catalog-title">Cuadre Caja</h2>
 
-            <div class="filters-container">
+            <form class="filters-container" onsubmit="event.preventDefault(); aplicarFiltros();">
                 <div class="filter-group">
                     <label for="fechaDesde">Desde:</label>
                     <input type="date" id="fechaDesde" class="filter-input" value="<?php echo htmlspecialchars($_GET['desde'] ?? ''); ?>">
@@ -65,13 +59,13 @@ function fmt_lempiras_reporte($valor) {
                     <label for="fechaHasta">Hasta:</label>
                     <input type="date" id="fechaHasta" class="filter-input" value="<?php echo htmlspecialchars($_GET['hasta'] ?? ''); ?>">
                 </div>
-                <button class="btn-filter" onclick="aplicarFiltros()">Buscar</button>
+                <button type="submit" class="btn-filter">Buscar</button>
                 <button class="btn-filter btn-reset" onclick="limpiarFiltros()">Limpiar</button>
-            </div>
+            </form>
 
             <div class="table-container">
                 <div class="table-responsive">
-                    <table id="tablaReporteCuadreCaja" class="display responsive-table dt-reporte-compras-unificado">
+                    <table id="tablaReporteCuadreCaja" class="display dt-reporte-compras-unificado">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -81,32 +75,7 @@ function fmt_lempiras_reporte($valor) {
                                 <th>Otros</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $desde = $_GET['desde'] ?? '';
-                            $hasta = $_GET['hasta'] ?? '';
-                            $filasCuadre = medidata_filas_cuadre_caja(
-                                $connect,
-                                $desde !== '' ? $desde : null,
-                                $hasta !== '' ? $hasta : null
-                            );
-
-                            foreach ($filasCuadre as $row):
-                                $fecha_raw = $row['fecha_orden'] ?? '';
-                                $fecha = $row['fecha'] ? date('d-m-Y', strtotime($row['fecha'])) : '-';
-                                $efectivo = medidata_cuadre_monto_metodo($row['metodos'], 'Efectivo');
-                                $tarjeta = medidata_cuadre_monto_metodo($row['metodos'], 'Tarjeta');
-                                $otros = medidata_cuadre_otros_metodos($row['metodos']);
-                            ?>
-                            <tr>
-                                <td data-order="<?php echo htmlspecialchars($fecha_raw); ?>"><?php echo htmlspecialchars($fecha); ?></td>
-                                <td><?php echo htmlspecialchars($row['nombre'] ?? '-'); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($efectivo); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($tarjeta); ?></td>
-                                <td><?php echo fmt_lempiras_reporte($otros); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -125,49 +94,21 @@ function fmt_lempiras_reporte($valor) {
 <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#tablaReporteCuadreCaja').DataTable({
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-        order: [[0, 'desc']],
-        initComplete: function() {
-            $('.dataTables_wrapper').addClass('dt-ready');
-            $('#page-loading-overlay').hide();
-        },
-        language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando 0 a 0 de 0 registros",
-            sInfoFiltered: "(filtrado de _MAX_ registros totales)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        }
-    });
+    medidataReporteComprasSS.initCuadreCaja();
 });
 
 function aplicarFiltros() {
-    var desde = document.getElementById('fechaDesde').value;
-    var hasta = document.getElementById('fechaHasta').value;
-    var params = [];
-    if (desde) params.push('desde=' + encodeURIComponent(desde));
-    if (hasta) params.push('hasta=' + encodeURIComponent(hasta));
-    var url = 'reporte_cuadre_caja.php';
-    if (params.length) url += '?' + params.join('&');
-    window.location.href = url;
+    medidataReporteComprasSS.recargar();
 }
 
 function limpiarFiltros() {
-    window.location.href = 'reporte_cuadre_caja.php';
+    document.getElementById('fechaDesde').value = '';
+    document.getElementById('fechaHasta').value = '';
+    medidataReporteComprasSS.recargar();
 }
 </script>
 </body>

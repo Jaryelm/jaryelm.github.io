@@ -1,7 +1,21 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../bd/Conexion.php';
+require_once __DIR__ . '/../bd/medidata_paths.php';
 require_once __DIR__ . '/../php/tablas_json_list_limits.php';
+
+if (!function_exists('medidata_tabla_product_foto_urls')) {
+    /** @param list<array<string, mixed>> $rows */
+    function medidata_tabla_product_foto_urls(array &$rows): void
+    {
+        foreach ($rows as &$row) {
+            $row['adj_foto_url'] = medidata_upload_public_url(
+                isset($row['adj_foto']) ? (string) $row['adj_foto'] : ''
+            );
+        }
+        unset($row);
+    }
+}
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -29,6 +43,8 @@ try {
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
+
+        medidata_tabla_product_foto_urls($results);
 
         echo json_encode($results);
     }

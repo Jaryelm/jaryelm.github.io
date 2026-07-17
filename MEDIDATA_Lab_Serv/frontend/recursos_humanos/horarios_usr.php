@@ -1,8 +1,12 @@
 <?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/registros/rrhh_guard.php';
+require_once '../../backend/php/schedule_lib.php';
 
 $pdoRrhh = medidata_rrhh_pdo();
+if ($pdoRrhh) {
+    medidata_schedule_ensure_schema($pdoRrhh);
+}
 $schedules = [];
 if ($pdoRrhh) {
     try {
@@ -31,7 +35,7 @@ if ($pdoRrhh) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
 
-    <title>MEDIDATA - Horarios Laborales</title>
+    <title>MEDIDATA</title>
 </head>
 <body>
     <?php include_once './menu.php'; ?>
@@ -65,12 +69,25 @@ if ($pdoRrhh) {
                                 <tr>
                                     <th>Nombre del Horario</th>
                                     <th>Días/Horas</th>
+                                    <th>Descanso</th>
+                                    <th>Horas efectivas / semana</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($schedules as $d): ?>
+                                <?php
+                                $breakMin = (int) ($d->break_minutes ?? 0);
+                                $weeklyHours = $d->weekly_effective_hours ?? null;
+                                if ($pdoRrhh) {
+                                    $calcRow = medidata_schedule_calc_weekly(
+                                        medidata_schedule_details_from_db($pdoRrhh, (int) $d->id),
+                                        $breakMin
+                                    );
+                                    $weeklyHours = $calcRow['effective_hours'];
+                                }
+                                ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($d->name); ?></td>
                                     <td>
@@ -83,10 +100,12 @@ if ($pdoRrhh) {
                                         foreach ($details as $det) {
                                             $dayStr[] = $det['day'] . " (" . $det['entry'] . "-" . $det['exit_t'] . ")";
                                         }
-                                        echo implode(", ", $dayStr);
+                                        echo implode(', ', $dayStr);
                                         ?>
                                         </small>
                                     </td>
+                                    <td><?php echo htmlspecialchars(medidata_schedule_break_label((int) ($d->break_minutes ?? 0))); ?></td>
+                                    <td><strong><?php echo htmlspecialchars(medidata_schedule_format_hours($weeklyHours ?? 0)); ?></strong></td>
                                     <td style="text-align: center;">
                                         <label class="switch">
                                             <input type="checkbox" class="state-toggle" data-id="<?php echo $d->id; ?>" checked disabled title="Función solo administrativa">

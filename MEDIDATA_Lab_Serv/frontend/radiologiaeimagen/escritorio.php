@@ -1,5 +1,9 @@
 <?php
 include_once '../../backend/registros/session_check.php';
+if (($_SESSION['rol'] ?? '') === 'Radiologo') {
+    require __DIR__ . '/escritorio_radiologo.php';
+    exit;
+}
 // incuir el archivo de sesion login
 ?>
 <?php
@@ -378,7 +382,7 @@ $totalPendientesRequisiciones = $connect->query("
 <body>
     <div class="dashboard-container">
         <header>
-            <h1>Radiología e Imagen</h1>
+            <h1>RADIOLOGÍA E IMAGEN</h1>
         </header>
         <div class="dashboard">
 

@@ -726,6 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
     <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
+    <script src="../../backend/registros/script/cierres_caja_datatable.js"></script>
 
     <!-- Inicializacion DataTables server-side (facturas + cierres de caja) -->
     <script>
@@ -789,49 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
             initFacturas('#tabla_pagadas', 'Cobrada', '', 'facturas_pagadas');
             initFacturas('#tabla_nopagadas', 'Pendiente', '', 'facturas_no_pagadas');
             initFacturas('#tabla_hosp', 'Pendiente', 'Hospitalizado', 'facturas_hospitalizacion');
-
-            $('#tabla_cierres').DataTable({
-                processing: true,
-                serverSide: true,
-                dom: 'Bfrtip',
-                scrollX: true,
-                order: [[0, 'desc']],
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                ajax: {
-                    url: '../../backend/php/get_cierres_caja.php',
-                    type: 'GET'
-                },
-                columns: [
-                    { data: 'fecha_cierre', render: function (d) { return esc(d) || '—'; } },
-                    { data: 'total_ventas', className: 'dt-right', render: function (d) { return lps(d); } },
-                    { data: 'total_facturas', render: function (d) { return esc(d) || '0'; } },
-                    { data: 'facturas_cobradas', render: function (d) { return esc(d) || '0'; } },
-                    { data: 'facturas_pendientes', render: function (d) { return esc(d) || '0'; } },
-                    {
-                        data: 'total_por_metodo',
-                        orderable: false,
-                        render: function (d) {
-                            if (!d) { return '—'; }
-                            var obj;
-                            try { obj = JSON.parse(d); } catch (e) { return esc(d); }
-                            if (!obj || typeof obj !== 'object') { return '—'; }
-                            return Object.keys(obj).map(function (k) {
-                                return esc(k) + ': ' + lps(obj[k]);
-                            }).join('<br>') || '—';
-                        }
-                    },
-                    { data: 'usuario_cierre', render: function (d) { return esc(d) || '—'; } },
-                    { data: 'nombre_completo', render: function (d) { return esc(d) || '—'; } }
-                ],
-                buttons: [
-                    { extend: 'copy', className: 'button' },
-                    { extend: 'csv', className: 'button', title: 'cierres_de_caja' },
-                    { extend: 'excel', className: 'button', title: 'cierres_de_caja' },
-                    { extend: 'print', className: 'button' }
-                ],
-                language: idiomaDataTable
-            });
+            medidataCierresCajaDT.init('#tabla_cierres', { showNombre: true });
         });
     })();
     </script>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 date_default_timezone_set('America/Tegucigalpa');
 
 require_once __DIR__ . '/../../backend/bd/Conexion.php';
+require_once __DIR__ . '/mhpacs_filters_lib.php';
 
 session_start();
 header('Content-Type: application/json; charset=utf-8');
@@ -18,10 +19,14 @@ if (!isset($_SESSION['id'])) {
  * @param array<string, mixed> $filters
  * @param list<mixed> $params
  */
-function medidata_worklist_sql_where(int $technicianId, array $filters, array &$params): string
+function medidata_worklist_sql_where(string $userRol, int $userId, array $filters, array &$params): string
 {
-    $where = ' WHERE (w.technician_id = ? OR w.technician_id IS NULL)';
-    $params = [$technicianId];
+    $where = ' WHERE 1=1';
+
+    if (mhpacs_is_tecnico_role($userRol)) {
+        $where .= ' AND (w.technician_id = ? OR w.technician_id IS NULL)';
+        $params[] = $userId;
+    }
 
     if (!empty($filters['modality'])) {
         $where .= ' AND w.modality = ?';
@@ -33,23 +38,14 @@ function medidata_worklist_sql_where(int $technicianId, array $filters, array &$
         $params[] = (string) $filters['priority'];
     }
 
-    if (!empty($filters['status'])) {
-        $where .= ' AND w.status = ?';
-        $params[] = (string) $filters['status'];
-    }
+    $where .= mhpacs_worklist_radiologist_sql((string) ($filters['radiologist_id'] ?? ''), $params);
 
-    if (!empty($filters['date'])) {
-        $where .= ' AND DATE(w.study_date) = ?';
-        $params[] = (string) $filters['date'];
-    }
-
-    if (!empty($filters['search'])) {
-        $where .= ' AND (w.patient_name LIKE ? OR w.patient_id LIKE ? OR w.study_description LIKE ?)';
-        $term = '%' . (string) $filters['search'] . '%';
-        $params[] = $term;
-        $params[] = $term;
-        $params[] = $term;
-    }
+    $where .= mhpacs_sql_date_range('w.study_date', $filters['date_from'], $filters['date_to'], $params);
+    $where .= mhpacs_sql_search(
+        ['w.patient_name', 'w.patient_id', 'w.study_description', 'w.study_id'],
+        $filters['search'],
+        $params
+    );
 
     return $where;
 }
@@ -60,22 +56,15 @@ try {
         $payload = [];
     }
 
-    $technicianId = (int) $_SESSION['id'];
-    $page = max(1, (int) ($payload['page'] ?? 1));
-    $limit = (int) ($payload['limit'] ?? 10);
-    $limit = max(5, min(50, $limit));
-    $offset = ($page - 1) * $limit;
-
-    $filters = [
-        'modality' => trim((string) ($payload['modality'] ?? '')),
-        'priority' => trim((string) ($payload['priority'] ?? '')),
-        'status'   => trim((string) ($payload['status'] ?? '')),
-        'date'     => trim((string) ($payload['date'] ?? '')),
-        'search'   => trim((string) ($payload['search'] ?? '')),
-    ];
+    $userId = (int) $_SESSION['id'];
+    $userRol = (string) ($_SESSION['rol'] ?? '');
+    $filters = mhpacs_filters_parse_payload($payload);
+    $page = $filters['page'];
+    $limit = $filters['limit'];
+    $offset = $filters['offset'];
 
     $params = [];
-    $where = medidata_worklist_sql_where($technicianId, $filters, $params);
+    $where = medidata_worklist_sql_where($userRol, $userId, $filters, $params);
 
     $countStmt = $connect->prepare('SELECT COUNT(*) FROM worklist w' . $where);
     $countStmt->execute($params);
@@ -119,17 +108,7 @@ try {
     }
     unset($row);
 
-    $totalPages = $total > 0 ? (int) ceil($total / $limit) : 1;
-
-    echo json_encode([
-        'success'     => true,
-        'data'        => $rows,
-        'total'       => $total,
-        'page'        => $page,
-        'limit'       => $limit,
-        'totalPages'  => $totalPages,
-    ], JSON_UNESCAPED_UNICODE);
-
+    mhpacs_json_paginated($rows, $total, $page, $limit);
 } catch (Throwable $e) {
     error_log('get_worklist.php: ' . $e->getMessage());
     http_response_code(500);

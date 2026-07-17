@@ -71,7 +71,7 @@ function medidata_generar_partida_desde_compra(
     $byCuenta = [];
     foreach ($lineas as $ln) {
         $cuenta = medidata_normalizar_codigo_cuenta_desde_cat((string) ($ln['cat_cuenta'] ?? ''));
-        if ($cuenta === '') {
+        if ($cuenta === '' || $cuenta === '0' || !preg_match('/^\d{6,12}$/', $cuenta)) {
             $cuenta = '110400102';
         }
         $byCuenta[$cuenta] = ($byCuenta[$cuenta] ?? 0) + round((float) ($ln['subtotal'] ?? 0), 2);

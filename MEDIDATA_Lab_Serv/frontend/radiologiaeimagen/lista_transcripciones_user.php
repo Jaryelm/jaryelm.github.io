@@ -8,6 +8,8 @@ include_once '../../backend/registros/session_check.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
+    <link rel="stylesheet" href="../../backend/css/transcripcion_informe_modal.css">
+    <link rel="stylesheet" href="../../backend/css/mhpacs_filters.css">
     <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <title>MEDIDATA</title>
@@ -74,25 +76,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             </div>
 
             <!-- Filtros -->
-            <div class="filters">
-                <select id="modalityFilter">
-                    <option value="">Todas las Modalidades</option>
-                    <option value="CR">Radiografía Computarizada</option>
-                    <option value="CT">Tomografía Computarizada</option>
-                    <option value="MR">Resonancia Magnética</option>
-                    <option value="US">Ultrasonido</option>
-                </select>
-
-                <select id="statusFilter">
-                    <option value="">Todos los Estados</option>
-                    <option value="pending_transcription">Pendientes</option>
-                    <option value="in_progress">En Progreso</option>
-                    <option value="completed">Completados</option>
-                </select>
-
-                <input type="date" id="dateFilter" />
-                <button onclick="applyFilters()" class="filter-btn">Aplicar Filtros</button>
-            </div>
+            <?php $mhpacs_filter_mode = 'transcriptions'; include __DIR__ . '/_mhpacs_filters.inc.php'; ?>
 
             <!-- Mensaje de acceso restringido -->
             <div id="noTranscriptionMsg" style="display:none; text-align:center; color:#035c67; font-size:18px; margin:30px 0; font-weight:600;">
@@ -106,6 +90,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <tr>
                             <th>ID Paciente</th>
                             <th>Nombre</th>
+                            <th>Médico radiólogo</th>
                             <th>Modalidad</th>
                             <th>Descripción</th>
                             <th>Fecha</th>
@@ -117,83 +102,87 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                         <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
+                <div id="transcriptionsPagination" class="mhpacs-pagination"></div>
             </div>
 
             <!-- Modal de Transcripción -->
-            <div id="transcriptionModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Transcripción de Informe</h2>
-                    <div class="transcription-container">
-                        <!-- Sección de Audio -->
-                        <div class="audio-section">
-                            <h3>Dictado</h3>
-                            <audio id="dictationAudio" controls style="width:100%;"></audio>
-
-                            <div class="audio-controls">
-                                <button onclick="playAudio()">Reproducir</button>
-                                <button onclick="pauseAudio()">Pausar</button>
-                                <button onclick="stopAudio()">Detener</button>
-                            </div>
+            <div id="transcriptionModal" class="tx-modal">
+                <div class="tx-modal-dialog">
+                    <div class="tx-modal-header">
+                        <div>
+                            <h2>Transcripción de Informe</h2>
+                            <p>Revise el dictado y el informe del médico, luego complete la transcripción formal.</p>
                         </div>
-
-                        <!-- Sección de Transcripción -->
-                        <div class="transcription-form">
-                            <form id="transcriptionForm">
-                                <input type="hidden" id="reportId" name="reportId">
-                                
-                                <!-- Informe Original del Médico -->
-                                <div class="original-report">
-                                    <h3>Informe del Médico</h3>
-                                    <div class="form-group">
-                                        <label>Historia Clínica:</label>
-                                        <textarea id="originalClinicalHistory" rows="3" readonly></textarea>
+                        <button type="button" class="tx-modal-close" id="transcriptionModalClose" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="tx-modal-body">
+                        <div class="tx-layout">
+                            <div class="tx-panel">
+                                <h3 class="tx-panel-title"><i class="bx bx-microphone"></i> Dictado e informe original</h3>
+                                <div class="tx-panel-body">
+                                    <div class="tx-audio-wrap">
+                                        <p class="tx-label" style="font-weight:600;margin:0 0 8px;color:#035c67;">Dictado de voz</p>
+                                        <audio id="dictationAudio" controls style="display:none;"></audio>
+                                        <p id="noAudioMsg" class="tx-no-audio">Sin audio de dictado para este informe.</p>
+                                        <div class="tx-audio-btns">
+                                            <button type="button" onclick="playAudio()"><i class="bx bx-play"></i> Reproducir</button>
+                                            <button type="button" onclick="pauseAudio()"><i class="bx bx-pause"></i> Pausar</button>
+                                            <button type="button" onclick="stopAudio()"><i class="bx bx-stop"></i> Detener</button>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Hallazgos:</label>
-                                        <textarea id="originalFindings" rows="6" readonly></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Impresión Diagnóstica:</label>
-                                        <textarea id="originalImpression" rows="4" readonly></textarea>
-                                    </div>
+                                    <section class="tx-section tx-section-readonly">
+                                        <h4 class="tx-section-title">Informe del médico</h4>
+                                        <div class="tx-field">
+                                            <label for="originalClinicalHistory">Historia clínica</label>
+                                            <textarea id="originalClinicalHistory" rows="3" readonly></textarea>
+                                        </div>
+                                        <div class="tx-field">
+                                            <label for="originalFindings">Hallazgos</label>
+                                            <textarea id="originalFindings" rows="5" readonly></textarea>
+                                        </div>
+                                        <div class="tx-field">
+                                            <label for="originalImpression">Impresión diagnóstica</label>
+                                            <textarea id="originalImpression" rows="4" readonly></textarea>
+                                        </div>
+                                    </section>
                                 </div>
+                            </div>
 
-                                <hr class="divider">
-
-                                <!-- Transcripción -->
-                                <br>
-                                <h3>Transcripción</h3>
-                                <br>
-                                <div class="form-group">
-                                    <label>TÍTULO DEL INFORME:</label>
-                                    <input type="text" id="reportTitle" required placeholder="Ej: TOMOGRAFÍA ABDOMINAL CONTRASTADA">
+                            <div class="tx-panel">
+                                <h3 class="tx-panel-title"><i class="bx bx-edit"></i> Transcripción formal</h3>
+                                <div class="tx-panel-body">
+                                    <form id="transcriptionForm" class="tx-form">
+                                        <input type="hidden" id="reportId" name="reportId">
+                                        <section class="tx-section">
+                                            <h4 class="tx-section-title">Datos del informe transcrito</h4>
+                                            <div class="tx-field">
+                                                <label for="reportTitle">Título del informe</label>
+                                                <input type="text" id="reportTitle" required placeholder="Ej: Tomografía abdominal contrastada">
+                                            </div>
+                                            <div class="tx-field">
+                                                <label for="clinicalHistory">Indicio / historia clínica</label>
+                                                <textarea id="clinicalHistory" rows="3" required placeholder="Indicación clínica..."></textarea>
+                                            </div>
+                                            <div class="tx-field">
+                                                <label for="findings">Hallazgos</label>
+                                                <textarea id="findings" rows="5" required placeholder="Hallazgos transcritos..."></textarea>
+                                            </div>
+                                            <div class="tx-field">
+                                                <label for="impression">Impresión diagnóstica</label>
+                                                <textarea id="impression" rows="4" required placeholder="Impresión diagnóstica..."></textarea>
+                                            </div>
+                                            <div class="tx-field">
+                                                <label for="comments">Recomendaciones</label>
+                                                <textarea id="comments" rows="2" placeholder="Recomendaciones opcionales..."></textarea>
+                                            </div>
+                                        </section>
+                                        <div class="tx-actions">
+                                            <button type="button" class="tx-btn-draft" onclick="saveDraft()"><i class="bx bx-save"></i> Guardar borrador</button>
+                                            <button type="button" class="tx-btn-complete" onclick="completeTranscription()"><i class="bx bx-check-circle"></i> Completar transcripción</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="form-group">
-                                    <label>Indicio:</label>
-                                    <textarea id="clinicalHistory" rows="3" required></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Hallazgos:</label>
-                                    <textarea id="findings" rows="6" required></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Impresión Diagnóstica:</label>
-                                    <textarea id="impression" rows="4" required></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Recomendaciones:</label>
-                                    <textarea id="comments" rows="2"></textarea>
-                                </div>
-
-                                <div class="button-group">
-                                    <button type="button" onclick="saveDraft()">Guardar Borrador</button>
-                                    <button type="button" onclick="completeTranscription()">Completar Transcripción</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -229,6 +218,24 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     <div id="seguimientoDetalle"></div>
                 </div>
             </div>
+
+            <!-- Modal visualización PDF -->
+            <div id="pdfModal" class="modal-pdf" style="z-index:10050;">
+                <div class="modal-pdf-content">
+                    <div class="modal-pdf-header">
+                        <h2 id="pdfModalTitle">Informe radiológico</h2>
+                        <span class="close-pdf-btn" onclick="cerrarPDFModal()" aria-label="Cerrar">&times;</span>
+                    </div>
+                    <div class="modal-pdf-body">
+                        <iframe id="pdfFrame" src="" frameborder="0" title="Vista previa del informe PDF"></iframe>
+                    </div>
+                    <div class="modal-pdf-footer">
+                        <button type="button" class="btn-descargar-pdf" onclick="descargarPDFActual()">
+                            <i class="bx bx-download"></i> Descargar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </section>
 
@@ -259,29 +266,6 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         font-size: 24px;
         font-weight: bold;
         color: #06adbf;
-    }
-
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .filters select, .filters input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        min-width: 150px;
-    }
-
-    .filter-btn {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
     }
 
     .table-container {
@@ -334,84 +318,28 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         overflow-y: auto;
     }
 
-    .transcription-container {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .audio-section {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 4px;
-    }
-
-    .audio-controls {
+    #reportModal .form-group,
+    #seguimientoModal .form-group {
         display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .audio-controls button {
-        padding: 8px 16px;
-        background-color: #06adbf;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .transcription-form {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 4px;
-    }
-
-    .form-group {
+        flex-direction: column;
+        gap: 6px;
         margin-bottom: 15px;
     }
 
-    .form-group label {
+    #reportModal .form-group label,
+    #seguimientoModal .form-group label {
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
     }
 
-    .form-group textarea {
+    #reportModal .form-group textarea,
+    #seguimientoModal .form-group textarea {
         width: 100%;
         padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .button-group button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .button-group button:first-child {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .button-group button:last-child {
-        background-color: #06adbf;
-        color: white;
-    }
-
-    @media (max-width: 1200px) {
-        .transcription-container {
-            grid-template-columns: 1fr;
-        }
+        margin: 0;
     }
 
     .action-buttons {
@@ -480,6 +408,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="mhpacs_filters_core.js"></script>
+    <script src="transcriptions_list_core.js"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {
@@ -494,57 +424,29 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         });
     }
 
-    // Cargar transcripciones
-    function loadTranscriptions() {
-        const filters = {
-            modality: document.getElementById('modalityFilter').value,
-            status: document.getElementById('statusFilter').value,
-            date: document.getElementById('dateFilter').value
-        };
-
-        fetch('get_transcriptions.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(filters)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('transcriptionsBody');
-            tbody.innerHTML = '';
-
-            if (Array.isArray(data)) {
-                data.forEach(transcription => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${transcription.patient_id}</td>
-                        <td>${transcription.patient_name}</td>
-                        <td>${transcription.modality}</td>
-                        <td>${transcription.description}</td>
-                        <td>${formatDateTime(transcription.study_date)}</td>
-                        <td>${formatStatus(transcription.status)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button onclick="openTranscription('${transcription.report_id}')" class="btn-transcribe">
-                                    <i class='bx bx-edit'></i> Transcribir
-                                </button>
-                                <button onclick="verSeguimiento('${transcription.report_id}', '${transcription.study_id || ''}')" class="btn-report">
-                                    <i class='bx bx-file'></i> Ver Informe
-                                </button>
-                                <button onclick="downloadPDF('${transcription.report_id}')" class="btn-history">
-                                    <i class='bx bx-download'></i> PDF
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } else {
-                // Muestra un mensaje de error si la respuesta no es un array
-                tbody.innerHTML = `<tr><td colspan=\"7\" style=\"text-align:center;color:red;\">${data.error || 'Error al cargar transcripciones'}</td></tr>`;
-            }
-        });
+    function renderTranscriptionRow(transcription) {
+        return `
+            <td>${transcription.patient_id}</td>
+            <td>${transcription.patient_name}</td>
+            <td>${transcription.radiologist_name || '—'}</td>
+            <td>${transcription.modality}</td>
+            <td>${transcription.description}</td>
+            <td>${formatDateTime(transcription.study_date)}</td>
+            <td>${formatStatus(transcription.status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="openTranscription('${transcription.report_id}')" class="btn-transcribe">
+                        <i class='bx bx-edit'></i> Transcribir
+                    </button>
+                    <button onclick="verSeguimiento('${transcription.report_id}', '${transcription.study_id || ''}')" class="btn-report">
+                        <i class='bx bx-file'></i> Ver Informe
+                    </button>
+                    <button onclick="downloadPDF('${transcription.report_id}')" class="btn-history">
+                        <i class='bx bx-download'></i> PDF
+                    </button>
+                </div>
+            </td>
+        `;
     }
 
     // Función para ver el informe original
@@ -570,6 +472,23 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                 alert('Error al cargar el informe');
             });
     }
+
+    function openTranscriptionModal() {
+        document.getElementById('transcriptionModal').classList.add('is-open');
+        document.body.classList.add('tx-modal-open');
+    }
+
+    function closeTranscriptionModal() {
+        document.getElementById('transcriptionModal').classList.remove('is-open');
+        document.body.classList.remove('tx-modal-open');
+    }
+
+    document.getElementById('transcriptionModalClose').onclick = closeTranscriptionModal;
+    document.getElementById('transcriptionModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeTranscriptionModal();
+        }
+    });
 
     // Modificar la función openTranscription para cargar también el informe original
     function openTranscription(reportId) {
@@ -600,17 +519,18 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                     document.getElementById('comments').value = data.transcription.comments || '';
                 }
                 window.currentReport = data.report;
-                document.getElementById('transcriptionModal').style.display = 'block';
-                // AUDIO: igual que en lista_estudios_medico.php
+                openTranscriptionModal();
                 const audioPlayback = document.getElementById('dictationAudio');
+                const noAudioMsg = document.getElementById('noAudioMsg');
                 if (data.report.audio_url) {
-                    // Ruta absoluta desde la raíz del proyecto
                     const audioPath = '../../backend/audios/' + data.report.audio_url;
                     audioPlayback.src = audioPath;
                     audioPlayback.style.display = 'block';
+                    noAudioMsg.style.display = 'none';
                 } else {
                     audioPlayback.src = '';
                     audioPlayback.style.display = 'none';
+                    noAudioMsg.style.display = 'block';
                 }
             } else {
                 Swal.fire('Error', 'No se pudo cargar el informe', 'error');
@@ -647,15 +567,30 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire("Éxito", "Transcripción guardada correctamente", "success");
-                document.getElementById('transcriptionModal').style.display = 'none';
+        .then(async function (response) {
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = { success: false };
+            }
+            if (response.ok && data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Transcripción guardada correctamente',
+                    confirmButtonColor: '#06adbf'
+                });
+                closeTranscriptionModal();
                 loadTranscriptions();
                 loadStats();
             } else {
-                Swal.fire("Error", "No se pudo guardar la transcripción", "error");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'No se pudo guardar la transcripción',
+                    confirmButtonColor: '#035c67'
+                });
             }
         })
         .catch(error => {
@@ -689,44 +624,47 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     // Formatear estado
     function formatStatus(status) {
         const statuses = {
-            'pending_transcription': 'En Transcripción',
+            'pending_transcription': 'Pendiente',
             'final': 'Finalizado',
             'completed': 'Completado',
-            'in_progress': 'En Progreso'
+            'in_progress': 'En progreso',
+            'needs_review': 'Requiere revisión'
         };
         return statuses[status] || status;
     }
 
-    // Cerrar modal
-    document.querySelectorAll('.close').forEach(closeBtn => {
+    document.querySelectorAll('#reportModal .close, #seguimientoModal .close').forEach(closeBtn => {
         closeBtn.onclick = function() {
             this.closest('.modal').style.display = 'none';
         }
     });
 
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal') && event.target.id !== 'transcriptionModal') {
             event.target.style.display = 'none';
         }
-    }
+    });
 
-    // Bloqueo de acceso para el rol Radiologo
     document.addEventListener('DOMContentLoaded', function() {
-        const rolUsuario = '<?php echo isset($_SESSION['rol']) ? $_SESSION['rol'] : ''; ?>';
+        const rolUsuario = '<?php echo isset($_SESSION['rol']) ? htmlspecialchars($_SESSION['rol'], ENT_QUOTES, 'UTF-8') : ''; ?>';
         if (rolUsuario === 'Radiologo') {
-            // Oculta la tabla, filtros y paginación
             document.querySelector('.table-container').style.display = 'none';
-            if(document.querySelector('.filters')) document.querySelector('.filters').style.display = 'none';
-            // Si tienes paginación, ocúltala aquí también
-            if(document.getElementById('pagination')) document.getElementById('pagination').style.display = 'none';
+            if (document.querySelector('.mhpacs-filters')) {
+                document.querySelector('.mhpacs-filters').style.display = 'none';
+            }
+            if (document.getElementById('transcriptionsPagination')) {
+                document.getElementById('transcriptionsPagination').style.display = 'none';
+            }
             document.getElementById('noTranscriptionMsg').style.display = 'block';
-            document.getElementById('noTranscriptionText').textContent = 'No tienes permisos para ver este apartado. Solo los técnicos radiólogos pueden acceder.';
-            return; // No sigas cargando nada más
+            document.getElementById('noTranscriptionText').textContent =
+                'No tienes permisos para ver este apartado. Solo los transcriptores pueden acceder.';
+            return;
         }
-        // Si no es radiologo, carga la tabla normalmente
         loadStats();
-        loadTranscriptions();
+        TranscriptionsListCore.init({
+            renderRow: renderTranscriptionRow,
+            canLoad: function () { return rolUsuario !== 'Radiologo'; },
+        });
     });
 
     function formatAvgTime(minutes) {
@@ -741,9 +679,106 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         }
     }
 
-    function downloadPDF(reportId) {
-        window.open('generar_pdf_informe.php?report_id=' + reportId, '_blank');
+    let pdfUrlActual = '';
+    let pdfBlobUrl = '';
+    let pdfNombreActual = 'informe_radiologico.pdf';
+
+    function rxParsePdfFilename(response, fallback) {
+        const cd = response.headers.get('Content-Disposition') || '';
+        const utfMatch = /filename\*=UTF-8''([^;\n]+)/i.exec(cd);
+        if (utfMatch && utfMatch[1]) {
+            try {
+                return decodeURIComponent(utfMatch[1].trim());
+            } catch (e) {
+                return utfMatch[1].trim();
+            }
+        }
+        const plainMatch = /filename="([^"]+)"/i.exec(cd);
+        if (plainMatch && plainMatch[1]) {
+            return plainMatch[1].trim();
+        }
+        return fallback || 'informe_radiologico.pdf';
     }
+
+    function downloadPDF(reportId) {
+        const url = 'generar_pdf_informe.php?report_id=' + encodeURIComponent(reportId);
+        verPDFInforme(url, 'Informe radiológico');
+    }
+
+    function verPDFInforme(url, titulo) {
+        const inlineUrl = url + (url.includes('?') ? '&' : '?') + 'view=inline';
+        fetch(inlineUrl, { credentials: 'same-origin' })
+            .then(async function (response) {
+                const contentType = response.headers.get('Content-Type') || '';
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || 'No se pudo generar el PDF.');
+                }
+                const blob = await response.blob();
+                if (!contentType.includes('pdf') && blob.type && !blob.type.includes('pdf')) {
+                    const text = await blob.text();
+                    throw new Error(text || 'El servidor no devolvió un PDF válido.');
+                }
+                if (pdfBlobUrl) {
+                    URL.revokeObjectURL(pdfBlobUrl);
+                }
+                pdfBlobUrl = URL.createObjectURL(blob);
+                pdfUrlActual = url;
+                pdfNombreActual = rxParsePdfFilename(response, 'informe_radiologico.pdf');
+                document.getElementById('pdfModalTitle').textContent = titulo;
+                document.getElementById('pdfFrame').src = pdfBlobUrl;
+                document.getElementById('pdfModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(function (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF no disponible',
+                    text: (error && error.message) ? error.message.trim() : 'No se pudo generar el informe PDF.',
+                    confirmButtonColor: '#035c67'
+                });
+            });
+    }
+
+    function cerrarPDFModal() {
+        document.getElementById('pdfModal').style.display = 'none';
+        document.getElementById('pdfFrame').src = '';
+        pdfUrlActual = '';
+        pdfNombreActual = 'informe_radiologico.pdf';
+        if (pdfBlobUrl) {
+            URL.revokeObjectURL(pdfBlobUrl);
+            pdfBlobUrl = '';
+        }
+        document.body.style.overflow = '';
+    }
+
+    function descargarPDFActual() {
+        if (pdfBlobUrl) {
+            const link = document.createElement('a');
+            link.href = pdfBlobUrl;
+            link.download = pdfNombreActual || 'informe_radiologico.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+        }
+        if (!pdfUrlActual) {
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = pdfUrlActual;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    document.getElementById('pdfModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            cerrarPDFModal();
+        }
+    });
 
     // Función para cargar y mostrar el seguimiento completo
     function verSeguimiento(reportId, studyId) {
