@@ -1,10 +1,11 @@
--- Reversión (Down) del esquema de vacaciones y permisos
-DROP TABLE IF EXISTS `rrhh_ausencias_auditoria`;
-DROP TABLE IF EXISTS `rrhh_ausencias_adjuntos`;
-DROP TABLE IF EXISTS `rrhh_ausencias_aprobaciones`;
-DROP TABLE IF EXISTS `rrhh_ausencias_solicitudes`;
-DROP TABLE IF EXISTS `rrhh_vacaciones_movimientos`;
-DROP TABLE IF EXISTS `rrhh_vacaciones_perfil`;
-DROP TABLE IF EXISTS `rrhh_calendario_feriados`;
-DROP TABLE IF EXISTS `rrhh_ausencias_tipos`;
-DROP TABLE IF EXISTS `rrhh_vacaciones_politicas`;
+-- Revert UP migration by dropping the newly created tables
+
+DROP TABLE IF EXISTS `hr_absence_audit_log`;
+DROP TABLE IF EXISTS `hr_absence_attachments`;
+DROP TABLE IF EXISTS `hr_absence_approvals`;
+DROP TABLE IF EXISTS `hr_absence_requests`;
+DROP TABLE IF EXISTS `hr_vacation_transactions`;
+DROP TABLE IF EXISTS `hr_vacation_profile`;
+DROP TABLE IF EXISTS `hr_holiday_calendar`;
+DROP TABLE IF EXISTS `hr_absence_types`;
+DROP TABLE IF EXISTS `hr_vacation_policies`;
