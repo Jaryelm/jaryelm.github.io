@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS `hr_approval_workflow_steps` (
   `approver_type` ENUM('Direct_Manager', 'Department_Manager', 'Specific_Role', 'Specific_User') NOT NULL,
   `approver_ref_id` INT(11) DEFAULT NULL, -- Used ONLY if type is Specific_Role or Specific_User
   PRIMARY KEY (`step_id`),
-  KEY `idx_workflow_step` (`workflow_id`)
+  KEY `idx_workflow_step` (`workflow_id`),
+  KEY `idx_approver_ref` (`approver_ref_id`),
+  CONSTRAINT `fk_step_workflow` FOREIGN KEY (`workflow_id`) REFERENCES `hr_approval_workflows` (`workflow_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 4. Approval Delegations (Out of Office)
@@ -43,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `hr_approval_delegations` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`delegation_id`),
   KEY `idx_delegation_delegator` (`delegator_user_id`),
+  KEY `idx_delegation_delegatee` (`delegatee_user_id`),
   KEY `idx_delegation_active` (`status`, `start_date`, `end_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -60,7 +63,8 @@ CREATE TABLE IF NOT EXISTS `hr_absence_types` (
   `status` TINYINT(1) DEFAULT 1,
   PRIMARY KEY (`type_id`),
   UNIQUE KEY `idx_absence_type_code` (`code`),
-  KEY `idx_absence_type_workflow` (`workflow_id`)
+  KEY `idx_absence_type_workflow` (`workflow_id`),
+  CONSTRAINT `fk_type_workflow` FOREIGN KEY (`workflow_id`) REFERENCES `hr_approval_workflows` (`workflow_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 6. Holiday Calendar
@@ -82,20 +86,7 @@ CREATE TABLE IF NOT EXISTS `hr_vacation_profile` (
   UNIQUE KEY `idx_vacation_profile_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 8. Vacation Transactions History (Kardex)
-CREATE TABLE IF NOT EXISTS `hr_vacation_transactions` (
-  `transaction_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `transaction_type` ENUM('Annual_Accrual', 'Vacation_Consumption', 'Cash_Payout', 'Manual_HR_Adjustment') NOT NULL,
-  `affected_days` DECIMAL(10,2) NOT NULL, 
-  `description` VARCHAR(255) NOT NULL,
-  `request_id_ref` INT(11) DEFAULT NULL,
-  `transaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`transaction_id`),
-  KEY `idx_vacation_txn_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 9. Transactions: Absence Requests
+-- 8. Transactions: Absence Requests
 CREATE TABLE IF NOT EXISTS `hr_absence_requests` (
   `request_id` INT(11) NOT NULL AUTO_INCREMENT,
   `user_id` INT(11) NOT NULL,
@@ -116,7 +107,27 @@ CREATE TABLE IF NOT EXISTS `hr_absence_requests` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`request_id`),
   KEY `idx_absence_req_user` (`user_id`),
-  KEY `idx_absence_req_status` (`request_status`)
+  KEY `idx_absence_req_status` (`request_status`),
+  KEY `idx_absence_req_type` (`type_id`),
+  KEY `idx_absence_req_workflow` (`workflow_id`),
+  KEY `idx_absence_req_final_approver` (`final_approver_id`),
+  CONSTRAINT `fk_req_type` FOREIGN KEY (`type_id`) REFERENCES `hr_absence_types` (`type_id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_req_workflow` FOREIGN KEY (`workflow_id`) REFERENCES `hr_approval_workflows` (`workflow_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 9. Vacation Transactions History (Kardex)
+CREATE TABLE IF NOT EXISTS `hr_vacation_transactions` (
+  `transaction_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `transaction_type` ENUM('Annual_Accrual', 'Vacation_Consumption', 'Cash_Payout', 'Manual_HR_Adjustment') NOT NULL,
+  `affected_days` DECIMAL(10,2) NOT NULL, 
+  `description` VARCHAR(255) NOT NULL,
+  `request_id_ref` INT(11) DEFAULT NULL,
+  `transaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`transaction_id`),
+  KEY `idx_vacation_txn_user` (`user_id`),
+  KEY `idx_vacation_txn_req` (`request_id_ref`),
+  CONSTRAINT `fk_txn_request` FOREIGN KEY (`request_id_ref`) REFERENCES `hr_absence_requests` (`request_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 10. Dynamic Approval Log / History (Tracks each decision per step)
@@ -130,7 +141,11 @@ CREATE TABLE IF NOT EXISTS `hr_absence_approval_logs` (
   `comments` TEXT DEFAULT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`approval_id`),
-  KEY `idx_absence_approval_req` (`request_id`)
+  KEY `idx_absence_approval_req` (`request_id`),
+  KEY `idx_absence_approval_step` (`step_id`),
+  KEY `idx_absence_approval_approver` (`approver_user_id`),
+  CONSTRAINT `fk_log_req` FOREIGN KEY (`request_id`) REFERENCES `hr_absence_requests` (`request_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_log_step` FOREIGN KEY (`step_id`) REFERENCES `hr_approval_workflow_steps` (`step_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 11. Attached Documents (1 to N)
@@ -143,7 +158,8 @@ CREATE TABLE IF NOT EXISTS `hr_absence_attachments` (
   `format` VARCHAR(50) DEFAULT NULL,
   `uploaded_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`attachment_id`),
-  KEY `idx_absence_att_req` (`request_id`)
+  KEY `idx_absence_att_req` (`request_id`),
+  CONSTRAINT `fk_att_req` FOREIGN KEY (`request_id`) REFERENCES `hr_absence_requests` (`request_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 12. Strict Audit Log
