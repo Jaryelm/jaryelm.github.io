@@ -63,7 +63,7 @@ try {
         
         $assignment['completion_date'] = $assignment['completion_date'] ? date('d/m/Y H:i', strtotime($assignment['completion_date'])) : null;
         
-        // Traducir estado
+        // Traducir estado del worklist
         $status_map = [
             'pending' => 'Pendiente',
             'in_progress' => 'En Progreso',
@@ -71,11 +71,24 @@ try {
             'cancelled' => 'Cancelado'
         ];
         $assignment['status'] = $status_map[$assignment['status']] ?? $assignment['status'];
+
+        $report_map = [
+            'pending' => 'Pendiente de lectura',
+            'draft' => 'Borrador',
+            'pending_transcription' => 'En transcripción',
+            'transcribed' => 'Transcrito',
+            'reviewed' => 'Revisado',
+            'final' => 'Finalizado',
+            'in_progress' => 'En progreso',
+        ];
+        $assignment['report_status_label'] = $reportStatus !== ''
+            ? ($report_map[$reportStatus] ?? $reportStatus)
+            : (($assignment['assignment_status'] === 'asignado') ? 'Pendiente de lectura' : 'Sin informe');
         
         echo json_encode([
             'success' => true,
             'assignment' => $assignment
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode([
             'success' => false,

@@ -18,6 +18,22 @@ if (!isset($connect) || !($connect instanceof PDO)) {
     cuentas_json(['data' => [], 'error' => 'No hay conexión a la base de datos.'], 500);
 }
 
+function cuentas_proveedor_coincide(string $filtro, string $prov): bool
+{
+    $filtro = mb_strtoupper(trim($filtro));
+    $prov = mb_strtoupper(trim($prov));
+    if ($filtro === '' || $prov === '') {
+        return false;
+    }
+    if ($filtro === $prov) {
+        return true;
+    }
+    return str_starts_with($filtro, $prov . ' ')
+        || str_starts_with($prov, $filtro . ' ')
+        || str_starts_with($filtro, $prov)
+        || str_starts_with($prov, $filtro);
+}
+
 $tipo = $_POST['tipo'] ?? 'comercial';
 $fecha_inicio = $_POST['fechaDesde'] ?? $_POST['fecha_inicio'] ?? '2020-01-01';
 $fecha_fin = $_POST['fechaHasta'] ?? $_POST['fecha_fin'] ?? date('Y-m-t');
@@ -80,7 +96,7 @@ try {
             $prov = $r['Proveedor'] ?? 'Desconocido';
             if (!trim((string)$prov)) $prov = 'Desconocido';
             
-            if ($proveedor_filtro && $proveedor_filtro !== $prov) {
+            if ($proveedor_filtro && !cuentas_proveedor_coincide($proveedor_filtro, (string) $prov)) {
                 continue;
             }
             
@@ -149,7 +165,7 @@ try {
             $prov = $r['Proveedor'] ?? 'Desconocido';
             if (!trim((string)$prov)) $prov = 'Desconocido';
             
-            if ($proveedor_filtro && $proveedor_filtro !== $prov) {
+            if ($proveedor_filtro && !cuentas_proveedor_coincide($proveedor_filtro, (string) $prov)) {
                 continue;
             }
             

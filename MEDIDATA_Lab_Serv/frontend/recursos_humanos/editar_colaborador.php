@@ -75,7 +75,7 @@ if (count($data) > 0 && !empty($data[0]->id_candidate_rrhh)) {
     <title>MEDIDATA</title>
 </head>
 <body>
-<?php include_once '../recursos_humanos/menu.php'; ?>
+<?php include_once '../admin/menu.php'; ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>

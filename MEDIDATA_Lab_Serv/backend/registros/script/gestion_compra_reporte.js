@@ -33,7 +33,50 @@
         init: function(opciones) {
             this.pagina = opciones.pagina || this.pagina;
             this.endpoint = opciones.endpoint || this.endpoint;
+            this.proveedoresCargados = false;
             this.bindEvents();
+            this.cargarProveedores();
+        },
+
+        cargarProveedores: function(callback) {
+            var self = this;
+            $.post(self.endpoint, { accion: 'proveedores' }, null, 'json')
+                .done(function(resp) {
+                    if (!resp || !resp.success || !Array.isArray(resp.proveedores)) {
+                        return;
+                    }
+                    var $sel = $('#editCompraProveedor');
+                    if (!$sel.length) {
+                        return;
+                    }
+                    var html = '<option value="">Seleccione proveedor</option>';
+                    resp.proveedores.forEach(function(p) {
+                        var nombre = p.nombre_empresa || '';
+                        if (!nombre) return;
+                        html += '<option value="' + $('<div>').text(nombre).html() + '">' +
+                            $('<div>').text(nombre).html() + '</option>';
+                    });
+                    $sel.html(html);
+                    self.proveedoresCargados = true;
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                });
+        },
+
+        seleccionarProveedor: function(nombre) {
+            var $sel = $('#editCompraProveedor');
+            var prov = (nombre || '').trim();
+            if (!prov) {
+                $sel.val('');
+                return;
+            }
+            if ($sel.find('option[value="' + prov.replace(/"/g, '\\"') + '"]').length === 0) {
+                $sel.append(
+                    $('<option>').val(prov).text(prov + ' (corregir: no está en directorio)')
+                );
+            }
+            $sel.val(prov);
         },
 
         bindEvents: function() {
@@ -52,35 +95,48 @@
 
         abrirEditar: function(idCompra) {
             var self = this;
-            $.post(self.endpoint, { accion: 'obtener', id_compra: idCompra }, null, 'json')
-                .done(function(resp) {
-                    if (!resp || !resp.success || !resp.compra) {
-                        Swal.fire('Error', (resp && resp.message) ? resp.message : 'No se pudo cargar la compra.', 'error');
-                        return;
-                    }
-                    var c = resp.compra;
-                    $('#editCompraId').val(c.id_compra);
-                    $('#editCompraFecha').val(c.fecha_emision || '');
-                    $('#editCompraProveedor').val(c.prov_datos || '');
-                    $('#editCompraFactura').val(c.dato_fac || '');
-                    $('#editCompraSubtotal').val(parseFloat(c.sub_total || 0).toFixed(2));
-                    $('#editCompraIsv').val(parseFloat(c.isv_global || 0).toFixed(2));
-                    $('#editCompraTotal').val(parseFloat(c.total || 0).toFixed(2));
-                    $('#editCompraMotivo').val('');
+            var abrirConDatos = function() {
+                $.post(self.endpoint, { accion: 'obtener', id_compra: idCompra }, null, 'json')
+                    .done(function(resp) {
+                        if (!resp || !resp.success || !resp.compra) {
+                            Swal.fire('Error', (resp && resp.message) ? resp.message : 'No se pudo cargar la compra.', 'error');
+                            return;
+                        }
+                        var c = resp.compra;
+                        $('#editCompraId').val(c.id_compra);
+                        $('#editCompraFecha').val(c.fecha_emision || '');
+                        self.seleccionarProveedor(c.prov_datos || '');
+                        $('#editCompraFactura').val(c.dato_fac || '');
+                        $('#editCompraSubtotal').val(parseFloat(c.sub_total || 0).toFixed(2));
+                        $('#editCompraIsv').val(parseFloat(c.isv_global || 0).toFixed(2));
+                        $('#editCompraTotal').val(parseFloat(c.total || 0).toFixed(2));
+                        $('#editCompraMotivo').val('');
 
-                    var bloqueado = !!c.tiene_pagos;
-                    $('#editCompraSubtotal, #editCompraIsv, #editCompraTotal').prop('readonly', bloqueado);
-                    $('#avisoCompraPagos').toggle(bloqueado);
+                        var bloqueado = !!c.tiene_pagos;
+                        $('#editCompraSubtotal, #editCompraIsv, #editCompraTotal').prop('readonly', bloqueado);
+                        $('#avisoCompraPagos').toggle(bloqueado);
 
-                    $('#modalEditarCompra').css('display', 'flex');
-                })
-                .fail(function() {
-                    Swal.fire('Error', 'No se pudo cargar la compra.', 'error');
-                });
+                        $('#modalEditarCompra').css('display', 'flex');
+                    })
+                    .fail(function() {
+                        Swal.fire('Error', 'No se pudo cargar la compra.', 'error');
+                    });
+            };
+
+            if (this.proveedoresCargados) {
+                abrirConDatos();
+            } else {
+                this.cargarProveedores(abrirConDatos);
+            }
         },
 
         guardarEdicion: function() {
             var self = this;
+            var prov = ($('#editCompraProveedor').val() || '').trim();
+            if (!prov || prov === '0') {
+                Swal.fire('Proveedor requerido', 'Seleccione un proveedor registrado en el Directorio Comercial.', 'warning');
+                return;
+            }
             var payload = $('#formEditarCompra').serializeArray();
             payload.push({ name: 'accion', value: 'actualizar' });
 

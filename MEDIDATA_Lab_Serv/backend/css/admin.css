@@ -2337,22 +2337,37 @@ input[type=radio] {
   opacity: 0.9;
 }
 
+/* Homogeneizar button vs <a> (mismo alto / tipografía / caja) */
+button.registerbtn,
+button.pabtn,
 a.registerbtn,
-a.pabtn {
-  display: block;
-  box-sizing: border-box;
-  text-decoration: none;
-  text-align: center;
-}
-
+a.pabtn,
 a.button.form-secondary-btn {
   display: block;
   box-sizing: border-box;
   width: 100%;
-  text-align: center;
   margin: 8px 0;
   padding: 16px 20px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.25;
+  text-align: center;
   text-decoration: none;
+  border: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.rrhh-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rrhh-form-actions .registerbtn,
+.rrhh-form-actions .pabtn {
+  margin: 8px 0;
 }
 
 .registerbtn-secondary-link {
@@ -4887,7 +4902,8 @@ input:checked + .slider:before {
   line-height: 1.45 !important;
   color: #4b5563 !important;
   margin-top: 0.2rem !important;
-  overflow: hidden !important;
+  overflow: auto !important;
+  max-height: min(60vh, 420px);
   word-break: break-word;
 }
 .swal2-actions {

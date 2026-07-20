@@ -5,6 +5,8 @@
     'use strict';
 
     let currentPage = 1;
+    let totalPages = 1;
+    let totalRecords = 0;
     let loading = false;
     const perPage = 10;
     let renderRowFn = null;
@@ -63,6 +65,10 @@
                 return;
             }
 
+            totalRecords = result.total;
+            totalPages = result.totalPages;
+            currentPage = result.page;
+
             if (!result.data.length) {
                 tbody.innerHTML =
                     '<tr><td colspan="8" style="text-align:center;padding:20px;">No hay transcripciones con los filtros seleccionados.</td></tr>';
@@ -77,9 +83,6 @@
                 });
             }
 
-            if (typeof MhpacsFilters !== 'undefined') {
-                MhpacsFilters.renderPagination('transcriptionsPagination', result, loadTranscriptions, loading);
-            }
         } catch (e) {
             console.error('TranscriptionsListCore:', e);
             if (tbody) {
@@ -87,7 +90,16 @@
                     '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">Error de comunicación.</td></tr>';
             }
         } finally {
+            // Reactivar botones DESPUÉS de liberar loading; si se pinta con true quedan bloqueados.
             loading = false;
+            if (typeof MhpacsFilters !== 'undefined') {
+                MhpacsFilters.renderPagination(
+                    'transcriptionsPagination',
+                    { total: totalRecords, page: currentPage, totalPages: totalPages },
+                    loadTranscriptions,
+                    false
+                );
+            }
         }
     }
 

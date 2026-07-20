@@ -92,9 +92,6 @@
                 });
             }
 
-            if (typeof MhpacsFilters !== 'undefined') {
-                MhpacsFilters.renderPagination('studiesPagination', result, loadStudies, loading);
-            }
         } catch (e) {
             console.error('StudiesListCore:', e);
             if (tbody) {
@@ -102,7 +99,16 @@
                     '<tr><td colspan="7" style="text-align:center;padding:20px;color:#c00;">Error al cargar datos.</td></tr>';
             }
         } finally {
+            // Pasar isLoading=false: si se renderiza con loading=true los botones quedan bloqueados.
             loading = false;
+            if (typeof MhpacsFilters !== 'undefined') {
+                MhpacsFilters.renderPagination(
+                    'studiesPagination',
+                    { total: totalRecords, page: currentPage, totalPages: totalPages },
+                    loadStudies,
+                    false
+                );
+            }
         }
     }
 

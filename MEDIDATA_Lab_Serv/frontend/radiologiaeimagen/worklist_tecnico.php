@@ -774,7 +774,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="mhpacs_filters_core.js"></script>
-    <script src="worklist_core.js"></script>
+    <script src="worklist_core.js?v=20260715a"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         WorklistCore.init('<?php echo htmlspecialchars($rol_usuario, ENT_QUOTES, 'UTF-8'); ?>');
@@ -1155,8 +1155,8 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
             <button onclick="openDicomViewer('${seriesId}')" class="btn-view">
                 <i class='bx bx-show'></i> Ver
             </button>
-            <button onclick="showAssignmentInfo('${studyId}')" class="btn-assignment">
-                <i class='bx bx-user-check'></i> Asignado
+            <button onclick="showAssignmentInfo('${studyId}')" class="btn-assignment" title="Ver médico asignado y estado">
+                <i class='bx bx-user-check'></i> Médico
             </button>
         `;
 
@@ -1579,8 +1579,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 8px;">
                                     <div>
-                                        <strong style="display: block; margin-bottom: 5px; color: #155724;">Estado:</strong>
+                                        <strong style="display: block; margin-bottom: 5px; color: #155724;">Estado estudio:</strong>
                                         <span style="padding: 8px 12px; background: ${assignment.radiologist_name && assignment.radiologist_name !== 'No asignado' ? '#28a745' : '#ffc107'}; color: white; border-radius: 6px; font-weight: bold; display: inline-block; margin-top: 5px;">${assignment.radiologist_name && assignment.radiologist_name !== 'No asignado' ? (assignment.status || 'Pendiente') : 'Sin Asignar'}</span>
+                                    </div>
+                                    <div>
+                                        <strong style="display: block; margin-bottom: 5px; color: #155724;">Estado informe:</strong>
+                                        <span style="padding: 8px 12px; background: #035c67; color: white; border-radius: 6px; font-weight: bold; display: inline-block; margin-top: 5px;">${assignment.report_status_label || 'Sin informe'}</span>
                                     </div>
                                     <div>
                                         <strong style="display: block; margin-bottom: 5px; color: #155724;">Fecha Asignación:</strong>

@@ -155,17 +155,34 @@ function hideLoadingModal() {
         btn.disabled = true;
         const prevText = btn.textContent;
         btn.textContent = 'Sincronizando...';
+        const statusEl = document.getElementById('sync-status');
+        if (statusEl) {
+            statusEl.style.color = '#035c67';
+            statusEl.textContent = 'Sincronizando con Orthanc...';
+        }
         try {
-            const response = await fetch('sync_orthanc.php', { cache: 'no-store' });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 120000);
+            const response = await fetch('../radiologiaeimagen/sync_orthanc.php', { cache: 'no-store', signal: controller.signal });
+            clearTimeout(timeoutId);
             const data = await response.json();
-            if (!data.success) {
-                throw new Error(data.error || 'Error al sincronizar');
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || ('HTTP ' + response.status));
             }
-            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Sincronización OK');
+            if (statusEl) {
+                statusEl.style.color = '#1a7f37';
+                statusEl.textContent = data.message || 'Sincronización OK';
+            }
             fetchTotalStudies();
         } catch (error) {
             console.error('Error syncing with Orthanc:', error);
-            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Error al sincronizar');
+            const msg = (error && error.name === 'AbortError')
+                ? 'Tiempo de espera agotado al sincronizar'
+                : ((error && error.message) ? error.message : 'Error al sincronizar');
+            if (statusEl) {
+                statusEl.style.color = '#c0392b';
+                statusEl.textContent = 'Error: ' + msg;
+            }
         } finally {
             btn.disabled = false;
             btn.textContent = prevText;

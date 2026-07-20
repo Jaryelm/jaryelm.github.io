@@ -24,11 +24,6 @@ try {
     $lengthRaw = (int) ($_GET['length'] ?? $_POST['length'] ?? 10);
     $length = ($lengthRaw <= 0) ? 10 : min($lengthRaw, 100);
 
-    $layout = strtolower(trim((string) ($_GET['layout'] ?? $_POST['layout'] ?? 'full')));
-    if (!in_array($layout, ['full', 'simple'], true)) {
-        $layout = 'full';
-    }
-
     $searchRaw = $_GET['search'] ?? $_POST['search'] ?? [];
     $searchValue = is_array($searchRaw)
         ? trim((string) ($searchRaw['value'] ?? ''))
@@ -68,39 +63,23 @@ try {
     $recordsFiltered = $recordsTotal;
 
     $orderRaw = $_GET['order'] ?? $_POST['order'] ?? [];
-    $orderColumn = (int) ($orderRaw[0]['column'] ?? ($layout === 'simple' ? 9 : 10));
+    $orderColumn = (int) ($orderRaw[0]['column'] ?? 10);
     $orderDir = strtoupper((string) ($orderRaw[0]['dir'] ?? 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
-
-    if ($layout === 'simple') {
-        $columns = [
-            0 => 'codigo_servicio',
-            1 => 'nombre_servicio',
-            2 => 'categoria_servicio',
-            3 => 'uso_servicio',
-            4 => 'precio_costo',
-            5 => 'margen_ganancia',
-            6 => 'impuesto',
-            7 => 'precio_venta',
-            8 => 'total',
-            9 => 'fecha_creacion',
-        ];
-    } else {
-        $columns = [
-            0 => 'codigo_servicio',
-            1 => 'nombre_servicio',
-            2 => 'nomservicio',
-            3 => 'categoria_servicio',
-            4 => 'uso_servicio',
-            5 => 'precio_costo',
-            6 => 'margen_ganancia',
-            7 => 'impuesto',
-            8 => 'precio_venta',
-            9 => 'total',
-            10 => 'fecha_creacion',
-            11 => 'estado',
-        ];
-    }
-    $orderBy = $columns[$orderColumn] ?? ($layout === 'simple' ? 'fecha_creacion' : 'fecha_creacion');
+    $columns = [
+        0 => 'codigo_servicio',
+        1 => 'nombre_servicio',
+        2 => 'nomservicio',
+        3 => 'categoria_servicio',
+        4 => 'uso_servicio',
+        5 => 'precio_costo',
+        6 => 'margen_ganancia',
+        7 => 'impuesto',
+        8 => 'precio_venta',
+        9 => 'total',
+        10 => 'fecha_creacion',
+        11 => 'estado',
+    ];
+    $orderBy = $columns[$orderColumn] ?? 'fecha_creacion';
 
     $query = 'SELECT id, codigo_servicio, nombre_servicio, nomservicio, categoria_servicio, uso_servicio,'
         . ' precio_costo, margen_ganancia, impuesto, precio_venta, total, fecha_creacion,'

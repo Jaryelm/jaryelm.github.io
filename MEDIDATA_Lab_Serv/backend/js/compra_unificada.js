@@ -8,7 +8,7 @@
     let catMedicateOptions = '';
     let productOptionsHtml = '';
 
-    var URL_CAT_CUENTAS = '../funciones/cat_cuentas.php';
+    var URL_CAT_CUENTAS = '../funciones/cat_cuentas_compra_inventario.php';
     var URL_CAT_MEDICATE = '../funciones/cat.php';
 
     function dropdownParent() {

@@ -239,7 +239,12 @@ if (!function_exists('medidata_rrhh_expediente_by_token')) {
 
 if (!function_exists('medidata_rrhh_expediente_estado')) {
     /**
-     * @return array{completed:array<int, array{key:string,label:string}>, missing:array<int, array{key:string,label:string}>, total:int, done:int}
+     * @return array{
+     *   completed:array<int, array{key:string,label:string,view_url:string}>,
+     *   missing:array<int, array{key:string,label:string}>,
+     *   total:int,
+     *   done:int
+     * }
      */
     function medidata_rrhh_expediente_estado(int $candidateId): array
     {
@@ -259,16 +264,22 @@ if (!function_exists('medidata_rrhh_expediente_estado')) {
         medidata_rrhh_hiring_requirements_ensure_row($pdo, $candidateId, 'sistema');
 
         $cols = array_map(static fn($d) => $d['column'], $docs);
-        $sql = 'SELECT ' . implode(', ', array_map(static fn($c) => "`{$c}`", $cols))
+        $selectParts = [];
+        foreach ($cols as $c) {
+            $selectParts[] = "(CASE WHEN `{$c}` IS NOT NULL AND OCTET_LENGTH(`{$c}`) > 0 THEN 1 ELSE 0 END) AS `{$c}`";
+        }
+        $sql = 'SELECT ' . implode(', ', $selectParts)
             . ' FROM hiring_requirements WHERE id_candidate = ? AND deleted = 0 ORDER BY id DESC LIMIT 1';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$candidateId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
         foreach ($docs as $key => $doc) {
-            $val = $row[$doc['column']] ?? null;
+            $hasDoc = !empty($row[$doc['column']]);
             $item = ['key' => $key, 'label' => $doc['label']];
-            if ($val !== null && $val !== '') {
+            if ($hasDoc) {
+                $item['view_url'] = '../../backend/php/view_expediente_doc.php?id='
+                    . $candidateId . '&doc=' . rawurlencode($key);
                 $completed[] = $item;
             } else {
                 $missing[] = $item;

@@ -5,8 +5,8 @@ declare(strict_types=1);
  * Registra el PAGO de una cuenta por pagar (proveedor comercial u honorario médico)
  * generando la partida contable balanceada en el Diario General.
  *
- * Comercial: Debe 210200107 (una línea por factura) / Haber cuenta banco (una sola línea con el total).
- * Médico:    Debe 210200108 (una línea por honorario) / Haber cuenta banco (una sola línea con el total).
+ * Comercial: Debe 210200107 (una línea por factura) / Haber cuenta banco (neto) y opcional Haber retención 1% (210400106).
+ * Médico:    Debe 210200108 (una línea por honorario) / Haber cuenta banco (neto) y opcional Haber retención 12.5% (210400105).
  *
  * Sistema: MEDIDATA
  */
@@ -40,6 +40,8 @@ try {
 
     $cuentaSalida = trim((string) ($_POST['cuenta_salida'] ?? ''));
     $referenciaBancaria = trim((string) ($_POST['referencia_bancaria'] ?? ''));
+    $aplicarRetencion = isset($_POST['aplicar_retencion']) && (string) $_POST['aplicar_retencion'] === '1';
+    $retencionMonto = round((float) ($_POST['retencion_monto'] ?? 0), 2);
     $usuario      = isset($_SESSION['name']) ? (string) $_SESSION['name'] : 'Sistema';
 
     $fechaPago = trim((string) ($_POST['fecha_pago'] ?? ''));
@@ -54,15 +56,27 @@ try {
     }
 
     $stVal = $connect->prepare('SELECT cuenta FROM cuentas_catalogo WHERE cuenta = ? LIMIT 1');
-    $stVal->execute([$cuentaSalida]);
-    if (!$stVal->fetch()) {
-        pago_json(['success' => false, 'message' => 'Cuenta de salida inválida o no existe en el catálogo.'], 400);
-    }
     if (empty($ids)) {
         pago_json(['success' => false, 'message' => 'Identificadores inválidos o vacíos.'], 400);
     }
     if ($modo !== 'comercial' && $modo !== 'medico') {
         pago_json(['success' => false, 'message' => 'Modo inválido.'], 400);
+    }
+
+    if (!$aplicarRetencion) {
+        $retencionMonto = 0.0;
+    } elseif ($retencionMonto <= 0) {
+        pago_json(['success' => false, 'message' => 'Indique el monto de retención a aplicar.'], 400);
+    }
+
+    $cuentaRetencion = $modo === 'comercial' ? '210400106' : '210400105';
+    $nombreRetencion = $modo === 'comercial' ? 'Retencion 1%' : 'Retencion 12.5%';
+    if ($retencionMonto > 0) {
+        $stRet = $connect->prepare('SELECT cuenta FROM cuentas_catalogo WHERE cuenta = ? LIMIT 1');
+        $stRet->execute([$cuentaRetencion]);
+        if (!$stRet->fetch()) {
+            pago_json(['success' => false, 'message' => 'La cuenta de retención no existe en el catálogo (' . $cuentaRetencion . ').'], 400);
+        }
     }
 
     $lockName = 'pago_cxp_multi_' . preg_replace('/[^a-zA-Z0-9_]/', '', $usuario);
@@ -187,23 +201,76 @@ try {
             pago_json(['success' => false, 'message' => 'No hay saldo pendiente válido para las facturas seleccionadas o ya fueron pagadas.'], 409);
         }
 
+        if ($retencionMonto > round($totalGeneral, 2) + 0.005) {
+            if ($connect->inTransaction()) {
+                $connect->rollBack();
+            }
+            pago_json(['success' => false, 'message' => 'La retención no puede ser mayor al total del pago.'], 400);
+        }
+
+        $netoBanco = round($totalGeneral - $retencionMonto, 2);
+        if ($netoBanco < 0) {
+            if ($connect->inTransaction()) {
+                $connect->rollBack();
+            }
+            pago_json(['success' => false, 'message' => 'El neto a pagar al banco no puede ser negativo.'], 400);
+        }
+
+        if ($netoBanco > 0.005) {
+            if ($cuentaSalida === '') {
+                if ($connect->inTransaction()) {
+                    $connect->rollBack();
+                }
+                pago_json(['success' => false, 'message' => 'Seleccione la cuenta de salida del pago.'], 400);
+            }
+            $stVal->execute([$cuentaSalida]);
+            if (!$stVal->fetch()) {
+                if ($connect->inTransaction()) {
+                    $connect->rollBack();
+                }
+                pago_json(['success' => false, 'message' => 'Cuenta de salida inválida o no existe en el catálogo.'], 400);
+            }
+        }
+
         $refBanco = $referenciaBancaria !== '' ? $referenciaBancaria : ('PAGO-' . date('YmdHis'));
         $descBanco = ($modo === 'comercial' ? 'Pago a proveedores' : 'Pago honorarios médicos')
             . ' (' . $facturasPagadas . ' factura(s))'
             . ($referenciaBancaria !== '' ? ' | Ref. bancaria: ' . $referenciaBancaria : '');
 
-        $trans[] = [
-            'unidad_servicio' => 'Hospital Medicasa',
-            'cuenta' => $cuentaSalida,
-            'nombre_cuenta' => obtenerNombreCuenta($cuentaSalida),
-            'descripcion' => $descBanco,
-            'debe' => 0,
-            'haber' => round($totalGeneral, 2),
-            'turno' => null,
-            'usuario' => $usuario,
-            'tipo_transaccion' => $modo === 'comercial' ? 'PAGO_PROVEEDOR' : 'PAGO_HONORARIO_MEDICO',
-            'referencia' => $refBanco,
-        ];
+        if ($netoBanco > 0.005) {
+            $trans[] = [
+                'unidad_servicio' => 'Hospital Medicasa',
+                'cuenta' => $cuentaSalida,
+                'nombre_cuenta' => obtenerNombreCuenta($cuentaSalida),
+                'descripcion' => $descBanco,
+                'debe' => 0,
+                'haber' => $netoBanco,
+                'turno' => null,
+                'usuario' => $usuario,
+                'tipo_transaccion' => $modo === 'comercial' ? 'PAGO_PROVEEDOR' : 'PAGO_HONORARIO_MEDICO',
+                'referencia' => $refBanco,
+            ];
+        }
+
+        if ($retencionMonto > 0.005) {
+            $descRet = ($modo === 'comercial' ? 'Retención 1%' : 'Retención 12.5%')
+                . ' | ' . ($modo === 'comercial' ? 'Pago proveedores' : 'Pago honorarios médicos')
+                . ' (' . $facturasPagadas . ' factura(s))'
+                . ($referenciaBancaria !== '' ? ' | Ref. bancaria: ' . $referenciaBancaria : '');
+
+            $trans[] = [
+                'unidad_servicio' => 'Hospital Medicasa',
+                'cuenta' => $cuentaRetencion,
+                'nombre_cuenta' => obtenerNombreCuenta($cuentaRetencion) ?: $nombreRetencion,
+                'descripcion' => $descRet,
+                'debe' => 0,
+                'haber' => $retencionMonto,
+                'turno' => null,
+                'usuario' => $usuario,
+                'tipo_transaccion' => $modo === 'comercial' ? 'PAGO_PROVEEDOR' : 'PAGO_HONORARIO_MEDICO',
+                'referencia' => $refBanco,
+            ];
+        }
 
         $numero = registrarPartidaCompleta($trans, $fechaPago);
         $connect->commit();
@@ -213,6 +280,8 @@ try {
             'message' => 'Pago registrado correctamente.',
             'numero_partida' => $numero,
             'monto' => $totalGeneral,
+            'retencion' => $retencionMonto,
+            'neto_banco' => $netoBanco,
             'facturas' => $facturasPagadas,
             'referencia_bancaria' => $refBanco,
         ]);

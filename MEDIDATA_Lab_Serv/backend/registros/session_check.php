@@ -16,6 +16,10 @@ if (!function_exists('medidata_session_json_api_script')) {
         $base = strtolower(basename((string) $script));
         $allowed = [
             'registrar_partida_manual.php',
+            'obtener_partida_manual.php',
+            'actualizar_partida_manual.php',
+            'obtener_partida_diario.php',
+            'actualizar_partida_diario.php',
             'get_partidas_manuales.php',
             'fetch_collaborators.php',
             'fetch_postulaciones_aplica.php',
@@ -34,6 +38,7 @@ if (!function_exists('medidata_session_json_api_script')) {
             'tabla_niveles_salariales.php',
             'get_reporte_compras_ingresadas.php',
             'get_reporte_compras_detalladas.php',
+            'get_reporte_compras_export.php',
             'get_reporte_detalle_factura.php',
             'get_colaboradores.php',
             'get_dashboard_ventas_resumen.php',
