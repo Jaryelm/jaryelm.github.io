@@ -579,3 +579,274 @@ if (!function_exists('medidata_reporte_devoluciones_format_row')) {
         ];
     }
 }
+
+if (!function_exists('medidata_reporte_compras_tiene_npc')) {
+    function medidata_reporte_compras_tiene_npc(PDO $connect): bool
+    {
+        static $cached = null;
+        if ($cached !== null) {
+            return $cached;
+        }
+        try {
+            $cached = (bool) $connect->query("SHOW COLUMNS FROM compras LIKE 'numero_partida_contable'")->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $cached = false;
+        }
+        return $cached;
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_ingresadas_build_where')) {
+    /**
+     * @param array<string, string> $params
+     */
+    function medidata_reporte_compras_ingresadas_build_where(
+        string $desde,
+        string $hasta,
+        string $searchValue,
+        PDO $connect,
+        array &$params
+    ): string {
+        $fromWhere = ' FROM compras c WHERE DATE(c.fecha_emision) BETWEEN :desde AND :hasta';
+        $params[':desde'] = $desde;
+        $params[':hasta'] = $hasta;
+
+        if ($searchValue !== '') {
+            $searchFields = [':searchId', ':searchProv', ':searchFac'];
+            $fromWhere .= ' AND (CAST(c.id_compra AS CHAR) LIKE :searchId OR c.prov_datos LIKE :searchProv OR c.dato_fac LIKE :searchFac';
+            if (medidata_reporte_compras_tiene_npc($connect)) {
+                $fromWhere .= ' OR c.numero_partida_contable LIKE :searchNpc';
+                $searchFields[] = ':searchNpc';
+            }
+            $fromWhere .= ')';
+            medidata_reporte_dt_like_params($params, $searchValue, $searchFields);
+        }
+
+        return $fromWhere;
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_ingresadas_format_row')) {
+    /**
+     * @param array<string, mixed> $row
+     * @return array<int, string>
+     */
+    function medidata_reporte_compras_ingresadas_format_row(array $row): array
+    {
+        $fechaRaw = $row['fecha_emision'] ?? '';
+
+        return [
+            (string) ($row['id_compra'] ?? ''),
+            $fechaRaw ? date('d-m-Y', strtotime((string) $fechaRaw)) : '-',
+            (string) ($row['prov_datos'] ?? '-'),
+            (string) ($row['dato_fac'] ?? '-'),
+            medidata_reporte_fmt_lempiras($row['isv_global'] ?? 0),
+            medidata_reporte_fmt_lempiras($row['sub_total'] ?? 0),
+            medidata_reporte_fmt_lempiras($row['total'] ?? 0),
+            (string) ($row['numero_partida_contable'] ?? ''),
+        ];
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_ingresadas_export_headers')) {
+    /** @return array<int, string> */
+    function medidata_reporte_compras_ingresadas_export_headers(): array
+    {
+        return [
+            'Numero de Orden',
+            'Fecha',
+            'Proveedor',
+            'Num. Factura',
+            'Impuesto',
+            'SubTotal',
+            'Total',
+            'Partida contable',
+        ];
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_ingresadas_stream_rows')) {
+    /**
+     * @return Generator<int, array<int, string>>
+     */
+    function medidata_reporte_compras_ingresadas_stream_rows(
+        PDO $connect,
+        string $desde,
+        string $hasta,
+        string $searchValue = ''
+    ): Generator {
+        $params = [];
+        $fromWhere = medidata_reporte_compras_ingresadas_build_where($desde, $hasta, $searchValue, $connect, $params);
+        $sqlNpc = medidata_reporte_compras_tiene_npc($connect)
+            ? 'c.numero_partida_contable'
+            : 'NULL AS numero_partida_contable';
+
+        $query = "SELECT c.id_compra, c.fecha_emision, c.prov_datos, c.dato_fac, c.isv_global, c.sub_total, c.total, {$sqlNpc}"
+            . $fromWhere
+            . ' ORDER BY c.fecha_emision DESC, c.id_compra DESC';
+
+        $stmt = $connect->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->execute();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            yield medidata_reporte_compras_ingresadas_format_row($row);
+        }
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_detalladas_build_where')) {
+    /**
+     * @param array<string, string> $params
+     */
+    function medidata_reporte_compras_detalladas_build_where(
+        string $desde,
+        string $hasta,
+        string $searchValue,
+        array &$params
+    ): string {
+        $fromJoin = " FROM compras c
+            LEFT JOIN (
+                SELECT id_compra,
+                    SUM(CASE WHEN COALESCE(exento,0) = 1 THEN COALESCE(subtotal,0) ELSE 0 END) AS sum_exenta,
+                    SUM(CASE WHEN COALESCE(gravado,0) = 1
+                        OR (COALESCE(exento,0) = 0 AND COALESCE(gravado,0) = 0)
+                        THEN COALESCE(subtotal,0) ELSE 0 END) AS sum_gravada
+                FROM detalle_compras
+                GROUP BY id_compra
+            ) d ON d.id_compra = c.id_compra
+            WHERE DATE(c.fecha_emision) BETWEEN :desde AND :hasta";
+
+        $params[':desde'] = $desde;
+        $params[':hasta'] = $hasta;
+
+        if ($searchValue !== '') {
+            $fromJoin .= ' AND (CAST(c.id_compra AS CHAR) LIKE :searchId OR c.prov_datos LIKE :searchProv OR c.dato_fac LIKE :searchFac)';
+            medidata_reporte_dt_like_params($params, $searchValue, [':searchId', ':searchProv', ':searchFac']);
+        }
+
+        return $fromJoin;
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_detalladas_format_row')) {
+    /**
+     * @param array<string, mixed> $row
+     * @return array<int, string>
+     */
+    function medidata_reporte_compras_detalladas_format_row(array $row): array
+    {
+        $fechaRaw = $row['fecha_emision'] ?? '';
+
+        return [
+            $fechaRaw ? date('d-m-Y', strtotime((string) $fechaRaw)) : '-',
+            (string) ($row['prov_datos'] ?? '-'),
+            (string) ($row['dato_fac'] ?? '-'),
+            medidata_reporte_fmt_lempiras($row['isv_global'] ?? 0),
+            'L. -',
+            medidata_reporte_fmt_lempiras($row['sum_exenta'] ?? 0),
+            medidata_reporte_fmt_lempiras($row['sum_gravada'] ?? 0),
+            medidata_reporte_fmt_lempiras($row['sub_total'] ?? 0),
+            medidata_reporte_fmt_lempiras($row['total'] ?? 0),
+        ];
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_detalladas_export_headers')) {
+    /** @return array<int, string> */
+    function medidata_reporte_compras_detalladas_export_headers(): array
+    {
+        return [
+            'Fecha',
+            'Proveedor',
+            'Num. Factura',
+            'Impuesto',
+            'Retencion',
+            'Exenta',
+            'Gravada',
+            'SubTotal',
+            'Total',
+        ];
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_detalladas_stream_rows')) {
+    /**
+     * @return Generator<int, array<int, string>>
+     */
+    function medidata_reporte_compras_detalladas_stream_rows(
+        PDO $connect,
+        string $desde,
+        string $hasta,
+        string $searchValue = ''
+    ): Generator {
+        $params = [];
+        $fromJoin = medidata_reporte_compras_detalladas_build_where($desde, $hasta, $searchValue, $params);
+
+        $query = "SELECT c.id_compra, c.fecha_emision, c.prov_datos, c.dato_fac, c.isv_global, c.sub_total, c.total,
+            COALESCE(d.sum_exenta, 0) AS sum_exenta,
+            COALESCE(d.sum_gravada, 0) AS sum_gravada"
+            . $fromJoin
+            . ' ORDER BY c.fecha_emision DESC, c.id_compra DESC';
+
+        $stmt = $connect->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->execute();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            yield medidata_reporte_compras_detalladas_format_row($row);
+        }
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_export_stream')) {
+    /**
+     * @return Generator<int, array<int, string>>
+     */
+    function medidata_reporte_compras_export_stream(
+        PDO $connect,
+        string $report,
+        string $desde,
+        string $hasta,
+        string $searchValue = ''
+    ): Generator {
+        if ($report === 'detalladas') {
+            yield from medidata_reporte_compras_detalladas_stream_rows($connect, $desde, $hasta, $searchValue);
+            return;
+        }
+        yield from medidata_reporte_compras_ingresadas_stream_rows($connect, $desde, $hasta, $searchValue);
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_export_headers')) {
+    /** @return array<int, string> */
+    function medidata_reporte_compras_export_headers(string $report): array
+    {
+        return $report === 'detalladas'
+            ? medidata_reporte_compras_detalladas_export_headers()
+            : medidata_reporte_compras_ingresadas_export_headers();
+    }
+}
+
+if (!function_exists('medidata_reporte_compras_export_fetch_rows')) {
+    /**
+     * @return array<int, array<int, string>>
+     */
+    function medidata_reporte_compras_export_fetch_rows(
+        PDO $connect,
+        string $report,
+        string $desde,
+        string $hasta,
+        string $searchValue = ''
+    ): array {
+        $rows = [];
+        foreach (medidata_reporte_compras_export_stream($connect, $report, $desde, $hasta, $searchValue) as $row) {
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+}

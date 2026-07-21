@@ -75,6 +75,11 @@
             const seriesId = study.series_id || '';
             const studyId = study.id;
             const status = study.status || 'pending';
+            const radName = (study.radiologist_name || '').trim();
+            const statusLabel = typeof formatStatus === 'function' ? formatStatus(study.status) : (study.status || '');
+            const statusHtml = radName
+                ? statusLabel + '<br><small style="color:#035c67;font-weight:600;">Dr(a). ' + radName + '</small>'
+                : statusLabel;
 
             row.innerHTML = `
                 <td>${study.patient_id || 'N/A'}</td>
@@ -83,15 +88,15 @@
                 <td>${study.description || 'Sin descripción'}</td>
                 <td>${typeof formatStudyDate === 'function' ? formatStudyDate(study.study_date) : (study.study_date || 'N/A')}</td>
                 <td>${typeof formatPriority === 'function' ? formatPriority(study.priority) : (study.priority || '')}</td>
-                <td>${typeof formatStatus === 'function' ? formatStatus(study.status) : (study.status || '')}</td>
+                <td>${statusHtml}</td>
                 <td>
                     <div class="action-buttons">
                         <button type="button" onclick="openDicomViewer('${seriesId}')" class="btn-view"><i class='bx bx-show'></i> Ver</button>
+                        <button type="button" onclick="showAssignmentInfo('${studyId}')" class="btn-assignment"><i class='bx bx-user-check'></i> Médico</button>
                         <button type="button" onclick="openQualityControl('${studyId}')" class="btn-quality"><i class='bx bx-check-circle'></i> Control</button>
                         <button type="button" onclick="openIncident('${studyId}')" class="btn-incident"><i class='bx bx-error'></i> Incidencia</button>
                         <button type="button" onclick="openRepeat('${studyId}')" class="btn-repeat"><i class='bx bx-refresh'></i> Repetir</button>
                         <button type="button" onclick="openDoseModal('${studyId}')" class="dose-btn"><i class='bx bx-radiation'></i> Dosis</button>
-                        <button type="button" onclick="showAssignmentInfo('${studyId}')" class="btn-assignment"><i class='bx bx-user-check'></i> Asignado</button>
                         <button type="button" onclick="${status === 'cancelled' ? `showCancelDetail('${studyId}')` : `openCancelModal('${studyId}', '${status}')`}" class="btn-cancel"><i class='bx bx-x-circle'></i> ${status === 'cancelled' ? 'Ver motivo' : 'Cancelar'}</button>
                     </div>
                 </td>
@@ -99,6 +104,7 @@
             row.dataset.studyId = studyId;
             row.dataset.status = status;
             row.dataset.seriesId = seriesId;
+            row.dataset.radiologistName = radName;
             tbody.appendChild(row);
             if (typeof updateActionButtons === 'function') {
                 updateActionButtons(row);
@@ -165,6 +171,7 @@
         worklistLoading = true;
         currentPage = page || 1;
         setTableLoading(true);
+        updatePaginationUi(); // deshabilita mientras carga
 
         try {
             const response = await fetch('get_worklist.php', {
@@ -185,7 +192,6 @@
             currentPage = data.page || currentPage;
 
             renderTableRows(currentPageStudies);
-            updatePaginationUi();
         } catch (error) {
             console.error('Error loading worklist:', error);
             if (typeof swal === 'function') {
@@ -196,7 +202,9 @@
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">Error al cargar datos.</td></tr>';
             }
         } finally {
+            // Reactivar botones DESPUÉS de liberar el flag; si se pinta con loading=true quedan deshabilitados para siempre.
             worklistLoading = false;
+            updatePaginationUi();
         }
     }
 

@@ -75,13 +75,13 @@ if (count($data) > 0 && !empty($data[0]->id_candidate_rrhh)) {
     <title>MEDIDATA</title>
 </head>
 <body>
-<?php include_once '../recursos_humanos/menu.php'; ?>
+<?php include_once './menu.php'; ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
         <form action="#"><div class="form-group"></div></form>
         <span class="divider"></span>
-        <?php include_once '../admin/perfil.php'; ?>
+        <?php include_once './perfil.php'; ?>
     </nav>
     <main>
         <?php

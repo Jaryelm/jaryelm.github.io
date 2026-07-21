@@ -44,13 +44,16 @@ try {
     $user_id = $validation_result['user_id'];
     $remitente = $radiologist_name;
     
-    // Si no existe el usuario, crearlo automáticamente
+    // Si no existe el usuario, crearlo automáticamente (username/email acotados)
     if (!$user_id) {
         $user_id = createUserIfNotExists($radiologist_id);
         if (!$user_id) {
-            throw new Exception('No se pudo crear el usuario para el radiólogo');
+            throw new Exception(
+                'No se pudo vincular el usuario del radiólogo "' . $radiologist_name .
+                '". Verifique que exista un usuario con rol Radiologo o contacte a sistemas.'
+            );
         }
-        error_log("Usuario creado automáticamente para: " . $radiologist_name . " (ID: " . $user_id . ")");
+        error_log('Usuario creado/vinculado automáticamente para: ' . $radiologist_name . ' (ID: ' . $user_id . ')');
     }
     
     error_log("Radiólogo validado: " . $radiologist_name . " (Doctor ID: " . $radiologist_id . ", User ID: " . $user_id . ")");

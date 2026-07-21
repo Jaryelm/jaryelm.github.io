@@ -511,7 +511,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/cat_nompro.js"></script>
     <script src="../../backend/js/cat_proveedores.js"></script>
-    <script src="../../backend/js/cat_cuentas.js"></script>
+    <script src="../../backend/js/cat_cuentas_compra_inventario.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="../../backend/js/fech_vence.js"></script>
 

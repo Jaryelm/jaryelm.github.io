@@ -872,7 +872,8 @@ $(function () {
                         actions.push('<button type="button" class="btn_ver_detalles" data-modo="' + modo + '" data-id="' + id + '">Ver detalles</button>');
                     }
                     if (row.editable) {
-                        actions.push('<button type="button" class="btn_ver_detalles" data-partida="' + (row.numero_partida || '') + '" data-referencia="' + (row.referencia || '') + '" data-tipo="' + (row.tipo_transaccion || '') + '" data-fecha="' + (row.fecha_ocurrencia_iso || '') + '">Editar</button>');
+                        var np = encodeURIComponent(row.numero_partida || '');
+                        actions.push('<a class="btn_ver_detalles" href="editar_partida_diario.php?numero_partida=' + np + '&return_to=' + encodeURIComponent('diariogeneral.php') + '">Editar</a>');
                     }
                     return actions.length ? '<div class="acciones-wrap">' + actions.join('') + '</div>' : '—';
                 }

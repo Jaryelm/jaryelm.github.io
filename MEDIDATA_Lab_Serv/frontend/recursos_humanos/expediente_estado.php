@@ -32,8 +32,10 @@ $volverUrl = 'detalle_postulante.php?id=' . $id;
     </main>
 </section>
 <script src="../../backend/js/jquery.min.js"></script>
+<?php include __DIR__ . '/_rrhh_select2_foot.php'; ?>
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+<script src="../../backend/registros/script/rrhh_expediente_estado.js?v=20260720"></script>
 </body>
 </html>

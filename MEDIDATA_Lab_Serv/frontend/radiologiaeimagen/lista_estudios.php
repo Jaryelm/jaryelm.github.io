@@ -418,7 +418,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="mhpacs_filters_core.js"></script>
-    <script src="studies_list_core.js"></script>
+    <script src="studies_list_core.js?v=20260714a"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {
@@ -666,10 +666,12 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
         }
     }
 
-    // Función para descargar un estudio (igual que en tabladeestudios.php y worklist.php)
+    // Descarga DICOM con aviso de peso (fase 1 rendimiento MH-PACS)
     function downloadStudy(studyId) {
-        const orthancDownloadUrl = `https://medicloud.medicasa.hn/orthanc/studies/${studyId}/archive`;
-        window.location.href = orthancDownloadUrl;
+        downloadStudyWithConfirm(studyId, {
+            downloadUrl: `https://medicloud.medicasa.hn/orthanc/studies/${encodeURIComponent(studyId)}/archive`,
+            openInNewTab: false
+        });
     }
 
     // Función para abrir el visor DICOM
@@ -787,6 +789,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <!-- Alertas -->
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script src="download_study_helper.js?v=20260717a"></script>
 
         <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>

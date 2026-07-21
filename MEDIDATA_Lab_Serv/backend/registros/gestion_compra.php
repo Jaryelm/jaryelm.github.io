@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 include_once __DIR__ . '/session_check.php';
 require_once __DIR__ . '/../php/gestion_compras_helper.php';
+require_once __DIR__ . '/../php/proveedor_comercial_lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -18,6 +19,17 @@ $accion = trim((string) ($_POST['accion'] ?? ''));
 $idCompra = (int) ($_POST['id_compra'] ?? 0);
 $motivo = trim((string) ($_POST['motivo'] ?? ''));
 $usuario = isset($_SESSION['name']) ? (string) $_SESSION['name'] : 'Sistema';
+
+if ($accion === 'proveedores') {
+    try {
+        medidata_gestion_json([
+            'success' => true,
+            'proveedores' => medidata_proveedor_listar($connect),
+        ]);
+    } catch (Throwable $e) {
+        medidata_gestion_json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
 
 if ($idCompra <= 0) {
     medidata_gestion_json(['success' => false, 'message' => 'Identificador de compra inválido.'], 400);
