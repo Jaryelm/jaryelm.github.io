@@ -139,18 +139,6 @@
     font-weight: 600;
 }
 
-.mhpacs-filters__field-hint {
-    margin: 4px 0 0;
-    font-size: 11px;
-    line-height: 1.4;
-    color: #6b7785;
-}
-
-.mhpacs-filters__field-hint strong {
-    color: #035c67;
-    font-weight: 600;
-}
-
 /* —— Grid criterios (modalidad, prioridad, estado, fechas) —— */
 .mhpacs-filters__row {
     display: grid;

@@ -34,11 +34,12 @@
     function baseConfig(ajaxUrl) {
         return {
             processing: true,
+            
             serverSide: true,
             pageLength: 10,
             lengthChange: false,
             dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            buttons: [],
             ajax: {
                 url: ajaxUrl,
                 type: 'GET',
@@ -53,6 +54,107 @@
                 $('#page-loading-overlay').hide();
             }
         };
+    }
+
+    function comprasExportFilters() {
+        var search = '';
+        if (window.medidataReporteComprasSS && medidataReporteComprasSS.tabla) {
+            search = medidataReporteComprasSS.tabla.search() || '';
+        }
+        return {
+            fechaDesde: ($('#fechaDesde').val() || '').trim(),
+            fechaHasta: ($('#fechaHasta').val() || '').trim(),
+            search: search.trim()
+        };
+    }
+
+    function runComprasExport(report, format, f) {
+        var params = new URLSearchParams();
+        params.set('report', report);
+        params.set('format', format);
+        params.set('fechaDesde', f.fechaDesde);
+        params.set('fechaHasta', f.fechaHasta);
+        if (f.search) {
+            params.set('search', f.search);
+        }
+        params.set('_ts', String(Date.now()));
+
+        var exportUrl = '../../backend/registros/get_reporte_compras_export.php';
+        var url = exportUrl + '?' + params.toString();
+        var fetchOpts = {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        };
+
+        if (format === 'print' || format === 'pdf') {
+            window.open(url, '_blank', 'width=1200,height=800');
+            return;
+        }
+
+        if (format === 'csv' || format === 'excel') {
+            window.location.href = url;
+            return;
+        }
+
+        if (format === 'copy') {
+            fetch(url, fetchOpts).then(function(r) {
+                if (!r.ok) {
+                    return r.text().then(function(body) {
+                        var msg = 'HTTP ' + r.status;
+                        try {
+                            var j = JSON.parse(body);
+                            if (j.error || j.message) {
+                                msg = j.error || j.message;
+                            }
+                        } catch (ignore) {}
+                        throw new Error(msg);
+                    });
+                }
+                return r.text();
+            }).then(function(text) {
+                var lines = text.split('\n').length;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text).then(function() {
+                        swalAlert('success', 'Copiado', 'Datos copiados al portapapeles (' + lines + ' filas).');
+                    });
+                }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Copiar datos',
+                        html: '<textarea readonly style="width:100%;height:220px;font-size:12px;">' +
+                            $('<div>').text(text).html() + '</textarea>',
+                        confirmButtonText: 'Cerrar'
+                    });
+                } else {
+                    window.prompt('Copie los datos (Ctrl+C):', text);
+                }
+            }).catch(function(err) {
+                swalAlert('error', 'Error', err && err.message ? err.message : 'Error al obtener los datos para copiar.');
+            });
+        }
+    }
+
+    function exportCompras(report, format) {
+        var f = comprasExportFilters();
+
+        if (!f.fechaDesde || !f.fechaHasta) {
+            swalAlert('warning', 'Aviso', 'Indique fecha Desde y Hasta antes de exportar.');
+            return;
+        }
+
+        runComprasExport(report, format, f);
+    }
+
+    function comprasExportButtons(report) {
+        return [
+            { extend: 'copy', text: 'Copy', action: function() { exportCompras(report, 'copy'); } },
+            { extend: 'csv', text: 'CSV', action: function() { exportCompras(report, 'csv'); } },
+            { extend: 'excel', text: 'Excel', action: function() { exportCompras(report, 'excel'); } },
+            { extend: 'pdf', text: 'PDF', action: function() { exportCompras(report, 'pdf'); } },
+            { extend: 'print', text: 'Print', action: function() { exportCompras(report, 'print'); } }
+        ];
     }
 
     function detallePagoExportFilters() {
@@ -201,6 +303,7 @@
 
         initIngresadas: function() {
             var cfg = baseConfig('../../backend/registros/get_reporte_compras_ingresadas.php');
+            cfg.buttons = comprasExportButtons('ingresadas');
             cfg.order = [[1, 'desc']];
             cfg.columns = [
                 { data: 'numero_orden' },
@@ -226,6 +329,7 @@
 
         initDetalladas: function() {
             var cfg = baseConfig('../../backend/registros/get_reporte_compras_detalladas.php');
+            cfg.buttons = comprasExportButtons('detalladas');
             cfg.order = [[0, 'desc']];
             cfg.columns = [
                 { data: 'fecha' },

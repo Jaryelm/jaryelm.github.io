@@ -84,14 +84,14 @@ if ($esMedifarma) $form_titulo = 'Nuevo Colaborador Medifarma';
 </head>
 <body>
 <?php 
-    include_once '../recursos_humanos/menu.php'; 
+    include_once './menu.php'; 
 ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu toggle-sidebar'></i>
         <form action="#"><div class="form-group"></div></form>
         <span class="divider"></span>
-        <?php include_once '../admin/perfil.php'; ?>
+        <?php include_once './perfil.php'; ?>
     </nav>
     <main>
         <?php

@@ -23,7 +23,10 @@ function medidata_worklist_sql_where(string $userRol, int $userId, array $filter
 {
     $where = ' WHERE 1=1';
 
-    if (mhpacs_is_tecnico_role($userRol)) {
+    $radiologistFilter = (string) ($filters['radiologist_id'] ?? '');
+    // Si filtra por radiólogo, mostrar sus asignados (no limitar por técnico).
+    // Sin ese filtro, el técnico solo ve los suyos o sin técnico.
+    if (mhpacs_is_tecnico_role($userRol) && ($radiologistFilter === '' || $radiologistFilter === '_unassigned')) {
         $where .= ' AND (w.technician_id = ? OR w.technician_id IS NULL)';
         $params[] = $userId;
     }
@@ -38,7 +41,7 @@ function medidata_worklist_sql_where(string $userRol, int $userId, array $filter
         $params[] = (string) $filters['priority'];
     }
 
-    $where .= mhpacs_worklist_radiologist_sql((string) ($filters['radiologist_id'] ?? ''), $params);
+    $where .= mhpacs_worklist_radiologist_sql($radiologistFilter, $params);
 
     $where .= mhpacs_sql_date_range('w.study_date', $filters['date_from'], $filters['date_to'], $params);
     $where .= mhpacs_sql_search(

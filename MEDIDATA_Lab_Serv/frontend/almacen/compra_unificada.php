@@ -517,7 +517,7 @@ try {
                         const cuentaSel = m.querySelector('select[name^="cat_cuenta"]');
                         const cuentaVal = cuentaSel ? String(cuentaSel.value || '').trim() : '';
                         if (!cuentaVal || cuentaVal === '0') {
-                            alert('Línea ' + (i + 1) + ': seleccione la cuenta contable de inventario.');
+                            alert('Línea ' + (i + 1) + ': seleccione Inventario de Insumos (110400102) o Inventario de Consumibles (110400103).');
                             if (cuentaSel) cuentaSel.focus();
                             return false;
                         }

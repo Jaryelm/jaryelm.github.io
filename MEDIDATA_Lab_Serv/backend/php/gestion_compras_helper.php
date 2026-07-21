@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/partida_compra_proveedor.php';
+require_once __DIR__ . '/proveedor_comercial_lib.php';
 
 function medidata_gestion_json(array $payload, int $status = 200): void
 {
@@ -126,8 +127,8 @@ function medidata_compra_actualizar(
         throw new RuntimeException('Fecha de emisión inválida.');
     }
 
-    $proveedor = trim((string) ($datos['prov_datos'] ?? ''));
-    $factura = trim((string) ($datos['dato_fac'] ?? ''));
+    $proveedor = medidata_proveedor_normalizar($connect, (string) ($datos['prov_datos'] ?? ''));
+    $factura = strtoupper(trim((string) ($datos['dato_fac'] ?? '')));
     $subTotal = round((float) ($datos['sub_total'] ?? 0), 2);
     $isv = round((float) ($datos['isv_global'] ?? 0), 2);
     $total = round((float) ($datos['total'] ?? 0), 2);

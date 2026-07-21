@@ -8,6 +8,7 @@ date_default_timezone_set('America/Tegucigalpa');
 $currentDateTime = date('Y-m-d H:i:s');
 require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/../php/cuentas_compra_inventario_lib.php';
+require_once __DIR__ . '/../php/proveedor_comercial_lib.php';
 
 if (!function_exists('medidata_parse_precio_unitario_compra')) {
     function medidata_parse_precio_unitario_compra($raw): float
@@ -36,7 +37,7 @@ if (!function_exists('medidata_parse_decimal_compra')) {
 try {
     $sucursal = strtoupper(trim($_POST['sucursal']));
     $bodega = strtoupper(trim($_POST['bodega']));
-    $prov_datos = strtoupper(trim($_POST['prov_datos']));
+    $prov_datos = medidata_proveedor_normalizar($connect, (string) ($_POST['prov_datos'] ?? ''));
     $dato_fac = strtoupper(trim($_POST['dato_fac']));
     $fecha_emision = trim($_POST['fecha_emision']);
     $cred_cont = strtoupper(trim($_POST['cred_cont']));

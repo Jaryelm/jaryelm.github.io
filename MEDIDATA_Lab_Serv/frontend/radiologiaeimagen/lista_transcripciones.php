@@ -409,7 +409,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/script.js"></script>
     <script src="mhpacs_filters_core.js"></script>
-    <script src="transcriptions_list_core.js"></script>
+    <script src="transcriptions_list_core.js?v=20260714a"></script>
     <script>
     // Cargar estadísticas
     function loadStats() {

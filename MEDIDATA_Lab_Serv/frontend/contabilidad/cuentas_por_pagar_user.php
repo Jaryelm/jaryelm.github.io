@@ -201,6 +201,20 @@ include_once '../contabilidad/menu.php';
                     <input type="text" id="pagoReferenciaBancaria" class="filter-input" style="width:100%;" maxlength="120" placeholder="Ej. transferencia, cheque, No. operación">
                 </div>
                 <div class="filter-group" style="text-align:left; margin-top:12px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                        <input type="checkbox" id="pagoAplicarRetencion">
+                        <span id="pagoRetencionLabel">Aplicar retención</span>
+                    </label>
+                </div>
+                <div id="pagoRetencionWrap" style="display:none; margin-top:12px; padding:12px; background:#f8f9fa; border-radius:8px; border:1px solid #dee2e6;">
+                    <div class="filter-group" style="text-align:left; margin:0;">
+                        <label for="pagoRetencionMonto">Monto retención (L.):</label>
+                        <input type="number" id="pagoRetencionMonto" class="filter-input" style="width:100%;" step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    <p id="pagoRetencionCuenta" style="margin:8px 0 0 0; font-size:12px; color:#666;"></p>
+                    <div id="pagoRetencionPreview" style="margin-top:10px; font-size:13px; color:#035c67;"></div>
+                </div>
+                <div class="filter-group" style="text-align:left; margin-top:12px;">
                     <label for="pagoCuentaSalida">Cuenta de salida (de dónde sale el dinero):</label>
                     <select id="pagoCuentaSalida" class="filter-input" style="width:100%;">
                         <option value="">Cargando cuentas...</option>
@@ -584,6 +598,51 @@ include_once '../contabilidad/menu.php';
 
             let pagoPendiente = null;
 
+            function fmtLps(n) {
+                return 'L. ' + (parseFloat(n) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            function actualizarPreviewPago() {
+                if (!pagoPendiente) { return; }
+                var total = parseFloat(pagoPendiente.saldo) || 0;
+                var aplica = $('#pagoAplicarRetencion').is(':checked');
+                var ret = aplica ? (parseFloat($('#pagoRetencionMonto').val()) || 0) : 0;
+                var neto = Math.max(0, total - ret);
+                var html = '<strong>Total a cancelar:</strong> ' + fmtLps(total);
+                if (aplica) {
+                    html += '<br><strong>Retención:</strong> ' + fmtLps(ret);
+                    html += '<br><strong>Neto al banco:</strong> ' + fmtLps(neto);
+                }
+                $('#pagoRetencionPreview').html(html);
+            }
+
+            function configurarModalRetencion() {
+                if (!pagoPendiente) { return; }
+                var esComercial = pagoPendiente.modo === 'comercial';
+                $('#pagoRetencionLabel').text(esComercial ? 'Aplicar retención 1%' : 'Aplicar retención 12.5%');
+                $('#pagoRetencionCuenta').text(
+                    esComercial
+                        ? 'Cuenta contable: 210400106 - Retención 1%'
+                        : 'Cuenta contable: 210400105 - Retención 12.5%'
+                );
+                $('#pagoAplicarRetencion').prop('checked', false);
+                $('#pagoRetencionMonto').val('');
+                $('#pagoRetencionWrap').hide();
+                actualizarPreviewPago();
+            }
+
+            $(document).on('change', '#pagoAplicarRetencion', function() {
+                if ($(this).is(':checked')) {
+                    $('#pagoRetencionWrap').show();
+                } else {
+                    $('#pagoRetencionWrap').hide();
+                    $('#pagoRetencionMonto').val('');
+                }
+                actualizarPreviewPago();
+            });
+
+            $(document).on('input', '#pagoRetencionMonto', actualizarPreviewPago);
+
             $(document).on('change', '.chk-pagar', function() {
                 var checkedCount = $('.chk-pagar:checked').length;
                 if (checkedCount > 0) {
@@ -624,6 +683,7 @@ include_once '../contabilidad/menu.php';
                 $('#pagoResumen').html('Se registrará el pago múltiple de ' + ids.length + ' factura(s) por un total de <strong>L. ' +
                     totalSaldo.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
                     '</strong>. Se generará una partida contable balanceada en el Diario General.');
+                configurarModalRetencion();
                 $('#pagoModal').css('display', 'flex');
             });
 
@@ -636,6 +696,23 @@ include_once '../contabilidad/menu.php';
                 if (!pagoPendiente || !pagoPendiente.ids || pagoPendiente.ids.length === 0) { return; }
                 var $btn = $(this);
                 var cuentaSalida = $('#pagoCuentaSalida').val();
+                var aplicaRetencion = $('#pagoAplicarRetencion').is(':checked');
+                var retencionMonto = aplicaRetencion ? (parseFloat($('#pagoRetencionMonto').val()) || 0) : 0;
+                var totalPago = parseFloat(pagoPendiente.saldo) || 0;
+
+                if (aplicaRetencion && retencionMonto <= 0) {
+                    Swal.fire({ icon: 'warning', title: 'Retención requerida', text: 'Indique el monto de retención a aplicar.' });
+                    return;
+                }
+                if (retencionMonto > totalPago + 0.005) {
+                    Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'La retención no puede ser mayor al total del pago.' });
+                    return;
+                }
+                if ((totalPago - retencionMonto) > 0.005 && !cuentaSalida) {
+                    Swal.fire({ icon: 'warning', title: 'Cuenta requerida', text: 'Seleccione la cuenta de salida del pago.' });
+                    return;
+                }
+
                 $btn.prop('disabled', true).text('Procesando...');
                 $.ajax({
                     url: '../../backend/registros/pagar_cuenta_por_pagar.php',
@@ -646,13 +723,19 @@ include_once '../contabilidad/menu.php';
                         ids: pagoPendiente.ids,
                         cuenta_salida: cuentaSalida,
                         fecha_pago: $('#pagoFecha').val(),
-                        referencia_bancaria: $('#pagoReferenciaBancaria').val().trim()
+                        referencia_bancaria: $('#pagoReferenciaBancaria').val().trim(),
+                        aplicar_retencion: aplicaRetencion ? '1' : '0',
+                        retencion_monto: retencionMonto
                     }
                 }).done(function(resp) {
                     if (resp && resp.success) {
                         var modoPago = pagoPendiente.modo;
                         var partidaNum = (resp.numero_partida) ? resp.numero_partida : '';
                         var refBanco = (resp.referencia_bancaria) ? resp.referencia_bancaria : '';
+                        var retHtml = (resp.retencion && parseFloat(resp.retencion) > 0)
+                            ? '<p style="margin:8px 0 0 0;"><strong>Retención:</strong> ' + fmtLps(resp.retencion)
+                                + '<br><strong>Neto al banco:</strong> ' + fmtLps(resp.neto_banco) + '</p>'
+                            : '';
                         cerrarModalPago();
                         Swal.fire({
                             icon: 'success',
@@ -660,6 +743,7 @@ include_once '../contabilidad/menu.php';
                             html: '<p style="margin:0 0 10px 0;">' + (resp.message || 'Partida generada correctamente.') + '</p>'
                                 + '<p style="margin:0;font-size:1.15em;"><strong>Partida:</strong> '
                                 + '<span id="swalPartidaNum" style="user-select:all;">' + partidaNum + '</span></p>'
+                                + retHtml
                                 + (refBanco ? '<p style="margin:8px 0 0 0;"><strong>Ref. bancaria:</strong> ' + refBanco + '</p>' : ''),
                             confirmButtonText: 'Cerrar',
                             allowOutsideClick: false

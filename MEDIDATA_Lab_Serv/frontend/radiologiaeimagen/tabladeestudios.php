@@ -154,19 +154,35 @@ function hideLoadingModal() {
         btn.disabled = true;
         const prevText = btn.textContent;
         btn.textContent = 'Sincronizando...';
+        const statusEl = document.getElementById('sync-status');
+        if (statusEl) {
+            statusEl.style.color = '#035c67';
+            statusEl.textContent = 'Sincronizando con Orthanc...';
+        }
         try {
-            const response = await fetch('sync_orthanc.php', { cache: 'no-store' });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 120000);
+            const response = await fetch('sync_orthanc.php', { cache: 'no-store', signal: controller.signal });
+            clearTimeout(timeoutId);
             const data = await response.json();
-            if (!data.success) {
-                throw new Error(data.error || 'Error al sincronizar');
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || ('HTTP ' + response.status));
             }
-            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Sincronización OK');
-            // Refrescar contadores y listado
+            if (statusEl) {
+                statusEl.style.color = '#1a7f37';
+                statusEl.textContent = data.message || 'Sincronización OK';
+            }
             fetchTotalStudies();
             fetchStudies();
         } catch (error) {
             console.error('Error syncing with Orthanc:', error);
-            document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Error al sincronizar');
+            const msg = (error && error.name === 'AbortError')
+                ? 'Tiempo de espera agotado al sincronizar'
+                : ((error && error.message) ? error.message : 'Error al sincronizar');
+            if (statusEl) {
+                statusEl.style.color = '#c0392b';
+                statusEl.textContent = 'Error: ' + msg;
+            }
         } finally {
             btn.disabled = false;
             btn.textContent = prevText;
@@ -438,18 +454,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Función para descargar un estudio
+// Descarga DICOM con aviso de peso (fase 1 rendimiento MH-PACS)
 function downloadStudy(studyId) {
-    if (!studyId || studyId === 'N/A') {
-        Swal.fire("Información", "No hay ID de estudio válido para descargar.", "info");
-        return;
-    }
-    
-    // URL directa con credenciales en la URL
-    const downloadUrl = `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/${studyId}/archive`;
-    
-    // Abrir en nueva ventana
-    window.open(downloadUrl, '_blank');
+    downloadStudyWithConfirm(studyId, {
+        downloadUrl: `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/${encodeURIComponent(studyId)}/archive`,
+        openInNewTab: true
+    });
 }
 </script>
 
@@ -705,6 +715,7 @@ th:nth-child(9), td:nth-child(9) {
 
     <!-- Alertas -->
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script src="download_study_helper.js?v=20260717a"></script>
 
 </body>
 </html>

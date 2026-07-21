@@ -26,7 +26,7 @@ if (!$pdo) {
 } else {
     try {
         $stmt = $pdo->prepare(
-            'SELECT id, fullname, dni, email, phonenumber, status FROM candidates WHERE id = ? AND deleted = 0 LIMIT 1'
+            'SELECT id, fullname, dni, email, phonenumber, status, academic_level, profession, previous_experience, salary_expectation FROM candidates WHERE id = ? AND deleted = 0 LIMIT 1'
         );
         $stmt->execute([$id]);
         $candidato = $stmt->fetch(PDO::FETCH_OBJ);
@@ -47,6 +47,19 @@ if ($interviewForm && !empty($interviewForm['payload'])) {
     if (is_array($decoded)) {
         $answers = $decoded;
     }
+}
+
+if (empty($answers['nivel_academico']) && !empty($candidato->academic_level)) {
+    $answers['nivel_academico'] = $candidato->academic_level;
+}
+if (empty($answers['profesion']) && !empty($candidato->profession)) {
+    $answers['profesion'] = $candidato->profession;
+}
+if (empty($answers['experiencia']) && !empty($candidato->previous_experience)) {
+    $answers['experiencia'] = $candidato->previous_experience;
+}
+if (empty($answers['expectativa_salarial']) && !empty($candidato->salary_expectation)) {
+    $answers['expectativa_salarial'] = $candidato->salary_expectation;
 }
 
 $dateVal = $interviewForm['date_interview'] ?? date('Y-m-d');
@@ -115,9 +128,11 @@ $nameSafe = htmlspecialchars((string) ($name ?? 'Usuario'), ENT_QUOTES, 'UTF-8')
         <?php endforeach; ?>
 
         <hr>
-        <button type="submit" class="registerbtn">Guardar entrevista</button>
-        <a href="<?php echo htmlspecialchars($volverUrl); ?>" class="pabtn">Volver al detalle</a>
-        <a href="<?php echo htmlspecialchars($calendarioUrl); ?>" class="button form-secondary-btn">Ver calendario</a>
+        <div class="rrhh-form-actions">
+            <button type="submit" class="registerbtn">Guardar entrevista</button>
+            <a href="<?php echo htmlspecialchars($volverUrl); ?>" class="pabtn">Volver al detalle</a>
+            <a href="<?php echo htmlspecialchars($calendarioUrl); ?>" class="registerbtn">Ver calendario</a>
+        </div>
     </div>
 </form>
 <?php

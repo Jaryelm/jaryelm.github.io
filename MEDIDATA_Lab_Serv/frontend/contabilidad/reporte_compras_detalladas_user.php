@@ -113,7 +113,9 @@ include_once '../../backend/registros/session_check.php';
             </div>
             <div class="filter-group" style="margin-bottom:10px;">
                 <label for="editCompraProveedor">Proveedor</label>
-                <input type="text" id="editCompraProveedor" name="prov_datos" class="filter-input" required style="width:100%;">
+                <select id="editCompraProveedor" name="prov_datos" class="filter-input" required style="width:100%;">
+                    <option value="">Cargando proveedores...</option>
+                </select>
             </div>
             <div class="filter-group" style="margin-bottom:10px;">
                 <label for="editCompraFactura">Número de factura</label>
@@ -155,7 +157,7 @@ include_once '../../backend/registros/session_check.php';
 <script src="../../backend/js/script.js"></script>
 <script src="../../backend/js/submenu.js"></script>
 <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-<script src="../../backend/registros/script/reporte_compras_serverside.js"></script>
+<script src="../../backend/registros/script/reporte_compras_serverside.js?v=20260713a"></script>
 <script src="../../backend/registros/script/gestion_compra_reporte.js"></script>
 
 <script>

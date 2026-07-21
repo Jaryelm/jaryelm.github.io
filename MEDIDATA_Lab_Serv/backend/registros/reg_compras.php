@@ -9,6 +9,7 @@ if (!isset($_POST['add_medicine'])) {
 
 require_once __DIR__ . '/../bd/Conexion.php';
 require_once __DIR__ . '/../php/cuentas_compra_inventario_lib.php';
+require_once __DIR__ . '/../php/proveedor_comercial_lib.php';
 
 // compras_seg.php y formularios sin line_mode → solo detalle (sin tocar stock)
 if (!isset($_POST['line_mode'])) {
@@ -87,7 +88,7 @@ try {
 
     $sucursal = strtoupper(trim($_POST['sucursal'] ?? ''));
     $bodega = strtoupper(trim($_POST['bodega'] ?? ''));
-    $prov_datos = strtoupper(trim($_POST['prov_datos'] ?? ''));
+    $prov_datos = medidata_proveedor_normalizar($connect, (string) ($_POST['prov_datos'] ?? ''));
     $dato_fac = strtoupper(trim($_POST['dato_fac'] ?? ''));
     $fecha_emision = trim($_POST['fecha_emision'] ?? '');
     $cred_cont = strtoupper(trim($_POST['cred_cont'] ?? ''));

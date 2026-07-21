@@ -12,9 +12,14 @@ require_once dirname(__DIR__, 2) . '/backend/bd/Conexion.php';
 require_once __DIR__ . '/../../backend/php/diario_tipo_etiqueta.php';
 require_once __DIR__ . '/../../backend/php/diario_detalle_accion.php';
 require_once __DIR__ . '/../../backend/php/funciones_diario_general.php';
+require_once __DIR__ . '/../../backend/php/diario_edicion_lib.php';
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 header('Content-Type: application/json');
 
 try {
+    $puedeEditar = medidata_diario_puede_editar_partidas($_SESSION['rol'] ?? null);
     $draw = intval($_GET['draw'] ?? 1);
     $start = max(0, intval($_GET['start'] ?? 0));
     $lengthRaw = intval($_GET['length'] ?? 10);
@@ -151,7 +156,7 @@ try {
             'partida_total_haber' => $ptHaber,
             'detalle_modo' => $detMeta['modo'],
             'detalle_id' => $detMeta['id'],
-            'editable' => in_array(strtoupper((string) ($row['tipo_transaccion'] ?? '')), ['COMPRA_PROVEEDOR', 'CIERRE_VENTA'], true),
+            'editable' => $puedeEditar && medidata_diario_tipo_es_editable($row['tipo_transaccion'] ?? null),
         ];
     }
 

@@ -61,6 +61,27 @@ if (!function_exists('medidata_url')) {
     }
 }
 
+if (!function_exists('medidata_upload_public_url')) {
+    /**
+     * Ruta web pública de un archivo en uploads/ (p. ej. uploads/adj_foto/foto.jpg).
+     */
+    function medidata_upload_public_url(?string $relativePath): string
+    {
+        if ($relativePath === null || trim($relativePath) === '') {
+            return '';
+        }
+        $path = str_replace('\\', '/', trim($relativePath));
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
+        }
+        $path = ltrim($path, '/');
+        if ($path === '' || strpos($path, '..') !== false) {
+            return '';
+        }
+        return medidata_url($path);
+    }
+}
+
 if (!function_exists('medidata_asset')) {
     function medidata_asset(string $path): string
     {
