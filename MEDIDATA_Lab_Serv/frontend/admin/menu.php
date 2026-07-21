@@ -1,4 +1,4 @@
-﻿<!-- SIDEBAR -->
+<!-- SIDEBAR -->
 <section id="sidebar">
     <a href="../admin/escritorio.php" class="brand"><i class='bx bxs-home home'></i><span>MEDIDATA</span></a>
     <ul class="side-menu">
@@ -97,6 +97,27 @@
                     </ul>
                 </li>
                 
+            </ul>
+        </li>
+
+        <li>
+            <a href="#"><i class='bx bxs-calendar-event icon'></i> <span>VACACIONES Y PERMISOS</span><i class='bx bx-chevron-right icon-right'></i></a>
+            <ul class="side-dropdown">
+                <li><a href="../vacaciones_permisos/mis_vacaciones.php"><span>MIS SOLICITUDES</span></a></li>
+                <li><a href="../vacaciones_permisos/aprobaciones.php"><span>MIS APROBACIONES</span></a></li>
+                <?php if(isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Recursos Humanos')): ?>
+                <li>
+                    <a href="#" class="new-submenu-link"><span>ADMINISTRACIÓN RRHH</span></a>
+                    <ul class="new-side-dropdown">
+                        <li><a href="../vacaciones_permisos/gestionar_solicitudes.php"><span>GESTIÓN DE SOLICITUDES</span></a></li>
+                        <li><a href="../vacaciones_permisos/kardex_vacaciones.php"><span>KARDEX DE VACACIONES</span></a></li>
+                        <li><a href="../vacaciones_permisos/tipos_ausencia.php"><span>TIPOS DE AUSENCIA</span></a></li>
+                        <li><a href="../vacaciones_permisos/flujos_aprobacion.php"><span>FLUJOS DE APROBACIÓN</span></a></li>
+                        <li><a href="../vacaciones_permisos/politicas_vacaciones.php"><span>POLÍTICAS DE VACACIONES</span></a></li>
+                        <li><a href="../vacaciones_permisos/calendario_feriados.php"><span>CALENDARIO DE FERIADOS</span></a></li>
+                    </ul>
+                </li>
+                <?php endif; ?>
             </ul>
         </li>
 
