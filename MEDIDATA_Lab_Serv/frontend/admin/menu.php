@@ -105,10 +105,11 @@
             <ul class="side-dropdown">
                 <li><a href="../vacaciones_permisos/mis_vacaciones.php"><span>MIS SOLICITUDES</span></a></li>
                 <li><a href="../vacaciones_permisos/aprobaciones.php"><span>MIS APROBACIONES</span></a></li>
-                <?php if(isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Recursos Humanos')): ?>
+                <?php if(isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Recursos_Humanos')): ?>
                 <li>
                     <a href="#" class="new-submenu-link"><span>ADMINISTRACIÓN RRHH</span></a>
                     <ul class="new-side-dropdown">
+                        <li><a href="../vacaciones_permisos/dashboard.php"><span>DASHBOARD</span></a></li>
                         <li><a href="../vacaciones_permisos/gestionar_solicitudes.php"><span>GESTIÓN DE SOLICITUDES</span></a></li>
                         <li><a href="../vacaciones_permisos/kardex_vacaciones.php"><span>KARDEX DE VACACIONES</span></a></li>
                         <li><a href="../vacaciones_permisos/tipos_ausencia.php"><span>TIPOS DE AUSENCIA</span></a></li>

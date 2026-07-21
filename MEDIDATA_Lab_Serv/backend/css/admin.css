@@ -5373,3 +5373,9 @@ main .containerss .demo-flujo-step-num {
     height: 16px;
     cursor: pointer;
 }
+
+/* Utilidad para remover margenes heredados en componentes flex */
+.rrhh-no-margin {
+  margin: 0 !important;
+}
+
