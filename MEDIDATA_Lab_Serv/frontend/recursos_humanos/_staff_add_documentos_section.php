@@ -38,6 +38,15 @@ require_once __DIR__ . '/../../backend/php/staff_form_docs_lib.php';
             'highlight' => true,
         ]);
         medidata_staff_render_doc_field([
+            'label' => 'Curriculum Vitae',
+            'name' => 'doc_curriculum_vitae',
+            'doc_key' => 'curriculum_vitae',
+            'accept' => '.pdf,.doc,.docx',
+            'has' => false,
+            'view_url' => null,
+            'view_title' => 'Curriculum Vitae',
+        ]);
+        medidata_staff_render_doc_field([
             'label' => 'Partida de nacimiento de hijos',
             'name' => 'doc_birth_cert_children',
             'doc_key' => 'birth_cert_children',

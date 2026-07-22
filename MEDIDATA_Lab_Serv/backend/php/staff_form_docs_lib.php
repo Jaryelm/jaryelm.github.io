@@ -109,3 +109,49 @@ if (!function_exists('medidata_staff_render_doc_field')) {
         <?php
     }
 }
+
+if (!function_exists('medidata_staff_load_hiring_docs_flags')) {
+    /**
+     * @return array<string, bool>
+     */
+    function medidata_staff_load_hiring_docs_flags(int $candidateId): array
+    {
+        $flags = [];
+        if ($candidateId <= 0) {
+            return $flags;
+        }
+
+        require_once __DIR__ . '/../registros/rrhh_guard.php';
+        $pdo = medidata_rrhh_pdo();
+        if (!$pdo) {
+            return $flags;
+        }
+
+        require_once __DIR__ . '/staff_doc_manage_lib.php';
+        $keys = medidata_staff_doc_hiring_keys();
+
+        try {
+            $cols = [];
+            foreach ($keys as $k) {
+                $cols[] = "({$k} IS NOT NULL AND OCTET_LENGTH({$k}) > 0) AS has_{$k}";
+            }
+            if (empty($cols)) {
+                return $flags;
+            }
+
+            $sql = 'SELECT ' . implode(', ', $cols) . ' FROM hiring_requirements WHERE id_candidate = ? LIMIT 1';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$candidateId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                foreach ($keys as $k) {
+                    $flags[$k] = !empty($row["has_{$k}"]);
+                }
+            }
+        } catch (Throwable $e) {
+            // Ignore if columns don't exist yet
+        }
+
+        return $flags;
+    }
+}
