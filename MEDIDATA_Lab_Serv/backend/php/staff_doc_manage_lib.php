@@ -40,6 +40,7 @@ if (!function_exists('medidata_staff_doc_hiring_keys')) {
             'professional_references',
             'diplomas',
             'home_sketch',
+            'curriculum_vitae',
         ];
     }
 }

@@ -342,8 +342,12 @@ if (!function_exists('medidata_staff_expediente_upload')) {
             return ['success' => false, 'message' => 'Documento no reconocido.'];
         }
 
-        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            return ['success' => false, 'message' => 'Seleccione un archivo válido.'];
+        $err = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+        if ($err !== UPLOAD_ERR_OK) {
+            if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+                return ['success' => false, 'message' => 'El archivo es demasiado grande. Verifique el límite de tamaño.'];
+            }
+            return ['success' => false, 'message' => 'Seleccione un archivo válido. (Error: ' . $err . ')'];
         }
 
         if (!medidata_staff_expediente_file_allowed($docKey, $file)) {
