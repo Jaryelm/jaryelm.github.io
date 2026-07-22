@@ -58,11 +58,15 @@ if (!function_exists('medidata_rrhh_employee_form_collect')) {
                 $fields[$key] = trim((string) $source[$key]);
             }
         }
-        if ($fields['direction'] === '' && ($fields['address_street'] !== '' || $fields['colony'] !== '' || $fields['city'] !== '')) {
+        $dir = $fields['direction'] ?? '';
+        $street = $fields['address_street'] ?? '';
+        $colony = $fields['colony'] ?? '';
+        $city = $fields['city'] ?? '';
+        if ($dir === '' && ($street !== '' || $colony !== '' || $city !== '')) {
             $fields['direction'] = trim(
-                $fields['address_street']
-                . ($fields['colony'] !== '' ? ', ' . $fields['colony'] : '')
-                . ($fields['city'] !== '' ? ', ' . $fields['city'] : '')
+                $street
+                . ($colony !== '' ? ', ' . $colony : '')
+                . ($city !== '' ? ', ' . $city : '')
             );
         }
         return $fields;

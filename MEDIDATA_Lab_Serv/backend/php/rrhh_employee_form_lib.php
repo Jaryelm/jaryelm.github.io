@@ -224,9 +224,6 @@ if (!function_exists('medidata_rrhh_employee_form_save_public')) {
             return ['success' => false, 'message' => 'Enlace no válido o expirado.'];
         }
 
-        if (($ctx['form_status'] ?? '') === 'Enviado') {
-            return ['success' => false, 'message' => 'Este formulario ya fue enviado.'];
-        }
 
         $pdo = medidata_rrhh_pdo();
         if (!$pdo) {

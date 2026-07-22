@@ -49,18 +49,20 @@ $prefill = $ctx ? medidata_rrhh_employee_form_prefill($ctx) : [];
         <?php if (!$ctx): ?>
             <h1>Enlace no válido</h1>
             <p class="lead">Este enlace no existe o ya no está disponible. Solicite uno nuevo a Recursos Humanos.</p>
-        <?php elseif ($alreadySent): ?>
-            <h1>Formulario recibido</h1>
-            <p class="lead">Gracias, <?php echo htmlspecialchars((string) $ctx['fullname'], ENT_QUOTES, 'UTF-8'); ?>. Su solicitud ya fue enviada correctamente.</p>
         <?php else: ?>
             <h1>Solicitud de empleo</h1>
             <p class="lead">Hospital MEDICASA — <?php echo htmlspecialchars((string) $ctx['fullname'], ENT_QUOTES, 'UTF-8'); ?></p>
 
+            <?php if ($alreadySent): ?>
+                <div style="background:#d4edda; color:#155724; border:1px solid #c3e6cb; padding:14px; border-radius:8px; margin-bottom:20px;">
+                    <strong>Formulario recibido previamente:</strong> Puede revisar o actualizar sus datos si es necesario.
+                </div>
+            <?php endif; ?>
             <form id="fe-form" method="post" action="#" autocomplete="off">
                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>">
                 <?php include __DIR__ . '/_formulario_empleado_campos.php'; ?>
                 <div class="fe-actions">
-                    <button type="submit" class="registerbtn">Enviar solicitud</button>
+                    <button type="submit" class="registerbtn"><?php echo $alreadySent ? "Actualizar solicitud" : "Enviar solicitud"; ?></button>
                 </div>
             </form>
         <?php endif; ?>

@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/../../backend/bd/Conexion.php';
 require_once __DIR__ . '/../../backend/php/staff_expediente_lib.php';
+require_once __DIR__ . '/../../backend/php/rrhh_employee_form_lib.php';
 
 $token = trim((string) ($_GET['token'] ?? ''));
 $ctx = ($token !== '' && isset($connect) && $connect instanceof PDO)
@@ -14,10 +15,18 @@ $ctx = ($token !== '' && isset($connect) && $connect instanceof PDO)
 $docs = medidata_staff_expediente_documentos();
 $estado = null;
 $completedKeys = [];
+$formLinkUrl = "#";
 if ($ctx) {
     $estado = medidata_staff_expediente_estado($connect, (string) $ctx['staff_table'], (int) $ctx['staff_id']);
     foreach ($estado['completed'] as $item) {
         $completedKeys[$item['key']] = true;
+    }
+    
+    if (isset($ctx['candidate_id']) && $ctx['candidate_id'] > 0) {
+        $issue = medidata_rrhh_employee_form_issue_link((int) $ctx['candidate_id'], 'sistema_empleados', false);
+        if ($issue['success']) {
+            $formLinkUrl = $issue['url'];
+        }
     }
 }
 ?>
@@ -62,7 +71,7 @@ if ($ctx) {
                 Solicitud de empleo / Datos personales
             </label>
             <p style="font-size:0.9rem; color:#555; margin-bottom:10px; margin-top:0;">Por favor, ingrese al siguiente enlace para llenar o actualizar su solicitud de empleo de forma digital.</p>
-            <a href="/frontend/recursos_humanos/formulario_empleado_ver.php?id=<?php echo (int) $ctx['candidate_id']; ?>" target="_blank" class="registerbtn" style="text-decoration:none; display:inline-block; padding:8px 14px;">Llenar Formulario</a>
+            <a href="<?php echo htmlspecialchars($formLinkUrl); ?>" target="_blank" class="registerbtn" style="text-decoration:none; display:inline-block; padding:8px 14px;">Llenar Formulario</a>
         </div>
 
         <?php foreach ($docs as $key => $doc): ?>

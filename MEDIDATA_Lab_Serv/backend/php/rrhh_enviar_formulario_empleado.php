@@ -83,16 +83,19 @@ try {
         }
 
         require_once __DIR__ . '/../registros/rrhh_aplica_bridge.php';
+        require_once __DIR__ . '/rrhh_candidato_workflow_lib.php';
 
         $mensaje = "<p>Estimado/a {$fullname},</p>
                     <p>Haga clic en el siguiente enlace para llenar su <strong>Formulario de Empleado</strong>:</p>
                     <p><a href=\"{$url}\">Completar Formulario</a></p>
                     <p>Enlace directo: <br>{$url}</p>";
 
-        $enviado = medidata_rrhh_send_notification_email($email, "Formulario de Empleado - MEDICASA", $mensaje);
+        $texto_plano = strip_tags(str_replace(['<br>', '<br/>', '</p>'], "\n", $mensaje));
+
+        $enviado = medidata_rrhh_send_notification_email($email, "Formulario de Empleado - MEDICASA", $mensaje, $texto_plano, $fullname);
         
-        if (!$enviado) {
-            throw new Exception('El correo no pudo ser enviado (Error de servidor de correo).');
+        if (!$enviado['success']) {
+            throw new Exception('El correo no pudo ser enviado: ' . ($enviado['message'] ?? 'Error desconocido'));
         }
 
         echo json_encode(['success' => true, 'message' => 'Enlace enviado al correo: ' . $email]);
