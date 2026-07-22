@@ -142,14 +142,33 @@ if (!isset($_SESSION['id'])) {
                     </label>
                 </div>
 
+                <div class="form-row">
+                    <label>Tipo de Duraci&oacute;n</label>
+                    <select name="duration_type" id="duration_type" required>
+                        <option value="full_day">D&iacute;as completos</option>
+                        <option value="partial_day">Por horas (D&iacute;a Parcial)</option>
+                    </select>
+                </div>
+
                 <div class="form-row" style="display: flex; gap:15px;">
                     <div style="flex:1;">
                         <label>Fecha de Inicio</label>
                         <input type="date" name="start_date" id="start_date" required>
                     </div>
-                    <div style="flex:1;">
-                        <label>Fecha de Finalización</label>
+                    <div style="flex:1;" id="div_end_date">
+                        <label>Fecha de Finalizaci&oacute;n</label>
                         <input type="date" name="end_date" id="end_date" required>
+                    </div>
+                </div>
+
+                <div class="form-row" id="div_times" style="display: none; gap:15px;">
+                    <div style="flex:1;">
+                        <label>Hora de Inicio</label>
+                        <input type="time" name="start_time" id="start_time">
+                    </div>
+                    <div style="flex:1;">
+                        <label>Hora de Fin</label>
+                        <input type="time" name="end_time" id="end_time">
                     </div>
                 </div>
 
@@ -222,7 +241,23 @@ if (!isset($_SESSION['id'])) {
         });
         
         // Evento Fechas -> Calcular Días
-        $('#start_date, #end_date').change(calcularDias);
+        // Manejar cambio de tipo de duración
+        $('#duration_type').change(function() {
+            if ($(this).val() === 'partial_day') {
+                $('#div_end_date').hide();
+                $('#end_date').prop('required', false);
+                $('#div_times').css('display', 'flex');
+                $('#start_time, #end_time').prop('required', true);
+            } else {
+                $('#div_end_date').show();
+                $('#end_date').prop('required', true);
+                $('#div_times').hide();
+                $('#start_time, #end_time').prop('required', false);
+            }
+            calcularDias();
+        });
+
+        $('#start_date, #end_date, #start_time, #end_time, #duration_type').change(calcularDias);
 
         // Enviar Formulario
         $('#formSolicitud').submit(function(e) {
@@ -278,10 +313,43 @@ if (!isset($_SESSION['id'])) {
         $('#modalNuevaSolicitud').fadeOut();
     }
 
-    function calcularDias() {
+        function calcularDias() {
+        let durationType = $('#duration_type').val();
         let start = $('#start_date').val();
-        let end = $('#end_date').val();
         
+        if (durationType === 'partial_day') {
+            let startTime = $('#start_time').val();
+            let endTime = $('#end_time').val();
+            
+            if (start && startTime && endTime) {
+                // Set end_date same as start_date
+                $('#end_date').val(start);
+                
+                let d1 = new Date(start + 'T' + startTime);
+                let d2 = new Date(start + 'T' + endTime);
+                let diffTime = d2 - d1;
+                
+                if (diffTime <= 0) {
+                    $('#days_amount').val(0);
+                    $('#ui_solicitados').text(0);
+                    $('#ui_saldo').text(diasDisponiblesTotales);
+                    return;
+                }
+                
+                let hours = diffTime / (1000 * 60 * 60);
+                let diffDays = hours / 8; // Assuming 8h = 1 day
+                diffDays = Math.round(diffDays * 10) / 10;
+                
+                $('#days_amount').val(diffDays);
+                $('#ui_solicitados').text(diffDays);
+                
+                let saldo = diasDisponiblesTotales - diffDays;
+                $('#ui_saldo').text(saldo.toFixed(1));
+            }
+            return;
+        }
+
+        let end = $('#end_date').val();
         if(start && end) {
             let d1 = new Date(start);
             let d2 = new Date(end);
@@ -292,6 +360,17 @@ if (!isset($_SESSION['id'])) {
                 $('#ui_saldo').text(diasDisponiblesTotales);
                 return;
             }
+            
+            let diffTime = Math.abs(d2 - d1);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el dÃa de fin
+            
+            $('#days_amount').val(diffDays);
+            $('#ui_solicitados').text(diffDays);
+            
+            let saldo = diasDisponiblesTotales - diffDays;
+            $('#ui_saldo').text(saldo.toFixed(1));
+        }
+    }
             
             // Calculo simple de dias de diferencia (asumiendo días calendario, ajustar si son hábiles)
             let diffTime = Math.abs(d2 - d1);

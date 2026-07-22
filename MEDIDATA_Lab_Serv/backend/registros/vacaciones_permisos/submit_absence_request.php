@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type_id = $_POST['type_id'] ?? null;
         $start_date = $_POST['start_date'] ?? null;
         $end_date = $_POST['end_date'] ?? null;
+        $start_time = !empty($_POST['start_time']) ? $_POST['start_time'] : null;
+        $end_time = !empty($_POST['end_time']) ? $_POST['end_time'] : null;
         $days_amount = $_POST['days_amount'] ?? null;
         $comments = $_POST['comments'] ?? '';
         $is_paid_vacation = isset($_POST['is_paid_vacation']) && $_POST['is_paid_vacation'] == '1' ? 1 : 0;
@@ -55,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 3. Insertar solicitud
         $stmt = $connect_hr_leaves->prepare("
             INSERT INTO hr_absence_requests 
-            (user_id, type_id, start_date, end_date, days_amount, request_status, workflow_id, comments, proof_doc_path, is_paid_vacation) 
-            VALUES (?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?)
+            (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, request_status, workflow_id, comments, proof_doc_path, is_paid_vacation) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?)
         ");
         
         $stmt->execute([
-            $user_id, $type_id, $start_date, $end_date, $days_amount, $workflow_id, $comments, $proof_doc_path, $is_paid_vacation
+            $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $workflow_id, $comments, $proof_doc_path, $is_paid_vacation
         ]);
         
         $request_id = $connect_hr_leaves->lastInsertId();
@@ -78,3 +80,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
+
