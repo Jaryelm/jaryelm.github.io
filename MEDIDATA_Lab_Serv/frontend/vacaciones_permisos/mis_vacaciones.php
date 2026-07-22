@@ -19,7 +19,13 @@ if (!isset($_SESSION['id'])) {
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
@@ -73,8 +79,11 @@ if (!isset($_SESSION['id'])) {
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
         
-        <button class="btn-new" onclick="abrirModal()">+ Nueva Solicitud</button>
-        
+            <div class="page-actions">
+                <button class="button" onclick="abrirModal()">
+                    <i class='bx bx-plus'></i> Nueva Solicitud
+                </button>
+            </div>
         <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <table id="tabla-solicitudes" class="responsive-table" style="width:100%">
                 <thead>
@@ -171,7 +180,25 @@ if (!isset($_SESSION['id'])) {
 
     $(document).ready(function() {
         $('#tabla-solicitudes').DataTable({
-            "language": { "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json" }
+                            "dom": 'Bfrtip',
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
+                "buttons": [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button' },
+                    { extend: 'excel', className: 'button' },
+                    { extend: 'print', className: 'button' }
+                ],
+                "language": {
+                    "processing": 'Cargando...',
+                    "lengthMenu": 'Mostrar _MENU_ registros',
+                    "zeroRecords": 'No se encontraron resultados',
+                    "emptyTable": 'No hay datos disponibles.',
+                    "info": 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    "infoEmpty": 'Mostrando 0 a 0 de 0 registros',
+                    "infoFiltered": '(filtrado de _MAX_ registros totales)',
+                    "search": 'Buscar:',
+                    "paginate": { "first": 'Primero', "last": 'Último', "next": 'Siguiente', "previous": 'Anterior' }
+                }
         });
         
         // Cargar Tipos de Ausencia
@@ -287,6 +314,8 @@ if (!isset($_SESSION['id'])) {
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
+
 
 
 

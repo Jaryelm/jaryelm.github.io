@@ -9,7 +9,7 @@ try {
     $max_seniority_years = $_POST['max_seniority_years'] ?? 0;
     $granted_days = $_POST['granted_days'] ?? 0;
     $max_accumulated_days = $_POST['max_accumulated_days'] ?? 0;
-    $status = $_POST['status'] ?? 'ACTIVE';
+    $status = isset($_POST['status']) ? intval($_POST['status']) : 1;
 
     global $connect; if (!$connect) throw new Exception("No db connection"); $pdo = $connect;
 
@@ -26,3 +26,4 @@ try {
     echo json_encode(['success' => false, 'message' => 'Internal error: ' . $e->getMessage()]);
 }
 ?>
+

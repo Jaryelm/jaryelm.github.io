@@ -19,7 +19,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - FLUJOS Aprobaci&oacute;n</title>
         <style>
@@ -47,8 +53,10 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos DÃ­as" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom: 20px;">
-                <button class="btn" style="background:#06adbf;color:white;border:none;padding:10px 15px;border-radius:5px;cursor:pointer;" onclick="agregarFlujo()">Agregar Flujo</button>
+            <div class="page-actions">
+                <button class="button" onclick="agregarFlujo()">
+                    <i class='bx bx-plus'></i> Agregar Flujo
+                </button>
             </div>
             <div style="background:#fff; padding:20px; border-radius:8px;">
                 <table id="tabla-flujos" class="responsive-table display" style="width:100%">
@@ -103,8 +111,24 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                         }
                     }
                 ],
+                                dom: 'Bfrtip',
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
+                buttons: [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button' },
+                    { extend: 'excel', className: 'button' },
+                    { extend: 'print', className: 'button' }
+                ],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                    processing: 'Cargando...',
+                    lengthMenu: 'Mostrar _MENU_ registros',
+                    zeroRecords: 'No se encontraron resultados',
+                    emptyTable: 'No hay datos disponibles.',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+                    infoFiltered: '(filtrado de _MAX_ registros totales)',
+                    search: 'Buscar:',
+                    paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
                 }
             });
         });
@@ -409,6 +433,9 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
+
+
 
 
 

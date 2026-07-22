@@ -13,7 +13,7 @@ try {
     $requires_document = isset($_POST['requires_document']) ? 1 : 0;
     
     if (empty($code) || empty($name) || empty($category)) {
-        echo json_encode(['status' => 'error', 'message' => 'El código, nombre y categoría son obligatorios.']);
+        echo json_encode(['success' => false, 'message' => 'El código, nombre y categoría son obligatorios.']);
         exit;
     }
     
@@ -21,14 +21,14 @@ try {
         // Insert
         $stmt = $pdo->prepare("INSERT INTO medic9ue_hr_leaves.hr_absence_types (code, name, category, is_paid, deducts_vacation, requires_document, status) VALUES (?, ?, ?, ?, ?, ?, 1)");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document]);
-        echo json_encode(['status' => 'success', 'message' => 'Tipo de ausencia agregado correctamente.']);
+        echo json_encode(['success' => true, 'message' => 'Tipo de ausencia agregado correctamente.']);
     } else {
         // Update
         $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_absence_types SET code = ?, name = ?, category = ?, is_paid = ?, deducts_vacation = ?, requires_document = ? WHERE type_id = ?");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document, $type_id]);
-        echo json_encode(['status' => 'success', 'message' => 'Tipo de ausencia actualizado correctamente.']);
+        echo json_encode(['success' => true, 'message' => 'Tipo de ausencia actualizado correctamente.']);
     }
 } catch (Throwable $e) {
-    echo json_encode(['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Internal error: ' . $e->getMessage()]);
 }
 ?>

@@ -16,7 +16,7 @@ try {
     $stmt->execute([$policy_id]);
     $current = $stmt->fetchColumn();
 
-    $new_status = ($current === 'ACTIVE') ? 'INACTIVE' : 'ACTIVE';
+    $new_status = ($current == 1) ? 0 : 1;
 
     $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_vacation_policies SET status = ? WHERE policy_id = ?");
     $stmt->execute([$new_status, $policy_id]);
@@ -26,3 +26,4 @@ try {
     echo json_encode(['success' => false, 'message' => 'Internal error: ' . $e->getMessage()]);
 }
 ?>
+

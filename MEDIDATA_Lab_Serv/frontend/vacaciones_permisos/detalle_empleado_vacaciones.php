@@ -73,9 +73,11 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             <?php include_once '../admin/perfil.php'; ?>
         </nav>
         <main>
-        <div class="header">
-            <h2>Ficha de Vacaciones por Colaborador</h2>
-        </div>
+                    <?php
+            $hora_actual = date('H');
+            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
+            ?>
+            <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
         
         <div class="select-container">
             <label for="empleado_select" style="font-weight: bold; margin-bottom:10px; display:block;">Seleccionar Colaborador:</label>
@@ -177,6 +179,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
 
 
 

@@ -19,7 +19,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - KARDEX VACACIONES</title>
 </head>
@@ -90,7 +96,25 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 { data: 'created_at' },
                 { data: 'comments' }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json" },
+                            dom: 'Bfrtip',
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
+                buttons: [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button' },
+                    { extend: 'excel', className: 'button' },
+                    { extend: 'print', className: 'button' }
+                ],
+                language: {
+                    processing: 'Cargando...',
+                    lengthMenu: 'Mostrar _MENU_ registros',
+                    zeroRecords: 'No se encontraron resultados',
+                    emptyTable: 'No hay datos disponibles.',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+                    infoFiltered: '(filtrado de _MAX_ registros totales)',
+                    search: 'Buscar:',
+                    paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
+                },
             responsive: true,
             order: [[6, 'desc']] // Ordenar por fecha reciente
         });
@@ -99,3 +123,6 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
+
+

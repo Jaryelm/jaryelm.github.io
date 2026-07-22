@@ -8,7 +8,7 @@ try {
     $current_status = $_POST['current_status'] ?? 0;
     
     if (empty($type_id)) {
-        echo json_encode(['status' => 'error', 'message' => 'ID no proporcionado.']);
+        echo json_encode(['success' => false, 'message' => 'ID no proporcionado.']);
         exit;
     }
     
@@ -17,8 +17,8 @@ try {
     $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_absence_types SET status = ? WHERE type_id = ?");
     $stmt->execute([$new_status, $type_id]);
     
-    echo json_encode(['status' => 'success', 'message' => 'Estado actualizado correctamente.']);
+    echo json_encode(['success' => true, 'message' => 'Estado actualizado correctamente.']);
 } catch (Throwable $e) {
-    echo json_encode(['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Internal error: ' . $e->getMessage()]);
 }
 ?>

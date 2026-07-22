@@ -5379,3 +5379,11 @@ main .containerss .demo-flujo-step-num {
   margin: 0 !important;
 }
 
+
+/* Generic wrapper for top action buttons in CRUD views */
+.page-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}

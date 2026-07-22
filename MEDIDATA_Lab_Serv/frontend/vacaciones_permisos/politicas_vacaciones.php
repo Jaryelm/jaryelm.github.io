@@ -19,7 +19,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - Pol&iacute;ticas VACACIONES</title>
 </head>
@@ -40,11 +46,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom: 20px;">
-                <button class="btn" style="background:#06adbf;color:white;border:none;padding:10px 15px;border-radius:5px;cursor:pointer;" onclick="openPolicyModal()">Agregar Política</button>
+            <div class="page-actions">
+                <button class="button" onclick="openPolicyModal()">
+                    <i class='bx bx-plus'></i> Agregar Política
+                </button>
             </div>
             <div style="background:#fff; padding:20px; border-radius:8px;">
-                <table id="tabla-Pol&iacute;ticas" class="responsive-table display" style="width:100%">
+                <table id="tabla-politicas" class="responsive-table display" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -64,11 +72,11 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/script.js"></script>
     <script src="../../backend/js/submenu.js"></script>
     <script>
-    let tablaPol&iacute;ticas;
+    let tablaPoliticas;
     $(document).ready(function() {
-        tablaPol&iacute;ticas = $('#tabla-Pol&iacute;ticas').DataTable({
+        tablaPoliticas = $('#tabla-politicas').DataTable({
             ajax: {
-                url: '../../backend/registros/vacaciones_permisos/fetch_Pol&iacute;ticas.php',
+                url: '../../backend/registros/vacaciones_permisos/fetch_politicas.php',
                 type: 'GET'
             },
             columns: [
@@ -80,25 +88,38 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 { 
                     data: 'status',
                     render: function(data, type, row) {
-                        return data === 'ACTIVE' 
-                            ? '<span class="badge" style="background:#28a745;color:white;padding:3px 8px;border-radius:4px;font-size:12px;">Activo</span>' 
-                            : '<span class="badge" style="background:#dc3545;color:white;padding:3px 8px;border-radius:4px;font-size:12px;">Inactivo</span>';
+                        var checked = data == 1 ? 'checked' : '';
+                        return `<label class="switch"><input type="checkbox" class="toggle-status" onchange="togglePolicy(${row.policy_id})" ${checked}><span class="slider round"></span></label>`;
                     }
                 },
                 {
                     data: null,
                     orderable: false,
                     render: function(data, type, row) {
-                        let toggleIcon = row.status === 'ACTIVE' ? 'bx-toggle-right' : 'bx-toggle-left';
                         let escapedRow = JSON.stringify(row).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                        return `
-                            <button class="btn btn-sm" style="background:#06adbf;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;" onclick="openPolicyModal(${escapedRow})"><i class='bx bx-edit-alt'></i></button>
-                            <button class="btn btn-sm" style="background:#035c67;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-left:5px;" onclick="togglePolicy(${row.policy_id})"><i class='bx ${toggleIcon}'></i></button>
-                        `;
+                        return `<button class="btn-edit" onclick="openPolicyModal(${escapedRow})" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:1.2rem;"><i class='bx bx-edit'></i></button>`;
                     }
                 }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json" },
+                            dom: 'Bfrtip',
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
+                buttons: [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button' },
+                    { extend: 'excel', className: 'button' },
+                    { extend: 'print', className: 'button' }
+                ],
+                language: {
+                    processing: 'Cargando...',
+                    lengthMenu: 'Mostrar _MENU_ registros',
+                    zeroRecords: 'No se encontraron resultados',
+                    emptyTable: 'No hay datos disponibles.',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+                    infoFiltered: '(filtrado de _MAX_ registros totales)',
+                    search: 'Buscar:',
+                    paginate: { first: 'Primero', last: '�ltimo', next: 'Siguiente', previous: 'Anterior' }
+                },
             responsive: true
         });
     });
@@ -128,8 +149,8 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 <div style="margin-bottom:15px;">
                     <label style="display:block;margin-bottom:5px;">Estado:</label>
                     <select id="status" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
-                        <option value="ACTIVE" ${isEdit && policy.status === 'ACTIVE' ? 'selected' : ''}>Activo</option>
-                        <option value="INACTIVE" ${isEdit && policy.status === 'INACTIVE' ? 'selected' : ''}>Inactivo</option>
+                        <option value="1" ${isEdit && policy.status == 1 ? 'selected' : ''}>Activo</option>
+                        <option value="0" ${isEdit && policy.status == 0 ? 'selected' : ''}>Inactivo</option>
                     </select>
                 </div>
             </form>
@@ -175,44 +196,37 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire('Guardado', 'La política ha sido guardada', 'success');
-                tablaPol&iacute;ticas.ajax.reload(null, false);
+                tablaPoliticas.ajax.reload(null, false);
             }
         });
     }
 
     function togglePolicy(id) {
-        Swal.fire({
-            title: '¿Cambiar estado?',
-            text: 'El estado de la política cambiará',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, cambiar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '../../backend/registros/vacaciones_permisos/toggle_politica.php',
-                    type: 'POST',
-                    data: { policy_id: id },
-                    dataType: 'json',
-                    success: function(response) {
-                        if(response.success) {
-                            tablaPol&iacute;ticas.ajax.reload(null, false);
-                            Swal.fire('Actualizado', 'El estado ha sido actualizado', 'success');
-                        } else {
-                            Swal.fire('Error', response.message || 'Error al actualizar', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error', 'No se pudo procesar la solicitud', 'error');
-                    }
-                });
+        $.ajax({
+            url: '../../backend/registros/vacaciones_permisos/toggle_politica.php',
+            type: 'POST',
+            data: { policy_id: id },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    tablaPoliticas.ajax.reload(null, false);
+                } else {
+                    Swal.fire('Error', response.message || 'Error al cambiar estado.', 'error');
+                    tablaPoliticas.ajax.reload(null, false);
+                }
             }
         });
     }
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 

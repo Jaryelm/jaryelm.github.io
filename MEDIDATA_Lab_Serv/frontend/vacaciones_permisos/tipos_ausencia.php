@@ -19,7 +19,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <title>MEDIDATA - TIPOS AUSENCIA</title>
 </head>
@@ -40,8 +46,8 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos DÃ­as" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom: 20px;">
-                <a href="#" id="btn-agregar" class="btn-download">
+            <div class="page-actions">
+                <a href="#" id="btn-agregar" class="button">
                     <i class='bx bx-plus'></i> Agregar Tipo
                 </a>
             </div>
@@ -99,8 +105,8 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     { 
                         "data": "status",
                         "render": function(data, type, row) {
-                            var checked = data === 'active' ? 'checked' : '';
-                            return `<label class="switch"><input type="checkbox" class="toggle-status" data-id="${row.type_id}" ${checked}><span class="slider round"></span></label>`;
+                            var checked = data == 1 ? 'checked' : '';
+                            return `<label class="switch"><input type="checkbox" class="toggle-status" data-id="${row.type_id}" data-status="${data}" ${checked}><span class="slider round"></span></label>`;
                         }
                     },
                     { 
@@ -110,8 +116,24 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                         }
                     }
                 ],
+                                "dom": 'Bfrtip',
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
+                "buttons": [
+                    { extend: 'copy', className: 'button' },
+                    { extend: 'csv', className: 'button' },
+                    { extend: 'excel', className: 'button' },
+                    { extend: 'print', className: 'button' }
+                ],
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+                    "processing": 'Cargando...',
+                    "lengthMenu": 'Mostrar _MENU_ registros',
+                    "zeroRecords": 'No se encontraron resultados',
+                    "emptyTable": 'No hay datos disponibles.',
+                    "info": 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    "infoEmpty": 'Mostrando 0 a 0 de 0 registros',
+                    "infoFiltered": '(filtrado de _MAX_ registros totales)',
+                    "search": 'Buscar:',
+                    "paginate": { "first": 'Primero', "last": 'Último', "next": 'Siguiente', "previous": 'Anterior' }
                 }
             });
 
@@ -191,10 +213,12 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 
             $('#tabla-tipos tbody').on('change', '.toggle-status', function() {
                 var id = $(this).data('id');
-                var status = $(this).is(':checked') ? 'active' : 'inactive';
-                $.post('../../backend/registros/vacaciones_permisos/toggle_tipo_ausencia.php', { type_id: id, status: status }, function(res) {
+                var currentStatus = $(this).data('status');
+                $.post('../../backend/registros/vacaciones_permisos/toggle_tipo_ausencia.php', { type_id: id, current_status: currentStatus }, function(res) {
                     if (!res.success) {
                         Swal.fire('Error', res.message, 'error');
+                        table.ajax.reload();
+                    } else {
                         table.ajax.reload();
                     }
                 }, 'json');
@@ -202,10 +226,10 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         });
     </script>
     </section>
-    <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
+
 
 
 

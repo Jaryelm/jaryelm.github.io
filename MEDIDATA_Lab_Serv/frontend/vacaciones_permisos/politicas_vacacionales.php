@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 require_once '../../backend/registros/session_check.php';
 if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'])) {
     header('Location: mis_vacaciones.php');
@@ -35,9 +35,11 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             <?php include_once '../admin/perfil.php'; ?>
         </nav>
         <main>
-            <div class="header">
-                <h2>M&oacute;dulo en construcci&oacute;n: POLITICAS VACACIONALES</h2>
-            </div>
+                        <?php
+            $hora_actual = date('H');
+            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
+            ?>
+            <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
             <div style="background:#fff; padding:20px; border-radius:8px;">
                 <p>Esta vista est&aacute; pendiente de implementaci&oacute;n. Pronto se agregar&aacute; la tabla responsiva corporativa aqu&iacute;.</p>
                 <table class="responsive-table" style="width:100%; display:none;"></table>
@@ -48,3 +50,4 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
+
