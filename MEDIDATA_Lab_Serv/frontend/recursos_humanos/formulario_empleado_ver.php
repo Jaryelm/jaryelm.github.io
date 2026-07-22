@@ -4,6 +4,11 @@ require_once '../../backend/registros/rrhh_guard.php';
 require_once '../../backend/php/rrhh_employee_form_lib.php';
 
 $id_candidato = (int) ($_GET['id'] ?? 0);
+
+if (isset($_SESSION['rol']) && $_SESSION['rol'] !== 'Administrador') {
+    header("Location: formulario_empleado_ver_usr.php?id=$id_candidato");
+    exit;
+}
 $pdo = medidata_rrhh_pdo();
 if (!$pdo || $id_candidato <= 0) {
     die("Candidato no válido o servicio no disponible.");
