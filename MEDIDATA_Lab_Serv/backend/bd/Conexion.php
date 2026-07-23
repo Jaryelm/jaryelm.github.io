@@ -209,3 +209,52 @@ if (!empty($GLOBALS[$pdoPostulacionesKey]) && $GLOBALS[$pdoPostulacionesKey] ins
         }
     }
 }
+
+// --- ADDED FOR HR LEAVES MODULE ---
+$hrLeavesErrorKey = '__MEDIDATA_HR_LEAVES_CONN_ERROR__';
+$pdoHrLeavesKey = '__MEDIDATA_PDO_HR_LEAVES__';
+
+if (!function_exists('medidata_conectar_hr_leaves')) {
+    function medidata_conectar_hr_leaves(string $host): ?PDO
+    {
+        $dsn = 'mysql:host=' . $host . ';dbname=medic9ue_hr_leaves;charset=utf8mb4';
+        return new PDO(
+            $dsn,
+            dbuser,
+            dbpass,
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+            ]
+        );
+    }
+}
+
+if (!empty($GLOBALS[$pdoHrLeavesKey]) && $GLOBALS[$pdoHrLeavesKey] instanceof PDO) {
+    $connect_hr_leaves = $GLOBALS[$pdoHrLeavesKey];
+} elseif (isset($connect_hr_leaves) && $connect_hr_leaves instanceof PDO) {
+    $GLOBALS[$pdoHrLeavesKey] = $connect_hr_leaves;
+} else {
+    $connect_hr_leaves = null;
+    $hrLeavesHosts = [dbhost];
+    if (dbhost !== 'localhost' && dbhost !== '127.0.0.1') {
+        $hrLeavesHosts[] = 'localhost';
+    }
+    foreach ($hrLeavesHosts as $postHost) {
+        try {
+            $connect_hr_leaves = medidata_conectar_hr_leaves($postHost);
+            $GLOBALS[$pdoHrLeavesKey] = $connect_hr_leaves;
+            unset($GLOBALS[$hrLeavesErrorKey]);
+            break;
+        } catch (PDOException $e) {
+            $GLOBALS[$hrLeavesErrorKey] = $e->getMessage();
+            error_log('Conexion.php PDO HR Leaves [' . $postHost . ']: ' . $e->getMessage());
+            $connect_hr_leaves = null;
+        }
+    }
+}
+// ----------------------------------
