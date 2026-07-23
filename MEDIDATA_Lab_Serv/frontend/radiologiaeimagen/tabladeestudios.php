@@ -715,7 +715,7 @@ th:nth-child(9), td:nth-child(9) {
 
     <!-- Alertas -->
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <script src="download_study_helper.js?v=20260717a"></script>
+    <script src="download_study_helper.js?v=20260717b"></script>
 
 </body>
 </html>

@@ -69,6 +69,46 @@ try {
         exit;
     }
 
+    // Documentos de staff a veces se guardan como ruta (/uploads/staff/...), no como BLOB.
+    $trimmed = trim($blob);
+    if (
+        strlen($trimmed) < 500
+        && (
+            preg_match('#^https?://#i', $trimmed)
+            || preg_match('#^/uploads/#i', $trimmed)
+            || (str_starts_with($trimmed, '/') && !str_starts_with($trimmed, '%PDF'))
+        )
+    ) {
+        if (preg_match('#^https?://#i', $trimmed)) {
+            header('Location: ' . $trimmed, true, 302);
+            exit;
+        }
+        $rel = ltrim($trimmed, '/');
+        $fullPath = realpath(__DIR__ . '/../../' . $rel);
+        $uploadsRoot = realpath(__DIR__ . '/../../uploads');
+        if (!$fullPath || !$uploadsRoot || !is_file($fullPath) || strpos($fullPath, $uploadsRoot) !== 0) {
+            http_response_code(404);
+            header('Content-Type: text/plain; charset=utf-8');
+            echo 'Archivo no encontrado.';
+            exit;
+        }
+        $mime = 'application/octet-stream';
+        if (class_exists('finfo')) {
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $detected = $finfo->file($fullPath);
+            if (is_string($detected) && $detected !== '') {
+                $mime = $detected;
+            }
+        }
+        $safeName = preg_replace('/[^a-zA-Z0-9_-]+/', '_', $docKey) ?: 'documento';
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="' . $safeName . '_' . $candidateId . '.' . pathinfo($fullPath, PATHINFO_EXTENSION) . '"');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        readfile($fullPath);
+        exit;
+    }
+
     $isPdf = strncmp($blob, '%PDF', 4) === 0;
     $safeName = preg_replace('/[^a-zA-Z0-9_-]+/', '_', $docKey) ?: 'documento';
     $filename = $safeName . '_' . $candidateId;

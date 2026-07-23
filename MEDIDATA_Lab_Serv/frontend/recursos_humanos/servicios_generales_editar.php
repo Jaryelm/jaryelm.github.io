@@ -1,6 +1,7 @@
 <?php
 include_once '../../backend/registros/session_check.php';
 require_once '../../backend/php/staff_colaborador_bootstrap.php';
+require_once '../../backend/registros/rrhh_guard.php';
 medidata_staff_ensure_tables($connect);
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -8,6 +9,12 @@ $sentencia = $connect->prepare('SELECT * FROM staff_general_services WHERE idsg 
 $sentencia->execute([':id' => $id]);
 $data = $sentencia->fetchAll(PDO::FETCH_OBJ);
 $staffUsers = medidata_staff_fetch_users_for_select($connect);
+
+$rrhh_docs = [];
+if (count($data) > 0 && !empty($data[0]->id_candidate_rrhh)) {
+    require_once __DIR__ . '/../../backend/php/staff_form_docs_lib.php';
+    $rrhh_docs = medidata_staff_load_hiring_docs_flags((int) $data[0]->id_candidate_rrhh);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -147,6 +154,8 @@ $staffUsers = medidata_staff_fetch_users_for_select($connect);
                 $staffDocIdcol = 'idsg';
                 $staffDocRow = $d;
                 $staffDocRrhh = $rrhh_docs ?? null;
+                $staffDocCandidateId = (int) ($d->id_candidate_rrhh ?? 0);
+                $staffDocEmail = (string) ($d->correo_personal ?? '');
                 include __DIR__ . '/_staff_edit_documentos_section.php';
                 ?>
 

@@ -3,6 +3,8 @@
  * Sección de documentos — formularios de edición de personal.
  */
 require_once __DIR__ . '/../../backend/php/staff_form_docs_lib.php';
+require_once __DIR__ . '/../../backend/php/staff_doc_manage_lib.php';
+medidata_staff_doc_ensure_hiring_columns();
 
 $staffDocId = (int) ($staffDocId ?? 0);
 $staffDocTable = $staffDocTable ?? 'staff_administrative';
@@ -63,6 +65,16 @@ $pathHas = static function (?string $col) use ($staffDocRrhh): bool {
             'view_url' => !empty($staffDocHas['contrato']) ? $blobUrl('contrato') : null,
             'view_title' => 'Contrato firmado',
             'highlight' => true,
+        ]);
+        medidata_staff_render_doc_field([
+            'label' => 'Curriculum Vitae',
+            'name' => 'doc_curriculum_vitae',
+            'doc_key' => 'curriculum_vitae',
+            'doc_kind' => 'hiring',
+            'accept' => '.pdf,.doc,.docx',
+            'has' => $pathHas('curriculum_vitae'),
+            'view_url' => $pathUrl('curriculum_vitae'),
+            'view_title' => 'Curriculum Vitae',
         ]);
         medidata_staff_render_doc_field([
             'label' => 'Partida de nacimiento de hijos',
@@ -164,7 +176,119 @@ $pathHas = static function (?string $col) use ($staffDocRrhh): bool {
             'view_url' => $pathUrl('home_sketch'),
             'view_title' => 'Croquis de vivienda',
         ]);
+        medidata_staff_render_doc_field([
+            'label' => 'Perfil de puesto',
+            'name' => 'doc_job_profile',
+            'doc_key' => 'job_profile',
+            'doc_kind' => 'hiring',
+            'accept' => '.pdf,.doc,.docx',
+            'has' => $pathHas('job_profile'),
+            'view_url' => $pathUrl('job_profile'),
+            'view_title' => 'Perfil de puesto',
+        ]);
         ?>
     </div>
 </div>
+
+<div class="card p-3 mb-3">
+    <h5 class="mb-2">Expediente del Colaborador (Documentos)</h5>
+    <p class="text-muted" style="font-size: 13px;">Envíe este enlace para que el colaborador pueda subir directamente sus propios documentos faltantes (CV, actas, certificados) desde su casa o móvil.</p>
+    <button type="button" id="btn-staff-expediente-link" style="background:#28a745;color:#fff;border:none;padding:10px 15px;border-radius:4px;cursor:pointer;font-weight:bold;">
+        <i class="bx bx-upload" style="margin-right:5px;"></i> Generar / Enviar enlace de Expediente
+    </button>
+</div>
+
+<script>
+window.MEDIDATA_STAFF_EXPEDIENTE = {
+    staffId: <?php echo (int) $staffDocId; ?>,
+    staffTable: '<?php echo htmlspecialchars($staffDocTable); ?>',
+    apiUrl: '../../backend/php/staff_expediente_link.php'
+};
+</script>
+<script src="../../backend/registros/script/staff_expediente_link.js"></script>
+
+<div class="card p-3 mb-3">
+    <h5 class="mb-2">Formulario de Empleado</h5>
+    <p class="text-muted" style="font-size: 13px;">Al enviar este enlace, se generará un perfil para que el colaborador llene sus datos (dirección, fecha nacimiento, etc).</p>
+    <button type="button" class="btn-enviar-solicitud" style="background:#06adbf;color:#fff;border:none;padding:10px 15px;border-radius:4px;cursor:pointer;font-weight:bold;">
+        <i class="bx bx-link" style="margin-right:5px;"></i> Generar / Enviar enlace de Formulario
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.querySelector('.btn-enviar-solicitud');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Generando enlace...',
+                text: 'Creando o verificando perfil del empleado para el formulario.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            var fd = new FormData();
+            fd.append('action', 'get_link');
+            fd.append('id', '<?php echo $staffDocId; ?>');
+            fd.append('table', '<?php echo htmlspecialchars($staffDocTable); ?>');
+
+            fetch('../../backend/php/rrhh_enviar_formulario_empleado.php', {
+                method: 'POST',
+                body: fd
+            }).then(r => r.json()).then(res => {
+                if (!res.success) {
+                    Swal.fire('Error', res.message, 'error');
+                    return;
+                }
+                
+                var url = res.url;
+                var email = res.email;
+                var html = '<p style="text-align:left;margin:0 0 10px;">Enlace para que el colaborador complete su formulario:</p>'
+                    + '<input id="swal-form-url" type="text" readonly class="swal2-input" style="width:100%;font-size:13px;" value="' + url + '">'
+                    + (email 
+                        ? '<p style="text-align:left;font-size:13px;color:#555;margin-top:10px;">Correo del empleado: <strong>' + email + '</strong></p>' 
+                        : '<p style="text-align:left;font-size:13px;color:#856404;margin-top:10px;">El empleado no tiene correo registrado. Copie el enlace y envíelo manualmente.</p>');
+
+                Swal.fire({
+                    title: 'Enlace Generado',
+                    html: html,
+                    width: 600,
+                    showCancelButton: true,
+                    showDenyButton: !!email,
+                    confirmButtonText: 'Copiar enlace',
+                    denyButtonText: 'Enviar por correo',
+                    cancelButtonText: 'Cerrar',
+                    reverseButtons: true,
+                    didOpen: () => {
+                        $('.swal2-actions').append('<a class="swal2-confirm swal2-styled" style="background-color: #06adbf; margin-left: 5px; display: inline-block; text-decoration: none;" href="' + url + '" target="_blank">Ver</a>');
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        navigator.clipboard.writeText(url).then(() => {
+                            Swal.fire({ icon: 'success', title: 'Copiado', timer: 1200, showConfirmButton: false });
+                        });
+                    } else if (result.isDenied) {
+                        Swal.fire({
+                            title: 'Enviando...',
+                            allowOutsideClick: false,
+                            didOpen: () => { Swal.showLoading(); }
+                        });
+                        var fdSend = new FormData();
+                        fdSend.append('action', 'send_email');
+                        fdSend.append('id', '<?php echo $staffDocId; ?>');
+                        fdSend.append('table', '<?php echo htmlspecialchars($staffDocTable); ?>');
+                        fetch('../../backend/php/rrhh_enviar_formulario_empleado.php', {
+                            method: 'POST',
+                            body: fdSend
+                        }).then(r => r.json()).then(resSend => {
+                            if (resSend.success) Swal.fire('Enviado', resSend.message, 'success');
+                            else Swal.fire('Error', resSend.message, 'error');
+                        });
+                    }
+                });
+            });
+        });
+    }
+});
+</script>
 <script src="../../backend/registros/script/staff_edit_docs.js"></script>

@@ -49,18 +49,20 @@ $prefill = $ctx ? medidata_rrhh_employee_form_prefill($ctx) : [];
         <?php if (!$ctx): ?>
             <h1>Enlace no válido</h1>
             <p class="lead">Este enlace no existe o ya no está disponible. Solicite uno nuevo a Recursos Humanos.</p>
-        <?php elseif ($alreadySent): ?>
-            <h1>Formulario recibido</h1>
-            <p class="lead">Gracias, <?php echo htmlspecialchars((string) $ctx['fullname'], ENT_QUOTES, 'UTF-8'); ?>. Su solicitud ya fue enviada correctamente.</p>
         <?php else: ?>
             <h1>Solicitud de empleo</h1>
             <p class="lead">Hospital MEDICASA — <?php echo htmlspecialchars((string) $ctx['fullname'], ENT_QUOTES, 'UTF-8'); ?></p>
 
+            <?php if ($alreadySent): ?>
+                <div style="background:#d4edda; color:#155724; border:1px solid #c3e6cb; padding:14px; border-radius:8px; margin-bottom:20px;">
+                    <strong>Formulario recibido previamente:</strong> Puede revisar o actualizar sus datos si es necesario.
+                </div>
+            <?php endif; ?>
             <form id="fe-form" method="post" action="#" autocomplete="off">
                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>">
                 <?php include __DIR__ . '/_formulario_empleado_campos.php'; ?>
                 <div class="fe-actions">
-                    <button type="submit" class="registerbtn">Enviar solicitud</button>
+                    <button type="submit" class="registerbtn"><?php echo $alreadySent ? "Actualizar solicitud" : "Enviar solicitud"; ?></button>
                 </div>
             </form>
         <?php endif; ?>
@@ -76,20 +78,28 @@ $('#fe-form').on('submit', function (e) {
     $btn.prop('disabled', true);
     $.ajax({
         type: 'POST',
-        url: '../../backend/php/rrhh_formulario_empleado_guardar.php',
+        url: '/backend/php/rrhh_formulario_empleado_guardar.php',
         data: $(this).serialize(),
         dataType: 'json'
     }).done(function (res) {
-        if (res.success) {
-            Swal.fire('¡Gracias!', res.message, 'success').then(function () {
+        if (res && res.success) {
+            Swal.fire('¡Gracias!', res.message || 'Solicitud enviada.', 'success').then(function () {
                 window.location.reload();
             });
         } else {
-            Swal.fire('Error', res.message || 'No se pudo enviar.', 'error');
+            Swal.fire('Error', (res && res.message) ? res.message : 'No se pudo enviar.', 'error');
             $btn.prop('disabled', false);
         }
-    }).fail(function () {
-        Swal.fire('Error', 'Error de comunicación.', 'error');
+    }).fail(function (xhr) {
+        var msg = 'Error de comunicación.';
+        if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+            msg = xhr.responseJSON.message;
+        } else if (xhr && xhr.status === 503) {
+            msg = 'Servicio temporalmente no disponible. Intente de nuevo en unos segundos.';
+        } else if (xhr && xhr.status) {
+            msg = 'Error de comunicación (HTTP ' + xhr.status + ').';
+        }
+        Swal.fire('Error', msg, 'error');
         $btn.prop('disabled', false);
     });
 });

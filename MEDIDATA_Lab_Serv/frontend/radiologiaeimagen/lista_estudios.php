@@ -789,7 +789,7 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 
     <!-- Alertas -->
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <script src="download_study_helper.js?v=20260717a"></script>
+    <script src="download_study_helper.js?v=20260717b"></script>
 
         <!-- Script para manejar el cambio de color en los botones -->
     <script src="../../backend/registros/script/botones_color.js"></script>

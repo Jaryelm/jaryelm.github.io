@@ -33,6 +33,7 @@ if (!function_exists('medidata_session_json_api_script')) {
             'rrhh_expediente_link.php',
             'rrhh_entrevista_guardar.php',
             'rrhh_psicometrica_guardar.php',
+            'rrhh_comunicados_enviar.php',
             'tabla_puestos_trabajo.php',
             'tabla_vacantes_trabajo.php',
             'tabla_niveles_salariales.php',

@@ -40,7 +40,33 @@ if (!function_exists('medidata_staff_doc_hiring_keys')) {
             'professional_references',
             'diplomas',
             'home_sketch',
+            'curriculum_vitae',
+            'job_profile',
         ];
+    }
+}
+
+if (!function_exists('medidata_staff_doc_ensure_hiring_columns')) {
+    /** Garantiza columnas path de documentos hiring (p. ej. perfil de puesto). */
+    function medidata_staff_doc_ensure_hiring_columns(?PDO $pdoRrhh = null): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
+        $pdoRrhh = $pdoRrhh ?: medidata_rrhh_pdo();
+        if (!$pdoRrhh) {
+            return;
+        }
+        try {
+            $cols = $pdoRrhh->query('SHOW COLUMNS FROM hiring_requirements')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('job_profile', $cols, true)) {
+                $pdoRrhh->exec('ALTER TABLE hiring_requirements ADD COLUMN job_profile VARCHAR(500) NULL DEFAULT NULL');
+            }
+        } catch (Throwable $e) {
+            error_log('medidata_staff_doc_ensure_hiring_columns: ' . $e->getMessage());
+        }
     }
 }
 
@@ -62,27 +88,118 @@ if (!function_exists('medidata_staff_doc_fetch_staff_row')) {
     function medidata_staff_doc_fetch_staff_row(PDO $connect, string $table, int $id): ?array
     {
         [$table, $idCol, $numideCol] = medidata_staff_doc_resolve_table($table);
-        $stmt = $connect->prepare("
-            SELECT {$idCol} AS staff_id, {$numideCol} AS numide, id_candidate_rrhh
+        require_once __DIR__ . '/staff_areas_lib.php';
+        $cols = medidata_staff_area_columns($table);
+        if (!$cols) {
+            return null;
+        }
+
+        $nombresCol = $cols['nombres'];
+        $apellidosCol = $cols['apellidos'];
+        $nacCol = $cols['nacimiento'];
+
+        $sqlFull = "
+            SELECT {$idCol} AS staff_id, {$numideCol} AS numide, id_candidate_rrhh,
+                   {$nombresCol} AS nombres, {$apellidosCol} AS apellidos, {$nacCol} AS nacimiento,
+                   telefono, correo_personal
             FROM {$table}
             WHERE {$idCol} = ?
             LIMIT 1
-        ");
-        $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        ";
+        $sqlMin = "
+            SELECT {$idCol} AS staff_id, {$numideCol} AS numide, id_candidate_rrhh,
+                   {$nombresCol} AS nombres, {$apellidosCol} AS apellidos, {$nacCol} AS nacimiento
+            FROM {$table}
+            WHERE {$idCol} = ?
+            LIMIT 1
+        ";
+
+        try {
+            $stmt = $connect->prepare($sqlFull);
+            $stmt->execute([$id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $stmt = $connect->prepare($sqlMin);
+            $stmt->execute([$id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $row['telefono'] = $row['telefono'] ?? '';
+                $row['correo_personal'] = $row['correo_personal'] ?? '';
+            }
+        }
+
         return $row ?: null;
     }
 }
 
+if (!function_exists('medidata_staff_doc_link_candidate')) {
+    function medidata_staff_doc_link_candidate(PDO $connect, string $table, int $id, int $idCandidate): void
+    {
+        [$tableName, $idCol] = medidata_staff_doc_resolve_table($table);
+        $connect->prepare("UPDATE {$tableName} SET id_candidate_rrhh = ? WHERE {$idCol} = ? LIMIT 1")
+            ->execute([$idCandidate, $id]);
+    }
+}
+
+if (!function_exists('medidata_staff_find_candidate_id_by_dni')) {
+    function medidata_staff_find_candidate_id_by_dni(PDO $pdoRrhh, string $dni): ?int
+    {
+        $dni = trim($dni);
+        if ($dni === '') {
+            return null;
+        }
+
+        $queries = [
+            'SELECT id FROM candidates WHERE deleted = 0 AND TRIM(dni) = ? ORDER BY id DESC LIMIT 1',
+            'SELECT id FROM candidates WHERE TRIM(dni) = ? ORDER BY id DESC LIMIT 1',
+            'SELECT id FROM candidates WHERE deleted = 0 AND dni = ? ORDER BY id DESC LIMIT 1',
+            'SELECT id FROM candidates WHERE dni = ? ORDER BY id DESC LIMIT 1',
+        ];
+        foreach ($queries as $sql) {
+            try {
+                $stmt = $pdoRrhh->prepare($sql);
+                $stmt->execute([$dni]);
+                $found = $stmt->fetchColumn();
+                if ($found) {
+                    return (int) $found;
+                }
+            } catch (Throwable $e) {
+                continue;
+            }
+        }
+
+        return null;
+    }
+}
+
 if (!function_exists('medidata_staff_doc_ensure_candidate')) {
-    function medidata_staff_doc_ensure_candidate(PDO $connect, string $table, int $id): int
+    /**
+     * Resuelve o crea el candidato RRHH vinculado al colaborador.
+     * @param bool $createIfMissing Si true, crea el registro en candidates (status Contratado).
+     */
+    function medidata_staff_doc_ensure_candidate(PDO $connect, string $table, int $id, bool $createIfMissing = false): int
     {
         $staff = medidata_staff_doc_fetch_staff_row($connect, $table, $id);
         if (!$staff) {
             throw new RuntimeException('Colaborador no encontrado.');
         }
         if (!empty($staff['id_candidate_rrhh'])) {
-            return (int) $staff['id_candidate_rrhh'];
+            $existingLink = (int) $staff['id_candidate_rrhh'];
+            // Verificar que el candidato aún exista; si no, recrear vínculo.
+            $pdoRrhhCheck = medidata_rrhh_pdo();
+            if ($pdoRrhhCheck) {
+                try {
+                    $chk = $pdoRrhhCheck->prepare('SELECT id FROM candidates WHERE id = ? LIMIT 1');
+                    $chk->execute([$existingLink]);
+                    if ($chk->fetchColumn()) {
+                        return $existingLink;
+                    }
+                } catch (Throwable $e) {
+                    return $existingLink;
+                }
+            } else {
+                return $existingLink;
+            }
         }
 
         $pdoRrhh = medidata_rrhh_pdo();
@@ -92,19 +209,72 @@ if (!function_exists('medidata_staff_doc_ensure_candidate')) {
 
         $numide = trim((string) ($staff['numide'] ?? ''));
         if ($numide !== '') {
-            $stmtC = $pdoRrhh->prepare('SELECT id FROM candidates WHERE dni = ? LIMIT 1');
-            $stmtC->execute([$numide]);
-            $found = $stmtC->fetchColumn();
+            $found = medidata_staff_find_candidate_id_by_dni($pdoRrhh, $numide);
             if ($found) {
-                $idCandidate = (int) $found;
-                [$tableName, $idCol] = medidata_staff_doc_resolve_table($table);
-                $connect->prepare("UPDATE {$tableName} SET id_candidate_rrhh = ? WHERE {$idCol} = ? LIMIT 1")
-                    ->execute([$idCandidate, $id]);
-                return $idCandidate;
+                medidata_staff_doc_link_candidate($connect, $table, $id, $found);
+                return $found;
             }
         }
 
-        throw new RuntimeException('No hay expediente RRHH vinculado a este colaborador.');
+        if (!$createIfMissing) {
+            throw new RuntimeException('No hay expediente RRHH vinculado a este colaborador.');
+        }
+
+        $stmtV = $pdoRrhh->query('SELECT id FROM vacant_positions ORDER BY id ASC LIMIT 1');
+        $idVacant = (int) ($stmtV->fetchColumn() ?: 1);
+        $fullname = trim((string) ($staff['nombres'] ?? '') . ' ' . (string) ($staff['apellidos'] ?? ''));
+        if ($fullname === '') {
+            $fullname = $numide !== '' ? $numide : ('Colaborador #' . $id);
+        }
+        $nacimiento = trim((string) ($staff['nacimiento'] ?? ''));
+        $telefono = trim((string) ($staff['telefono'] ?? ''));
+        $email = trim((string) ($staff['correo_personal'] ?? ''));
+        $usuario = trim((string) ($_SESSION['name'] ?? 'System'));
+        $dniInsert = $numide !== '' ? $numide : ('TMP' . str_pad((string) $id, 12, '0', STR_PAD_LEFT));
+
+        try {
+            $stmtIns = $pdoRrhh->prepare("
+                INSERT INTO candidates (id_vacant_position, fullname, dni, birthdate, phonenumber, email, direction, status, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, 'N/D', 'Llenando Expediente', ?)
+            ");
+            $stmtIns->execute([
+                $idVacant,
+                $fullname,
+                $dniInsert,
+                $nacimiento !== '' ? $nacimiento : null,
+                $telefono,
+                $email,
+                $usuario,
+            ]);
+            $idCandidate = (int) $pdoRrhh->lastInsertId();
+        } catch (Throwable $e) {
+            // Clave única (vacante + DNI): reutilizar el candidato ya existente.
+            $msg = $e->getMessage();
+            if (strpos($msg, '1062') === false && strpos($msg, 'Duplicate') === false) {
+                throw $e;
+            }
+            $idCandidate = medidata_staff_find_candidate_id_by_dni($pdoRrhh, $dniInsert);
+            if (!$idCandidate) {
+                try {
+                    $stmtDup = $pdoRrhh->prepare(
+                        'SELECT id FROM candidates WHERE id_vacant_position = ? AND TRIM(dni) = ? ORDER BY id DESC LIMIT 1'
+                    );
+                    $stmtDup->execute([$idVacant, $dniInsert]);
+                    $idCandidate = (int) $stmtDup->fetchColumn();
+                } catch (Throwable $e2) {
+                    $idCandidate = 0;
+                }
+            }
+            if ($idCandidate <= 0) {
+                throw new RuntimeException(
+                    'Ya existe un expediente RRHH con este DNI y no se pudo vincular. Detalle: ' . $msg
+                );
+            }
+        }
+
+        medidata_staff_doc_link_candidate($connect, $table, $id, $idCandidate);
+
+        return $idCandidate;
     }
 }
 
@@ -175,6 +345,7 @@ if (!function_exists('medidata_staff_doc_upload_hiring')) {
         if (!$pdoRrhh) {
             throw new RuntimeException('Base de datos RRHH no disponible.');
         }
+        medidata_staff_doc_ensure_hiring_columns($pdoRrhh);
 
         $staff = medidata_staff_doc_fetch_staff_row($connect, $table, $id);
         if (!$staff) {

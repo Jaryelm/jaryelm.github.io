@@ -175,7 +175,7 @@ foreach ($eduLevels as $key => $label):
             <label><input type="radio" name="has_illness" value="NO" <?php echo (strtoupper(fe_val($prefill, 'has_illness')) === 'NO') ? 'checked' : ''; ?>> No</label>
         </div>
     </div>
-    <div class="full"><label>Detalle enfermedad</label><input type="text" name="illness_detail" value="<?php echo fe_val($prefill, 'illness_detail'); ?>"></div>
+    <div class="full"><label>Detalle enfermedad o cirugía</label><input type="text" name="illness_detail" value="<?php echo fe_val($prefill, 'illness_detail'); ?>"></div>
     <div><label>¿Toma medicamento por prescripción médica?</label>
         <div class="radio-group">
             <label><input type="radio" name="takes_medication" value="SI" <?php echo (strtoupper(fe_val($prefill, 'takes_medication')) === 'SI' || strtoupper(fe_val($prefill, 'takes_medication')) === 'SÍ') ? 'checked' : ''; ?>> Sí</label>

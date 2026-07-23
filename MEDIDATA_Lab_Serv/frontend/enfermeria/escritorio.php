@@ -38,6 +38,40 @@ $req = $connect->prepare("
 ");
 $req->execute();
 $events = $req->fetchAll(PDO::FETCH_ASSOC);
+
+require_once __DIR__ . '/../../backend/php/medidata_calendar_institucional_lib.php';
+$events = array_merge(
+    $events,
+    medidata_calendar_institucional_as_programacion_events((int) ($_SESSION['id'] ?? 0))
+);
+
+$eventsForCalendar = [];
+foreach ($events as $event) {
+    $eventsForCalendar[] = [
+        'id' => (string) ($event['id'] ?? ''),
+        'title' => (string) ($event['title'] ?? ''),
+        'start' => (string) ($event['start'] ?? ''),
+        'end' => (string) ($event['end'] ?? ''),
+        'color' => (string) ($event['color'] ?? '#035c67'),
+        'patient' => trim((string) (($event['patient_name'] ?? '') . ' ' . ($event['patient_surname'] ?? ''))),
+        'doctor' => trim((string) (($event['doctor_name'] ?? '') . ' ' . ($event['doctor_surname'] ?? ''))),
+        'specialty' => (string) ($event['specialty'] ?? ''),
+        'area' => (string) ($event['area_name'] ?? ''),
+        'room_number' => (string) ($event['room_number'] ?? 'N/A'),
+        'insurer' => (string) ($event['insurer'] ?? 'N/A'),
+        'policy_number' => (string) ($event['policy_number'] ?? 'N/A'),
+        'certificate_number' => (string) ($event['certificate_number'] ?? 'N/A'),
+        'surgery' => (string) ($event['surgery'] ?? 'N/A'),
+        'hospitalization' => (string) ($event['hospitalization'] ?? 'N/A'),
+        'assistant' => (string) ($event['assistant'] ?? 'N/A'),
+        'anesthetist' => (string) ($event['anesthetist'] ?? 'N/A'),
+        'circulating' => (string) ($event['circulating'] ?? 'N/A'),
+        'technician' => (string) ($event['technician'] ?? 'N/A'),
+        'instrumentist' => (string) ($event['instrumentist'] ?? 'N/A'),
+        'evaluation' => (string) ($event['evaluation'] ?? 'N/A'),
+        'is_institutional' => !empty($event['is_institutional']) ? 1 : 0,
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -591,46 +625,7 @@ $(document).ready(function () {
     eventLimit: true,
     selectable: true,
     selectHelper: true,
-    events: [
-      <?php foreach($events as $event): 
-      $start = explode(" ", $event['start']);
-      $end = explode(" ", $event['end']);
-      if($start[1] == '00:00:00'){
-        $start = $start[0];
-      }else{
-        $start = $event['start'];
-      }
-      if($end[1] == '00:00:00'){
-        $end = $end[0];
-      }else{
-        $end = $event['end'];
-      }
-      ?>
-    {
-        id: '<?php echo $event['id']; ?>',
-        title: '<?php echo $event['title']; ?>',
-        start: '<?php echo $event['start']; ?>',
-        end: '<?php echo $event['end']; ?>',
-        color: '<?php echo $event['color']; ?>',
-        patient: '<?php echo $event['patient_name'] . ' ' . $event['patient_surname']; ?>',
-        doctor: '<?php echo $event['doctor_name'] . ' ' . $event['doctor_surname']; ?>',
-        specialty: '<?php echo $event['specialty']; ?>',
-        area: '<?php echo $event['area_name']; ?>',
-        room_number: '<?php echo $event['room_number'] ?? "N/A"; ?>',
-        insurer: '<?php echo $event['insurer'] ?? "N/A"; ?>',
-        policy_number: '<?php echo $event['policy_number'] ?? "N/A"; ?>',
-        certificate_number: '<?php echo $event['certificate_number'] ?? "N/A"; ?>',
-        surgery: '<?php echo $event['surgery'] ?? "N/A"; ?>',
-        hospitalization: '<?php echo $event['hospitalization'] ?? "N/A"; ?>',
-        assistant: '<?php echo $event['assistant'] ?? "N/A"; ?>',
-        anesthetist: '<?php echo $event['anesthetist'] ?? "N/A"; ?>',
-        circulating: '<?php echo $event['circulating'] ?? "N/A"; ?>',
-        technician: '<?php echo $event['technician'] ?? "N/A"; ?>',
-        instrumentist: '<?php echo $event['instrumentist'] ?? "N/A"; ?>',
-        evaluation: '<?php echo $event['evaluation'] ?? "N/A"; ?>'
-    },
-      <?php endforeach; ?>
-    ],
+    events: <?php echo json_encode($eventsForCalendar, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
     eventRender: function (event, element) {
       element.bind('click', function () {
         updateNotificationPanel(event);

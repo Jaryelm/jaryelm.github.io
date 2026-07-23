@@ -32,6 +32,7 @@ foreach ($events as $event) {
         'description' => (string) ($event['description'] ?? ''),
         'event_type_name' => (string) ($event['event_type_name'] ?? ''),
         'is_public' => (string) ($event['is_public'] ?? '0'),
+        'shared_user_ids' => array_values(array_map('intval', $event['shared_user_ids'] ?? [])),
     ];
     if ($type === 'vacancy_end' || $type === 'birthday' || $type === 'anniversary' || !empty($event['allDay'])) {
         $day = substr($startStr, 0, 10);
@@ -81,6 +82,7 @@ try {
 }
 
 $eventTypes = [];
+$shareUsers = [];
 try {
     $pdoRRHH = medidata_rrhh_pdo();
     if ($pdoRRHH) {
@@ -88,6 +90,15 @@ try {
     }
 } catch (Throwable $e) {
     error_log('escritorio eventTypes: ' . $e->getMessage());
+}
+try {
+    if (isset($connect) && $connect instanceof PDO) {
+        $shareUsers = $connect->query(
+            "SELECT id, name, rol FROM users WHERE state = '1' ORDER BY name ASC"
+        )->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Throwable $e) {
+    error_log('escritorio shareUsers: ' . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -303,6 +314,21 @@ try {
             // Establecer idioma de moment explicitly
             moment.locale('es');
 
+            if (typeof $.fn.select2 === 'function') {
+                var $share = $('#customEventShare');
+                if ($share.length && !$share.data('select2')) {
+                    $share.select2({
+                        width: '100%',
+                        dropdownParent: $('#addCustomEventModal'),
+                        placeholder: $share.attr('data-placeholder') || 'Buscar usuarios…',
+                        allowClear: true,
+                        language: {
+                            noResults: function () { return 'Sin resultados'; },
+                            searching: function () { return 'Buscando...'; }
+                        }
+                    });
+                }
+            }
             function updateRrhhBodyScrollLock() {
                 if ($('#eventModal:visible, #addCustomEventModal:visible').length > 0) {
                     $('html, body').addClass('rrhh-modal-open');
@@ -402,6 +428,7 @@ try {
                     $('#customEventDescription').val('');
                     $('#customEventAllDay').prop('checked', false).trigger('change');
                     $('#customEventPublic').prop('checked', false);
+                    $('#customEventShare').val(null).trigger('change');
                     $('#customEventRecurrence').val('none').trigger('change');
                     $('#customEventRecurrenceUntil').val('');
                     $('#customEventModalTitle').text('Añadir Nuevo Evento');
@@ -492,6 +519,7 @@ try {
                     event_type_name: datos.event_type_name || '',
                     description: datos.description || '',
                     is_public: datos.is_public,
+                    shared_user_ids: Array.isArray(datos.shared_user_ids) ? datos.shared_user_ids : [],
                     recurrence: datos.recurrence || 'none',
                     recurrence_until: datos.recurrence_until || null,
                     start_date: datos.start_date || '',
@@ -810,7 +838,10 @@ try {
                         ${event.description ? `<tr><th>Descripción</th><td>${event.description}</td></tr>` : ''}
                         <tr><th>Todo el día</th><td>${isAllDay ? 'Sí' : 'No'}</td></tr>
                         ${recRow}
-                        <tr><th>Visibilidad</th><td>${event.is_public == 1 ? 'Público' : 'Privado'}</td></tr>
+                        <tr><th>Visibilidad</th><td>${event.is_public == 1 ? 'Público (todos los usuarios con agenda)' : 'Privado'}</td></tr>
+                        ${(Array.isArray(event.shared_user_ids) && event.shared_user_ids.length)
+                            ? `<tr><th>Compartido con</th><td>${event.shared_user_ids.length} persona(s)</td></tr>`
+                            : ''}
                     `);
 
                     $('#modal-footer').append(`
@@ -905,6 +936,10 @@ try {
                 $('#customEventDescription').val(event.description || '');
                 $('#customEventAllDay').prop('checked', !!event.allDay).trigger('change');
                 $('#customEventPublic').prop('checked', event.is_public == 1);
+                const shareIds = Array.isArray(event.shared_user_ids)
+                    ? event.shared_user_ids.map(String)
+                    : [];
+                $('#customEventShare').val(shareIds).trigger('change');
                 $('#customEventRecurrence').val(event.recurrence || 'none').trigger('change');
                 $('#customEventRecurrenceUntil').val(event.recurrence_until ? moment(event.recurrence_until).format('YYYY-MM-DD') : '');
                 $('#customEventModalTitle').text('Editar Evento');
@@ -1017,6 +1052,7 @@ try {
                 const description = $('#customEventDescription').val();
                 const allDay = $('#customEventAllDay').is(':checked');
                 const isPublic = $('#customEventPublic').is(':checked');
+                const sharedUserIds = $('#customEventShare').val() || [];
                 const recurrence = $('#customEventRecurrence').val() || 'none';
                 const recurrenceUntil = recurrence !== 'none' ? ($('#customEventRecurrenceUntil').val() || '') : '';
 
@@ -1046,6 +1082,7 @@ try {
                         description: description,
                         all_day: allDay ? 'true' : 'false',
                         is_public: isPublic ? 'true' : 'false',
+                        'shared_user_ids[]': sharedUserIds,
                         recurrence: recurrence,
                         recurrence_until: recurrenceUntil
                     },
@@ -1071,6 +1108,7 @@ try {
                                     description: description,
                                     all_day: allDay ? 1 : 0,
                                     is_public: isPublic ? 1 : 0,
+                                    shared_user_ids: (sharedUserIds || []).map(function (v) { return parseInt(v, 10); }),
                                     recurrence: recurrence,
                                     recurrence_until: recurrenceUntil || null
                                 });
@@ -1202,6 +1240,23 @@ try {
                         <input type="checkbox" id="customEventPublic">
                         <span class="slider round"></span>
                     </label>
+                </div>
+                <p class="rrhh-form-hint">Público: lo ven todos los usuarios con agenda (IT, enfermería, RX, servicio al cliente, etc.), sin invitarlos.</p>
+                <div class="form-group rrhh-form-group">
+                    <label for="customEventShare">Compartir con personas específicas:</label>
+                    <select id="customEventShare" class="select2 rrhh-form-control" multiple="multiple" data-placeholder="Buscar usuarios…">
+                        <?php foreach ($shareUsers as $su): ?>
+                            <option value="<?php echo (int) $su['id']; ?>">
+                                <?php
+                                echo htmlspecialchars(trim((string) ($su['name'] ?? '')), ENT_QUOTES, 'UTF-8');
+                                $rolSu = trim((string) ($su['rol'] ?? ''));
+                                if ($rolSu !== '') {
+                                    echo ' (' . htmlspecialchars($rolSu, ENT_QUOTES, 'UTF-8') . ')';
+                                }
+                                ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="form-group rrhh-form-group">
                     <label for="customEventColor">Color:</label>

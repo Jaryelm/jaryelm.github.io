@@ -219,38 +219,39 @@ if (!function_exists('medidata_rrhh_employee_form_save_public')) {
      */
     function medidata_rrhh_employee_form_save_public(string $token, array $fields): array
     {
-        $ctx = medidata_rrhh_employee_form_by_token($token);
-        if (!$ctx) {
-            return ['success' => false, 'message' => 'Enlace no válido o expirado.'];
+        try {
+            $ctx = medidata_rrhh_employee_form_by_token($token);
+            if (!$ctx) {
+                return ['success' => false, 'message' => 'Enlace no válido o expirado.'];
+            }
+
+            $pdo = medidata_rrhh_pdo();
+            if (!$pdo) {
+                return ['success' => false, 'message' => 'Servicio no disponible.'];
+            }
+
+            $candidateId = (int) $ctx['candidate_id'];
+            $payload = json_encode($fields, JSON_UNESCAPED_UNICODE);
+            if ($payload === false) {
+                return ['success' => false, 'message' => 'Datos del formulario no válidos.'];
+            }
+
+            $formId = (int) ($ctx['form_id'] ?? 0);
+            if ($formId <= 0) {
+                $formId = medidata_rrhh_employee_form_ensure_row($pdo, $candidateId, 'formulario_publico');
+            }
+
+            $pdo->prepare(
+                "UPDATE employees_form SET payload = ?, status = 'Enviado', updated_by = 'formulario_publico', updated_at = NOW()
+                 WHERE id = ?"
+            )->execute([$payload, $formId]);
+
+            medidata_rrhh_employee_form_sync_candidate($pdo, $candidateId, $fields);
+
+            return ['success' => true, 'message' => 'Solicitud de empleo enviada correctamente. Gracias.'];
+        } catch (Throwable $e) {
+            error_log('medidata_rrhh_employee_form_save_public: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'No se pudo guardar la solicitud. Intente de nuevo.'];
         }
-
-        if (($ctx['form_status'] ?? '') === 'Enviado') {
-            return ['success' => false, 'message' => 'Este formulario ya fue enviado.'];
-        }
-
-        $pdo = medidata_rrhh_pdo();
-        if (!$pdo) {
-            return ['success' => false, 'message' => 'Servicio no disponible.'];
-        }
-
-        $candidateId = (int) $ctx['candidate_id'];
-        $payload = json_encode($fields, JSON_UNESCAPED_UNICODE);
-        if ($payload === false) {
-            return ['success' => false, 'message' => 'Datos del formulario no válidos.'];
-        }
-
-        $formId = (int) ($ctx['form_id'] ?? 0);
-        if ($formId <= 0) {
-            $formId = medidata_rrhh_employee_form_ensure_row($pdo, $candidateId, 'formulario_publico');
-        }
-
-        $pdo->prepare(
-            "UPDATE employees_form SET payload = ?, status = 'Enviado', updated_by = 'formulario_publico', updated_at = NOW()
-             WHERE id = ?"
-        )->execute([$payload, $formId]);
-
-        medidata_rrhh_employee_form_sync_candidate($pdo, $candidateId, $fields);
-
-        return ['success' => true, 'message' => 'Solicitud de empleo enviada correctamente. Gracias.'];
     }
 }

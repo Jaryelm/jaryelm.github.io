@@ -69,6 +69,7 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                 <li>
                     <a href="#" class="new-submenu-link">PERSONAL</a>
                     <ul class="new-side-dropdown">
+                        <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>comunicados_usr.php">COMUNICADOS</a></li>
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>relojbio_usr.php">RELOJ BIOMÉTRICO</a></li>
                     </ul>
                 </li>

@@ -424,11 +424,14 @@ function showPaginatedStudies(filteredStudies) {
     window.open(orthancViewerUrl, '_blank'); // Abrir en una nueva pestaña
 }
 
-    // Función para descargar un estudio
+    // Descarga DICOM con aviso de peso (fase 1 rendimiento MH-PACS)
     function downloadStudy(studyId) {
-    const orthancDownloadUrl = `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/${studyId}/archive`;
-    window.location.href = orthancDownloadUrl; // Iniciar descarga
-}
+        downloadStudyWithConfirm(studyId, {
+            infoUrl: '../radiologiaeimagen/get_study_download_info.php',
+            downloadUrl: `https://dev:Mrecords7@medicloud.medicasa.hn/orthanc/studies/${encodeURIComponent(studyId)}/archive`,
+            openInNewTab: false
+        });
+    }
 </script>
 
 <script>
@@ -696,6 +699,7 @@ th:nth-child(9), td:nth-child(9) {
 
     <!-- Alertas -->
     <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../radiologiaeimagen/download_study_helper.js?v=20260717b"></script>
 
 </body>
 </html>

@@ -93,6 +93,7 @@
                 <li>
                     <a href="#" class="new-submenu-link"><span>PERSONAL</span></a>
                     <ul class="new-side-dropdown">
+                        <li><a href="../recursos_humanos/comunicados.php"><span>COMUNICADOS</span></a></li>
                         <li><a href="../recursos/relojbio.php"><span>RELOJ BIOMÉTRICO</span></a></li>
                     </ul>
                 </li>

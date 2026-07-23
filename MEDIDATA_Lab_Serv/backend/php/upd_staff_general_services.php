@@ -127,7 +127,9 @@ try {
             'doc_personal_references' => 'personal_references',
             'doc_professional_references' => 'professional_references',
             'doc_diplomas' => 'diplomas',
-            'doc_home_sketch' => 'home_sketch'
+            'doc_home_sketch' => 'home_sketch',
+            'doc_curriculum_vitae' => 'curriculum_vitae',
+            'doc_job_profile' => 'job_profile',
         ];
 
         $hr_updates = [];

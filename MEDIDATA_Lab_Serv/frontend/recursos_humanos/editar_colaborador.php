@@ -50,14 +50,10 @@ try {
     $cargos = $stmt_p->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {}
 
-$rrhh_docs = null;
+$rrhh_docs = [];
 if (count($data) > 0 && !empty($data[0]->id_candidate_rrhh)) {
-    $pdoRrhh = medidata_rrhh_pdo();
-    if ($pdoRrhh) {
-        $stmtHR = $pdoRrhh->prepare("SELECT * FROM hiring_requirements WHERE id_candidate = ? LIMIT 1");
-        $stmtHR->execute([$data[0]->id_candidate_rrhh]);
-        $rrhh_docs = $stmtHR->fetch(PDO::FETCH_ASSOC);
-    }
+    require_once __DIR__ . '/../../backend/php/staff_form_docs_lib.php';
+    $rrhh_docs = medidata_staff_load_hiring_docs_flags((int) $data[0]->id_candidate_rrhh);
 }
 ?>
 <!DOCTYPE html>
@@ -260,6 +256,8 @@ if (count($data) > 0 && !empty($data[0]->id_candidate_rrhh)) {
                     'contrato' => !empty($d->has_contrato),
                 ];
                 $staffDocRrhh = $rrhh_docs;
+                $staffDocCandidateId = (int) ($d->id_candidate_rrhh ?? 0);
+                $staffDocEmail = (string) ($d->correo_personal ?? '');
                 include __DIR__ . '/_staff_edit_documentos_section.php';
                 ?>
 

@@ -3,6 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/session_check.php';
 require_once __DIR__ . '/rrhh_guard.php';
+require_once __DIR__ . '/../php/medidata_calendar_institucional_lib.php';
 
 $pdo = medidata_rrhh_pdo();
 if (!$pdo) {
@@ -72,6 +73,10 @@ try {
     ]);
 
     if ($stmt->rowCount() >= 0) { // >= 0 because they might save without changing anything
+        $sharedIds = isset($_POST['shared_user_ids']) && is_array($_POST['shared_user_ids'])
+            ? $_POST['shared_user_ids']
+            : [];
+        medidata_calendar_save_event_shares($id, $sharedIds, $pdo);
         echo json_encode(['success' => true, 'message' => 'Evento actualizado exitosamente.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'No se pudo actualizar el evento.']);

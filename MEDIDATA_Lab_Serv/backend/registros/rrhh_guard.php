@@ -488,6 +488,8 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
             }
 
             medidata_rrhh_ensure_recurrence_columns($pdo);
+            require_once __DIR__ . '/../php/medidata_calendar_institucional_lib.php';
+            medidata_calendar_ensure_event_shares($pdo);
             $stmtCustom = $pdo->prepare("
                 SELECT
                     e.id,
@@ -506,12 +508,22 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                     'custom' AS type
                 FROM rrhh_custom_events e
                 LEFT JOIN rrhh_calendar_event_types t ON e.id_event_type = t.id
-                WHERE e.deleted = 0 AND (e.id_user = ? OR e.is_public = 1)
+                WHERE e.deleted = 0
+                  AND (
+                        e.id_user = ?
+                     OR e.is_public = 1
+                     OR EXISTS (
+                            SELECT 1 FROM rrhh_event_shares s
+                            WHERE s.event_id = e.id AND s.user_id = ?
+                        )
+                  )
             ");
-            $stmtCustom->execute([$userId]);
+            $stmtCustom->execute([$userId, $userId]);
             $winStart = strtotime('-31 days 00:00:00');
             $winEnd = strtotime('+366 days 23:59:59');
             foreach ($stmtCustom->fetchAll(PDO::FETCH_ASSOC) as $custom) {
+                $shareIds = medidata_calendar_event_share_ids((int) $custom['id'], $pdo);
+                $custom['shared_user_ids'] = $shareIds;
                 $rec = (string) ($custom['recurrence'] ?? 'none');
                 if ($rec === '' || $rec === 'none') {
                     $custom['raw_id'] = $custom['id'];
@@ -520,6 +532,7 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                     $events[] = $custom;
                 } else {
                     foreach (medidata_rrhh_expand_custom_event($custom, $winStart, $winEnd) as $occ) {
+                        $occ['shared_user_ids'] = $shareIds;
                         $events[] = $occ;
                     }
                 }

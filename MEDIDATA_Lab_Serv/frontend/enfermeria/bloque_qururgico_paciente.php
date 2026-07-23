@@ -65,11 +65,9 @@ if ($hora_actual >= 6 && $hora_actual < 12) {
 <h1 class="title"><?php echo $saludo . ', <strong>' . $name . '</strong>'; ?></h1>
 
            <!-- multistep form -->
-           <button class="button" onclick="cambiarColor(this, '../pacientes/nuevo.php')">Registro de Pacientes</button>
-           <button class="button" onclick="cambiarColor(this, '../pacientes/historial.php')">Expediente Clínico</button>
-           <button class="button" onclick="cambiarColor(this, '../pacientes/documentos.php')">Agregar Documentos</button>
-           <button class="button" onclick="cambiarColor(this, '../citas/nueva.php')">Nueva Cita</button>
-           <button class="button" onclick="cambiarColor(this, '../citas/calendario.php')">Calendario de Citas</button>
+           <button class="button" onclick="cambiarColor(this, '../enfermeria/bloque_qururgico_paciente.php')">Bloque Quirúrgico</button>
+           <button class="button" onclick="cambiarColor(this, '../enfermeria/historial_user.php')">Expediente Clínico</button>
+           <button class="button" onclick="cambiarColor(this, '../enfermeria/uci.php')">UCI</button>
 
           <div class="data">
                 <div class="content-data">
@@ -119,7 +117,7 @@ if($sentencia){
                         </td>
                         <td>
                            
-                            <a title="Historial médico" href="../servicioalcliente/bloque_quirurgico.php?id=<?php echo $d->idpa ?>" class="fa fa-stethoscope"></a>
+                            <a title="Historial médico" href="../enfermeria/bloque_quirurgico.php?id=<?php echo $d->idpa ?>" class="fa fa-stethoscope"></a>
                             
         
                         </td>

@@ -309,8 +309,12 @@ if (!function_exists('medidata_rrhh_expediente_upload_pdf')) {
             return ['success' => false, 'message' => 'Documento no reconocido.'];
         }
 
-        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            return ['success' => false, 'message' => 'Seleccione un archivo PDF válido.'];
+        $err = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+        if ($err !== UPLOAD_ERR_OK) {
+            if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+                return ['success' => false, 'message' => 'El archivo PDF es demasiado grande.'];
+            }
+            return ['success' => false, 'message' => 'Seleccione un archivo PDF válido. (Error: ' . $err . ')'];
         }
 
         $tmp = (string) ($file['tmp_name'] ?? '');

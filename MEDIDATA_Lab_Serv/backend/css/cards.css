@@ -1123,6 +1123,17 @@ body.rrhh-modal-open {
     gap: 10px;
 }
 
+.rrhh-form-hint {
+    margin: -6px 0 14px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.35;
+}
+
+.rrhh-calendar-event-form .select2-container {
+    width: 100% !important;
+}
+
 .rrhh-calendar-event-form textarea.rrhh-form-control {
     resize: vertical;
     min-height: 60px;
@@ -1468,3 +1479,251 @@ body.rrhh-modal-open {
     margin-top: 10px;
 }
 
+
+/* Comunicados RRHH */
+.rrhh-comunicados-intro {
+    margin: 0 0 18px;
+    color: #555;
+    line-height: 1.45;
+    max-width: 920px;
+}
+
+.rrhh-comunicados-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 980px) {
+    .rrhh-comunicados-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rrhh-comunicados-panel {
+    border: 1px solid #e4e7eb;
+    border-radius: 8px;
+    padding: 14px;
+    background: #fff;
+}
+
+.rrhh-comunicados-panel h4,
+.rrhh-comunicados-panel__head h4 {
+    margin: 0 0 10px;
+    color: #035c67;
+    font-size: 1rem;
+}
+
+.rrhh-comunicados-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.rrhh-comunicados-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rrhh-comunicados-btn-secondary {
+    background: #035c67 !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    min-width: auto !important;
+    width: auto !important;
+    height: auto !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    align-self: center;
+}
+
+.rrhh-comunicados-manual-row {
+    align-items: center;
+}
+
+.rrhh-comunicados-manual-row .rrhh-comunicados-btn-secondary {
+    flex: 0 0 auto;
+}
+
+.rrhh-comunicados-meta {
+    margin: 8px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.rrhh-comunicados-userlist {
+    max-height: 360px;
+    overflow-y: auto;
+    border: 1px solid #edf0f2;
+    border-radius: 6px;
+    padding: 6px;
+    background: #fafbfc;
+}
+
+.rrhh-comunicados-user {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 6px;
+    border-bottom: 1px solid #eef1f3;
+    cursor: pointer;
+}
+
+.rrhh-comunicados-user:last-child {
+    border-bottom: none;
+}
+
+.rrhh-comunicados-user.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.rrhh-comunicados-user__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rrhh-comunicados-user__body strong {
+    color: #222;
+    font-weight: 600;
+}
+
+.rrhh-comunicados-user__body small {
+    color: #666;
+    font-size: 12px;
+}
+
+.rrhh-comunicados-empty {
+    margin: 8px 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.rrhh-comunicados-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    min-height: 36px;
+}
+
+.rrhh-comunicados-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8f7f9;
+    color: #035c67;
+    border: 1px solid #b6e4ea;
+    border-radius: 16px;
+    padding: 4px 8px 4px 10px;
+    font-size: 13px;
+}
+
+.rrhh-comunicados-chip button {
+    border: none;
+    background: transparent;
+    color: #035c67;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+}
+
+.rrhh-comunicados-compose {
+    border-top: 1px solid #e4e7eb;
+    margin-top: 6px;
+    padding: 18px 16px 8px;
+    background: #f7fbfc;
+    border-radius: 8px;
+}
+
+.rrhh-comunicados-compose__title {
+    margin: 0 0 12px;
+    color: #035c67;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.rrhh-comunicados-callout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #b6e4ea;
+    border-left: 4px solid #06adbf;
+    background: #e8f7f9;
+    color: #234;
+    line-height: 1.45;
+}
+
+.rrhh-comunicados-callout__badge {
+    flex: 0 0 auto;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #035c67;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.rrhh-comunicados-callout p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.rrhh-comunicados-callout code {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #c5e8ed;
+    color: #035c67;
+    font-size: 12px;
+}
+
+.rrhh-comunicados-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #035c67;
+}
+
+.rrhh-comunicados-field .rrhh-form-control {
+    background: #fff;
+}
+
+.rrhh-comunicados-message {
+    min-height: 180px;
+    line-height: 1.5;
+}
+
+.rrhh-comunicados-submit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+.rrhh-comunicados-form .rrhh-form-group {
+    margin-bottom: 14px;
+}
+
+.rrhh-comunicados-form textarea.rrhh-form-control {
+    resize: vertical;
+    min-height: 80px;
+}

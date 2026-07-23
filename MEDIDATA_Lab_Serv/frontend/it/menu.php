@@ -3,6 +3,7 @@
     <a href="../it/escritorio.php" class="brand"><i class='bx bxs-home home'></i><span>MEDIDATA</span></a>
     <ul class="side-menu">
         <li><a href="../it/escritorio.php" class="active"><i class='bx bxs-dashboard icon'></i> <span>Panel</span></a></li>
+        <li><a href="../it/programacion.php"><i class='bx bxs-calendar icon'></i> <span>Programación</span></a></li>
         <li class="divider" data-text="panel">Panel</li>
 
         <li>
