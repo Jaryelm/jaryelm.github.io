@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Obtener la información de la solicitud y del tipo de ausencia
         $stmt_req = $connect_hr_leaves->prepare("
-            SELECT r.user_id, r.days_amount, t.category, t.deducts_vacation, r.request_status 
+            SELECT r.user_id, r.days_amount, t.category, t.deducts_vacation, r.request_status, r.start_time, r.end_time 
             FROM hr_absence_requests r
             JOIN hr_absence_types t ON r.type_id = t.type_id
             WHERE r.request_id = ? FOR UPDATE
@@ -44,7 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Los días a afectar deben ser negativos (resta)
             $dias_a_restar = -abs($req['days_amount']);
+            
             $descripcion = "Consumo de vacaciones por solicitud #" . $request_id;
+            if (!empty($req['start_time']) && !empty($req['end_time'])) {
+                $descripcion = "Consumo por solicitud #" . $request_id . " (Permiso de " . substr($req['start_time'], 0, 5) . " a " . substr($req['end_time'], 0, 5) . ")";
+            }
             
             $stmt_kardex = $connect_hr_leaves->prepare("
                 INSERT INTO hr_vacation_transactions 

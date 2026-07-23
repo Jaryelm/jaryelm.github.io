@@ -1,6 +1,6 @@
 <?php
-require_once '../../session_check.php';
-require_once '../../../backend/bd/Conexion.php';
+require_once __DIR__ . '/../session_check.php';
+require_once __DIR__ . '/../../bd/Conexion.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['rol'])) {
@@ -19,16 +19,26 @@ try {
     
     // Fetch Employee Base Data from main DB
     // Assuming staff_administrative and users structure
-    $stmt_emp = $pdo->prepare("
+    $stmt_emp = $connect->prepare("
         SELECT 
-            s.numide AS codigo_colaborador, 
-            CONCAT(s.nomadm, ' ', s.apeadm) AS nombre_completo, 
+            s.codigo_colaborador, 
+            s.nombre_completo, 
             s.fecha_ingreso,
             p.name AS puesto,
             d.name AS departamento
-        FROM staff_administrative s
+        FROM (
+            SELECT numide AS codigo_colaborador, CONCAT(nomadm, ' ', apeadm) AS nombre_completo, fecha_ingreso, id_cargo, id_departamento, id_user FROM staff_administrative
+            UNION ALL
+            SELECT ceddoc AS codigo_colaborador, CONCAT(nodoc, ' ', apdoc) AS nombre_completo, fecha_ingreso, id_cargo, id_departamento, id_user FROM doctor
+            UNION ALL
+            SELECT numide AS codigo_colaborador, CONCAT(nomnur, ' ', apenur) AS nombre_completo, fecha_ingreso, id_cargo, id_departamento, id_user FROM nurse
+            UNION ALL
+            SELECT numide AS codigo_colaborador, CONCAT(nomsg, ' ', apesg) AS nombre_completo, fecha_ingreso, id_cargo, id_departamento, id_user FROM staff_general_services
+            UNION ALL
+            SELECT numide AS codigo_colaborador, CONCAT(nommf, ' ', apemf) AS nombre_completo, fecha_ingreso, id_cargo, id_departamento, id_user FROM staff_medifarma
+        ) s
         LEFT JOIN positions p ON s.id_cargo = p.id
-        LEFT JOIN departaments d ON s.id_departamento = d.id
+        LEFT JOIN medic9ue_medi_rrhh_interviews.departaments d ON s.id_departamento = d.id
         WHERE s.id_user = ? 
         LIMIT 1
     ");
@@ -60,7 +70,7 @@ try {
     // Fetch aggregated data from Kardex
     $stmt_kardex = $connect_hr_leaves->prepare("
         SELECT 
-            SUM(CASE WHEN transaction_type = 'Annual_Accrual' THEN affected_days ELSE 0 END) as dias_otorgados,
+            SUM(CASE WHEN transaction_type IN ('Annual_Accrual', 'Manual_HR_Adjustment') THEN affected_days ELSE 0 END) as dias_otorgados,
             SUM(CASE WHEN transaction_type = 'Vacation_Consumption' THEN ABS(affected_days) ELSE 0 END) as dias_disfrutados,
             SUM(CASE WHEN transaction_type = 'Cash_Payout' THEN ABS(affected_days) ELSE 0 END) as dias_pagados,
             SUM(affected_days) as dias_pendientes,

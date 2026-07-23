@@ -20,14 +20,12 @@ try {
             k.user_id,
             u.name AS user_name,
             k.transaction_type,
-            k.days_amount,
-            k.balance_after,
-            k.reference_type,
-            k.created_at,
-            k.comments
-        FROM medic9ue_hr_leaves.hr_vacation_kardex k
+            k.affected_days AS days_amount,
+            k.transaction_date AS created_at,
+            k.description AS comments
+        FROM medic9ue_hr_leaves.hr_vacation_transactions k
         LEFT JOIN users u ON k.user_id = u.id
-        ORDER BY k.created_at DESC
+        ORDER BY k.transaction_date DESC
     ";
     
     $stmt = $connect->prepare($sql);

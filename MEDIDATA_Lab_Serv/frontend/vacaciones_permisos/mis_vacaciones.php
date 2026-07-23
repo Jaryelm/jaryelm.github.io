@@ -88,13 +88,13 @@ if (!isset($_SESSION['id'])) {
             <table id="tabla-solicitudes" class="responsive-table" style="width:100%">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Colaborador</th>
                         <th>Tipo</th>
-                        <th>Inicio</th>
-                        <th>Fin</th>
-                        <th>Días</th>
+                        <th>Fechas</th>
+                        <th>Días/Horas</th>
                         <th>Estado</th>
-                        <th>Fecha Creación</th>
+                        <th>Observaciones</th>
+                        <th>Resolución</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -195,10 +195,33 @@ if (!isset($_SESSION['id'])) {
 
     <script>
     let diasDisponiblesTotales = 0;
+
     const userId = <?php echo $_SESSION['id']; ?>;
 
-    $(document).ready(function() {
+$(document).ready(function() {
+
+        // Cargar saldo principal al inicio
+        $.getJSON('../../backend/registros/vacaciones_permisos/fetch_vacation_profile.php?user_id=' + userId, function(res) {
+            if(!res.error) {
+                diasDisponiblesTotales = parseFloat(res.info_vacaciones.dias_pendientes) || 0;
+                $('#main_balance_ui').text(diasDisponiblesTotales);
+            }
+        });
+
+
         $('#tabla-solicitudes').DataTable({
+            ajax: '../../backend/registros/vacaciones_permisos/fetch_my_requests.php',
+            columns: [
+                { data: 'colaborador' },
+                { data: 'type_name' },
+                { data: 'fechas' },
+                { data: 'days_amount' },
+                { data: 'status' },
+                { data: 'comments' },
+                { data: 'last_comment' }
+            ],
+            order: [],
+
                             "dom": 'Bfrtip',
                 "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
                 "buttons": [
@@ -234,9 +257,11 @@ if (!isset($_SESSION['id'])) {
             let cat = $(this).find(':selected').data('category');
             if (cat === 'Vacation') {
                 $('#div_pago').show();
+                $('#duration_type').val('full_day').trigger('change').prop('disabled', true);
             } else {
                 $('#div_pago').hide();
                 $('#is_paid_vacation').prop('checked', false);
+                $('#duration_type').prop('disabled', false);
             }
         });
         
@@ -369,19 +394,7 @@ if (!isset($_SESSION['id'])) {
             
             let saldo = diasDisponiblesTotales - diffDays;
             $('#ui_saldo').text(saldo.toFixed(1));
-        }
-    }
-            
-            // Calculo simple de dias de diferencia (asumiendo días calendario, ajustar si son hábiles)
-            let diffTime = Math.abs(d2 - d1);
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el día de fin
-            
-            $('#days_amount').val(diffDays);
-            $('#ui_solicitados').text(diffDays);
-            
-            let saldo = diasDisponiblesTotales - diffDays;
-            $('#ui_saldo').text(saldo);
-            
+
             if (saldo < 0) {
                 $('#ui_saldo').css('color', 'red');
             } else {
