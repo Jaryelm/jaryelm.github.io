@@ -1,6 +1,7 @@
 <?php
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/jefe_lib.php';
 
 header('Content-Type: application/json');
 
@@ -12,18 +13,13 @@ if (!isset($_SESSION['id'])) {
 try {
     global $connect_hr_leaves, $connect;
     if (!$connect) throw new Exception("No db connection");
-    
-    // En un sistema real, aquí habría un JOIN con hr_approval_workflow_steps
-    // para buscar si el usuario logueado ($_SESSION['id']) o su rol ($_SESSION['rol'])
-    // es el encargado del step_order actual.
-    // Por simplicidad en la base, mostraremos todas las solicitudes 'Pending'
-    // si el usuario es Administrador/HR, o un subset.
-    
-    $user_id = $_SESSION['id'];
-    $rol = $_SESSION['rol'];
-    
+
+    $user_id = (int) $_SESSION['id'];
+    $rol = $_SESSION['rol'] ?? '';
+    $isAdminHr = in_array($rol, ['Administrador', 'Recursos_Humanos'], true);
+
     $sql = "
-        SELECT 
+        SELECT
             r.request_id,
             r.user_id,
             u.name AS user_name,
@@ -38,22 +34,30 @@ try {
         LEFT JOIN users u ON r.user_id = u.id
         WHERE r.request_status = 'Pending'
     ";
-    
-    // Si no es admin/hr, quizás solo pueda aprobar las de su departamento
-    // Filtro simplificado:
-    if (!in_array($rol, ['Administrador', 'Recursos_Humanos'])) {
-        // Pseudo-lógica: Jefe inmediato, etc.
-        // Aquí requeriría cruzar con tabla de departamentos/empleados.
-        // Por ahora, como es un stub funcional:
-        $sql .= " AND 1=0 "; // Ocultar si no hay lógica de jefe inmediato implementada aún
+    $params = [];
+
+    if (!$isAdminHr) {
+        // Jefe inmediato: solo las solicitudes de SU equipo (departamentos que encabeza),
+        // excluyendo las propias (esas las resuelve RRHH/Admin).
+        $equipo = array_values(array_filter(
+            medidata_jefe_equipo_user_ids($connect, $user_id),
+            fn($id) => $id !== $user_id
+        ));
+        if (!$equipo) {
+            echo json_encode(['data' => []]);
+            exit;
+        }
+        $in = implode(',', array_fill(0, count($equipo), '?'));
+        $sql .= " AND r.user_id IN ($in)";
+        $params = $equipo;
     }
-    
+
     $sql .= " ORDER BY r.created_at ASC";
 
     $stmt = $connect->prepare($sql);
-    $stmt->execute();
+    $stmt->execute($params);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     echo json_encode(['data' => $data]);
 } catch (Throwable $e) {
     echo json_encode(['data' => [], 'error' => 'Internal error: ' . $e->getMessage()]);

@@ -20,6 +20,7 @@
             </ul>
         </li>
 
+        <?php include __DIR__ . '/../vacaciones_permisos/_menu_vacaciones.php'; ?>
         <li>
             <a href="../it/acerca.php"><i class='bx bxs-help-circle icon'></i><span>ACERCA DE MEDIDATA</span></a>
         </li>

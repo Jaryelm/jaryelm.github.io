@@ -1,6 +1,7 @@
 <?php
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/audit_lib.php';
 
 header('Content-Type: application/json');
 
@@ -20,7 +21,7 @@ try {
     $steps = $data['steps'] ?? [];
     
     if (empty($workflow_id)) {
-        throw new Exception("ID de flujo no válido");
+        throw new Exception("ID de flujo no vï¿½lido");
     }
 
     $pdo->beginTransaction();
@@ -50,6 +51,9 @@ try {
     }
 
     $pdo->commit();
+
+    medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'UPDATE_WORKFLOW_STEPS', 'hr_approval_workflow_steps', $workflow_id, null, ['pasos' => count($steps)]);
+
     echo json_encode(['success' => true]);
 
 } catch (Throwable $e) {

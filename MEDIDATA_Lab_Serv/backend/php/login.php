@@ -75,7 +75,7 @@ if (isset($_POST['login'])) {
                         'Facturación' => 'facturacion/escritorio.php',
                         'Recursos_Humanos' => 'recursos_humanos/escritorio.php',
                         'Mantenimiento' => 'mantenimiento/escritorio.php',
-                        'Médico' => 'medico/escritorio.php',
+                        'Médico' => 'medicos/escritorio.php',
                         'Enfermero' => 'enfermeria/escritorio.php',
                         'Paciente' => 'paciente/escritorio.php',
                         'Proveedor' => 'proveedor/escritorio.php',

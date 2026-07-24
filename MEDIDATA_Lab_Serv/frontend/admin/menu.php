@@ -104,6 +104,7 @@
             <a href="#"><i class='bx bxs-calendar-event icon'></i> <span>VACACIONES Y PERMISOS</span><i class='bx bx-chevron-right icon-right'></i></a>
             <ul class="side-dropdown">
                 <li><a href="../vacaciones_permisos/mis_vacaciones.php"><span>MIS SOLICITUDES</span></a></li>
+                <li><a href="../vacaciones_permisos/incapacidades.php"><span>MIS INCAPACIDADES</span></a></li>
                 <li><a href="../vacaciones_permisos/aprobaciones.php"><span>MIS APROBACIONES</span></a></li>
                 <?php if(isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Recursos_Humanos')): ?>
                 <li>
@@ -112,8 +113,12 @@
                         <li><a href="../vacaciones_permisos/dashboard.php"><span>DASHBOARD</span></a></li>
                         <li><a href="../vacaciones_permisos/gestionar_solicitudes.php"><span>GESTIÓN DE SOLICITUDES</span></a></li>
                         <li><a href="../vacaciones_permisos/kardex_vacaciones.php"><span>KARDEX DE VACACIONES</span></a></li>
+                        <li><a href="../vacaciones_permisos/reportes.php"><span>REPORTES</span></a></li>
+                        <li><a href="../vacaciones_permisos/bitacora.php"><span>BITÁCORA DE AUDITORÍA</span></a></li>
                         <li><a href="../vacaciones_permisos/tipos_ausencia.php"><span>TIPOS DE AUSENCIA</span></a></li>
                         <li><a href="../vacaciones_permisos/flujos_aprobacion.php"><span>FLUJOS DE APROBACIÓN</span></a></li>
+                        <li><a href="../vacaciones_permisos/jefes_departamento.php"><span>JEFES DE DEPARTAMENTO</span></a></li>
+                        <li><a href="../vacaciones_permisos/calendario_departamento.php"><span>CALENDARIO POR DEPARTAMENTO</span></a></li>
                         <li><a href="../vacaciones_permisos/politicas_vacaciones.php"><span>POLÍTICAS DE VACACIONES</span></a></li>
                         <li><a href="../vacaciones_permisos/gestionar_feriados.php"><span>GESTIÓN DE FERIADOS</span></a></li>
                         <li><a href="../vacaciones_permisos/calendario_feriados.php"><span>CALENDARIO DE FERIADOS</span></a></li>

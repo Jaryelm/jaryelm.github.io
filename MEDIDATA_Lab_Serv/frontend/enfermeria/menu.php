@@ -44,6 +44,7 @@
             </ul>
         </li>
 
+        <?php include __DIR__ . '/../vacaciones_permisos/_menu_vacaciones.php'; ?>
         <li><a href="../enfermeria/mostrar.php"><i class='bx bxs-info-circle icon'></i><span>ACERCA DE MEDICASA</span></a></li>
     </ul>
 </section>

@@ -121,6 +121,7 @@
                 { data: 'fecha', defaultContent: '—' },
                 { data: 'hora_entrada', defaultContent: '—' },
                 { data: 'hora_salida', defaultContent: '—' },
+                { data: 'justificacion', defaultContent: '—' },
             ],
             language: {
                 sProcessing: 'Procesando...',

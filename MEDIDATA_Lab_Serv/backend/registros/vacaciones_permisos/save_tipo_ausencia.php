@@ -1,6 +1,7 @@
 <?php
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/audit_lib.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
@@ -31,19 +32,28 @@ try {
         exit;
     }
 
+    $actor = (int) ($_SESSION['id'] ?? 0);
+    $new_vals = compact('code', 'name', 'category', 'is_paid', 'deducts_vacation', 'requires_document', 'requires_special_auth');
+
     if (empty($type_id)) {
         // Insert
         $stmt = $pdo->prepare("INSERT INTO medic9ue_hr_leaves.hr_absence_types
             (code, name, category, is_paid, deducts_vacation, requires_document, requires_special_auth, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document, $requires_special_auth]);
+        medidata_audit_log($pdo, $actor, 'CREATE_ABSENCE_TYPE', 'hr_absence_types', $pdo->lastInsertId(), null, $new_vals);
         echo json_encode(['success' => true, 'message' => 'Tipo de ausencia agregado correctamente.']);
     } else {
         // Update
+        $oldStmt = $pdo->prepare("SELECT code, name, category, is_paid, deducts_vacation, requires_document, requires_special_auth FROM medic9ue_hr_leaves.hr_absence_types WHERE type_id = ?");
+        $oldStmt->execute([$type_id]);
+        $old_vals = $oldStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
         $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_absence_types
             SET code = ?, name = ?, category = ?, is_paid = ?, deducts_vacation = ?, requires_document = ?, requires_special_auth = ?
             WHERE type_id = ?");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document, $requires_special_auth, $type_id]);
+        medidata_audit_log($pdo, $actor, 'UPDATE_ABSENCE_TYPE', 'hr_absence_types', $type_id, $old_vals, $new_vals);
         echo json_encode(['success' => true, 'message' => 'Tipo de ausencia actualizado correctamente.']);
     }
 } catch (Throwable $e) {

@@ -16,23 +16,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $days_amount = $_POST['days_amount'] ?? null;
         $comments = $_POST['comments'] ?? '';
         $is_paid_vacation = isset($_POST['is_paid_vacation']) && $_POST['is_paid_vacation'] == '1' ? 1 : 0;
-        
+        // Campos propios de incapacidad (solo se guardan si el tipo es Medical_Leave)
+        $issuing_institution  = trim((string) ($_POST['issuing_institution'] ?? ''));
+        $medical_leave_number = trim((string) ($_POST['medical_leave_number'] ?? ''));
+
+        // Info del tipo de ausencia. Se obtiene ANTES del chequeo de traslape porque
+        // necesitamos saber si esta solicitud es de vacaciones (para poder recortar los
+        // días que caen dentro de una incapacidad) o si es una incapacidad.
+        $stmt_t = $connect_hr_leaves->prepare("SELECT category, deducts_vacation, requires_document FROM hr_absence_types WHERE type_id = ?");
+        $stmt_t->execute([$type_id]);
+        $type_info = $stmt_t->fetch(PDO::FETCH_ASSOC);
+        $new_category       = $type_info['category'] ?? '';
+        $new_es_vacacion    = ($new_category === 'Vacation' || (isset($type_info['deducts_vacation']) && $type_info['deducts_vacation'] == 1));
+        $new_es_incapacidad = ($new_category === 'Medical_Leave');
+
         // --- VALIDACIONES AUTOMATICAS ---
         // 1. Fechas pasadas
         $hoy = date('Y-m-d');
         if ($start_date < $hoy) {
             throw new Exception("No se pueden solicitar fechas en el pasado.");
         }
-        
+
         // 2. Traslapes (vacaciones, permisos, incapacidades). Para permisos por HORA en el
         //    mismo día, dos franjas horarias distintas y no solapadas NO son traslape.
+        //    Excepción: una VACACIÓN que se traslapa con una INCAPACIDAD ya registrada NO se
+        //    rechaza; más abajo se recalculan los días omitiendo el período de incapacidad.
         $new_is_partial = ($start_time && $end_time && $start_date === $end_date);
 
         $stmt_overlap = $connect_hr_leaves->prepare("
-            SELECT start_date, end_date, start_time, end_time
-            FROM hr_absence_requests
-            WHERE user_id = ? AND request_status NOT IN ('Rejected', 'Cancelled')
-            AND start_date <= ? AND end_date >= ?
+            SELECT r.start_date, r.end_date, r.start_time, r.end_time, t.category
+            FROM hr_absence_requests r
+            JOIN hr_absence_types t ON r.type_id = t.type_id
+            WHERE r.user_id = ? AND r.request_status NOT IN ('Rejected', 'Cancelled')
+            AND r.start_date <= ? AND r.end_date >= ?
         ");
         $stmt_overlap->execute([$user_id, $end_date, $start_date]);
 
@@ -49,14 +65,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 continue; // franjas distintas: no es traslape
             }
 
+            // Vacación de día completo que se traslapa con una incapacidad: permitido.
+            // Los días de la incapacidad se descontarán del cómputo (ver más abajo), en
+            // lugar de rechazar toda la solicitud.
+            if ($new_es_vacacion && !$new_is_partial && $ov['category'] === 'Medical_Leave') {
+                continue;
+            }
+
             // Cualquier otro caso (día completo de por medio) => traslape real
             throw new Exception("Ya tienes una solicitud (vacación, permiso o incapacidad) que se traslapa con estas fechas.");
         }
-        
-        // 3. Obtener info del tipo de ausencia
-        $stmt_t = $connect_hr_leaves->prepare("SELECT category, deducts_vacation, requires_document FROM hr_absence_types WHERE type_id = ?");
-        $stmt_t->execute([$type_id]);
-        $type_info = $stmt_t->fetch(PDO::FETCH_ASSOC);
         // ---------------------------------
         
         $reference_workday_hours = null;
@@ -141,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $days_amount = $calc['days'];
 
             if ($days_amount <= 0) {
-                throw new Exception("El rango seleccionado no contiene días laborables (feriados o días de descanso según tu horario).");
+                throw new Exception("El rango seleccionado no contiene días laborables (feriados, días de descanso según tu horario o días cubiertos por una incapacidad).");
             }
         }
 
@@ -213,15 +231,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Este tipo de ausencia requiere adjuntar un documento de respaldo.');
         }
         
+        // Datos de incapacidad: solo se almacenan cuando el tipo es Medical_Leave.
+        $db_issuing_institution  = ($new_es_incapacidad && $issuing_institution !== '')  ? $issuing_institution  : null;
+        $db_medical_leave_number = ($new_es_incapacidad && $medical_leave_number !== '') ? $medical_leave_number : null;
+
         // 3. Insertar solicitud (incluye la marca de pago en efectivo — vacaciones pagadas)
         $stmt = $connect_hr_leaves->prepare("
             INSERT INTO hr_absence_requests
-            (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, is_cash_payout, request_status, workflow_id, comments, reference_workday_hours)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?)
+            (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, is_cash_payout, request_status, workflow_id, comments, reference_workday_hours, issuing_institution, medical_leave_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
-            $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $is_paid_vacation, $workflow_id, $comments, $reference_workday_hours
+            $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $is_paid_vacation, $workflow_id, $comments, $reference_workday_hours, $db_issuing_institution, $db_medical_leave_number
         ]);
         
         $request_id = $connect_hr_leaves->lastInsertId();

@@ -107,6 +107,55 @@ if (!function_exists('medidata_absence_holiday_set')) {
     }
 }
 
+if (!function_exists('medidata_absence_medical_leave_set')) {
+    /**
+     * Conjunto de fechas 'Y-m-d' dentro de [start,end] cubiertas por una INCAPACIDAD
+     * (categoría Medical_Leave) del colaborador que no esté rechazada/cancelada.
+     * Se usa para recalcular los días de vacaciones omitiendo el período de incapacidad.
+     *
+     * @return array<string,bool>
+     */
+    function medidata_absence_medical_leave_set(?PDO $connect_hr_leaves, int $user_id, string $start_date, string $end_date, ?int $exclude_request_id = null): array
+    {
+        if (!$connect_hr_leaves) {
+            return [];
+        }
+        try {
+            $sql = "SELECT r.start_date, r.end_date
+                    FROM hr_absence_requests r
+                    JOIN hr_absence_types t ON r.type_id = t.type_id
+                    WHERE r.user_id = ?
+                      AND t.category = 'Medical_Leave'
+                      AND r.request_status NOT IN ('Rejected', 'Cancelled')
+                      AND r.start_date <= ? AND r.end_date >= ?";
+            $params = [$user_id, $end_date, $start_date];
+            if ($exclude_request_id !== null) {
+                $sql .= " AND r.request_id <> ?";
+                $params[] = $exclude_request_id;
+            }
+            $stmt = $connect_hr_leaves->prepare($sql);
+            $stmt->execute($params);
+
+            $set = [];
+            $rangeStart = strtotime($start_date);
+            $rangeEnd   = strtotime($end_date);
+            if ($rangeStart === false || $rangeEnd === false) {
+                return [];
+            }
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $s = max($rangeStart, (int) strtotime((string) $row['start_date']));
+                $e = min($rangeEnd, (int) strtotime((string) $row['end_date']));
+                for ($t = $s; $t <= $e; $t += 86400) {
+                    $set[date('Y-m-d', $t)] = true;
+                }
+            }
+            return $set;
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
+}
+
 if (!function_exists('medidata_absence_count_working_days')) {
     /**
      * Cuenta los días hábiles (según horario activo, excluyendo feriados) entre dos fechas,
@@ -123,7 +172,8 @@ if (!function_exists('medidata_absence_count_working_days')) {
         ?PDO $connect_hr_leaves,
         int $user_id,
         string $start_date,
-        string $end_date
+        string $end_date,
+        ?int $exclude_request_id = null
     ): array {
         $codes = medidata_absence_weekday_codes();
 
@@ -131,6 +181,9 @@ if (!function_exists('medidata_absence_count_working_days')) {
         $working_set  = $schedule_id ? medidata_absence_working_weekday_set($connect, $schedule_id) : [];
         $has_schedule = $schedule_id !== null && !empty($working_set);
         $holiday_set  = medidata_absence_holiday_set($connect_hr_leaves, $start_date, $end_date);
+        // Días cubiertos por una incapacidad ya registrada: se omiten del cómputo de
+        // vacaciones (el sistema recalcula omitiendo el período de incapacidad).
+        $medical_set  = medidata_absence_medical_leave_set($connect_hr_leaves, $user_id, $start_date, $end_date, $exclude_request_id);
 
         $cursor = strtotime($start_date);
         $limit  = strtotime($end_date);
@@ -138,6 +191,7 @@ if (!function_exists('medidata_absence_count_working_days')) {
         $days = 0;
         $total = 0;
         $nonworking = [];
+        $medical_excluded = [];
         if ($cursor !== false && $limit !== false && $cursor <= $limit) {
             $oneDay = 86400;
             for ($t = $cursor; $t <= $limit; $t += $oneDay) {
@@ -146,26 +200,31 @@ if (!function_exists('medidata_absence_count_working_days')) {
                 $code = $codes[(int) date('w', $t)];
 
                 $isHoliday = isset($holiday_set[$ymd]);
+                $isMedical = isset($medical_set[$ymd]);
                 // Sin horario activo: se asume día laborable (sólo se descuentan feriados),
                 // preservando un comportamiento seguro para colaboradores sin horario asignado.
                 $isWorkday = $has_schedule ? isset($working_set[$code]) : true;
 
-                if ($isWorkday && !$isHoliday) {
+                if ($isWorkday && !$isHoliday && !$isMedical) {
                     $days++;
                 } else {
                     $nonworking[] = $ymd;
+                    if ($isMedical) {
+                        $medical_excluded[] = $ymd;
+                    }
                 }
             }
         }
 
         return [
-            'days'           => $days,
-            'has_schedule'   => $has_schedule,
-            'schedule_id'    => $schedule_id,
-            'working_codes'  => array_keys($working_set),
-            'holidays'       => array_keys($holiday_set),
-            'nonworking'     => $nonworking,
-            'total_calendar' => $total,
+            'days'            => $days,
+            'has_schedule'    => $has_schedule,
+            'schedule_id'     => $schedule_id,
+            'working_codes'   => array_keys($working_set),
+            'holidays'        => array_keys($holiday_set),
+            'medical_leave'   => $medical_excluded,
+            'nonworking'      => $nonworking,
+            'total_calendar'  => $total,
         ];
     }
 }

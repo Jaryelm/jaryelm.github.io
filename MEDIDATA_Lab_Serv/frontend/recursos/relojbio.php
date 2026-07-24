@@ -296,6 +296,7 @@ include_once '../../backend/registros/session_check.php';
                             <th>Fecha</th>
                             <th>Hora entrada</th>
                             <th>Hora salida</th>
+                            <th>Justificación</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -322,7 +323,7 @@ window.MEDIDATA_RELOJBIO = {
     dbOk: <?php echo !empty($dbOk) ? 'true' : 'false'; ?>
 };
 </script>
-<script src="../../backend/registros/script/tabla_relojbio.js?v=20260716export"></script>
+<script src="../../backend/registros/script/tabla_relojbio.js?v=20260724just"></script>
 
 </body>
 </html>

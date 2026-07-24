@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../session_check.php';
 require_once __DIR__ . '/../../bd/Conexion.php';
+require_once __DIR__ . '/../../php/audit_lib.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
@@ -108,6 +109,8 @@ try {
             if ($dias_retroactivos > 0) {
                 $stmt_insert_txn->execute([$user_id, $dias_retroactivos]);
                 $dias_otorgados_totales += $dias_retroactivos;
+                // Auditar el ajuste de saldo (información sensible)
+                medidata_audit_log($connect_hr_leaves, (int) ($_SESSION['id'] ?? 0), 'BALANCE_ADJUSTMENT_SYNC', 'hr_vacation_transactions', $user_id, ['saldo_previo' => 0], ['affected_days' => $dias_retroactivos, 'motivo' => 'Saldo Inicial Retroactivo (Sincronización)']);
             }
         }
         $procesados++;

@@ -448,6 +448,7 @@ if (!function_exists('medidata_biometric_datatables')) {
             pares AS (
                 SELECT
                     e.id AS entrada_id,
+                    e.user_id,
                     e.empleado,
                     e.email,
                     e.rol,
@@ -572,7 +573,45 @@ if (!function_exists('medidata_biometric_datatables')) {
                     'fecha_salida' => ($salidaRaw !== null && (string) $salidaRaw !== '')
                         ? medidata_biometric_format_display_datetime($salidaRaw)
                         : '—',
+                    // Integración Vacaciones y Permisos (se completa abajo).
+                    'justificacion' => '—',
                 ];
+            }
+
+            // Integración con Vacaciones y Permisos: si la marca cae dentro de una ausencia o
+            // permiso APROBADO del colaborador, se etiqueta como justificada (el control de
+            // asistencia no debe tratarla como falta/tardanza injustificada). Aislado para que
+            // un fallo aquí nunca rompa el listado de marcas.
+            try {
+                global $connect_hr_leaves;
+                if (!empty($data) && isset($connect_hr_leaves) && $connect_hr_leaves) {
+                    require_once __DIR__ . '/absence_coverage_lib.php';
+                    $uids = [];
+                    $dias = [];
+                    foreach ($rows as $r) {
+                        $uid = (int) ($r['user_id'] ?? 0);
+                        if ($uid > 0) $uids[] = $uid;
+                        $d = substr((string) ($r['marca_dia'] ?? ''), 0, 10);
+                        if ($d !== '') $dias[] = $d;
+                    }
+                    if ($uids && $dias) {
+                        sort($dias);
+                        $cov = medidata_absence_coverage_fetch($connect_hr_leaves, $uids, $dias[0], end($dias));
+                        foreach ($rows as $i => $r) {
+                            $uid = (int) ($r['user_id'] ?? 0);
+                            $d = substr((string) ($r['marca_dia'] ?? ''), 0, 10);
+                            if ($uid > 0 && $d !== '' && isset($cov[$uid], $data[$i])) {
+                                $entradaTime = substr((string) ($r['fecha_entrada_raw'] ?? ''), 11, 8);
+                                $label = medidata_absence_coverage_label($cov[$uid], $d, $entradaTime !== '' ? $entradaTime : null);
+                                if ($label !== '') {
+                                    $data[$i]['justificacion'] = $label;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable $e) {
+                error_log('medidata_biometric coverage: ' . $e->getMessage());
             }
 
             return [

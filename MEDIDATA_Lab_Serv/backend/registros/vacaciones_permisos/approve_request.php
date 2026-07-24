@@ -1,12 +1,15 @@
 <?php
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/jefe_lib.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
+if (!isset($_SESSION['id'])) {
     echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
     exit;
 }
+$rol_actual = $_SESSION['rol'] ?? '';
+$es_admin_hr = in_array($rol_actual, ['Administrador', 'Recursos_Humanos'], true);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
@@ -50,6 +53,16 @@ try {
     if (!$req) throw new Exception("Solicitud no encontrada.");
     if (in_array($req['request_status'], ['Approved', 'Rejected', 'Cancelled'], true)) {
         throw new Exception("La solicitud ya fue resuelta (" . $req['request_status'] . ").");
+    }
+
+    // Autorización: RRHH/Admin resuelven cualquier solicitud; un jefe solo las de su equipo
+    // (y nunca la propia). Se valida aquí porque necesitamos el user_id del solicitante.
+    if (!$es_admin_hr) {
+        global $connect;
+        $equipo = medidata_jefe_equipo_user_ids($connect, $approver_id);
+        if ((int) $req['user_id'] === $approver_id || !in_array((int) $req['user_id'], $equipo, true)) {
+            throw new Exception("No tienes permisos para resolver esta solicitud.");
+        }
     }
 
     $current_order = (int) ($req['current_step_order'] ?? 1);

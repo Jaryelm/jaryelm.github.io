@@ -76,6 +76,7 @@
                 </ul>
         </li>
 
+            <?php include __DIR__ . '/../vacaciones_permisos/_menu_vacaciones.php'; ?>
             <li><a href="../contabilidad/mostrar.php"><i class='bx bxs-info-circle icon' ></i>ACERCA DE MEDICASA</a></li>
            
         </ul>

@@ -96,6 +96,17 @@
                     </label>
                 </div>
 
+                <div class="vp-form-row vp-form-row-split" id="div_incapacidad" style="display:none;">
+                    <div>
+                        <label>Instituci&oacute;n emisora</label>
+                        <input type="text" name="issuing_institution" id="issuing_institution" maxlength="255" placeholder="Ej. IHSS, cl&iacute;nica, hospital...">
+                    </div>
+                    <div>
+                        <label>N&uacute;mero de incapacidad</label>
+                        <input type="text" name="medical_leave_number" id="medical_leave_number" maxlength="100" placeholder="N.&ordm; de incapacidad">
+                    </div>
+                </div>
+
                 <div class="vp-form-row">
                     <label>Tipo de Duraci&oacute;n</label>
                     <select name="duration_type" id="duration_type" required>
@@ -250,6 +261,15 @@ $(document).ready(function() {
                 $('#is_paid_vacation').prop('checked', false);
                 $('#duration_type').prop('disabled', false);
             }
+
+            // Incapacidad: mostrar campos propios (institución y número) y forzar día completo.
+            if (cat === 'Medical_Leave') {
+                $('#div_incapacidad').show();
+                $('#duration_type').val('full_day').trigger('change').prop('disabled', true);
+            } else {
+                $('#div_incapacidad').hide();
+                $('#issuing_institution, #medical_leave_number').val('');
+            }
             cargarFlujo($(this).val() || 0);
         });
         
@@ -306,6 +326,7 @@ $(document).ready(function() {
     function abrirModal() {
         $('#formSolicitud')[0].reset();
         $('#div_pago').hide();
+        $('#div_incapacidad').hide();
         $('#ui_solicitados').text('0');
         $('#ui_saldo').text('0');
         $('#days_amount').val('');

@@ -6,6 +6,7 @@
  */
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/audit_lib.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
@@ -58,6 +59,7 @@ try {
         }
         $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_holiday_calendar SET `date` = ?, description = ? WHERE holiday_id = ?");
         $stmt->execute([$date, $description, $holiday_id]);
+        medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'UPDATE_HOLIDAY', 'hr_holiday_calendar', $holiday_id, null, ['date' => $date, 'description' => $description]);
         echo json_encode(['success' => true, 'message' => 'Feriado actualizado correctamente.']);
         exit;
     }
@@ -101,6 +103,7 @@ try {
     if ($omitidos > 0) {
         $msg .= " ($omitidos ya existían y se conservaron).";
     }
+    medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'CREATE_HOLIDAY', 'hr_holiday_calendar', null, null, ['date' => $date, 'end_date' => $end_date, 'description' => $description, 'dias_agregados' => $agregados]);
     echo json_encode(['success' => true, 'message' => $msg]);
 } catch (Throwable $e) {
     echo json_encode(['success' => false, 'message' => 'Internal error: ' . $e->getMessage()]);

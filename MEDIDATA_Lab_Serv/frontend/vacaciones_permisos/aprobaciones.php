@@ -1,6 +1,11 @@
 <?php
 require_once '../../backend/registros/session_check.php';
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador','Recursos_Humanos'], true)) {
+require_once '../../backend/bd/Conexion.php';
+require_once '../../backend/php/jefe_lib.php';
+// Acceso: RRHH/Admin o un Jefe inmediato (usuario que encabeza al menos un departamento).
+$__isAdminHr = isset($_SESSION['rol']) && in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true);
+$__isJefe = (isset($connect) && $connect) ? medidata_jefe_es_jefe($connect, (int) ($_SESSION['id'] ?? 0)) : false;
+if (!$__isAdminHr && !$__isJefe) {
     header('Location: mis_vacaciones.php');
     exit;
 }
@@ -117,6 +122,9 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador','Re
 
     function processApproval(id, action) {
         let actionText = action === 'Approve' ? 'aprobar' : 'rechazar';
+        // El backend approve_request.php espera 'decision' ('Approved'|'Rejected') y 'comment',
+        // y responde con { status: 'success'|'error', message }.
+        let decision = action === 'Approve' ? 'Approved' : 'Rejected';
         Swal.fire({
             title: `¿Desea ${actionText} esta solicitud?`,
             input: 'textarea',
@@ -128,11 +136,11 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador','Re
                 return $.ajax({
                     url: '../../backend/registros/vacaciones_permisos/approve_request.php',
                     type: 'POST',
-                    data: { request_id: id, action: action, comments: comments },
+                    data: { request_id: id, decision: decision, comment: comments },
                     dataType: 'json'
                 }).then(response => {
-                    if (!response.success) {
-                        throw new Error(response.message || 'Error al procesar');
+                    if (!response || response.status !== 'success') {
+                        throw new Error((response && response.message) || 'Error al procesar');
                     }
                     return response;
                 }).catch(error => {
@@ -141,7 +149,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador','Re
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire('Procesado', 'La solicitud ha sido procesada.', 'success');
+                Swal.fire('Procesado', (result.value && result.value.message) || 'La solicitud ha sido procesada.', 'success');
                 $('#tabla-aprobaciones').DataTable().ajax.reload();
             }
         });

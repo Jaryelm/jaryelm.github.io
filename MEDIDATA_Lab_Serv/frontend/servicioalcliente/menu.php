@@ -29,6 +29,7 @@
             </ul>
         </li>
 
+            <?php include __DIR__ . '/../vacaciones_permisos/_menu_vacaciones.php'; ?>
             <li><a href="../../../frontend/servicioalcliente/acerca.php"><i class='bx bxs-info-circle icon' ></i>ACERCA DE MEDICASA</a></li>
            
         </ul>
