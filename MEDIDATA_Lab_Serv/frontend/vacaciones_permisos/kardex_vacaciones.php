@@ -1,6 +1,6 @@
 <?php
 require_once '../../backend/registros/session_check.php';
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'])) {
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
     header('Location: mis_vacaciones.php');
     exit;
 }
@@ -10,24 +10,15 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
-    <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
-    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <title>MEDIDATA - KARDEX VACACIONES</title>
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+    <title>MEDIDATA - KARDEX DE VACACIONES</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -46,7 +37,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-            <div style="background:#fff; padding:20px; border-radius:8px;">
+            <div class="vp-panel">
                 <table id="tabla-kardex" class="responsive-table display" style="width:100%">
                     <thead>
                         <tr>
@@ -65,7 +56,16 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             </div>
         </main>
     </section>
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script>
     $(document).ready(function() {
         $('#tabla-kardex').DataTable({
@@ -113,7 +113,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     infoEmpty: 'Mostrando 0 a 0 de 0 registros',
                     infoFiltered: '(filtrado de _MAX_ registros totales)',
                     search: 'Buscar:',
-                    paginate: { first: 'Primero', last: '�ltimo', next: 'Siguiente', previous: 'Anterior' }
+                    paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
                 },
             responsive: true,
             order: [[6, 'desc']] // Ordenar por fecha reciente

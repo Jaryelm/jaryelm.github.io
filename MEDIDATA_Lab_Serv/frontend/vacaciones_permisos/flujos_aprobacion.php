@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
@@ -18,23 +18,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
-    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <title>MEDIDATA - FLUJOS Aprobaci&oacute;n</title>
-        <style>
-        .swal2-cancel-custom-color { color: #333 !important; font-size: 15px !important; padding: 10px 24px !important; }
-        .swal2-confirm-custom { font-size: 15px !important; padding: 10px 24px !important; }
-        .sortable-ghost { opacity: 0.4; background-color: #e8f4f8 !important; border-left: 4px solid #06adbf !important; }
-        .step-target:focus, .step-val:focus { border-color: #06adbf !important; box-shadow: 0 0 5px rgba(6, 173, 191, 0.3); }
-        .drag-handle:active { cursor: grabbing !important; }
-    </style>
+    <title>MEDIDATA - FLUJOS DE APROBACIÓN</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -58,7 +42,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     <i class='bx bx-plus'></i> Agregar Flujo
                 </button>
             </div>
-            <div style="background:#fff; padding:20px; border-radius:8px;">
+            <div class="vp-panel">
                 <table id="tabla-flujos" class="responsive-table display" style="width:100%">
                     <thead>
                         <tr>
@@ -75,6 +59,15 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         </main>
     </section>
 
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script>
         let tablaFlujos;
         $(document).ready(function() {
@@ -128,7 +121,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     infoEmpty: 'Mostrando 0 a 0 de 0 registros',
                     infoFiltered: '(filtrado de _MAX_ registros totales)',
                     search: 'Buscar:',
-                    paginate: { first: 'Primero', last: '�ltimo', next: 'Siguiente', previous: 'Anterior' }
+                    paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
                 }
             });
         });
@@ -270,10 +263,10 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                               Flujo: <b>${name}</b><br>
                               <small>Arrastra los pasos desde el icono izquierdo para reordenarlos.</small>
                           </div>
-                        <div id="steps-container" style="text-align: left; max-height: 350px; overflow-y: auto; padding: 10px; background: #f4f6f9; border-radius: 8px; border: 1px solid #e0e0e0; min-height: 100px;">
+                        <div id="steps-container">
                             ${stepsHtml}
                         </div>
-                        <button class="btn" onclick="addStepRow()" style="margin-top: 15px; background: #06adbf; color: #fff; padding: 10px 20px; border-radius: 5px; font-weight: 600; font-size: 14px; border: none; box-shadow: 0 2px 4px rgba(6, 173, 191, 0.2);"><i class='bx bx-plus'></i> Añadir Paso</button>
+                        <button class="vp-add-step-btn" onclick="addStepRow()"><i class='bx bx-plus'></i> Añadir Paso</button>
                     `,
                     width: '700px',
                     showCancelButton: true,
@@ -365,12 +358,12 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             });
             
             return `
-                  <div class="step-row" style="display:flex; gap:10px; margin-bottom:12px; align-items:center; background:#fff; padding:10px 15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); border-left:4px solid #06adbf; transition: all 0.2s ease; height: 58px; box-sizing: border-box;">
-                      <div class="drag-handle" style="cursor:grab; color:#999; font-size:24px; padding-right:5px; display:flex; align-items:center;" title="Arrastrar para ordenar">
+                  <div class="step-row">
+                      <div class="drag-handle" title="Arrastrar para ordenar">
                           <i class='bx bx-menu'></i>
                       </div>
-                      <div style="flex-grow: 1; display:flex; gap:10px; flex-wrap: nowrap; align-items:center; justify-content:center;">
-                          <select class="step-target rrhh-no-margin" style="flex:1; min-width:160px; height: 34px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:14px; outline:none; box-sizing:border-box; vertical-align:middle;" onchange="toggleStepVal(this)">
+                      <div class="step-fields">
+                          <select class="step-target rrhh-no-margin" onchange="toggleStepVal(this)">
                               <option value="Direct_Manager" ${type=='Direct_Manager'?'selected':''}>Jefe Inmediato</option>
                               <option value="Role_Recursos_Humanos" ${isHR?'selected':''}>Recursos Humanos</option>
                               <option value="Role_Administrador" ${isAdmin?'selected':''}>Administrador</option>
@@ -378,12 +371,12 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                               <option value="Specific_Role" ${isOtherRole?'selected':''}>Otro Rol...</option>
                               <option value="Specific_User" ${type=='Specific_User'?'selected':''}>Empleado Específico</option>
                           </select>
-                          <select class="step-val step-val-user rrhh-no-margin" style="flex:1; min-width:120px; height: 34px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:14px; outline:none; box-sizing:border-box; vertical-align:middle; display:${type=='Specific_User'?'block':'none'};">
+                          <select class="step-val step-val-user rrhh-no-margin" style="display:${type=='Specific_User'?'block':'none'};">
                               ${userOptions}
                           </select>
-                          <input type="text" class="step-val step-val-text rrhh-no-margin" placeholder="Ej. Encargado Compras" value="${type=='Specific_User' ? '' : val}" style="flex:1; min-width:120px; height: 34px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:14px; outline:none; box-sizing:border-box; vertical-align:middle; display:${isOtherRole?'block':'none'};">
+                          <input type="text" class="step-val step-val-text rrhh-no-margin" placeholder="Ej. Encargado Compras" value="${type=='Specific_User' ? '' : val}" style="display:${isOtherRole?'block':'none'};">
                       </div>
-                      <i class='bx bx-trash' style="color:#b02a37; font-size:22px; cursor:pointer; padding:5px; display:flex; align-items:center;" onclick="$(this).closest('.step-row').remove();" title="Eliminar Paso"></i>
+                      <i class='bx bx-trash step-del' onclick="$(this).closest('.step-row').remove();" title="Eliminar Paso"></i>
                   </div>
             `;
         }

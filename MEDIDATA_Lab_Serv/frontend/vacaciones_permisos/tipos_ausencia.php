@@ -1,6 +1,6 @@
 <?php
 require_once '../../backend/registros/session_check.php';
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'])) {
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
     header('Location: mis_vacaciones.php');
     exit;
 }
@@ -10,24 +10,15 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
-    <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
-    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <title>MEDIDATA - TIPOS AUSENCIA</title>
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+    <title>MEDIDATA - TIPOS DE AUSENCIA</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -51,7 +42,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     <i class='bx bx-plus'></i> Agregar Tipo
                 </a>
             </div>
-            <div style="background:#fff; padding:20px; border-radius:8px;">
+            <div class="vp-panel">
                 <table id="tabla-tipos" class="responsive-table" style="width:100%">
                     <thead>
                         <tr>
@@ -70,8 +61,16 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             </div>
         </main>
     </section>
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
     <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/js/submenu.js"></script>
     <script>
         $(document).ready(function() {
             var table = $('#tabla-tipos').DataTable({
@@ -112,7 +111,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     { 
                         "data": null,
                         "render": function(data, type, row) {
-                            return `<button class="btn-edit" data-id="${row.type_id}" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:1.2rem;"><i class='bx bx-edit'></i></button>`;
+                            return `<button class="btn-edit vp-icon-btn" data-id="${row.type_id}"><i class='bx bx-edit'></i></button>`;
                         }
                     }
                 ],
@@ -133,7 +132,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     "infoEmpty": 'Mostrando 0 a 0 de 0 registros',
                     "infoFiltered": '(filtrado de _MAX_ registros totales)',
                     "search": 'Buscar:',
-                    "paginate": { "first": 'Primero', "last": '�ltimo', "next": 'Siguiente', "previous": 'Anterior' }
+                    "paginate": { "first": 'Primero', "last": 'Último', "next": 'Siguiente', "previous": 'Anterior' }
                 }
             });
 
@@ -142,30 +141,30 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 var html = `
                     <form id="form-tipo" style="text-align: left;">
                         <input type="hidden" id="type_id" value="${isEdit ? data.type_id : ''}">
-                        <div style="margin-bottom: 10px;">
+                        <div class="vp-form-row">
                             <label>Código</label>
-                            <input type="text" id="code" class="form-control" value="${isEdit ? data.code : ''}" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                            <input type="text" id="code" class="form-control" value="${isEdit ? data.code : ''}" required>
                         </div>
-                        <div style="margin-bottom: 10px;">
+                        <div class="vp-form-row">
                             <label>Nombre</label>
-                            <input type="text" id="name" class="form-control" value="${isEdit ? data.name : ''}" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                            <input type="text" id="name" class="form-control" value="${isEdit ? data.name : ''}" required>
                         </div>
-                        <div style="margin-bottom: 10px;">
+                        <div class="vp-form-row">
                             <label>Categoría</label>
-                            <select id="category" class="form-control" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                            <select id="category" class="form-control" required>
                                 <option value="Vacation" ${isEdit && data.category === 'Vacation' ? 'selected' : ''}>Vacaciones</option>
                                 <option value="Permission" ${isEdit && data.category === 'Permission' ? 'selected' : ''}>Permiso</option>
                                 <option value="Medical_Leave" ${isEdit && data.category === 'Medical_Leave' ? 'selected' : ''}>Incapacidad Médica</option>
                             </select>
                         </div>
-                        <div style="margin-bottom: 10px;">
-                            <label><input type="checkbox" id="is_paid" ${isEdit && data.is_paid == 1 ? 'checked' : ''}> ¿Es pagado?</label>
+                        <div class="vp-form-row">
+                            <label class="vp-checkbox-inline"><input type="checkbox" id="is_paid" ${isEdit && data.is_paid == 1 ? 'checked' : ''}> ¿Es pagado?</label>
                         </div>
-                        <div style="margin-bottom: 10px;">
-                            <label><input type="checkbox" id="deducts_vacation" ${isEdit && data.deducts_vacation == 1 ? 'checked' : ''}> ¿Deduce vacaciones?</label>
+                        <div class="vp-form-row">
+                            <label class="vp-checkbox-inline"><input type="checkbox" id="deducts_vacation" ${isEdit && data.deducts_vacation == 1 ? 'checked' : ''}> ¿Deduce vacaciones?</label>
                         </div>
-                        <div style="margin-bottom: 10px;">
-                            <label><input type="checkbox" id="requires_document" ${isEdit && data.requires_document == 1 ? 'checked' : ''}> ¿Requiere documento?</label>
+                        <div class="vp-form-row">
+                            <label class="vp-checkbox-inline"><input type="checkbox" id="requires_document" ${isEdit && data.requires_document == 1 ? 'checked' : ''}> ¿Requiere documento?</label>
                         </div>
                     </form>
                 `;
@@ -225,7 +224,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             });
         });
     </script>
-    </section>
+    <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
 

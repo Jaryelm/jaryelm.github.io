@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
@@ -18,10 +18,9 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="../../backend/js/fullcalendar/fullcalendar.min.css">
+    <title>MEDIDATA - CALENDARIO DE FERIADOS</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -40,19 +39,22 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-            <div style="background:#fff; padding:20px; border-radius:8px;">
+            <div class="vp-panel">
                 <div id="calendar"></div>
             </div>
         </main>
     </section>
     
-    <script src="../../backend/js/fullcalendar/lib/moment.min.js"></script>
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="../../backend/js/moment.min.js"></script>
     <script src="../../backend/js/fullcalendar/fullcalendar.min.js"></script>
     <script src="../../backend/js/fullcalendar/locale/es.js"></script>
-    
+
     <script>
     $(document).ready(function() {
+        moment.locale('es');
         $('#calendar').fullCalendar({
+            locale: 'es',
             header: {
                 left: 'prev,next today',
                 center: 'title',

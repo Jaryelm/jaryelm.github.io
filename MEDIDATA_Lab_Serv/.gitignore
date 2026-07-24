@@ -3,5 +3,7 @@
 *.md
 .clinerules
 .antigravity/
+.claude/
+CLAUDE.md
 graphify-out/
 .graphify*

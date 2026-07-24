@@ -1,7 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['id']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'])) {
-    header("Location: ../../index.php");
+require_once '../../backend/registros/session_check.php';
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
+    header('Location: mis_vacaciones.php');
     exit;
 }
 ?>
@@ -10,63 +10,16 @@ if (!isset($_SESSION['id']) || !in_array($_SESSION['rol'], ['Administrador', 'Re
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Vacaciones y Permisos</title>
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
-    <!-- FullCalendar CSS -->
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.css' rel='stylesheet' />
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Moment.js is required by FullCalendar -->
-    <script src='https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/locale/es.js'></script>
-    
-    <style>
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .metric-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 4px solid var(--blue, #06adbf);
-        }
-        .metric-card h3 {
-            margin: 0;
-            font-size: 1.1em;
-            color: #555;
-        }
-        .metric-card .value {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--dark-blue, #035c67);
-            margin-top: 10px;
-        }
-        .metric-card.proximo {
-            grid-column: 1 / -1;
-            background: #f8fbff;
-            border-top-color: #f39c12;
-        }
-        .metric-card.proximo .value {
-            font-size: 1.5em;
-            color: #d35400;
-        }
-        #calendar-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        /* Custom calendar event styling via eventRender is handled in JS */
-    </style>
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+    <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
+    <title>MEDIDATA - DASHBOARD VACACIONES Y PERMISOS</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -86,73 +39,77 @@ if (!isset($_SESSION['id']) || !in_array($_SESSION['rol'], ['Administrador', 'Re
             $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-        
-        <div class="dashboard-grid" id="metrics-container">
+
+        <div class="rrhh-dashboard" id="metrics-container">
             <!-- Metrics will be loaded here via AJAX -->
-            <div class="metric-card"><div class="value">Cargando...</div></div>
+            <div class="rrhh-kpi"><p>Cargando...</p></div>
         </div>
 
-        <div id="calendar-container">
+        <div class="vp-panel">
             <h3>Calendario de Ausencias y Vacaciones</h3>
-            <br>
             <div id="calendar"></div>
-        </div>
         </div>
         </main>
     </section>
 
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <script src="../../backend/js/moment.min.js"></script>
+    <script src='../../backend/js/fullcalendar/fullcalendar.min.js'></script>
+    <script src='../../backend/js/fullcalendar/locale/es.js'></script>
     <script>
     $(document).ready(function() {
         // Load Metrics
         $.getJSON('../../backend/registros/vacaciones_permisos/dashboard_metrics.php', function(data) {
             if(data.error) {
-                $('#metrics-container').html('<div class="metric-card"><h3 style="color:red">Error</h3><div class="value">'+data.error+'</div></div>');
+                $('#metrics-container').html('<div class="rrhh-kpi vp-kpi-error"><h2>Error</h2><p>'+data.error+'</p></div>');
                 return;
             }
-            
+
             let html = `
-                <div class="metric-card">
-                    <h3>Vacaciones Activas</h3>
-                    <div class="value">${data.vacaciones_activas}</div>
-                    <small style="color:#777">Días pendientes totales: ${data.dias_pendientes_empresa}</small>
+                <div class="rrhh-kpi">
+                    <h2>Vacaciones Activas</h2>
+                    <p>${data.vacaciones_activas}</p>
+                    <small class="vp-kpi-note">Días pendientes totales: ${data.dias_pendientes_empresa}</small>
                 </div>
-                <div class="metric-card">
-                    <h3>Incapacidades Activas</h3>
-                    <div class="value">${data.incapacidades_activas}</div>
+                <div class="rrhh-kpi">
+                    <h2>Incapacidades Activas</h2>
+                    <p>${data.incapacidades_activas}</p>
                 </div>
-                <div class="metric-card">
-                    <h3>Permisos (Este Mes)</h3>
-                    <div class="value">${data.permisos_mes}</div>
+                <div class="rrhh-kpi">
+                    <h2>Permisos (Este Mes)</h2>
+                    <p>${data.permisos_mes}</p>
                 </div>
-                <div class="metric-card">
-                    <h3>Solicitudes Pendientes</h3>
-                    <div class="value">${data.solicitudes_pendientes}</div>
+                <div class="rrhh-kpi">
+                    <h2>Solicitudes Pendientes</h2>
+                    <p>${data.solicitudes_pendientes}</p>
                 </div>
-                <div class="metric-card">
-                    <h3>Solicitudes Aprobadas</h3>
-                    <div class="value">${data.solicitudes_aprobadas}</div>
+                <div class="rrhh-kpi">
+                    <h2>Solicitudes Aprobadas</h2>
+                    <p>${data.solicitudes_aprobadas}</p>
                 </div>
-                <div class="metric-card">
-                    <h3>Solicitudes Rechazadas</h3>
-                    <div class="value">${data.solicitudes_rechazadas}</div>
+                <div class="rrhh-kpi">
+                    <h2>Solicitudes Rechazadas</h2>
+                    <p>${data.solicitudes_rechazadas}</p>
                 </div>
             `;
-            
+
             if(data.proximo_vacaciones) {
                 html += `
-                <div class="metric-card proximo">
-                    <h3>Próximo derecho a Vacaciones</h3>
-                    <div class="value">${data.proximo_vacaciones.nombre}</div>
-                    <small>Cumple ciclo en: ${data.proximo_vacaciones.fecha}</small>
+                <div class="rrhh-kpi vp-kpi-highlight">
+                    <h2>Próximo derecho a Vacaciones</h2>
+                    <p>${data.proximo_vacaciones.nombre}</p>
+                    <small class="vp-kpi-note">Cumple ciclo en: ${data.proximo_vacaciones.fecha}</small>
                 </div>
                 `;
             }
-            
+
             $('#metrics-container').html(html);
         });
 
         // Initialize Calendar
+        moment.locale('es');
         $('#calendar').fullCalendar({
             header: {
                 left: 'prev,next today',
@@ -171,8 +128,3 @@ if (!isset($_SESSION['id']) || !in_array($_SESSION['rol'], ['Administrador', 'Re
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
-
-
-
-
-

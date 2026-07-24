@@ -1,7 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos Humanos'])) {
-    header('Location: detalle_empleado_vacaciones_usr.php');
+require_once '../../backend/registros/session_check.php';
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
+    header('Location: mis_vacaciones.php');
     exit;
 }
 ?>
@@ -10,55 +10,16 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Vacaciones por Colaborador - MEDIDATA</title>
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    
-    <style>
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .info-section {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .info-section h3 {
-            border-bottom: 2px solid var(--blue);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            color: var(--dark-blue);
-        }
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .data-row span:first-child {
-            font-weight: bold;
-            color: #555;
-        }
-        .data-row span:last-child {
-            color: #333;
-        }
-        .select-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-    </style>
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
+    <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+    <?php include '../recursos_humanos/_rrhh_select2_head.php'; ?>
+    <title>MEDIDATA - DETALLE DE EMPLEADO</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -73,51 +34,53 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             <?php include_once '../admin/perfil.php'; ?>
         </nav>
         <main>
-                    <?php
+            <?php
             $hora_actual = date('H');
-            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos D�as" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
+            $saludo = ($hora_actual >= 6 && $hora_actual < 12) ? "Buenos Días" : (($hora_actual >= 12 && $hora_actual < 18) ? "Buenas Tardes" : "Buenas Noches");
             ?>
             <h1 class="title"><?php echo $saludo . ', <strong>' . htmlspecialchars($name ?? '') . '</strong>'; ?></h1>
-        
-        <div class="select-container">
-            <label for="empleado_select" style="font-weight: bold; margin-bottom:10px; display:block;">Seleccionar Colaborador:</label>
-            <select id="empleado_select" style="width: 100%;">
-                <option value="">Seleccione un colaborador...</option>
-            </select>
-        </div>
 
-        <div id="profile-content" style="display: none;">
-            <div class="profile-grid">
-                <!-- Información General -->
-                <div class="info-section">
-                    <h3>Información General</h3>
-                    <div class="data-row"><span>Nombre Completo</span> <span id="lbl_nombre"></span></div>
-                    <div class="data-row"><span>Código de colaborador</span> <span id="lbl_codigo"></span></div>
-                    <div class="data-row"><span>Puesto</span> <span id="lbl_puesto"></span></div>
-                    <div class="data-row"><span>Departamento</span> <span id="lbl_depto"></span></div>
-                    <div class="data-row"><span>Jefe Inmediato</span> <span id="lbl_jefe"></span></div>
-                    <div class="data-row"><span>Fecha de Ingreso</span> <span id="lbl_ingreso"></span></div>
-                    <div class="data-row"><span>Antigüedad</span> <span id="lbl_antiguedad"></span></div>
-                </div>
+            <div class="vp-panel">
+                <label for="empleado_select" class="vp-select-label">Seleccionar Colaborador:</label>
+                <select id="empleado_select" style="width: 100%;">
+                    <option value="">Seleccione un colaborador...</option>
+                </select>
+            </div>
 
-                <!-- Información de Vacaciones -->
-                <div class="info-section">
-                    <h3>Información de Vacaciones</h3>
-                    <div class="data-row"><span>Período vacacional</span> <span id="lbl_periodo"></span></div>
-                    <div class="data-row"><span>Días otorgados</span> <span id="lbl_otorgados"></span></div>
-                    <div class="data-row"><span>Días disfrutados</span> <span id="lbl_disfrutados"></span></div>
-                    <div class="data-row"><span>Días pendientes</span> <span id="lbl_pendientes" style="font-weight:bold; color:var(--blue);"></span></div>
-                    <div class="data-row"><span>Días pagados</span> <span id="lbl_pagados"></span></div>
-                    <div class="data-row"><span>Fecha del último disfrute</span> <span id="lbl_ultimo"></span></div>
-                    <div class="data-row"><span>Próxima fecha de generación</span> <span id="lbl_proxima"></span></div>
+            <div id="profile-content" style="display: none;">
+                <div class="vp-profile-grid">
+                    <!-- Información General -->
+                    <div class="vp-panel">
+                        <h3>Información General</h3>
+                        <div class="vp-data-row"><span class="vp-data-label">Nombre Completo</span> <span class="vp-data-value" id="lbl_nombre"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Código de colaborador</span> <span class="vp-data-value" id="lbl_codigo"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Puesto</span> <span class="vp-data-value" id="lbl_puesto"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Departamento</span> <span class="vp-data-value" id="lbl_depto"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Jefe Inmediato</span> <span class="vp-data-value" id="lbl_jefe"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Fecha de Ingreso</span> <span class="vp-data-value" id="lbl_ingreso"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Antigüedad</span> <span class="vp-data-value" id="lbl_antiguedad"></span></div>
+                    </div>
+
+                    <!-- Información de Vacaciones -->
+                    <div class="vp-panel">
+                        <h3>Información de Vacaciones</h3>
+                        <div class="vp-data-row"><span class="vp-data-label">Período vacacional</span> <span class="vp-data-value" id="lbl_periodo"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Días otorgados</span> <span class="vp-data-value" id="lbl_otorgados"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Días disfrutados</span> <span class="vp-data-value" id="lbl_disfrutados"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Días pendientes</span> <span class="vp-data-value vp-data-value--highlight" id="lbl_pendientes"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Días pagados</span> <span class="vp-data-value" id="lbl_pagados"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Fecha del último disfrute</span> <span class="vp-data-value" id="lbl_ultimo"></span></div>
+                        <div class="vp-data-row"><span class="vp-data-label">Próxima fecha de generación</span> <span class="vp-data-value" id="lbl_proxima"></span></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
         </main>
     </section>
 
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
+    <?php include '../recursos_humanos/_rrhh_select2_foot.php'; ?>
 
     <script>
     $(document).ready(function() {
@@ -146,10 +109,10 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             if(userId) {
                 $.getJSON('../../backend/registros/vacaciones_permisos/fetch_vacation_profile.php', { user_id: userId }, function(res) {
                     if(res.error) {
-                        alert(res.error);
+                        Swal.fire({ icon: 'error', title: 'Error', text: res.error });
                         return;
                     }
-                    
+
                     // Llenar info general
                     $('#lbl_nombre').text(res.info_general.nombre_completo);
                     $('#lbl_codigo').text(res.info_general.codigo_colaborador);
@@ -179,8 +142,3 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
-
-
-
-
-

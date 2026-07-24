@@ -1,6 +1,6 @@
 <?php
 require_once '../../backend/registros/session_check.php';
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'])) {
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
     header('Location: mis_vacaciones.php');
     exit;
 }
@@ -10,24 +10,15 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='/backend/vendor/boxicons/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../backend/css/admin.css">
     <link rel="stylesheet" href="../../backend/css/cards.css">
     <link rel="icon" type="image/png" sizes="96x96" href="../../backend/img/icon.png">
     <link rel="stylesheet" type="text/css" href="../../backend/css/datatable.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/buttonsdataTables.css">
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
-    <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="text/javascript" src="../../backend/js/datatable.js"></script>
-    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
-    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
-    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
-    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
-    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
-    <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <title>MEDIDATA - Pol&iacute;ticas VACACIONES</title>
+    <link rel="stylesheet" href="/backend/vendor/sweetalert2/sweetalert2.min.css">
+    <title>MEDIDATA - POLÍTICAS DE VACACIONES</title>
 </head>
 <body>
     <?php include 'menu_router.php'; ?>
@@ -51,7 +42,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     <i class='bx bx-plus'></i> Agregar Política
                 </button>
             </div>
-            <div style="background:#fff; padding:20px; border-radius:8px;">
+            <div class="vp-panel">
                 <table id="tabla-politicas" class="responsive-table display" style="width:100%">
                     <thead>
                         <tr>
@@ -69,8 +60,16 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             </div>
         </main>
     </section>
+    <script src="../../backend/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatable.js"></script>
+    <script type="text/javascript" src="../../backend/js/datatablebuttons.js"></script>
+    <script type="text/javascript" src="../../backend/js/jszip.js"></script>
+    <script type="text/javascript" src="../../backend/js/pdfmake.js"></script>
+    <script type="text/javascript" src="../../backend/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonshtml5.js"></script>
+    <script type="text/javascript" src="../../backend/js/buttonsprint.js"></script>
+    <script src="/backend/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="../../backend/js/script.js"></script>
-    <script src="../../backend/js/submenu.js"></script>
     <script>
     let tablaPoliticas;
     $(document).ready(function() {
@@ -97,7 +96,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     orderable: false,
                     render: function(data, type, row) {
                         let escapedRow = JSON.stringify(row).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                        return `<button class="btn-edit" onclick="openPolicyModal(${escapedRow})" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:1.2rem;"><i class='bx bx-edit'></i></button>`;
+                        return `<button class="vp-icon-btn" onclick="openPolicyModal(${escapedRow})"><i class='bx bx-edit'></i></button>`;
                     }
                 }
             ],
@@ -118,7 +117,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     infoEmpty: 'Mostrando 0 a 0 de 0 registros',
                     infoFiltered: '(filtrado de _MAX_ registros totales)',
                     search: 'Buscar:',
-                    paginate: { first: 'Primero', last: '�ltimo', next: 'Siguiente', previous: 'Anterior' }
+                    paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
                 },
             responsive: true
         });
@@ -128,27 +127,27 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         let isEdit = policy !== null;
         let title = isEdit ? 'Editar Política' : 'Agregar Política';
         let html = `
-            <form id="policyForm" style="text-align:left; font-size:14px;">
+            <form id="policyForm">
                 <input type="hidden" id="policy_id" value="${isEdit ? policy.policy_id : ''}">
-                <div style="margin-bottom:15px;">
-                    <label style="display:block;margin-bottom:5px;">Años Mínimos de Antigüedad:</label>
-                    <input type="number" id="min_seniority_years" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;" value="${isEdit ? policy.min_seniority_years : ''}" required>
+                <div class="vp-form-row">
+                    <label>Años Mínimos de Antigüedad:</label>
+                    <input type="number" id="min_seniority_years" class="form-control" value="${isEdit ? policy.min_seniority_years : ''}" required>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block;margin-bottom:5px;">Años Máximos de Antigüedad:</label>
-                    <input type="number" id="max_seniority_years" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;" value="${isEdit ? policy.max_seniority_years : ''}" required>
+                <div class="vp-form-row">
+                    <label>Años Máximos de Antigüedad:</label>
+                    <input type="number" id="max_seniority_years" class="form-control" value="${isEdit ? policy.max_seniority_years : ''}" required>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block;margin-bottom:5px;">Días Otorgados:</label>
-                    <input type="number" id="granted_days" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;" value="${isEdit ? policy.granted_days : ''}" required>
+                <div class="vp-form-row">
+                    <label>Días Otorgados:</label>
+                    <input type="number" id="granted_days" class="form-control" value="${isEdit ? policy.granted_days : ''}" required>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block;margin-bottom:5px;">Máximo de Días Acumulables:</label>
-                    <input type="number" id="max_accumulated_days" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;" value="${isEdit ? policy.max_accumulated_days : ''}" required>
+                <div class="vp-form-row">
+                    <label>Máximo de Días Acumulables:</label>
+                    <input type="number" id="max_accumulated_days" class="form-control" value="${isEdit ? policy.max_accumulated_days : ''}" required>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block;margin-bottom:5px;">Estado:</label>
-                    <select id="status" class="form-control" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+                <div class="vp-form-row">
+                    <label>Estado:</label>
+                    <select id="status" class="form-control">
                         <option value="1" ${isEdit && policy.status == 1 ? 'selected' : ''}>Activo</option>
                         <option value="0" ${isEdit && policy.status == 0 ? 'selected' : ''}>Inactivo</option>
                     </select>
@@ -218,6 +217,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         });
     }
     </script>
+    <script src="../../backend/js/submenu.js"></script>
 </body>
 </html>
 
