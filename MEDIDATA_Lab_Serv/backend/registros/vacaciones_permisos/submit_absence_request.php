@@ -24,19 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("No se pueden solicitar fechas en el pasado.");
         }
         
-        // 2. Traslapes (Vacaciones, permisos, incapacidades)
+        // 2. Traslapes (vacaciones, permisos, incapacidades). Para permisos por HORA en el
+        //    mismo día, dos franjas horarias distintas y no solapadas NO son traslape.
+        $new_is_partial = ($start_time && $end_time && $start_date === $end_date);
+
         $stmt_overlap = $connect_hr_leaves->prepare("
-            SELECT request_id FROM hr_absence_requests 
-            WHERE user_id = ? AND request_status != 'Rejected'
+            SELECT start_date, end_date, start_time, end_time
+            FROM hr_absence_requests
+            WHERE user_id = ? AND request_status NOT IN ('Rejected', 'Cancelled')
             AND start_date <= ? AND end_date >= ?
         ");
         $stmt_overlap->execute([$user_id, $end_date, $start_date]);
-        if ($stmt_overlap->rowCount() > 0) {
+
+        foreach ($stmt_overlap->fetchAll(PDO::FETCH_ASSOC) as $ov) {
+            $ov_is_partial = ($ov['start_time'] && $ov['end_time'] && $ov['start_date'] === $ov['end_date']);
+
+            if ($new_is_partial && $ov_is_partial && $ov['start_date'] === $start_date) {
+                // Ambos por hora el mismo día: conflicto sólo si los rangos horarios se solapan
+                $ns = strtotime($start_time); $ne = strtotime($end_time);
+                $os = strtotime($ov['start_time']); $oe = strtotime($ov['end_time']);
+                if ($ns < $oe && $os < $ne) {
+                    throw new Exception("Ya tienes un permiso por horas que se traslapa con este horario.");
+                }
+                continue; // franjas distintas: no es traslape
+            }
+
+            // Cualquier otro caso (día completo de por medio) => traslape real
             throw new Exception("Ya tienes una solicitud (vacación, permiso o incapacidad) que se traslapa con estas fechas.");
         }
         
         // 3. Obtener info del tipo de ausencia
-        $stmt_t = $connect_hr_leaves->prepare("SELECT category, deducts_vacation FROM hr_absence_types WHERE type_id = ?");
+        $stmt_t = $connect_hr_leaves->prepare("SELECT category, deducts_vacation, requires_document FROM hr_absence_types WHERE type_id = ?");
         $stmt_t->execute([$type_id]);
         $type_info = $stmt_t->fetch(PDO::FETCH_ASSOC);
         // ---------------------------------
@@ -147,37 +165,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $workflow_id = $type_res['workflow_id'] ?? 1; // Default
         }
         
-        // 2. Determinar si hay documentacion (Opcional en este flujo)
-        $proof_doc_path = null;
-        if (isset($_FILES['proof_doc']) && $_FILES['proof_doc']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = '../../../frontend/vacaciones_permisos/uploads/';
-            if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-            $filename = time() . '_' . basename($_FILES['proof_doc']['name']);
-            if(move_uploaded_file($_FILES['proof_doc']['tmp_name'], $upload_dir . $filename)) {
-                $proof_doc_path = 'uploads/' . $filename;
+        // 2. Documento de respaldo: validar tipo/tamaño y exigirlo si el tipo lo requiere.
+        //    (El archivo se mueve DESPUÉS del INSERT, cuando ya tenemos el request_id.)
+        $has_proof  = isset($_FILES['proof_doc']) && $_FILES['proof_doc']['error'] === UPLOAD_ERR_OK && $_FILES['proof_doc']['size'] > 0;
+        $proof_ext  = null;
+        $proof_mime = null;
+        if ($has_proof) {
+            $allowed_ext  = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'doc', 'docx'];
+            $allowed_mime = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            $max_bytes    = 5 * 1024 * 1024; // 5 MB
+
+            $proof_ext = strtolower(pathinfo($_FILES['proof_doc']['name'], PATHINFO_EXTENSION));
+            $finfo = function_exists('finfo_open') ? finfo_open(FILEINFO_MIME_TYPE) : null;
+            $proof_mime = $finfo ? finfo_file($finfo, $_FILES['proof_doc']['tmp_name']) : ($_FILES['proof_doc']['type'] ?? '');
+            if ($finfo) finfo_close($finfo);
+
+            if (!in_array($proof_ext, $allowed_ext, true)) {
+                throw new Exception('Formato de documento no permitido. Use PDF, imagen (JPG/PNG/WEBP) o Word.');
+            }
+            if ($proof_mime && !in_array($proof_mime, $allowed_mime, true)) {
+                throw new Exception('El contenido del documento no corresponde a un PDF/imagen/Word válido.');
+            }
+            if ($_FILES['proof_doc']['size'] > $max_bytes) {
+                throw new Exception('El documento supera el tamaño máximo permitido (5 MB).');
             }
         }
+
+        if (!empty($type_info['requires_document']) && !$has_proof) {
+            throw new Exception('Este tipo de ausencia requiere adjuntar un documento de respaldo.');
+        }
         
-        // 3. Insertar solicitud
+        // 3. Insertar solicitud (incluye la marca de pago en efectivo — vacaciones pagadas)
         $stmt = $connect_hr_leaves->prepare("
-            INSERT INTO hr_absence_requests 
-            (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, request_status, workflow_id, comments, reference_workday_hours) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?)
+            INSERT INTO hr_absence_requests
+            (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, is_cash_payout, request_status, workflow_id, comments, reference_workday_hours)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?)
         ");
-        
+
         $stmt->execute([
-            $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $workflow_id, $comments, $reference_workday_hours
+            $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $is_paid_vacation, $workflow_id, $comments, $reference_workday_hours
         ]);
         
         $request_id = $connect_hr_leaves->lastInsertId();
-        
-        // 4. Insertar documento si existe
-        if ($proof_doc_path) {
-            $stmt_doc = $connect_hr_leaves->prepare("
-                INSERT INTO hr_absence_attachments (request_id, original_filename, file_path) 
-                VALUES (?, ?, ?)
-            ");
-            $stmt_doc->execute([$request_id, basename($proof_doc_path), $proof_doc_path]);
+
+        // Auditoría: registrar la creación de la solicitud (no bloquea si falla)
+        try {
+            $connect_hr_leaves->prepare("
+                INSERT INTO hr_absence_audit_log (action_user_id, action_executed, affected_table, record_id, old_value, new_value)
+                VALUES (?, 'CREATE_REQUEST', 'hr_absence_requests', ?, NULL, ?)
+            ")->execute([
+                $user_id,
+                $request_id,
+                json_encode([
+                    'type_id'        => $type_id,
+                    'start_date'     => $start_date,
+                    'end_date'       => $end_date,
+                    'days_amount'    => $days_amount,
+                    'is_cash_payout' => $is_paid_vacation,
+                ], JSON_UNESCAPED_UNICODE),
+            ]);
+        } catch (Throwable $e) { /* la auditoría no debe impedir el registro */ }
+
+        // 4. Guardar el documento en un directorio protegido (fuera del alcance web directo)
+        //    con nombre seguro, y registrar el adjunto.
+        if ($has_proof) {
+            $upload_dir = __DIR__ . '/uploads/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+            }
+            // Bloquear acceso HTTP directo a los archivos subidos
+            $htaccess = $upload_dir . '.htaccess';
+            if (!file_exists($htaccess)) {
+                @file_put_contents($htaccess, "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\nOrder deny,allow\nDeny from all\n</IfModule>\n");
+            }
+
+            $safe_name = 'req' . (int) $request_id . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $proof_ext;
+            if (move_uploaded_file($_FILES['proof_doc']['tmp_name'], $upload_dir . $safe_name)) {
+                $stmt_doc = $connect_hr_leaves->prepare("
+                    INSERT INTO hr_absence_attachments (request_id, attachment_type, original_filename, file_path, format)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $stmt_doc->execute([
+                    $request_id,
+                    'Comprobante',
+                    substr(basename($_FILES['proof_doc']['name']), 0, 250),
+                    $safe_name,
+                    $proof_mime ?: $proof_ext,
+                ]);
+            }
         }
         
         // Fin de inserción de solicitud

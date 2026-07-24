@@ -1,5 +1,5 @@
 <?php
-require_once '../../session_check.php';
+require_once '../session_check.php';
 require_once '../../../backend/bd/Conexion.php';
 header('Content-Type: application/json');
 

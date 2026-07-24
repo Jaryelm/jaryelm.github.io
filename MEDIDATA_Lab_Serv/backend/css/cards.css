@@ -1484,6 +1484,150 @@ body.rrhh-modal-open {
     margin-bottom: 20px;
 }
 
+/* Tabla clave/valor para modales de detalle (SweetAlert) */
+.vp-details-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+.vp-details-table th,
+.vp-details-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+.vp-details-table th {
+    width: 38%;
+    color: var(--dark-blue, #035c67);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.vp-details-table td {
+    color: #333;
+    word-break: break-word;
+}
+
+/* Badges de estado de solicitudes (mis_vacaciones, gestionar_solicitudes) */
+.vp-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #fff;
+    white-space: nowrap;
+}
+.vp-badge--pending     { background: #ffc107; color: #5c4700; }
+.vp-badge--in-progress { background: #17a2b8; }
+.vp-badge--approved    { background: #28a745; }
+.vp-badge--rejected    { background: #dc3545; }
+.vp-badge--cancelled   { background: #6c757d; }
+.vp-badge--neutral     { background: #6c757d; }
+
+/* Texto atenuado para placeholders en celdas (— / En espera) */
+.vp-muted { color: #999; }
+
+/* Utilidad para centrar el contenido de una columna de DataTable */
+.vp-col-center { text-align: center; }
+
+/* Caja del flujo de aprobación (preview en el modal de Nueva Solicitud) */
+.vp-flow-box {
+    background: #f8f9fb;
+    border: 1px solid #e6e8ee;
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+.vp-flow-name {
+    font-weight: 700;
+    color: var(--dark-blue, #035c67);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Stepper de flujo de aprobación (preview + historial) */
+.vp-stepper { list-style: none; margin: 0; padding: 0; }
+.vp-step {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    padding: 0 0 18px 0;
+}
+.vp-step:last-child { padding-bottom: 0; }
+.vp-step::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+}
+.vp-step:last-child::before { display: none; }
+.vp-step-badge {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #cfd3da;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    z-index: 1;
+}
+.vp-step-body { padding-top: 4px; min-width: 0; }
+.vp-step-title { font-weight: 600; color: #333; }
+.vp-step-meta { font-size: 0.82rem; color: #777; margin-top: 2px; }
+.vp-step-comment {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 4px;
+    font-style: italic;
+    word-break: break-word;
+}
+.vp-step--approved  .vp-step-badge { background: #28a745; }
+.vp-step--rejected  .vp-step-badge { background: #dc3545; }
+.vp-step--current   .vp-step-badge { background: var(--blue, #06adbf); }
+.vp-step--current   .vp-step-title { color: var(--dark-blue, #035c67); }
+.vp-step--waiting   .vp-step-badge { background: #cfd3da; }
+.vp-step--cancelled .vp-step-badge { background: #cfd3da; }
+.vp-step--cancelled .vp-step-body { opacity: 0.55; }
+
+/* Contenedor del historial dentro de un modal SweetAlert */
+.vp-hist { text-align: left; }
+.vp-hist .vp-flow-name { margin-top: 16px; }
+
+/* Aviso/alerta ámbar dentro de modales */
+.vp-alert-warn {
+    background: #fff8e1;
+    border: 1px solid #ffe0a3;
+    border-left: 4px solid #f39c12;
+    color: #7a5b00;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+/* Lista de documentos adjuntos */
+.vp-doc-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.vp-doc-list li { margin-bottom: 6px; }
+.vp-doc-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--dark-blue, #035c67);
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-word;
+}
+.vp-doc-list a:hover { color: var(--blue, #06adbf); text-decoration: underline; }
+
 /* Dashboard KPI — variante destacada "Próximo" (se combina con .rrhh-dashboard + .rrhh-kpi) */
 .rrhh-kpi.vp-kpi-highlight {
     grid-column: 1 / -1;

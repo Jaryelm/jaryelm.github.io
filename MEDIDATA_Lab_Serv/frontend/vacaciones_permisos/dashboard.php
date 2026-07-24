@@ -96,11 +96,15 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             `;
 
             if(data.proximo_vacaciones) {
+                const pv = data.proximo_vacaciones;
+                const nota = pv.dentro_ventana
+                    ? `Con derecho vigente (ventana ±2 meses) · ${pv.fecha}`
+                    : `Cumple ciclo en: ${pv.fecha}`;
                 html += `
                 <div class="rrhh-kpi vp-kpi-highlight">
                     <h2>Próximo derecho a Vacaciones</h2>
-                    <p>${data.proximo_vacaciones.nombre}</p>
-                    <small class="vp-kpi-note">Cumple ciclo en: ${data.proximo_vacaciones.fecha}</small>
+                    <p>${pv.nombre}</p>
+                    <small class="vp-kpi-note">${nota}</small>
                 </div>
                 `;
             }

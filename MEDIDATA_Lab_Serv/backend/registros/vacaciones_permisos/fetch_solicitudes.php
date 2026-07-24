@@ -19,14 +19,17 @@ try {
     // Assuming the DB user can query both medic9ue_hr_leaves and the main DB:
     
     $stmt = $connect->prepare("
-        SELECT 
+        SELECT
             r.request_id,
             r.user_id,
             u.name AS user_name,
             t.name AS type_name,
             r.start_date,
             r.end_date,
+            r.start_time,
+            r.end_time,
             r.days_amount,
+            r.comments,
             r.request_status,
             r.created_at
         FROM medic9ue_hr_leaves.hr_absence_requests r

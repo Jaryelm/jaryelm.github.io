@@ -49,6 +49,7 @@
                         <th>Estado</th>
                         <th>Observaciones</th>
                         <th>Resolución</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,6 +136,19 @@
                     <textarea name="comments" rows="3"></textarea>
                 </div>
 
+                <div class="vp-form-row">
+                    <label>Documento de respaldo</label>
+                    <input type="file" name="proof_doc" id="proof_doc" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx">
+                    <small class="vp-muted">PDF, imagen (JPG/PNG/WEBP) o Word. Obligatorio si el tipo de ausencia lo requiere. Máx. 5&nbsp;MB.</small>
+                </div>
+
+                <div class="vp-form-row">
+                    <label>Flujo de aprobación</label>
+                    <div id="flujo-aprobacion" class="vp-flow-box">
+                        <span class="vp-muted">Selecciona un tipo de ausencia para ver el flujo…</span>
+                    </div>
+                </div>
+
                 <div class="vp-modal-footer">
                     <button type="button" class="vp-btn-cancel" onclick="cerrarModal()">Cancelar</button>
                     <button type="submit" class="vp-btn-submit">Enviar Solicitud</button>
@@ -179,9 +193,20 @@ $(document).ready(function() {
                 { data: 'days_amount' },
                 { data: 'status' },
                 { data: 'comments' },
-                { data: 'last_comment' }
+                { data: 'last_comment' },
+                {
+                    data: null,
+                    orderable: false,
+                    className: 'vp-col-center',
+                    render: function(data, type, row) {
+                        return `<button class="vp-icon-btn" onclick="verHistorial(${row.request_id})" title="Ver historial del flujo de aprobación"><i class='bx bx-show'></i> Ver</button>`;
+                    }
+                }
             ],
             order: [],
+            columnDefs: [
+                { targets: [3, 4], className: 'vp-col-center' }
+            ],
 
                             "dom": 'Bfrtip',
                 "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, 'Todos']],
@@ -224,6 +249,7 @@ $(document).ready(function() {
                 $('#is_paid_vacation').prop('checked', false);
                 $('#duration_type').prop('disabled', false);
             }
+            cargarFlujo($(this).val() || 0);
         });
         
         // Evento Fechas -> Calcular Días
@@ -282,7 +308,8 @@ $(document).ready(function() {
         $('#ui_solicitados').text('0');
         $('#ui_saldo').text('0');
         $('#days_amount').val('');
-        
+        cargarFlujo($('#type_id').val() || 0);
+
         // Cargar saldo en vivo
         $.getJSON('../../backend/registros/vacaciones_permisos/fetch_vacation_profile.php?user_id=' + userId, function(res) {
             if(!res.error) {
@@ -362,6 +389,130 @@ $(document).ready(function() {
                 $('#ui_saldo').css('color', 'var(--blue)');
             }
         }
+    }
+
+    // ---- Flujo de aprobación (preview) e historial (stepper) ----
+    function vpEsc(v) {
+        if (v === null || v === undefined || v === '') return '—';
+        return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    const VP_STEP_META = {
+        approved:  { cls: 'vp-step--approved',  icon: 'bx-check' },
+        rejected:  { cls: 'vp-step--rejected',  icon: 'bx-x' },
+        current:   { cls: 'vp-step--current',   icon: 'bx-time-five' },
+        waiting:   { cls: 'vp-step--waiting',   icon: '' },
+        cancelled: { cls: 'vp-step--cancelled', icon: 'bx-minus' }
+    };
+
+    // mode: 'preview' (solo pasos numerados) | 'history' (con estado y quién resolvió)
+    function renderStepper(steps, mode) {
+        if (!steps || !steps.length) {
+            return '<span class="vp-muted">Este flujo no tiene pasos configurados (aprobación directa por RRHH).</span>';
+        }
+        let html = '<ul class="vp-stepper">';
+        steps.forEach(function(s) {
+            if (mode === 'preview') {
+                html += `<li class="vp-step vp-step--waiting">
+                    <span class="vp-step-badge">${s.step_order}</span>
+                    <div class="vp-step-body"><div class="vp-step-title">Paso ${s.step_order} · ${vpEsc(s.label)}</div></div>
+                </li>`;
+                return;
+            }
+            const meta  = VP_STEP_META[s.state] || VP_STEP_META.waiting;
+            const badge = meta.icon ? `<i class='bx ${meta.icon}'></i>` : s.step_order;
+            let metaLine;
+            if (s.state === 'approved')       metaLine = `Aprobado por ${vpEsc(s.by)}${s.at ? ' · ' + vpEsc(s.at) : ''}`;
+            else if (s.state === 'rejected')  metaLine = `Rechazado por ${vpEsc(s.by)}${s.at ? ' · ' + vpEsc(s.at) : ''}`;
+            else if (s.state === 'current')   metaLine = 'Pendiente de aprobación';
+            else if (s.state === 'cancelled') metaLine = 'No procesado';
+            else                              metaLine = 'En espera';
+            const comment = (s.comment && (s.state === 'approved' || s.state === 'rejected'))
+                ? `<div class="vp-step-comment">"${vpEsc(s.comment)}"</div>` : '';
+            html += `<li class="vp-step ${meta.cls}">
+                <span class="vp-step-badge">${badge}</span>
+                <div class="vp-step-body">
+                    <div class="vp-step-title">Paso ${s.step_order} · ${vpEsc(s.label)}</div>
+                    <div class="vp-step-meta">${metaLine}</div>
+                    ${comment}
+                </div>
+            </li>`;
+        });
+        html += '</ul>';
+        return html;
+    }
+
+    // Lista de documentos adjuntos con enlace al visor protegido.
+    function renderDocs(attachments) {
+        if (!attachments || !attachments.length) return '';
+        let html = `<div class="vp-flow-name"><i class='bx bx-paperclip'></i> Documentos adjuntos</div><ul class="vp-doc-list">`;
+        attachments.forEach(function(a) {
+            html += `<li><a href="../../backend/registros/vacaciones_permisos/view_absence_doc.php?id=${a.id}" target="_blank" rel="noopener"><i class='bx bx-file'></i> ${vpEsc(a.name)}</a></li>`;
+        });
+        html += '</ul>';
+        return html;
+    }
+
+    // Carga el flujo que procesará la solicitud (solo lectura) en el modal Nueva Solicitud.
+    function cargarFlujo(typeId) {
+        const cont = $('#flujo-aprobacion');
+        cont.html('<span class="vp-muted">Cargando flujo…</span>');
+        $.getJSON('../../backend/registros/vacaciones_permisos/fetch_request_flow.php', { type_id: typeId || 0 })
+            .done(function(res) {
+                if (!res || res.error || !res.workflow) {
+                    cont.html('<span class="vp-muted">No hay flujo de aprobación configurado.</span>');
+                    return;
+                }
+                let html = `<div class="vp-flow-name"><i class='bx bx-git-repo-forked'></i> ${vpEsc(res.workflow.name)}</div>`;
+                html += renderStepper(res.steps, 'preview');
+                cont.html(html);
+            })
+            .fail(function() {
+                cont.html('<span class="vp-muted">No se pudo cargar el flujo.</span>');
+            });
+    }
+
+    const VP_ESTADOS_HIST = {
+        'Pending':     { mod: 'pending',     text: 'Pendiente' },
+        'In_Progress': { mod: 'in-progress', text: 'En Proceso' },
+        'Approved':    { mod: 'approved',    text: 'Aprobada' },
+        'Rejected':    { mod: 'rejected',    text: 'Rechazada' },
+        'Cancelled':   { mod: 'cancelled',   text: 'Cancelada' }
+    };
+    function histBadge(status) {
+        const e = VP_ESTADOS_HIST[status] || { mod: 'neutral', text: status || '—' };
+        return `<span class="vp-badge vp-badge--${e.mod}">${e.text}</span>`;
+    }
+
+    // Botón "Ver" de la tabla: historial del flujo (quién aprobó / quién falta).
+    function verHistorial(requestId) {
+        Swal.fire({ title: 'Cargando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        $.getJSON('../../backend/registros/vacaciones_permisos/fetch_request_history.php', { request_id: requestId })
+            .done(function(res) {
+                if (!res || res.error) {
+                    Swal.fire('Error', (res && res.error) ? res.error : 'No se pudo cargar el historial.', 'error');
+                    return;
+                }
+                const r = res.request;
+                const head = `<table class="vp-details-table">
+                    <tr><th>Solicitud</th><td>#${vpEsc(r.request_id)}</td></tr>
+                    <tr><th>Tipo</th><td>${vpEsc(r.type_name)}</td></tr>
+                    <tr><th>Fechas</th><td>${vpEsc(r.start_date)}${(r.end_date && r.end_date !== r.start_date) ? ' al ' + vpEsc(r.end_date) : ''}</td></tr>
+                    <tr><th>Días</th><td>${vpEsc(r.days_amount)}</td></tr>
+                    <tr><th>Estado</th><td>${histBadge(r.status)}</td></tr>
+                    <tr><th>Flujo</th><td>${vpEsc(r.workflow_name)}</td></tr>
+                </table>`;
+                const body = `<div class="vp-flow-name"><i class='bx bx-list-check'></i> Flujo de aprobación</div>` + renderStepper(res.steps, 'history');
+                Swal.fire({
+                    title: 'Historial de la solicitud',
+                    html: `<div class="vp-hist">${head}${body}${renderDocs(res.attachments)}</div>`,
+                    width: 620,
+                    confirmButtonText: 'Cerrar'
+                });
+            })
+            .fail(function() {
+                Swal.fire('Error', 'No se pudo cargar el historial.', 'error');
+            });
     }
     </script>
     <script src="../../backend/js/submenu.js"></script>

@@ -155,6 +155,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                                 <option value="Vacation" ${isEdit && data.category === 'Vacation' ? 'selected' : ''}>Vacaciones</option>
                                 <option value="Permission" ${isEdit && data.category === 'Permission' ? 'selected' : ''}>Permiso</option>
                                 <option value="Medical_Leave" ${isEdit && data.category === 'Medical_Leave' ? 'selected' : ''}>Incapacidad Médica</option>
+                                <option value="License" ${isEdit && data.category === 'License' ? 'selected' : ''}>Licencia</option>
                             </select>
                         </div>
                         <div class="vp-form-row">
@@ -165,6 +166,9 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                         </div>
                         <div class="vp-form-row">
                             <label class="vp-checkbox-inline"><input type="checkbox" id="requires_document" ${isEdit && data.requires_document == 1 ? 'checked' : ''}> ¿Requiere documento?</label>
+                        </div>
+                        <div class="vp-form-row">
+                            <label class="vp-checkbox-inline"><input type="checkbox" id="requires_special_auth" ${!isEdit || data.requires_special_auth == 1 ? 'checked' : ''}> ¿Requiere autorización especial?</label>
                         </div>
                     </form>
                 `;
@@ -183,7 +187,8 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                             category: $('#category').val(),
                             is_paid: $('#is_paid').is(':checked') ? 1 : 0,
                             deducts_vacation: $('#deducts_vacation').is(':checked') ? 1 : 0,
-                            requires_document: $('#requires_document').is(':checked') ? 1 : 0
+                            requires_document: $('#requires_document').is(':checked') ? 1 : 0,
+                            requires_special_auth: $('#requires_special_auth').is(':checked') ? 1 : 0
                         };
                     }
                 }).then((result) => {

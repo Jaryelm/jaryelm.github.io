@@ -41,6 +41,9 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 <button class="button" onclick="openPolicyModal()">
                     <i class='bx bx-plus'></i> Agregar Política
                 </button>
+                <button class="pabtn" onclick="sincronizarPerfiles()" title="Crea/actualiza los perfiles de vacaciones y acredita el saldo inicial retroactivo según las políticas activas">
+                    <i class='bx bx-sync'></i> Sincronizar perfiles
+                </button>
             </div>
             <div class="vp-panel">
                 <table id="tabla-politicas" class="responsive-table display" style="width:100%">
@@ -214,6 +217,38 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     tablaPoliticas.ajax.reload(null, false);
                 }
             }
+        });
+    }
+
+    // Ejecuta la sincronización de perfiles de vacaciones (crea perfiles faltantes y
+    // acredita el saldo inicial retroactivo según las políticas activas).
+    function sincronizarPerfiles() {
+        Swal.fire({
+            title: '¿Sincronizar perfiles de vacaciones?',
+            html: 'Se crearán los perfiles faltantes y se acreditará el <b>saldo inicial retroactivo</b> a los colaboradores que aún no tengan movimientos, según las políticas activas.<br><small>Los colaboradores con saldo ya existente no se duplican.</small>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, sincronizar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#035c67'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+            Swal.fire({ title: 'Sincronizando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            $.ajax({
+                url: '../../backend/registros/vacaciones_permisos/sync_vacation_profiles.php',
+                type: 'POST',
+                dataType: 'json',
+                success: function(res) {
+                    if (res && res.status === 'success') {
+                        Swal.fire('Listo', res.message, 'success');
+                    } else {
+                        Swal.fire('Error', (res && res.message) ? res.message : 'No se pudo sincronizar.', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Error de comunicación con el servidor.', 'error');
+                }
+            });
         });
     }
     </script>

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../session_check.php';
 require_once __DIR__ . '/../../bd/Conexion.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos Humanos'])) {
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'Recursos_Humanos'], true)) {
     echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
     exit;
 }
