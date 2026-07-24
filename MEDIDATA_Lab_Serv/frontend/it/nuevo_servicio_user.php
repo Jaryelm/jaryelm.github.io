@@ -58,11 +58,29 @@ include_once '../it/menu.php'; // Menú principal
 
         <br>
 
-        <!-- Campo Nombre del Servicio Dinámico -->
-        <label for="service_name"><b>Nombre del Servicio</b></label><span class="badge-warning">*</span>
+        <!-- Campo Cuenta del Servicio: catálogo completo (sin filtrar por tipo) -->
+        <label for="service_name"><b>Cuenta del Servicio</b></label><span class="badge-warning">*</span>
         <select id="service_name" name="service_name" class="select2" style="width: 100%;" required>
-            <option value="">Seleccione o busque un servicio</option>
+            <option value="">Seleccione o busque una cuenta</option>
+            <?php
+            require_once '../../backend/bd/Conexion.php';
+            $stmtCuentasServicio = $connect->query(
+                'SELECT cuenta, nombre FROM cuentas_catalogo ORDER BY cuenta ASC'
+            );
+            while ($cuentaServicio = $stmtCuentasServicio->fetch(PDO::FETCH_ASSOC)) {
+                $codigoCuenta = htmlspecialchars((string) $cuentaServicio['cuenta'], ENT_QUOTES, 'UTF-8');
+                $nombreCuenta = htmlspecialchars((string) $cuentaServicio['nombre'], ENT_QUOTES, 'UTF-8');
+                echo '<option value="' . $nombreCuenta . '" data-cuenta="' . $codigoCuenta . '">'
+                    . $codigoCuenta . ' - ' . $nombreCuenta . '</option>';
+            }
+            ?>
         </select>
+
+        <br><br>
+
+        <!-- Campo Nombre del Servicio -->
+        <label for="nomservicio"><b>Nombre del Servicio</b></label><span class="badge-warning">*</span>
+        <input type="text" id="nomservicio" name="nomservicio" placeholder="Ingrese el nombre del servicio" required>
 
         <br><br>
 
@@ -211,11 +229,15 @@ include_once '../it/menu.php'; // Menú principal
 
 <script src="../../backend/js/jquery.min.js"></script>
 <script src="../../backend/js/script.js"></script>
-<script src="../../backend/js/cat_cuentas_ingreso.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
     $('.select2').select2();
+
+    $('#service_name').on('change', function() {
+        var cuentaSeleccionada = $(this).find(':selected').data('cuenta');
+        $('#service_code').val(cuentaSeleccionada || '');
+    });
 });
 </script>
 <script src="../../backend/js/submenu.js"></script>

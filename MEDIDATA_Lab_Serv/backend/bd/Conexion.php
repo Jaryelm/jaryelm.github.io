@@ -18,13 +18,36 @@ $dbProduccionHosting = $dbProduccionRemoto;
 $dbProduccionHosting['host'] = '192.168.176.2';
 
 $httpHost = isset($_SERVER['HTTP_HOST']) ? strtolower((string) $_SERVER['HTTP_HOST']) : '';
-$esEntornoLocal = ($httpHost === '')
-    || $httpHost === 'localhost'
-    || strpos($httpHost, '127.0.0.1') === 0;
+/* Quitar puerto (:8080) para no fallar la detección de local. */
+$hostSinPuerto = preg_replace('/:\d+$/', '', $httpHost) ?: '';
 
-/* PHP en el mismo cPanel que MySQL: localhost evita conexiones por IP pública (menos 1040). */
+/**
+ * Entorno local / laboratorio (XAMPP u otra PC en LAN).
+ * Antes solo se aceptaba "localhost" exacto: entrar por IP (192.168.x.x)
+ * o "localhost:8080" forzaba MySQL remoto 192.168.176.2 y el login
+ * esperaba el timeout TCP (~20–60 s) antes de responder.
+ */
+$esServidorProduccionIp = ($hostSinPuerto === '192.168.176.2');
+$esIpPrivada = (bool) preg_match(
+    '/^(127\.0\.0\.1|0\.0\.0\.0|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})$/',
+    $hostSinPuerto
+);
+$esEntornoLocal = !$esServidorProduccionIp && (
+    ($hostSinPuerto === '')
+    || $hostSinPuerto === 'localhost'
+    || $hostSinPuerto === '::1'
+    || $esIpPrivada
+    || (bool) preg_match('/\.local$/', $hostSinPuerto)
+    || getenv('MEDIDATA_DB_LOCAL') === '1'
+);
+
+/* PHP en el mismo cPanel / servidor que MySQL (o dominio de producción). */
 $esWebProduccionEnHosting = !$esEntornoLocal
-    && (strpos($httpHost, 'medicasa.hn') !== false || strpos($httpHost, 'medic9ue') !== false);
+    && (
+        $esServidorProduccionIp
+        || strpos($hostSinPuerto, 'medicasa.hn') !== false
+        || strpos($hostSinPuerto, 'medic9ue') !== false
+    );
 
 require_once __DIR__ . '/medidata_paths.php';
 
@@ -100,6 +123,8 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false,
             /* Evita segundo round-trip "SET NAMES"; alinea cliente con UTF-8 completo. */
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+            /* Si el host MySQL no responde, falla en segundos (no ~1 min de TCP). */
+            PDO::ATTR_TIMEOUT => 5,
         ]
     );
     $GLOBALS[$pdoReuseKey] = $connect;
@@ -132,6 +157,7 @@ if (!function_exists('medidata_conectar_rrhh')) {
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                 PDO::ATTR_EMULATE_PREPARES => false,
                 PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                PDO::ATTR_TIMEOUT => 5,
             ]
         );
     }
@@ -145,8 +171,9 @@ if (!empty($GLOBALS[$pdoRrhhKey]) && $GLOBALS[$pdoRrhhKey] instanceof PDO) {
     $connect_rrhh = null;
     $rrhhHosts = [dbhost];
 
-    /* En hosting compartido, localhost suele ser el host correcto para PHP en el mismo servidor. */
-    if (dbhost !== 'localhost' && dbhost !== '127.0.0.1') {
+    /* Solo en hosting de producción reintentar por localhost (mismo servidor).
+       En laboratorio/LAN el fallback a localhost sumaba otro timeout de ~20–60 s. */
+    if (!empty($esWebProduccionEnHosting) && dbhost !== 'localhost' && dbhost !== '127.0.0.1') {
         $rrhhHosts[] = 'localhost';
     }
 
@@ -181,6 +208,7 @@ if (!function_exists('medidata_conectar_postulaciones')) {
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                 PDO::ATTR_EMULATE_PREPARES => false,
                 PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                PDO::ATTR_TIMEOUT => 5,
             ]
         );
     }
@@ -193,7 +221,7 @@ if (!empty($GLOBALS[$pdoPostulacionesKey]) && $GLOBALS[$pdoPostulacionesKey] ins
 } else {
     $connect_postulaciones = null;
     $postulacionesHosts = [dbhost];
-    if (dbhost !== 'localhost' && dbhost !== '127.0.0.1') {
+    if (!empty($esWebProduccionEnHosting) && dbhost !== 'localhost' && dbhost !== '127.0.0.1') {
         $postulacionesHosts[] = 'localhost';
     }
     foreach ($postulacionesHosts as $postHost) {

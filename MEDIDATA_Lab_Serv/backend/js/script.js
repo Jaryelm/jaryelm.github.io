@@ -86,22 +86,50 @@ function applySidebarCollapsedState(collapsed) {
 	}
 }
 
-// Restaurar preferencia al cargar la vista (misma experiencia en todo el sistema)
-if (sidebar) {
-	if (readSidebarCollapsedPref()) {
+function isCompactSidebarViewport() {
+	return window.matchMedia('(max-width: 1024px)').matches;
+}
+
+/** En tablet/móvil el menú inicia colapsado para que el ☰ sea usable. */
+function syncSidebarToViewport() {
+	if (!sidebar) {
+		return;
+	}
+	if (isCompactSidebarViewport()) {
 		applySidebarCollapsedState(true);
 	} else {
-		applySidebarCollapsedState(false);
+		applySidebarCollapsedState(readSidebarCollapsedPref());
 	}
+}
+
+// Restaurar preferencia al cargar la vista (misma experiencia en todo el sistema)
+if (sidebar) {
+	syncSidebarToViewport();
+	let sidebarWasCompact = isCompactSidebarViewport();
+	window.addEventListener('resize', function () {
+		const nowCompact = isCompactSidebarViewport();
+		if (nowCompact === sidebarWasCompact) {
+			return;
+		}
+		sidebarWasCompact = nowCompact;
+		syncSidebarToViewport();
+	});
 }
 
 // Verificar que sidebar y toggleSidebar existan antes de usarlos
 if (sidebar && toggleSidebar) {
+	toggleSidebar.setAttribute('role', 'button');
+	toggleSidebar.setAttribute('aria-label', 'Mostrar u ocultar menú');
+	toggleSidebar.setAttribute('title', 'Menú');
 	toggleSidebar.addEventListener('click', function (e) {
 		e.preventDefault();
+		e.stopPropagation();
 		sidebar.classList.toggle('hide');
 		const collapsed = sidebar.classList.contains('hide');
-		writeSidebarCollapsedPref(collapsed);
+		/* En compacto no persistimos "abierto": al recargar vuelve colapsado */
+		if (!isCompactSidebarViewport()) {
+			writeSidebarCollapsedPref(collapsed);
+		}
 		if (collapsed) {
 			allSideDivider.forEach(item => {
 				item.textContent = '-';
@@ -112,6 +140,26 @@ if (sidebar && toggleSidebar) {
 				item.textContent = item.dataset.text;
 			});
 		}
+	});
+}
+
+/* En pantallas compactas: tocar fuera del menú lo vuelve a colapsar */
+if (sidebar) {
+	document.addEventListener('click', function (e) {
+		if (!isCompactSidebarViewport()) {
+			return;
+		}
+		if (sidebar.classList.contains('hide')) {
+			return;
+		}
+		const t = e.target;
+		if (sidebar.contains(t)) {
+			return;
+		}
+		if (toggleSidebar && (toggleSidebar === t || toggleSidebar.contains(t))) {
+			return;
+		}
+		applySidebarCollapsedState(true);
 	});
 }
 

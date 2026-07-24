@@ -886,11 +886,13 @@ table.rrhh-aplica-dt .rrhh-action-icon--muted {
     align-items: flex-start;
     gap: 20px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .rrhh-calendar-layout #calendar {
-    flex: 1;
-    max-width: 60%;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
     min-height: 500px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -899,14 +901,16 @@ table.rrhh-aplica-dt .rrhh-action-icon--muted {
 }
 
 .rrhh-calendar-layout #notification-panel {
-    flex: 1;
-    max-width: 35%;
+    flex: 0 0 340px;
+    max-width: 340px;
+    width: 340px;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
     background-color: var(--grey, #F1F0F6);
     overflow-y: auto;
     max-height: 75.5vh;
+    box-sizing: border-box;
 }
 
 .rrhh-calendar-layout #notification-panel h4 {
@@ -947,6 +951,7 @@ table.rrhh-aplica-dt .rrhh-action-icon--muted {
     .rrhh-calendar-layout #calendar,
     .rrhh-calendar-layout #notification-panel {
         max-width: 100%;
+        width: 100%;
         flex: none;
     }
 }

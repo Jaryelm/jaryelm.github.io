@@ -24,7 +24,8 @@ html {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
-	scrollbar-gutter: stable;
+	/* No usar scrollbar-gutter:stable: reserva una franja fija a la derecha
+	   y deja un hueco gris aunque no haya scroll (p. ej. Programación IT). */
 }
 
 body {
@@ -333,9 +334,14 @@ li {
 /* CONTENT */
 #content {
 	position: relative;
-	width: calc(100% - 320px);
-	left: 320px;
-	transition: all .3s ease;
+	/* margin-left (no left+width calc): el panel llega al borde derecho real */
+	margin-left: 320px;
+	width: auto;
+	left: auto;
+	right: auto;
+	max-width: none;
+	box-sizing: border-box;
+	transition: margin-left .3s ease;
 	/* Reserva altura del nav fijo; el main no queda tapado */
 	display: flex;
 	flex-direction: column;
@@ -343,12 +349,15 @@ li {
 	align-items: stretch;
 	gap: 0;
 	min-height: 100vh;
-	margin: 0;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
 	padding: 64px 0 0 0;
 }
 #sidebar.hide + #content {
-	width: calc(100% - 60px);
-	left: 60px;
+	margin-left: 60px;
+	width: auto;
+	left: auto;
 }
 #sidebar.hide + #content > nav {
 	left: 60px;
@@ -472,6 +481,7 @@ nav .profile .profile-link a:hover {
 	top: 0;
 	right: 0;
 	left: 320px;
+	width: auto;
 	z-index: 150;
 	transition: left 0.3s ease;
 	display: flex;
@@ -1486,18 +1496,69 @@ main .btn-send:hover {
 
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
+	/*
+	 * Tablets / ventanas angostas / móviles:
+	 * el menú abierto a 320px tapaba el botón ☰ (nav a left:60 debajo del sidebar).
+	 * Aquí: rail colapsado, ☰ siempre visible encima, sin expandir al hover.
+	 */
+	#sidebar {
+		z-index: 200;
+	}
+	#sidebar.hide:hover {
+		max-width: 60px;
+	}
+	#sidebar.hide:hover .side-menu {
+		padding: 0 6px;
+	}
+	#sidebar.hide:hover .divider {
+		text-align: center;
+	}
+	#sidebar.hide:hover .ads {
+		display: none;
+	}
+	#sidebar:not(.hide) {
+		box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+	}
+
 	#content {
 		position: relative;
-		left: 60px;
-		width: calc(100% - 60px);
-		transition: all .3s ease;
+		margin-left: 60px;
+		width: auto;
+		left: auto;
+		transition: margin-left .3s ease;
 	}
 	#content > nav {
 		left: 60px;
+		right: 0;
+		z-index: 260;
+	}
+	#content > nav > .toggle-sidebar {
+		display: inline-flex !important;
+		visibility: visible !important;
+		opacity: 1 !important;
+		position: relative;
+		z-index: 270;
+		font-size: 26px;
+		width: 44px;
+		height: 44px;
+		color: var(--dark-blue);
+		cursor: pointer;
+		border-radius: 8px;
+	}
+	#content > nav > .toggle-sidebar:hover,
+	#content > nav > .toggle-sidebar:focus {
+		background: var(--grey);
+		color: var(--blue);
 	}
 	nav .nav-link,
 	nav .divider {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	#content > nav .profile > span:first-child {
 		display: none;
 	}
 }
