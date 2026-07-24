@@ -93,6 +93,7 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                         <li><a href="../vacaciones_permisos/tipos_ausencia.php"><span>TIPOS DE AUSENCIA</span></a></li>
                         <li><a href="../vacaciones_permisos/flujos_aprobacion.php"><span>FLUJOS DE APROBACIÓN</span></a></li>
                         <li><a href="../vacaciones_permisos/politicas_vacaciones.php"><span>POLÍTICAS DE VACACIONES</span></a></li>
+                        <li><a href="../vacaciones_permisos/gestionar_feriados.php"><span>GESTIÓN DE FERIADOS</span></a></li>
                         <li><a href="../vacaciones_permisos/calendario_feriados.php"><span>CALENDARIO DE FERIADOS</span></a></li>
                     </ul>
                 </li>

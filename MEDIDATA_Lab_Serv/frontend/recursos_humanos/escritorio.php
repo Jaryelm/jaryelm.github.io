@@ -833,8 +833,18 @@ try {
                     $('#modal-footer').append(`
                         <button type="button" class="button rrhh-btn-inline rrhh-btn-inline--primary rrhh-close-event-modal">Cerrar</button>
                     `);
+                } else if (event.type === 'holiday') {
+                    $('#event-details tbody').append(`
+                        <tr><th>Tipo</th><td>Feriado</td></tr>
+                        <tr><th>Descripción</th><td>${event.description || event.title || ''}</td></tr>
+                        <tr><th>Fecha</th><td>${event.start.format('YYYY-MM-DD')}</td></tr>
+                    `);
+                    $('#modal-footer').append(`
+                        <a href="../vacaciones_permisos/gestionar_feriados.php" class="button rrhh-btn-inline rrhh-btn-inline--accent">Gestionar Feriados</a>
+                        <button type="button" class="button rrhh-btn-inline rrhh-btn-inline--primary rrhh-close-event-modal">Cerrar</button>
+                    `);
                 }
-                
+
                 openRrhhModal('eventModal');
             }
 

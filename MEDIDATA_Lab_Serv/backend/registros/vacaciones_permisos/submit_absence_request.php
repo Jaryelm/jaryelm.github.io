@@ -125,6 +125,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $reference_workday_hours = round($shift_minutes / 60, 2);
             $days_amount = round($requested_minutes / $shift_minutes, 4);
+        } else {
+            // Día(s) completo(s): el total de días NO se toma del cliente. Se recalcula de
+            // forma autoritativa contando sólo los días que el colaborador labora según su
+            // horario activo y excluyendo feriados (p. ej. no cuenta domingos ni feriados).
+            require_once __DIR__ . '/../../php/absence_workdays_lib.php';
+            global $connect;
+            $calc = medidata_absence_count_working_days(
+                $connect,
+                $connect_hr_leaves,
+                $user_id,
+                $start_date,
+                $end_date
+            );
+            $days_amount = $calc['days'];
+
+            if ($days_amount <= 0) {
+                throw new Exception("El rango seleccionado no contiene días laborables (feriados o días de descanso según tu horario).");
+            }
         }
 
         if (!$type_id || !$start_date || !$end_date || !$days_amount) {

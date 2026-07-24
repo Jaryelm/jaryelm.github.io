@@ -19,7 +19,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     <link rel="stylesheet" type="text/css" href="../../backend/css/font.css">
     <link rel="stylesheet" href="../../backend/vendor/sweetalert2/sweetalert2.min.css">
     <script src="../../backend/vendor/sweetalert2/sweetalert2.min.js"></script>
-    <link rel="stylesheet" href="../../backend/js/fullcalendar/fullcalendar.min.css">
+    <link href='../../backend/css/fullcalendar.css' rel='stylesheet' />
     <title>MEDIDATA - CALENDARIO DE FERIADOS</title>
 </head>
 <body>
@@ -47,7 +47,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
     
     <script src="../../backend/js/jquery.min.js"></script>
     <script src="../../backend/js/moment.min.js"></script>
-    <script src="../../backend/js/fullcalendar/fullcalendar.min.js"></script>
+    <script src="../../backend/js/fullcalendar/fullcalendar.js"></script>
     <script src="../../backend/js/fullcalendar/locale/es.js"></script>
 
     <script>

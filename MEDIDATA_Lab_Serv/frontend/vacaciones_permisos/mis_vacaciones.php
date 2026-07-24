@@ -170,6 +170,7 @@
 
     <script>
     let diasDisponiblesTotales = 0;
+    let calcDiasReqSeq = 0; // controla respuestas AJAX fuera de orden en el cálculo de días
 
     const userId = <?php echo $_SESSION['id']; ?>;
 
@@ -366,28 +367,38 @@ $(document).ready(function() {
         if(start && end) {
             let d1 = new Date(start);
             let d2 = new Date(end);
-            
+
             if(d2 < d1) {
                 $('#days_amount').val(0);
                 $('#ui_solicitados').text(0);
                 $('#ui_saldo').text(diasDisponiblesTotales);
                 return;
             }
-            
-            let diffTime = Math.abs(d2 - d1);
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el día de fin
-            
-            $('#days_amount').val(diffDays);
-            $('#ui_solicitados').text(diffDays);
-            
-            let saldo = diasDisponiblesTotales - diffDays;
-            $('#ui_saldo').text(saldo.toFixed(1));
 
-            if (saldo < 0) {
-                $('#ui_saldo').css('color', 'red');
-            } else {
-                $('#ui_saldo').css('color', 'var(--blue)');
-            }
+            // Los días se calculan en el servidor: sólo cuenta días laborables según el
+            // horario activo del colaborador y excluye feriados (p. ej. no cuenta domingos).
+            calcDiasReqSeq++;
+            const miReq = calcDiasReqSeq;
+            $.getJSON('../../backend/registros/vacaciones_permisos/fetch_dias_habiles.php', {
+                start_date: start,
+                end_date: end
+            }, function(res) {
+                // Ignorar respuestas fuera de orden (si el usuario siguió cambiando fechas)
+                if (miReq !== calcDiasReqSeq) return;
+                if (res.error) {
+                    $('#days_amount').val('');
+                    $('#ui_solicitados').text('0');
+                    return;
+                }
+
+                let diffDays = parseFloat(res.days) || 0;
+                $('#days_amount').val(diffDays);
+                $('#ui_solicitados').text(diffDays);
+
+                let saldo = diasDisponiblesTotales - diffDays;
+                $('#ui_saldo').text(saldo.toFixed(1));
+                $('#ui_saldo').css('color', saldo < 0 ? 'red' : 'var(--blue)');
+            });
         }
     }
 
