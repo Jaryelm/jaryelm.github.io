@@ -34,8 +34,8 @@ try {
 
     // Tipos de ausencia (para el filtro por tipo de permiso).
     $tipos = [];
-    if (isset($connect_hr_leaves) && $connect_hr_leaves) {
-        $tipos = $connect_hr_leaves->query(
+    if (isset($connect) && $connect) {
+        $tipos = $connect->query(
             "SELECT type_id, name, category FROM hr_absence_types WHERE status = 1 ORDER BY name ASC"
         )->fetchAll(PDO::FETCH_ASSOC);
     }

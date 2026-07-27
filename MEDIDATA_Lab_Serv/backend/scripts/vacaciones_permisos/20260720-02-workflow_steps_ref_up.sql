@@ -1,5 +1,5 @@
 -- Migration UP
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 ALTER TABLE `hr_approval_workflow_steps`
 CHANGE COLUMN `approver_ref_id` `approver_role_name` VARCHAR(100) DEFAULT NULL COMMENT 'Stores string role if approver_type is Specific_Role';

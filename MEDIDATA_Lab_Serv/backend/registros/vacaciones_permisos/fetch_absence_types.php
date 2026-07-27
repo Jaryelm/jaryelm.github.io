@@ -7,7 +7,7 @@ try {
     $pdo = $connect;
     
     // Traer tipos activos
-    $stmt = $pdo->query("SELECT type_id, name, category, deducts_vacation, requires_document as requires_proof FROM medic9ue_hr_leaves.hr_absence_types WHERE status = 1 ORDER BY name ASC");
+    $stmt = $pdo->query("SELECT type_id, name, category, deducts_vacation, requires_document as requires_proof FROM hr_absence_types WHERE status = 1 ORDER BY name ASC");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     
 } catch (Throwable $e) {

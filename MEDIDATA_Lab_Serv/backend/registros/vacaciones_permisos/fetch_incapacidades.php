@@ -8,10 +8,10 @@ require_once '../../bd/Conexion.php';
 header('Content-Type: application/json');
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception("Sin conexión a BD.");
+    if (!isset($connect) || !$connect) throw new Exception("Sin conexión a BD.");
     $user_id = (int) ($_SESSION['id'] ?? 0);
 
-    $stmt = $connect_hr_leaves->prepare("
+    $stmt = $connect->prepare("
         SELECT r.request_id, r.start_date, r.end_date, r.days_amount, r.request_status,
                r.issuing_institution, r.medical_leave_number, t.name AS type_name
         FROM hr_absence_requests r

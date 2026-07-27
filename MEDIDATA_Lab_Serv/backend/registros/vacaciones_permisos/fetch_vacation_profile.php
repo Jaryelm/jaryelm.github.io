@@ -15,7 +15,7 @@ if (!$user_id) {
 }
 
 try {
-    if (!isset($connect_hr_leaves)) throw new Exception("Sin conexión a BD de hojas.");
+    if (!isset($connect)) throw new Exception("Sin conexión a BD de hojas.");
     
     // Fetch Employee Base Data from main DB
     // Assuming staff_administrative and users structure
@@ -56,7 +56,7 @@ try {
     $emp['antiguedad'] = $antiguedad_diff->y . ' años, ' . $antiguedad_diff->m . ' meses';
     
     // Fetch vacation profile
-    $stmt_prof = $connect_hr_leaves->prepare("SELECT new_vacations_date, calculation_start_date FROM hr_vacation_profile WHERE user_id = ?");
+    $stmt_prof = $connect->prepare("SELECT new_vacations_date, calculation_start_date FROM hr_vacation_profile WHERE user_id = ?");
     $stmt_prof->execute([$user_id]);
     $prof = $stmt_prof->fetch(PDO::FETCH_ASSOC);
     
@@ -68,7 +68,7 @@ try {
     $periodo_vacacional = $per_start_year . ' - ' . $per_next_year;
     
     // Fetch aggregated data from Kardex
-    $stmt_kardex = $connect_hr_leaves->prepare("
+    $stmt_kardex = $connect->prepare("
         SELECT 
             SUM(CASE WHEN transaction_type IN ('Annual_Accrual', 'Manual_HR_Adjustment') THEN affected_days ELSE 0 END) as dias_otorgados,
             SUM(CASE WHEN transaction_type = 'Vacation_Consumption' THEN ABS(affected_days) ELSE 0 END) as dias_disfrutados,

@@ -14,7 +14,7 @@ if (!isset($_SESSION['id'])) {
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception('Sin conexión.');
+    if (!isset($connect) || !$connect) throw new Exception('Sin conexión.');
 
     $uid = (int) $_SESSION['id'];
     $isAdminHr = in_array($_SESSION['rol'] ?? '', ['Administrador', 'Recursos_Humanos'], true);
@@ -54,7 +54,7 @@ try {
         $sql .= " AND r.user_id IN ($in)";
         $params = $equipo;
     }
-    $stmt = $connect_hr_leaves->prepare($sql);
+    $stmt = $connect->prepare($sql);
     $stmt->execute($params);
 
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -82,7 +82,7 @@ try {
 
     // Feriados.
     try {
-        foreach ($connect_hr_leaves->query("SELECT holiday_id, `date`, description FROM hr_holiday_calendar")->fetchAll(PDO::FETCH_ASSOC) as $h) {
+        foreach ($connect->query("SELECT holiday_id, `date`, description FROM hr_holiday_calendar")->fetchAll(PDO::FETCH_ASSOC) as $h) {
             $events[] = [
                 'id'        => 'hol_' . $h['holiday_id'],
                 'title'     => 'Feriado: ' . $h['description'],

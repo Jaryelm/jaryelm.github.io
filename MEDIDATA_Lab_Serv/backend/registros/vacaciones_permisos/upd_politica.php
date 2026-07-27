@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (!isset($connect_hr_leaves)) throw new Exception("Sin conexión.");
+        if (!isset($connect)) throw new Exception("Sin conexión.");
         $id = $_POST['policy_id'] ?? '';
         $min = $_POST['min_seniority_years'] ?? '';
         $max = $_POST['max_seniority_years'] ?? '';
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($id === '' || $min === '' || $max === '' || $days === '') throw new Exception("Campos requeridos faltantes.");
         
-        $stmt = $connect_hr_leaves->prepare("UPDATE hr_vacation_policies SET min_seniority_years=?, max_seniority_years=?, granted_days=?, max_accumulated_days=?, status=? WHERE policy_id=?");
+        $stmt = $connect->prepare("UPDATE hr_vacation_policies SET min_seniority_years=?, max_seniority_years=?, granted_days=?, max_accumulated_days=?, status=? WHERE policy_id=?");
         $stmt->execute([$min, $max, $days, $accum, $status, $id]);
         echo json_encode(['status' => 'success', 'message' => 'Política actualizada correctamente.']);
     } catch (Throwable $e) {

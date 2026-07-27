@@ -8,8 +8,8 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 try {
-    if (!isset($connect_hr_leaves)) throw new Exception("Error de conexión a BD de hojas.");
-    $stmt = $connect_hr_leaves->query("SELECT * FROM hr_vacation_policies ORDER BY min_seniority_years ASC");
+    if (!isset($connect)) throw new Exception("Error de conexión a BD de hojas.");
+    $stmt = $connect->query("SELECT * FROM hr_vacation_policies ORDER BY min_seniority_years ASC");
     echo json_encode(['data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
 } catch (Throwable $e) {
     echo json_encode(['data' => [], 'error' => $e->getMessage()]);

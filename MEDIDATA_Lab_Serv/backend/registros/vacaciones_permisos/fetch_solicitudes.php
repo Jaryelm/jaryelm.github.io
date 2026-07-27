@@ -10,13 +10,12 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    global $connect_hr_leaves, $connect;
-    if (!$connect_hr_leaves) throw new Exception("No db connection to hr_leaves");
-    if (!$connect) throw new Exception("No db connection to main db");
+    global $connect;
+    if (!$connect) throw new Exception("No db connection");
     
     // As per user rules, referential integrity across DBs is handled at the application layer.
     // Fetch users manually or use a JOIN if the DB user has access to both.
-    // Assuming the DB user can query both medic9ue_hr_leaves and the main DB:
+    // Tablas hr_* centralizadas en la BD principal (medic9ue_medi_data):
     
     $stmt = $connect->prepare("
         SELECT
@@ -32,8 +31,8 @@ try {
             r.comments,
             r.request_status,
             r.created_at
-        FROM medic9ue_hr_leaves.hr_absence_requests r
-        LEFT JOIN medic9ue_hr_leaves.hr_absence_types t ON r.type_id = t.type_id
+        FROM hr_absence_requests r
+        LEFT JOIN hr_absence_types t ON r.type_id = t.type_id
         LEFT JOIN users u ON r.user_id = u.id
         ORDER BY r.created_at DESC
     ");

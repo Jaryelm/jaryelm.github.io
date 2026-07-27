@@ -4,9 +4,9 @@
  * Centraliza la generación de filas para que el endpoint JSON (fetch_reporte.php) y
  * el export a Word (export_reporte_word.php) usen exactamente la misma lógica.
  *
- * BDs separadas: los datos de la solicitud viven en medic9ue_hr_leaves ($connect_hr_leaves);
- * el nombre y departamento del colaborador viven en la BD principal / RRHH ($connect).
- * El cruce se hace en PHP (no se hace JOIN entre bases).
+ * Los datos de la solicitud (tablas hr_*) viven centralizados en la BD principal
+ * medic9ue_medi_data ($connect), junto con el nombre del colaborador; el departamento
+ * se resuelve vía esquema calificado (medic9ue_medi_rrhh_interviews.departaments).
  */
 
 if (!function_exists('medidata_reporte_departamentos_map')) {
@@ -102,7 +102,7 @@ if (!function_exists('medidata_reporte_generar')) {
      *
      * @return array{titulo:string, columns:array<int,array{title:string,data:string}>, rows:array<int,array<string,mixed>>}
      */
-    function medidata_reporte_generar(PDO $connect, PDO $connect_hr_leaves, array $f): array
+    function medidata_reporte_generar(PDO $connect, array $f): array
     {
         $tipo = $f['tipo_reporte'] ?? 'solicitudes';
         $empMap = medidata_reporte_empleados_map($connect);
@@ -121,7 +121,7 @@ if (!function_exists('medidata_reporte_generar')) {
                 GROUP BY user_id
             ";
             $rows = [];
-            foreach ($connect_hr_leaves->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $t) {
+            foreach ($connect->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $t) {
                 $uid = (int) $t['user_id'];
                 $emp = $empMap[$uid] ?? null;
                 if ($filtroUser !== null && $uid !== $filtroUser) continue;
@@ -187,7 +187,7 @@ if (!function_exists('medidata_reporte_generar')) {
         }
         $sql .= ' ORDER BY r.start_date DESC';
 
-        $stmt = $connect_hr_leaves->prepare($sql);
+        $stmt = $connect->prepare($sql);
         $stmt->execute($params);
 
         $rows = [];

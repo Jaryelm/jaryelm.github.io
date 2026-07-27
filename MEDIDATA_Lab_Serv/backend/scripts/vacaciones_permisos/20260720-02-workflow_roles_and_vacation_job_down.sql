@@ -1,4 +1,4 @@
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 -- 3. Drop Scheduled Job (Event)
 DROP EVENT IF EXISTS `job_update_annual_vacations`;

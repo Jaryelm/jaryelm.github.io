@@ -76,17 +76,9 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RECURSOS_BASE); ?>relojbio_usr.php">RELOJ BIOMÉTRICO</a></li>
                     </ul>
                 </li>
-            </ul>
-        </li>
-        <li>
-            <a href="#"><i class='bx bxs-calendar-event icon'></i> <span>VACACIONES Y PERMISOS</span><i class='bx bx-chevron-right icon-right'></i></a>
-            <ul class="side-dropdown">
-                <li><a href="../vacaciones_permisos/mis_vacaciones.php"><span>MIS SOLICITUDES</span></a></li>
-                <li><a href="../vacaciones_permisos/incapacidades.php"><span>MIS INCAPACIDADES</span></a></li>
-                <li><a href="../vacaciones_permisos/aprobaciones.php"><span>MIS APROBACIONES</span></a></li>
                 <?php if(isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Recursos_Humanos')): ?>
                 <li>
-                    <a href="#" class="new-submenu-link"><span>ADMINISTRACIÓN RRHH</span></a>
+                    <a href="#" class="new-submenu-link"><span>ADMINISTRACIÓN VACACIONES Y PERMISOS</span></a>
                     <ul class="new-side-dropdown">
                         <li><a href="../vacaciones_permisos/dashboard.php"><span>DASHBOARD</span></a></li>
                         <li><a href="../vacaciones_permisos/gestionar_solicitudes.php"><span>GESTIÓN DE SOLICITUDES</span></a></li>
@@ -103,6 +95,14 @@ if (!isset($MEDIDATA_RECURSOS_BASE)) {
                     </ul>
                 </li>
                 <?php endif; ?>
+            </ul>
+        </li>
+        <li>
+            <a href="#"><i class='bx bxs-calendar-event icon'></i> <span>VACACIONES Y PERMISOS</span><i class='bx bx-chevron-right icon-right'></i></a>
+            <ul class="side-dropdown">
+                <li><a href="../vacaciones_permisos/mis_vacaciones.php"><span>MIS SOLICITUDES</span></a></li>
+                <li><a href="../vacaciones_permisos/incapacidades.php"><span>MIS INCAPACIDADES</span></a></li>
+                <li><a href="../vacaciones_permisos/aprobaciones.php"><span>MIS APROBACIONES</span></a></li>
             </ul>
         </li>
         <li><a href="<?php echo htmlspecialchars($MEDIDATA_RRHH_BASE); ?>mostrar.php"><i class='bx bxs-info-circle icon'></i>ACERCA DE MEDIDATA</a></li>

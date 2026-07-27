@@ -1,5 +1,5 @@
 -- Migration DOWN
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 ALTER TABLE `hr_approval_workflow_steps`
 DROP COLUMN `approver_user_id`;

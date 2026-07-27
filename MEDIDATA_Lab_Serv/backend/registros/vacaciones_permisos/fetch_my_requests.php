@@ -9,8 +9,8 @@ if (!isset($_SESSION['id'])) {
 }
 
 try {
-    global $connect_hr_leaves;
-    if (!$connect_hr_leaves) throw new Exception("Sin conexión.");
+    global $connect;
+    if (!$connect) throw new Exception("Sin conexión.");
 
     $user_id = $_SESSION['id'];
 
@@ -43,7 +43,7 @@ try {
         ORDER BY r.created_at DESC
     ";
 
-    $stmt = $connect_hr_leaves->prepare($sql);
+    $stmt = $connect->prepare($sql);
     $stmt->execute([$user_id]);
     $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

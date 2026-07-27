@@ -9,7 +9,7 @@ if (!isset($_SESSION['rol'])) {
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception("Sin conexión.");
+    if (!isset($connect) || !$connect) throw new Exception("Sin conexión.");
 
     // Mapa id_user => nombre (una sola consulta a la BD principal)
     $nombres = [];
@@ -37,7 +37,7 @@ try {
         'Medical_Leave' => '#dc3545', // rojo
         'License'       => '#6f42c1', // morado
     ];
-    $stmt = $connect_hr_leaves->query("
+    $stmt = $connect->query("
         SELECT r.request_id, r.user_id, r.start_date, r.end_date, r.start_time, r.end_time, t.category, t.name AS type_name
         FROM hr_absence_requests r
         JOIN hr_absence_types t ON r.type_id = t.type_id
@@ -73,7 +73,7 @@ try {
 
     // Feriados (día completo, como fondo)
     try {
-        $qh = $connect_hr_leaves->query("SELECT holiday_id, `date`, description FROM hr_holiday_calendar");
+        $qh = $connect->query("SELECT holiday_id, `date`, description FROM hr_holiday_calendar");
         foreach ($qh->fetchAll(PDO::FETCH_ASSOC) as $h) {
             $events[] = [
                 'id'        => 'hol_' . $h['holiday_id'],

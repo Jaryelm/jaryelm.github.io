@@ -1,5 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `medic9ue_hr_leaves` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `medic9ue_hr_leaves`;
+-- Módulo Vacaciones y Permisos: todas las tablas hr_* viven CENTRALIZADAS en la
+-- base principal `medic9ue_medi_data` (no se crea ninguna base separada).
+USE `medic9ue_medi_data`;
 
 -- 1. Institutional Vacation Policies
 CREATE TABLE IF NOT EXISTS `hr_vacation_policies` (

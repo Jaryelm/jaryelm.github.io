@@ -30,16 +30,16 @@ try {
     ];
 
     if ($policy_id > 0) {
-        $oldStmt = $pdo->prepare("SELECT min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status FROM medic9ue_hr_leaves.hr_vacation_policies WHERE policy_id = ?");
+        $oldStmt = $pdo->prepare("SELECT min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status FROM hr_vacation_policies WHERE policy_id = ?");
         $oldStmt->execute([$policy_id]);
         $old_vals = $oldStmt->fetch(PDO::FETCH_ASSOC) ?: null;
 
-        $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_vacation_policies SET min_seniority_years = ?, max_seniority_years = ?, granted_days = ?, max_accumulated_days = ?, status = ? WHERE policy_id = ?");
+        $stmt = $pdo->prepare("UPDATE hr_vacation_policies SET min_seniority_years = ?, max_seniority_years = ?, granted_days = ?, max_accumulated_days = ?, status = ? WHERE policy_id = ?");
         $stmt->execute([$min_seniority_years, $max_seniority_years, $granted_days, $max_accumulated_days, $status, $policy_id]);
 
         medidata_audit_log($pdo, $actor, 'UPDATE_POLICY', 'hr_vacation_policies', $policy_id, $old_vals, $new_vals);
     } else {
-        $stmt = $pdo->prepare("INSERT INTO medic9ue_hr_leaves.hr_vacation_policies (min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO hr_vacation_policies (min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$min_seniority_years, $max_seniority_years, $granted_days, $max_accumulated_days, $status]);
 
         medidata_audit_log($pdo, $actor, 'CREATE_POLICY', 'hr_vacation_policies', $pdo->lastInsertId(), null, $new_vals);

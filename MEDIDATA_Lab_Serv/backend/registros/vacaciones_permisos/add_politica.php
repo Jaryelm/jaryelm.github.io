@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (!isset($connect_hr_leaves)) throw new Exception("Sin conexión.");
+        if (!isset($connect)) throw new Exception("Sin conexión.");
         $min = $_POST['min_seniority_years'] ?? '';
         $max = $_POST['max_seniority_years'] ?? '';
         $days = $_POST['granted_days'] ?? '';
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($min === '' || $max === '' || $days === '') throw new Exception("Campos requeridos faltantes.");
         
-        $stmt = $connect_hr_leaves->prepare("INSERT INTO hr_vacation_policies (min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $connect->prepare("INSERT INTO hr_vacation_policies (min_seniority_years, max_seniority_years, granted_days, max_accumulated_days, status) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$min, $max, $days, $accum, $status]);
         echo json_encode(['status' => 'success', 'message' => 'Política agregada correctamente.']);
     } catch (Throwable $e) {

@@ -14,7 +14,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception('Sin conexión a BD de ausencias.');
+    if (!isset($connect) || !$connect) throw new Exception('Sin conexión a BD de ausencias.');
 
     // Mapa id_user => nombre (BD principal) para mostrar el autor de cada acción.
     $nombres = [];
@@ -28,7 +28,7 @@ try {
         } catch (Throwable $e) { /* si falla el mapa, se usa el id */ }
     }
 
-    $rows = $connect_hr_leaves->query("
+    $rows = $connect->query("
         SELECT log_id, action_user_id, action_executed, affected_table, record_id, old_value, new_value, created_at
         FROM hr_absence_audit_log
         ORDER BY created_at DESC, log_id DESC

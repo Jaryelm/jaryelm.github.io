@@ -16,9 +16,9 @@ if (!$attachment_id) {
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception('Sin conexión');
+    if (!isset($connect) || !$connect) throw new Exception('Sin conexión');
 
-    $stmt = $connect_hr_leaves->prepare("
+    $stmt = $connect->prepare("
         SELECT a.original_filename, a.file_path, a.format, r.user_id
         FROM hr_absence_attachments a
         JOIN hr_absence_requests r ON a.request_id = r.request_id

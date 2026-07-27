@@ -639,14 +639,14 @@ if (!function_exists('medidata_rrhh_fetch_eventos_calendario')) {
                 }
             }
 
-            // Feriados (fuente única: módulo de Vacaciones y Permisos, BD medic9ue_hr_leaves).
-            // Se muestran en el calendario de RRHH porque estas áreas gestionan el talento
-            // humano y sus vacaciones. Aislado en su propio try para que un fallo aquí no
-            // afecte al resto de eventos del calendario.
+            // Feriados (fuente única: módulo de Vacaciones y Permisos, centralizado en la
+            // BD principal medic9ue_medi_data; se califica el esquema porque esta consulta
+            // corre sobre la conexión RRHH). Aislado en su propio try para que un fallo
+            // aquí no afecte al resto de eventos del calendario.
             try {
                 $stmtHolidays = $pdo->query("
                     SELECT holiday_id, `date`, description
-                    FROM medic9ue_hr_leaves.hr_holiday_calendar
+                    FROM medic9ue_medi_data.hr_holiday_calendar
                 ");
                 foreach ($stmtHolidays->fetchAll(PDO::FETCH_ASSOC) as $h) {
                     $d = substr((string) ($h['date'] ?? ''), 0, 10);

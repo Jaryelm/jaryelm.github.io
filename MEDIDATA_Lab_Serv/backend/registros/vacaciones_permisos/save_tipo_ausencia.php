@@ -37,7 +37,7 @@ try {
 
     if (empty($type_id)) {
         // Insert
-        $stmt = $pdo->prepare("INSERT INTO medic9ue_hr_leaves.hr_absence_types
+        $stmt = $pdo->prepare("INSERT INTO hr_absence_types
             (code, name, category, is_paid, deducts_vacation, requires_document, requires_special_auth, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document, $requires_special_auth]);
@@ -45,11 +45,11 @@ try {
         echo json_encode(['success' => true, 'message' => 'Tipo de ausencia agregado correctamente.']);
     } else {
         // Update
-        $oldStmt = $pdo->prepare("SELECT code, name, category, is_paid, deducts_vacation, requires_document, requires_special_auth FROM medic9ue_hr_leaves.hr_absence_types WHERE type_id = ?");
+        $oldStmt = $pdo->prepare("SELECT code, name, category, is_paid, deducts_vacation, requires_document, requires_special_auth FROM hr_absence_types WHERE type_id = ?");
         $oldStmt->execute([$type_id]);
         $old_vals = $oldStmt->fetch(PDO::FETCH_ASSOC) ?: null;
 
-        $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_absence_types
+        $stmt = $pdo->prepare("UPDATE hr_absence_types
             SET code = ?, name = ?, category = ?, is_paid = ?, deducts_vacation = ?, requires_document = ?, requires_special_auth = ?
             WHERE type_id = ?");
         $stmt->execute([$code, $name, $category, $is_paid, $deducts_vacation, $requires_document, $requires_special_auth, $type_id]);

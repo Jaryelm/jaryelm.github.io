@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception("Sin conexión a BD.");
+    if (!isset($connect) || !$connect) throw new Exception("Sin conexión a BD.");
 
     $request_id  = $_POST['request_id'] ?? '';
     $decision    = $_POST['decision'] ?? 'Approved'; // 'Approved' | 'Rejected'
@@ -28,19 +28,19 @@ try {
     if (!in_array($decision, ['Approved', 'Rejected'], true)) throw new Exception("Decisión inválida.");
 
     // Auditoría de la decisión (no debe abortar la operación si falla)
-    $audit = function ($action, $old, $new) use ($connect_hr_leaves, $approver_id, $request_id) {
+    $audit = function ($action, $old, $new) use ($connect, $approver_id, $request_id) {
         try {
-            $connect_hr_leaves->prepare("
+            $connect->prepare("
                 INSERT INTO hr_absence_audit_log (action_user_id, action_executed, affected_table, record_id, old_value, new_value)
                 VALUES (?, ?, 'hr_absence_requests', ?, ?, ?)
             ")->execute([$approver_id, $action, $request_id, $old, $new]);
         } catch (Throwable $e) { /* la auditoría no debe abortar la decisión */ }
     };
 
-    $connect_hr_leaves->beginTransaction();
+    $connect->beginTransaction();
 
     // Solicitud + tipo de ausencia (bloqueada para evitar decisiones concurrentes)
-    $stmt_req = $connect_hr_leaves->prepare("
+    $stmt_req = $connect->prepare("
         SELECT r.user_id, r.days_amount, r.request_status, r.start_time, r.end_time,
                r.workflow_id, r.current_step_order, r.is_cash_payout, t.category, t.deducts_vacation
         FROM hr_absence_requests r
@@ -71,8 +71,8 @@ try {
     // Paso actual del flujo (si el workflow tiene pasos configurados)
     $current_step = null;
     if ($workflow_id) {
-        $st = $connect_hr_leaves->prepare("
-            SELECT step_id, step_order
+        $st = $connect->prepare("
+            SELECT step_id, step_order, approver_type, approver_role_name
             FROM hr_approval_workflow_steps
             WHERE workflow_id = ? AND step_order = ?
             LIMIT 1
@@ -81,10 +81,22 @@ try {
         $current_step = $st->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Control por paso: el paso actual define quién puede resolverlo.
+    // - Department_Manager: el jefe del departamento del solicitante (validado arriba
+    //   por equipo) o RRHH/Admin desde la consola de gestión.
+    // - Specific_Role: solo ese rol (el Administrador siempre puede).
+    if ($current_step && $current_step['approver_type'] === 'Specific_Role') {
+        $rol_paso   = (string) ($current_step['approver_role_name'] ?? '');
+        $permitidos = ($rol_paso === 'Administrador') ? ['Administrador'] : array_unique(['Administrador', $rol_paso]);
+        if (!in_array($rol_actual, $permitidos, true)) {
+            throw new Exception("Este paso del flujo corresponde a: " . str_replace('_', ' ', $rol_paso ?: 'otro rol') . ".");
+        }
+    }
+
     // Registrar la decisión de este paso en el historial (sólo si existe un paso real:
     // hr_absence_approval_logs.step_id es NOT NULL con FK a los pasos del flujo).
     if ($current_step) {
-        $lg = $connect_hr_leaves->prepare("
+        $lg = $connect->prepare("
             INSERT INTO hr_absence_approval_logs
             (request_id, step_id, step_order, approver_user_id, decision_status, comments)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -101,13 +113,13 @@ try {
 
     // --- RECHAZO: termina el flujo inmediatamente ---
     if ($decision === 'Rejected') {
-        $connect_hr_leaves->prepare("
+        $connect->prepare("
             UPDATE hr_absence_requests SET request_status = 'Rejected', final_approver_id = ? WHERE request_id = ?
         ")->execute([$approver_id, $request_id]);
 
         $audit('REJECT_REQUEST', $req['request_status'], 'Rejected');
 
-        $connect_hr_leaves->commit();
+        $connect->commit();
         echo json_encode(['status' => 'success', 'message' => 'Solicitud rechazada correctamente.']);
         exit;
     }
@@ -115,7 +127,7 @@ try {
     // --- APROBACIÓN: ¿hay un paso siguiente? ---
     $next_order = null;
     if ($workflow_id) {
-        $ns = $connect_hr_leaves->prepare("
+        $ns = $connect->prepare("
             SELECT MIN(step_order) AS next_order
             FROM hr_approval_workflow_steps
             WHERE workflow_id = ? AND step_order > ?
@@ -127,19 +139,19 @@ try {
 
     if ($next_order !== null) {
         // Avanzar al siguiente aprobador; la solicitud queda "En Proceso"
-        $connect_hr_leaves->prepare("
+        $connect->prepare("
             UPDATE hr_absence_requests SET request_status = 'In_Progress', current_step_order = ? WHERE request_id = ?
         ")->execute([$next_order, $request_id]);
 
         $audit('APPROVE_STEP', $req['request_status'], 'In_Progress (paso ' . $next_order . ')');
 
-        $connect_hr_leaves->commit();
+        $connect->commit();
         echo json_encode(['status' => 'success', 'message' => 'Paso aprobado. La solicitud avanzó al siguiente aprobador del flujo.', 'advanced' => true]);
         exit;
     }
 
     // --- Último paso (o flujo sin pasos): aprobación FINAL + Kardex ---
-    $connect_hr_leaves->prepare("
+    $connect->prepare("
         UPDATE hr_absence_requests SET request_status = 'Approved', final_approver_id = ? WHERE request_id = ?
     ")->execute([$approver_id, $request_id]);
 
@@ -159,7 +171,7 @@ try {
             }
         }
 
-        $connect_hr_leaves->prepare("
+        $connect->prepare("
             INSERT INTO hr_vacation_transactions
             (user_id, transaction_type, affected_days, description, request_id_ref)
             VALUES (?, ?, ?, ?, ?)
@@ -168,12 +180,12 @@ try {
 
     $audit('APPROVE_FINAL', $req['request_status'], 'Approved');
 
-    $connect_hr_leaves->commit();
+    $connect->commit();
     echo json_encode(['status' => 'success', 'message' => 'Solicitud aprobada por completo (días rebajados si aplica).', 'completed' => true]);
 
 } catch (Throwable $e) {
-    if (isset($connect_hr_leaves) && $connect_hr_leaves instanceof PDO && $connect_hr_leaves->inTransaction()) {
-        $connect_hr_leaves->rollBack();
+    if (isset($connect) && $connect instanceof PDO && $connect->inTransaction()) {
+        $connect->rollBack();
     }
     echo json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
 }

@@ -33,7 +33,6 @@ try {
 
     $result = medidata_absence_count_working_days(
         $connect,
-        $connect_hr_leaves ?? null,
         $user_id,
         $start_date,
         $end_date

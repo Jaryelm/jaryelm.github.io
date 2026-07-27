@@ -22,7 +22,7 @@ try {
 
     $new_status = ($current_status == 1) ? 0 : 1;
 
-    $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_absence_types SET status = ? WHERE type_id = ?");
+    $stmt = $pdo->prepare("UPDATE hr_absence_types SET status = ? WHERE type_id = ?");
     $stmt->execute([$new_status, $type_id]);
 
     medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'TOGGLE_ABSENCE_TYPE', 'hr_absence_types', $type_id, ['status' => (int) $current_status], ['status' => $new_status]);

@@ -10,8 +10,8 @@
  * (si el horario no incluye domingo) ni los feriados que caigan en el rango.
  *
  * Requiere:
- *   - $connect            (BD principal: staff_* / doctor / nurse y, vía esquema calificado, schedules)
- *   - $connect_hr_leaves  (BD de ausencias: hr_holiday_calendar)  — opcional
+ *   - $connect  (BD principal medic9ue_medi_data: staff_* / doctor / nurse, las tablas hr_*
+ *               centralizadas del módulo y, vía esquema calificado, schedules)
  */
 
 require_once __DIR__ . '/schedule_lib.php';
@@ -86,13 +86,13 @@ if (!function_exists('medidata_absence_holiday_set')) {
      * Feriados dentro del rango [start,end] como mapa 'Y-m-d' => true.
      * Si la conexión/tabla no está disponible, devuelve vacío (no bloquea el cálculo).
      */
-    function medidata_absence_holiday_set(?PDO $connect_hr_leaves, string $start_date, string $end_date): array
+    function medidata_absence_holiday_set(?PDO $connect, string $start_date, string $end_date): array
     {
-        if (!$connect_hr_leaves) {
+        if (!$connect) {
             return [];
         }
         try {
-            $stmt = $connect_hr_leaves->prepare(
+            $stmt = $connect->prepare(
                 "SELECT `date` FROM hr_holiday_calendar WHERE `date` BETWEEN ? AND ?"
             );
             $stmt->execute([$start_date, $end_date]);
@@ -115,9 +115,9 @@ if (!function_exists('medidata_absence_medical_leave_set')) {
      *
      * @return array<string,bool>
      */
-    function medidata_absence_medical_leave_set(?PDO $connect_hr_leaves, int $user_id, string $start_date, string $end_date, ?int $exclude_request_id = null): array
+    function medidata_absence_medical_leave_set(?PDO $connect, int $user_id, string $start_date, string $end_date, ?int $exclude_request_id = null): array
     {
-        if (!$connect_hr_leaves) {
+        if (!$connect) {
             return [];
         }
         try {
@@ -133,7 +133,7 @@ if (!function_exists('medidata_absence_medical_leave_set')) {
                 $sql .= " AND r.request_id <> ?";
                 $params[] = $exclude_request_id;
             }
-            $stmt = $connect_hr_leaves->prepare($sql);
+            $stmt = $connect->prepare($sql);
             $stmt->execute($params);
 
             $set = [];
@@ -169,7 +169,6 @@ if (!function_exists('medidata_absence_count_working_days')) {
      */
     function medidata_absence_count_working_days(
         PDO $connect,
-        ?PDO $connect_hr_leaves,
         int $user_id,
         string $start_date,
         string $end_date,
@@ -180,10 +179,10 @@ if (!function_exists('medidata_absence_count_working_days')) {
         $schedule_id  = medidata_absence_resolve_schedule_id($connect, $user_id);
         $working_set  = $schedule_id ? medidata_absence_working_weekday_set($connect, $schedule_id) : [];
         $has_schedule = $schedule_id !== null && !empty($working_set);
-        $holiday_set  = medidata_absence_holiday_set($connect_hr_leaves, $start_date, $end_date);
+        $holiday_set  = medidata_absence_holiday_set($connect, $start_date, $end_date);
         // Días cubiertos por una incapacidad ya registrada: se omiten del cómputo de
         // vacaciones (el sistema recalcula omitiendo el período de incapacidad).
-        $medical_set  = medidata_absence_medical_leave_set($connect_hr_leaves, $user_id, $start_date, $end_date, $exclude_request_id);
+        $medical_set  = medidata_absence_medical_leave_set($connect, $user_id, $start_date, $end_date, $exclude_request_id);
 
         $cursor = strtotime($start_date);
         $limit  = strtotime($end_date);

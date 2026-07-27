@@ -1,6 +1,6 @@
 -- Revert UP migration by dropping the newly created tables
 
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 DROP TABLE IF EXISTS `hr_absence_audit_log`;
 DROP TABLE IF EXISTS `hr_absence_attachments`;
@@ -15,5 +15,5 @@ DROP TABLE IF EXISTS `hr_approval_workflow_steps`;
 DROP TABLE IF EXISTS `hr_approval_workflows`;
 DROP TABLE IF EXISTS `hr_vacation_policies`;
 
--- Optionally, you can drop the entire database if it's exclusively for this module:
--- DROP DATABASE IF EXISTS `medic9ue_hr_leaves`;
+-- NOTA: las tablas del módulo viven en la base principal `medic9ue_medi_data`;
+-- NUNCA eliminar la base de datos.

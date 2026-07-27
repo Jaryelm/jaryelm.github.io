@@ -49,6 +49,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripci&oacute;n</th>
+                            <th>Departamentos</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -86,7 +87,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                     { data: 'workflow_id' },
                     { data: 'name' },
                     { data: 'description' },
-                                                            { 
+                    {
+                        data: 'departments_label',
+                        render: function(data) {
+                            return data && data.length ? data : '<span style="color:#999;">Sin asignar</span>';
+                        }
+                    },
+                                                            {
                         data: 'status',
                         render: function(data, type, row) {
                             const isChecked = data == 1 ? 'checked' : '';
@@ -126,29 +133,64 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             });
         });
 
-        function agregarFlujo() {
+        // El flujo se asigna por DEPARTAMENTO del solicitante: cada departamento puede
+        // tener a lo sumo un flujo y el paso "Jefe de Departamento" lo resuelve el jefe
+        // asignado en la vista "Jefes de Departamento".
+        function cargarDepartamentos() {
+            return $.getJSON('../../backend/registros/vacaciones_permisos/fetch_departamentos_jefes.php')
+                .then(res => res.data || []);
+        }
+
+        function deptOptionsHtml(departamentos, seleccionados) {
+            const sel = (seleccionados || []).map(Number);
+            return departamentos.map(d => {
+                const marcado = sel.includes(Number(d.id)) ? 'selected' : '';
+                const jefe = d.jefe_nombre ? ` (Jefe: ${d.jefe_nombre})` : ' (sin jefe asignado)';
+                return `<option value="${d.id}" ${marcado}>${d.name}${jefe}</option>`;
+            }).join('');
+        }
+
+        function abrirModalFlujo(titulo, row, departamentos) {
+            const selDeps = row ? (row.departments || []).map(d => d.id) : [];
             Swal.fire({
-                title: 'Agregar Flujo',
+                title: titulo,
                 html: `
+                    ${row ? `<input type="hidden" id="workflow_id" value="${row.workflow_id}">` : ''}
                     <div class="form-group" style="text-align: left; margin-bottom: 10px;">
                         <label>Nombre del Flujo</label>
-                        <input type="text" id="workflow_name" class="swal2-input" style="width: 90%; margin: 5px auto; display: block;" placeholder="Ej. Aprobaci&oacute;n Regular">
+                        <input type="text" id="workflow_name" class="swal2-input" style="width: 90%; margin: 5px auto; display: block;" placeholder="Ej. Aprobaci&oacute;n Regular" value="${row ? (row.name || '').replace(/"/g, '&quot;') : ''}">
+                    </div>
+                    <div class="form-group" style="text-align: left; margin-bottom: 10px;">
+                        <label>Descripción</label>
+                        <textarea id="workflow_desc" class="swal2-textarea" style="width: 90%; margin: 5px auto; display: block;" placeholder="Descripción...">${row ? (row.description || '') : ''}</textarea>
                     </div>
                     <div class="form-group" style="text-align: left;">
-                        <label>Descripción</label>
-                        <textarea id="workflow_desc" class="swal2-textarea" style="width: 90%; margin: 5px auto; display: block;" placeholder="Descripción..."></textarea>
+                        <label>Departamentos que usan este flujo</label>
+                        <select id="workflow_depts" multiple size="8" class="swal2-select" style="width: 90%; margin: 5px auto; display: block;">
+                            ${deptOptionsHtml(departamentos, selDeps)}
+                        </select>
+                        <small style="display:block; color:#777; margin-top:4px;">
+                            Mantén presionada la tecla Ctrl para seleccionar varios. Un departamento
+                            solo puede pertenecer a un flujo; el aprobador "Jefe de Departamento" es
+                            el jefe asignado a cada departamento.
+                        </small>
                     </div>
                 `,
+                width: '640px',
                 showCancelButton: true,
                 confirmButtonText: 'Guardar',
                 cancelButtonText: 'Cancelar',
                 preConfirm: () => {
                     const name = $('#workflow_name').val();
                     const desc = $('#workflow_desc').val();
+                    const depts = ($('#workflow_depts').val() || []).map(Number);
                     if (!name) {
                         Swal.showValidationMessage('El nombre es requerido');
+                        return false;
                     }
-                    return { name: name, description: desc };
+                    const payload = { name: name, description: desc, department_ids: depts };
+                    if (row) payload.id = $('#workflow_id').val();
+                    return payload;
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -157,37 +199,16 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
             });
         }
 
+        function agregarFlujo() {
+            cargarDepartamentos()
+                .then(deps => abrirModalFlujo('Agregar Flujo', null, deps))
+                .catch(() => Swal.fire('Error', 'No se pudo cargar la lista de departamentos', 'error'));
+        }
+
         function editarFlujo(row) {
-            Swal.fire({
-                title: 'Editar Flujo',
-                html: `
-                    <input type="hidden" id="workflow_id" value="${row.workflow_id}">
-                    <div class="form-group" style="text-align: left; margin-bottom: 10px;">
-                        <label>Nombre del Flujo</label>
-                        <input type="text" id="workflow_name" class="swal2-input" style="width: 90%; margin: 5px auto; display: block;" value="${row.name}">
-                    </div>
-                    <div class="form-group" style="text-align: left;">
-                        <label>Descripción</label>
-                        <textarea id="workflow_desc" class="swal2-textarea" style="width: 90%; margin: 5px auto; display: block;">${row.description || ''}</textarea>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Guardar',
-                cancelButtonText: 'Cancelar',
-                preConfirm: () => {
-                    const id = $('#workflow_id').val();
-                    const name = $('#workflow_name').val();
-                    const desc = $('#workflow_desc').val();
-                    if (!name) {
-                        Swal.showValidationMessage('El nombre es requerido');
-                    }
-                    return { id: id, name: name, description: desc };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    guardarFlujo(result.value);
-                }
-            });
+            cargarDepartamentos()
+                .then(deps => abrirModalFlujo('Editar Flujo', row, deps))
+                .catch(() => Swal.fire('Error', 'No se pudo cargar la lista de departamentos', 'error'));
         }
 
         function guardarFlujo(data) {
@@ -242,26 +263,24 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                 }
             });
         }
-                                            let globalUsersList = [];
-        
         function configurarPasos(id, name) {
             $.getJSON('../../backend/registros/vacaciones_permisos/fetch_workflow_steps.php?id=' + id, function(res) {
-                globalUsersList = res.users || [];
                 let stepsHtml = '';
                 if(res.data) {
-                    res.data.forEach(function(step, index) {
-                        let val = step.approver_type === 'Specific_Role' ? (step.approver_role_name || '') : 
-                                  (step.approver_type === 'Specific_User' ? (step.approver_user_id || '') : '');
+                    res.data.forEach(function(step) {
+                        let val = step.approver_type === 'Specific_Role' ? (step.approver_role_name || '') : '';
                         stepsHtml += getStepRowHtml(step.approver_type, val);
                     });
                 }
-                
+
                 Swal.fire({
                     title: 'Secuencia de Aprobación',
                     html: `
                           <div style="text-align:center; margin-bottom:15px; color:#555; font-size:14px;">
                               Flujo: <b>${name}</b><br>
-                              <small>Arrastra los pasos desde el icono izquierdo para reordenarlos.</small>
+                              <small>Arrastra los pasos desde el icono izquierdo para reordenarlos.
+                              El paso "Jefe de Departamento" lo resuelve el jefe asignado al
+                              departamento del solicitante.</small>
                           </div>
                         <div id="steps-container">
                             ${stepsHtml}
@@ -289,40 +308,23 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
                         }
                     },
                     preConfirm: () => {
-                        let valid = true;
                         const steps = [];
                         $('#steps-container .step-row').each(function(index) {
                             const target = $(this).find('.step-target').val();
                             let type = target;
                             let val = '';
-                            
-                            if (target === 'Specific_User') {
-                                val = $(this).find('.step-val-user').val();
-                                if(!val) {
-                                    valid = false;
-                                    Swal.showValidationMessage('Debe seleccionar un empleado para el paso ' + (index + 1));
-                                }
-                            } else if (target === 'Specific_Role') {
-                                val = $(this).find('.step-val-text').val();
-                                if(!val) {
-                                    valid = false;
-                                    Swal.showValidationMessage('Debe ingresar un rol para el paso ' + (index + 1));
-                                }
-                            } else if (target === 'Role_Recursos_Humanos') {
+
+                            if (target === 'Role_Recursos_Humanos') {
                                 type = 'Specific_Role';
                                 val = 'Recursos_Humanos';
                             } else if (target === 'Role_Administrador') {
                                 type = 'Specific_Role';
                                 val = 'Administrador';
                             }
-                            
+
                             if(type) steps.push({ order: index + 1, type: type, value: val });
                         });
-                        
-                        if (!valid) {
-                            return false;
-                        }
-                        
+
                         return { workflow_id: id, steps: steps };
                     }
                 }).then((result) => {
@@ -349,58 +351,29 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
         function getStepRowHtml(type = '', val = '') {
             const isHR = (type === 'Specific_Role' && val === 'Recursos_Humanos');
             const isAdmin = (type === 'Specific_Role' && val === 'Administrador');
-            const isOtherRole = (type === 'Specific_Role' && !isHR && !isAdmin);
-            
-            let userOptions = '<option value="">-- Seleccionar --</option>';
-            globalUsersList.forEach(u => {
-                const sel = (val == u.id) ? 'selected' : '';
-                userOptions += `<option value="${u.id}" ${sel}>${u.name} (${u.rol})</option>`;
-            });
-            
+            const isDeptManager = !isHR && !isAdmin; // por defecto: Jefe de Departamento
+
             return `
                   <div class="step-row">
                       <div class="drag-handle" title="Arrastrar para ordenar">
                           <i class='bx bx-menu'></i>
                       </div>
                       <div class="step-fields">
-                          <select class="step-target rrhh-no-margin" onchange="toggleStepVal(this)">
-                              <option value="Direct_Manager" ${type=='Direct_Manager'?'selected':''}>Jefe Inmediato</option>
+                          <select class="step-target rrhh-no-margin">
+                              <option value="Department_Manager" ${isDeptManager?'selected':''}>Jefe de Departamento (del solicitante)</option>
                               <option value="Role_Recursos_Humanos" ${isHR?'selected':''}>Recursos Humanos</option>
                               <option value="Role_Administrador" ${isAdmin?'selected':''}>Administrador</option>
-                              <option value="Department_Manager" ${type=='Department_Manager'?'selected':''}>Jefe de Departamento</option>
-                              <option value="Specific_Role" ${isOtherRole?'selected':''}>Otro Rol...</option>
-                              <option value="Specific_User" ${type=='Specific_User'?'selected':''}>Empleado Específico</option>
                           </select>
-                          <select class="step-val step-val-user rrhh-no-margin" style="display:${type=='Specific_User'?'block':'none'};">
-                              ${userOptions}
-                          </select>
-                          <input type="text" class="step-val step-val-text rrhh-no-margin" placeholder="Ej. Encargado Compras" value="${type=='Specific_User' ? '' : val}" style="display:${isOtherRole?'block':'none'};">
                       </div>
                       <i class='bx bx-trash step-del' onclick="$(this).closest('.step-row').remove();" title="Eliminar Paso"></i>
                   </div>
             `;
         }
-        
+
         function addStepRow() {
             $('#steps-container').append(getStepRowHtml());
             const container = $('#steps-container');
             container.scrollTop(container[0].scrollHeight);
-        }
-        
-        function toggleStepVal(selectObj) {
-            const val = $(selectObj).val();
-            const inputUser = $(selectObj).siblings('.step-val-user');
-            const inputText = $(selectObj).siblings('.step-val-text');
-            if(val === 'Specific_Role') {
-                inputUser.hide();
-                inputText.show();
-            } else if (val === 'Specific_User') {
-                inputText.hide();
-                inputUser.show();
-            } else {
-                inputUser.hide();
-                inputText.hide();
-            }
         }
         
         function guardarPasos(data) {

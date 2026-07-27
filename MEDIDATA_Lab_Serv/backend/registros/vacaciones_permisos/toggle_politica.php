@@ -19,13 +19,13 @@ try {
 
     global $connect; if (!$connect) throw new Exception("No db connection"); $pdo = $connect;
 
-    $stmt = $pdo->prepare("SELECT status FROM medic9ue_hr_leaves.hr_vacation_policies WHERE policy_id = ?");
+    $stmt = $pdo->prepare("SELECT status FROM hr_vacation_policies WHERE policy_id = ?");
     $stmt->execute([$policy_id]);
     $current = $stmt->fetchColumn();
 
     $new_status = ($current == 1) ? 0 : 1;
 
-    $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_vacation_policies SET status = ? WHERE policy_id = ?");
+    $stmt = $pdo->prepare("UPDATE hr_vacation_policies SET status = ? WHERE policy_id = ?");
     $stmt->execute([$new_status, $policy_id]);
 
     medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'TOGGLE_POLICY', 'hr_vacation_policies', $policy_id, ['status' => $current], ['status' => $new_status]);

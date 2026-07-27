@@ -1,6 +1,6 @@
 <?php
 /**
- * Alta / edición de un feriado. Fuente única: medic9ue_hr_leaves.hr_holiday_calendar
+ * Alta / edición de un feriado. Fuente única: hr_holiday_calendar
  * (columna `date` es UNIQUE). Al guardarse se refleja automáticamente en los
  * calendarios del sistema que consumen fetch_calendario.php.
  */
@@ -50,14 +50,14 @@ try {
 
     if (!empty($holiday_id)) {
         // Edición: cada fila es un único día. Se edita ese día puntual.
-        $chk = $pdo->prepare("SELECT holiday_id FROM medic9ue_hr_leaves.hr_holiday_calendar WHERE `date` = ?");
+        $chk = $pdo->prepare("SELECT holiday_id FROM hr_holiday_calendar WHERE `date` = ?");
         $chk->execute([$date]);
         $existente = $chk->fetch(PDO::FETCH_ASSOC);
         if ($existente && (int) $existente['holiday_id'] !== (int) $holiday_id) {
             echo json_encode(['success' => false, 'message' => 'Ya existe otro feriado registrado en esa fecha.']);
             exit;
         }
-        $stmt = $pdo->prepare("UPDATE medic9ue_hr_leaves.hr_holiday_calendar SET `date` = ?, description = ? WHERE holiday_id = ?");
+        $stmt = $pdo->prepare("UPDATE hr_holiday_calendar SET `date` = ?, description = ? WHERE holiday_id = ?");
         $stmt->execute([$date, $description, $holiday_id]);
         medidata_audit_log($pdo, (int) ($_SESSION['id'] ?? 0), 'UPDATE_HOLIDAY', 'hr_holiday_calendar', $holiday_id, null, ['date' => $date, 'description' => $description]);
         echo json_encode(['success' => true, 'message' => 'Feriado actualizado correctamente.']);
@@ -75,8 +75,8 @@ try {
     }
 
     // Insertar sólo los días que aún no existan, sin sobrescribir descripciones previas.
-    $ins  = $pdo->prepare("INSERT INTO medic9ue_hr_leaves.hr_holiday_calendar (`date`, description) VALUES (?, ?)");
-    $chkD = $pdo->prepare("SELECT 1 FROM medic9ue_hr_leaves.hr_holiday_calendar WHERE `date` = ?");
+    $ins  = $pdo->prepare("INSERT INTO hr_holiday_calendar (`date`, description) VALUES (?, ?)");
+    $chkD = $pdo->prepare("SELECT 1 FROM hr_holiday_calendar WHERE `date` = ?");
 
     $agregados = 0;
     $omitidos  = 0;

@@ -1,6 +1,6 @@
 -- Migration DOWN: revertir la categoría 'License'
 -- (Reasignar antes cualquier tipo con category='License' a 'Permission' para no perder filas.)
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 UPDATE `hr_absence_types` SET `category` = 'Permission' WHERE `category` = 'License';
 

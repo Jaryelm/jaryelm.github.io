@@ -15,7 +15,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 
 try {
     if (!isset($connect) || !$connect) throw new Exception('Sin conexión a BD principal.');
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) throw new Exception('Sin conexión a BD de ausencias.');
+    if (!isset($connect) || !$connect) throw new Exception('Sin conexión a BD de ausencias.');
 
     $filtros = [
         'tipo_reporte'    => $_GET['tipo_reporte']    ?? 'solicitudes',
@@ -27,7 +27,7 @@ try {
         'hasta'           => $_GET['hasta']           ?? '',
     ];
 
-    $rep = medidata_reporte_generar($connect, $connect_hr_leaves, $filtros);
+    $rep = medidata_reporte_generar($connect, $filtros);
     echo json_encode(['titulo' => $rep['titulo'], 'columns' => $rep['columns'], 'data' => $rep['rows']]);
 } catch (Throwable $e) {
     echo json_encode(['error' => 'Internal error: ' . $e->getMessage()]);

@@ -1,6 +1,6 @@
 -- Seed: tipos de permiso/incapacidad de ejemplo (RRHH puede ajustarlos luego en tipos_ausencia).
 -- INSERT IGNORE por `code` (único): no duplica si ya existen.
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 INSERT IGNORE INTO `hr_absence_types`
   (`code`, `name`, `category`, `is_paid`, `deducts_vacation`, `requires_document`, `requires_special_auth`, `status`)

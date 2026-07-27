@@ -10,13 +10,13 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    global $connect, $connect_hr_leaves;
-    if (!$connect || !$connect_hr_leaves) {
+    global $connect;
+    if (!$connect) {
         throw new Exception("Sin conexión a base de datos.");
     }
     
     // Obtener politicas
-    $stmt_pol = $connect_hr_leaves->prepare("SELECT * FROM hr_vacation_policies WHERE status = 1 ORDER BY min_seniority_years ASC");
+    $stmt_pol = $connect->prepare("SELECT * FROM hr_vacation_policies WHERE status = 1 ORDER BY min_seniority_years ASC");
     $stmt_pol->execute();
     $policies = $stmt_pol->fetchAll(PDO::FETCH_ASSOC);
     
@@ -48,18 +48,18 @@ try {
     $hoy = new DateTime();
     $hoy->setTime(0,0,0);
     
-    $stmt_insert_prof = $connect_hr_leaves->prepare("
+    $stmt_insert_prof = $connect->prepare("
         INSERT IGNORE INTO hr_vacation_profile (user_id, calculation_start_date, new_vacations_date)
         VALUES (?, ?, ?)
     ");
     
-    $stmt_insert_txn = $connect_hr_leaves->prepare("
+    $stmt_insert_txn = $connect->prepare("
         INSERT INTO hr_vacation_transactions (user_id, transaction_type, affected_days, description, transaction_date)
         VALUES (?, 'Manual_HR_Adjustment', ?, 'Saldo Inicial Retroactivo (Sincronización)', NOW())
     ");
     
     // Verificar si ya tiene transacciones (para no duplicar retroactivos)
-    $stmt_check_txn = $connect_hr_leaves->prepare("SELECT COUNT(*) FROM hr_vacation_transactions WHERE user_id = ?");
+    $stmt_check_txn = $connect->prepare("SELECT COUNT(*) FROM hr_vacation_transactions WHERE user_id = ?");
 
     foreach ($empleados as $emp) {
         $user_id = $emp['id_usuario'];
@@ -110,7 +110,7 @@ try {
                 $stmt_insert_txn->execute([$user_id, $dias_retroactivos]);
                 $dias_otorgados_totales += $dias_retroactivos;
                 // Auditar el ajuste de saldo (información sensible)
-                medidata_audit_log($connect_hr_leaves, (int) ($_SESSION['id'] ?? 0), 'BALANCE_ADJUSTMENT_SYNC', 'hr_vacation_transactions', $user_id, ['saldo_previo' => 0], ['affected_days' => $dias_retroactivos, 'motivo' => 'Saldo Inicial Retroactivo (Sincronización)']);
+                medidata_audit_log($connect, (int) ($_SESSION['id'] ?? 0), 'BALANCE_ADJUSTMENT_SYNC', 'hr_vacation_transactions', $user_id, ['saldo_previo' => 0], ['affected_days' => $dias_retroactivos, 'motivo' => 'Saldo Inicial Retroactivo (Sincronización)']);
             }
         }
         $procesados++;

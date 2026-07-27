@@ -53,6 +53,7 @@ if (!$__isAdminHr && !$__isJefe) {
                             <th>Fin</th>
                             <th>Días</th>
                             <th>Fecha Solicitud</th>
+                            <th>Paso Actual</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -86,6 +87,13 @@ if (!$__isAdminHr && !$__isJefe) {
                 { data: 'end_date' },
                 { data: 'days_amount' },
                 { data: 'created_at' },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        const estado = row.request_status === 'In_Progress' ? 'En proceso' : 'Pendiente';
+                        return row.current_step_label ? `${estado} — ${row.current_step_label}` : estado;
+                    }
+                },
                 {
                     data: null,
                     orderable: false,

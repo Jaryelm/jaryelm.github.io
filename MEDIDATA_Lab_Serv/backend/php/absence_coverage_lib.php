@@ -5,7 +5,7 @@
  * está cubierto por una ausencia o permiso APROBADO, para que el control de asistencia no lo
  * trate como falta o tardanza injustificada.
  *
- * Cruce entre BDs en PHP: las solicitudes viven en medic9ue_hr_leaves ($connect_hr_leaves);
+ * Las solicitudes viven centralizadas en la BD principal medic9ue_medi_data ($connect);
  * el vínculo con la marca es por user_id (= users.id, que a su vez resuelve uid_biometrico).
  */
 
@@ -27,9 +27,9 @@ if (!function_exists('medidata_absence_coverage_fetch')) {
      * @param int[] $userIds
      * @return array<int, array<int, array<string,mixed>>>  user_id => lista de ausencias aprobadas
      */
-    function medidata_absence_coverage_fetch(?PDO $connect_hr_leaves, array $userIds, string $desde, string $hasta): array
+    function medidata_absence_coverage_fetch(?PDO $connect, array $userIds, string $desde, string $hasta): array
     {
-        if (!$connect_hr_leaves) return [];
+        if (!$connect) return [];
         $userIds = array_values(array_unique(array_filter(array_map('intval', $userIds), fn($v) => $v > 0)));
         if (!$userIds) return [];
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) return [];
@@ -46,7 +46,7 @@ if (!function_exists('medidata_absence_coverage_fetch')) {
                   AND r.start_date <= ? AND r.end_date >= ?
             ";
             $params = array_merge($userIds, [$hasta, $desde]);
-            $stmt = $connect_hr_leaves->prepare($sql);
+            $stmt = $connect->prepare($sql);
             $stmt->execute($params);
 
             $map = [];

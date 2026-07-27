@@ -1,4 +1,4 @@
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 -- Añadir columna para guardar la jornada laboral del empleado al momento de pedir el permiso
 ALTER TABLE hr_absence_requests

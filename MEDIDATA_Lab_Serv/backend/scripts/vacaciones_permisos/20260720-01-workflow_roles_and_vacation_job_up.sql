@@ -1,4 +1,4 @@
-USE `medic9ue_hr_leaves`;
+USE `medic9ue_medi_data`;
 
 -- 1. Create table to map workflows to specific roles
 CREATE TABLE IF NOT EXISTS `hr_workflow_roles` (

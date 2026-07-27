@@ -4,6 +4,7 @@
 // cada paso y quién falta. El empleado sólo ve sus propias solicitudes; RRHH/Admin ve todas.
 require_once '../session_check.php';
 require_once '../../bd/Conexion.php';
+require_once '../../php/jefe_lib.php';
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['id'])) {
@@ -11,14 +12,19 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-function vp_hist_approver_label(array $s): string
+/**
+ * Etiqueta legible del aprobador de un paso. El paso "Jefe de Departamento" muestra,
+ * si está asignado, el nombre del jefe del departamento del SOLICITANTE.
+ */
+function vp_hist_approver_label(array $s, ?string $jefe_nombre): string
 {
     switch ($s['approver_type']) {
-        case 'Direct_Manager':     return 'Jefe Inmediato';
-        case 'Department_Manager': return 'Jefe de Departamento';
-        case 'Specific_Role':      return str_replace('_', ' ', (string) ($s['approver_role_name'] ?? 'Rol'));
-        case 'Specific_User':      return !empty($s['approver_user_name']) ? $s['approver_user_name'] : ('Usuario #' . (int) $s['approver_user_id']);
-        default:                   return (string) $s['approver_type'];
+        case 'Department_Manager':
+            return 'Jefe de Departamento' . ($jefe_nombre ? ' — ' . $jefe_nombre : '');
+        case 'Specific_Role':
+            return str_replace('_', ' ', (string) ($s['approver_role_name'] ?? 'Rol'));
+        default:
+            return (string) $s['approver_type'];
     }
 }
 
@@ -38,10 +44,10 @@ try {
         SELECT r.request_id, r.user_id, r.workflow_id, r.current_step_order, r.request_status,
                r.start_date, r.end_date, r.days_amount,
                u.name AS user_name, t.name AS type_name, w.name AS workflow_name
-        FROM medic9ue_hr_leaves.hr_absence_requests r
+        FROM hr_absence_requests r
         LEFT JOIN users u ON r.user_id = u.id
-        LEFT JOIN medic9ue_hr_leaves.hr_absence_types t ON r.type_id = t.type_id
-        LEFT JOIN medic9ue_hr_leaves.hr_approval_workflows w ON r.workflow_id = w.workflow_id
+        LEFT JOIN hr_absence_types t ON r.type_id = t.type_id
+        LEFT JOIN hr_approval_workflows w ON r.workflow_id = w.workflow_id
         WHERE r.request_id = ?
     ");
     $stmt->execute([$request_id]);
@@ -52,11 +58,15 @@ try {
     $status  = $req['request_status'];
     $current = (int) $req['current_step_order'];
 
+    // Jefe del departamento del solicitante (para etiquetar el paso "Jefe de Departamento")
+    $departamento_id = medidata_user_departamento($connect, (int) $req['user_id']);
+    $jefe            = $departamento_id ? medidata_departamento_jefe($connect, $departamento_id) : null;
+    $jefe_nombre     = $jefe['name'] ?? null;
+
     // Pasos del workflow
     $stmt = $connect->prepare("
-        SELECT s.step_id, s.step_order, s.approver_type, s.approver_role_name, s.approver_user_id, u.name AS approver_user_name
-        FROM medic9ue_hr_leaves.hr_approval_workflow_steps s
-        LEFT JOIN users u ON s.approver_user_id = u.id
+        SELECT s.step_id, s.step_order, s.approver_type, s.approver_role_name
+        FROM hr_approval_workflow_steps s
         WHERE s.workflow_id = ?
         ORDER BY s.step_order ASC
     ");
@@ -66,7 +76,7 @@ try {
     // Decisiones registradas (última por step_order)
     $stmt = $connect->prepare("
         SELECT l.step_order, l.decision_status, l.comments, l.created_at, l.approver_user_id, u.name AS approver_name
-        FROM medic9ue_hr_leaves.hr_absence_approval_logs l
+        FROM hr_absence_approval_logs l
         LEFT JOIN users u ON l.approver_user_id = u.id
         WHERE l.request_id = ?
         ORDER BY l.step_order ASC, l.created_at ASC
@@ -104,7 +114,7 @@ try {
 
         $steps[] = [
             'step_order' => $ord,
-            'label'      => vp_hist_approver_label($s),
+            'label'      => vp_hist_approver_label($s, $jefe_nombre),
             'state'      => $state,
             'by'         => $by,
             'at'         => $at,
@@ -115,7 +125,7 @@ try {
     // Documentos adjuntos de la solicitud
     $stmt = $connect->prepare("
         SELECT attachment_id, original_filename, format
-        FROM medic9ue_hr_leaves.hr_absence_attachments
+        FROM hr_absence_attachments
         WHERE request_id = ?
         ORDER BY attachment_id ASC
     ");
@@ -147,8 +157,8 @@ try {
         if ($dep) {
             $stmtOv = $connect->prepare("
                 SELECT s.nombre, r2.start_date, r2.end_date
-                FROM medic9ue_hr_leaves.hr_absence_requests r2
-                JOIN medic9ue_hr_leaves.hr_absence_types t2 ON r2.type_id = t2.type_id
+                FROM hr_absence_requests r2
+                JOIN hr_absence_types t2 ON r2.type_id = t2.type_id
                 JOIN ($staffUnion) s ON r2.user_id = s.id_user
                 WHERE t2.category = 'Vacation'
                   AND r2.request_status IN ('Approved', 'Pending', 'In_Progress')

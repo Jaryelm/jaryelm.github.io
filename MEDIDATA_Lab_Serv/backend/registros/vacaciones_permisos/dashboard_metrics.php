@@ -9,42 +9,42 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    if (!isset($connect_hr_leaves)) throw new Exception("Sin conexión.");
+    if (!isset($connect)) throw new Exception("Sin conexión.");
     $metrics = [];
 
     // a. Colaboradores actualmente de vacaciones
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Vacation' AND r.request_status = 'Approved' AND CURRENT_DATE BETWEEN r.start_date AND r.end_date");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Vacation' AND r.request_status = 'Approved' AND CURRENT_DATE BETWEEN r.start_date AND r.end_date");
     $metrics['vacaciones_activas'] = $stmt->fetchColumn();
 
     // a. Días de vacaciones pendientes por disfrutar (Sumatoria total de la empresa)
-    $stmt = $connect_hr_leaves->query("SELECT SUM(affected_days) as total FROM hr_vacation_transactions");
+    $stmt = $connect->query("SELECT SUM(affected_days) as total FROM hr_vacation_transactions");
     $metrics['dias_pendientes_empresa'] = $stmt->fetchColumn() ?? 0;
 
     // b. Solicitudes pendientes de aprobación
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status IN ('Pending', 'In_Progress')");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status IN ('Pending', 'In_Progress')");
     $metrics['solicitudes_pendientes'] = $stmt->fetchColumn();
 
     // c. Solicitudes aprobadas (Histórico o del mes, asumiremos total o del mes actual)
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status = 'Approved' AND MONTH(created_at) = MONTH(CURRENT_DATE) AND YEAR(created_at) = YEAR(CURRENT_DATE)");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status = 'Approved' AND MONTH(created_at) = MONTH(CURRENT_DATE) AND YEAR(created_at) = YEAR(CURRENT_DATE)");
     $metrics['solicitudes_aprobadas'] = $stmt->fetchColumn();
 
     // d. Solicitudes rechazadas
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status = 'Rejected' AND MONTH(created_at) = MONTH(CURRENT_DATE) AND YEAR(created_at) = YEAR(CURRENT_DATE)");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests WHERE request_status = 'Rejected' AND MONTH(created_at) = MONTH(CURRENT_DATE) AND YEAR(created_at) = YEAR(CURRENT_DATE)");
     $metrics['solicitudes_rechazadas'] = $stmt->fetchColumn();
 
     // e. Permisos registrados del mes (todos los registrados, cualquier estado excepto cancelados)
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Permission' AND r.request_status <> 'Cancelled' AND MONTH(r.start_date) = MONTH(CURRENT_DATE) AND YEAR(r.start_date) = YEAR(CURRENT_DATE)");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Permission' AND r.request_status <> 'Cancelled' AND MONTH(r.start_date) = MONTH(CURRENT_DATE) AND YEAR(r.start_date) = YEAR(CURRENT_DATE)");
     $metrics['permisos_mes'] = $stmt->fetchColumn();
 
     // f. Incapacidades activas
-    $stmt = $connect_hr_leaves->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Medical_Leave' AND r.request_status = 'Approved' AND CURRENT_DATE BETWEEN r.start_date AND r.end_date");
+    $stmt = $connect->query("SELECT COUNT(*) as count FROM hr_absence_requests r JOIN hr_absence_types t ON r.type_id = t.type_id WHERE t.category = 'Medical_Leave' AND r.request_status = 'Approved' AND CURRENT_DATE BETWEEN r.start_date AND r.end_date");
     $metrics['incapacidades_activas'] = $stmt->fetchColumn();
 
     // g. Próximo colaborador con derecho a vacaciones (código de trabajo hondureño: la vacación
     //    puede gozarse en una ventana de 2 meses antes o 2 meses después del aniversario).
     //    Por eso incluimos a quienes ya cumplieron hasta 2 meses atrás (siguen dentro de la ventana)
     //    y al próximo por venir; tomamos el más cercano.
-    $stmt = $connect_hr_leaves->query("
+    $stmt = $connect->query("
         SELECT p.user_id, p.new_vacations_date
         FROM hr_vacation_profile p
         WHERE p.new_vacations_date >= (CURRENT_DATE - INTERVAL 2 MONTH)

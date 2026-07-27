@@ -1,6 +1,6 @@
 <?php
 /**
- * Lista los feriados registrados (fuente única: medic9ue_hr_leaves.hr_holiday_calendar).
+ * Lista los feriados registrados (fuente única: hr_holiday_calendar).
  * Estos feriados se reflejan en los calendarios que consumen fetch_calendario.php.
  */
 require_once '../../bd/Conexion.php';
@@ -13,7 +13,7 @@ try {
 
     $stmt = $pdo->query("
         SELECT holiday_id, `date`, description
-        FROM medic9ue_hr_leaves.hr_holiday_calendar
+        FROM hr_holiday_calendar
         ORDER BY `date` ASC
     ");
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

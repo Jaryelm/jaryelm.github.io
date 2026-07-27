@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (!isset($connect_hr_leaves)) throw new Exception("Sin conexión a BD.");
+        if (!isset($connect)) throw new Exception("Sin conexión a BD.");
         
         $user_id = $_SESSION['id'];
         $type_id = $_POST['type_id'] ?? null;
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Info del tipo de ausencia. Se obtiene ANTES del chequeo de traslape porque
         // necesitamos saber si esta solicitud es de vacaciones (para poder recortar los
         // días que caen dentro de una incapacidad) o si es una incapacidad.
-        $stmt_t = $connect_hr_leaves->prepare("SELECT category, deducts_vacation, requires_document FROM hr_absence_types WHERE type_id = ?");
+        $stmt_t = $connect->prepare("SELECT category, deducts_vacation, requires_document FROM hr_absence_types WHERE type_id = ?");
         $stmt_t->execute([$type_id]);
         $type_info = $stmt_t->fetch(PDO::FETCH_ASSOC);
         $new_category       = $type_info['category'] ?? '';
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //    rechaza; más abajo se recalculan los días omitiendo el período de incapacidad.
         $new_is_partial = ($start_time && $end_time && $start_date === $end_date);
 
-        $stmt_overlap = $connect_hr_leaves->prepare("
+        $stmt_overlap = $connect->prepare("
             SELECT r.start_date, r.end_date, r.start_time, r.end_time, t.category
             FROM hr_absence_requests r
             JOIN hr_absence_types t ON r.type_id = t.type_id
@@ -151,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             global $connect;
             $calc = medidata_absence_count_working_days(
                 $connect,
-                $connect_hr_leaves,
                 $user_id,
                 $start_date,
                 $end_date
@@ -169,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // 4. Validar saldo si aplica
         if ($type_info && ($type_info['category'] === 'Vacation' || $type_info['deducts_vacation'] == 1)) {
-            $stmt_bal = $connect_hr_leaves->prepare("SELECT SUM(affected_days) as balance FROM hr_vacation_transactions WHERE user_id = ?");
+            $stmt_bal = $connect->prepare("SELECT SUM(affected_days) as balance FROM hr_vacation_transactions WHERE user_id = ?");
             $stmt_bal->execute([$user_id]);
             $bal = $stmt_bal->fetch(PDO::FETCH_ASSOC);
             $saldo_actual = $bal['balance'] ?? 0;
@@ -179,27 +178,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // 1. Obtener la jerarquía del rol del usuario para definir su workflow
-        // Check if there is an explicit role assigned in hr_workflow_roles
-        // Para simplificar, buscamos si su rol específico tiene un workflow, sino tomamos el default
-        $rol_usuario = $_SESSION['rol'];
-        
-        $stmt_wf = $connect_hr_leaves->prepare("
-            SELECT workflow_id FROM hr_workflow_roles 
-            WHERE role_name = ? LIMIT 1
-        ");
-        $stmt_wf->execute([$rol_usuario]);
-        $wf_res = $stmt_wf->fetch(PDO::FETCH_ASSOC);
-        
-        if ($wf_res) {
-            $workflow_id = $wf_res['workflow_id'];
-        } else {
-            // Fallback al workflow del tipo de ausencia
-            $stmt_type = $connect_hr_leaves->prepare("SELECT workflow_id FROM hr_absence_types WHERE type_id = ?");
-            $stmt_type->execute([$type_id]);
-            $type_res = $stmt_type->fetch(PDO::FETCH_ASSOC);
-            $workflow_id = $type_res['workflow_id'] ?? 1; // Default
-        }
+        // 1. El flujo de aprobación se determina por el DEPARTAMENTO del solicitante
+        //    (hr_workflow_departments); si su departamento no tiene flujo asignado se usa
+        //    el flujo del tipo de ausencia y, en última instancia, el flujo por defecto.
+        require_once __DIR__ . '/../../php/workflow_lib.php';
+        global $connect;
+        $workflow_id = medidata_workflow_para_usuario($connect, (int) $user_id, (int) $type_id);
         
         // 2. Documento de respaldo: validar tipo/tamaño y exigirlo si el tipo lo requiere.
         //    (El archivo se mueve DESPUÉS del INSERT, cuando ya tenemos el request_id.)
@@ -236,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db_medical_leave_number = ($new_es_incapacidad && $medical_leave_number !== '') ? $medical_leave_number : null;
 
         // 3. Insertar solicitud (incluye la marca de pago en efectivo — vacaciones pagadas)
-        $stmt = $connect_hr_leaves->prepare("
+        $stmt = $connect->prepare("
             INSERT INTO hr_absence_requests
             (user_id, type_id, start_date, end_date, start_time, end_time, days_amount, is_cash_payout, request_status, workflow_id, comments, reference_workday_hours, issuing_institution, medical_leave_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?, ?)
@@ -246,11 +230,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_id, $type_id, $start_date, $end_date, $start_time, $end_time, $days_amount, $is_paid_vacation, $workflow_id, $comments, $reference_workday_hours, $db_issuing_institution, $db_medical_leave_number
         ]);
         
-        $request_id = $connect_hr_leaves->lastInsertId();
+        $request_id = $connect->lastInsertId();
 
         // Auditoría: registrar la creación de la solicitud (no bloquea si falla)
         try {
-            $connect_hr_leaves->prepare("
+            $connect->prepare("
                 INSERT INTO hr_absence_audit_log (action_user_id, action_executed, affected_table, record_id, old_value, new_value)
                 VALUES (?, 'CREATE_REQUEST', 'hr_absence_requests', ?, NULL, ?)
             ")->execute([
@@ -281,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $safe_name = 'req' . (int) $request_id . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $proof_ext;
             if (move_uploaded_file($_FILES['proof_doc']['tmp_name'], $upload_dir . $safe_name)) {
-                $stmt_doc = $connect_hr_leaves->prepare("
+                $stmt_doc = $connect->prepare("
                     INSERT INTO hr_absence_attachments (request_id, attachment_type, original_filename, file_path, format)
                     VALUES (?, ?, ?, ?, ?)
                 ");

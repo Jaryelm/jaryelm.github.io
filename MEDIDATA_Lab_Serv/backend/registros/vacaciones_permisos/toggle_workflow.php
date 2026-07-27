@@ -11,7 +11,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    if (!isset($connect_hr_leaves) || !$connect_hr_leaves) {
+    if (!isset($connect) || !$connect) {
         throw new Exception("Error de conexión a la base de datos.");
     }
 
@@ -23,10 +23,10 @@ try {
         exit;
     }
 
-    $stmt = $connect_hr_leaves->prepare("UPDATE hr_approval_workflows SET status = ? WHERE workflow_id = ?");
+    $stmt = $connect->prepare("UPDATE hr_approval_workflows SET status = ? WHERE workflow_id = ?");
     $stmt->execute([$status, $id]);
 
-    medidata_audit_log($connect_hr_leaves, (int) ($_SESSION['id'] ?? 0), 'TOGGLE_WORKFLOW', 'hr_approval_workflows', $id, null, ['status' => (int) $status]);
+    medidata_audit_log($connect, (int) ($_SESSION['id'] ?? 0), 'TOGGLE_WORKFLOW', 'hr_approval_workflows', $id, null, ['status' => (int) $status]);
 
     echo json_encode(['success' => true]);
 } catch (Throwable $e) {

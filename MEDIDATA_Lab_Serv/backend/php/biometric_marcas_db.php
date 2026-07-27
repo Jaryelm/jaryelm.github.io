@@ -583,8 +583,8 @@ if (!function_exists('medidata_biometric_datatables')) {
             // asistencia no debe tratarla como falta/tardanza injustificada). Aislado para que
             // un fallo aquí nunca rompa el listado de marcas.
             try {
-                global $connect_hr_leaves;
-                if (!empty($data) && isset($connect_hr_leaves) && $connect_hr_leaves) {
+                global $connect;
+                if (!empty($data) && isset($connect) && $connect) {
                     require_once __DIR__ . '/absence_coverage_lib.php';
                     $uids = [];
                     $dias = [];
@@ -596,7 +596,7 @@ if (!function_exists('medidata_biometric_datatables')) {
                     }
                     if ($uids && $dias) {
                         sort($dias);
-                        $cov = medidata_absence_coverage_fetch($connect_hr_leaves, $uids, $dias[0], end($dias));
+                        $cov = medidata_absence_coverage_fetch($connect, $uids, $dias[0], end($dias));
                         foreach ($rows as $i => $r) {
                             $uid = (int) ($r['user_id'] ?? 0);
                             $d = substr((string) ($r['marca_dia'] ?? ''), 0, 10);

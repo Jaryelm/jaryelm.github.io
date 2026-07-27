@@ -10,7 +10,7 @@ if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['Administrador', 'R
 }
 
 try {
-    global $connect_hr_leaves, $connect;
+    global $connect;
     if (!$connect) throw new Exception("No db connection");
     
     // Kardex: Log de transacciones de días de vacaciones por empleado
@@ -23,7 +23,7 @@ try {
             k.affected_days AS days_amount,
             k.transaction_date AS created_at,
             k.description AS comments
-        FROM medic9ue_hr_leaves.hr_vacation_transactions k
+        FROM hr_vacation_transactions k
         LEFT JOIN users u ON k.user_id = u.id
         ORDER BY k.transaction_date DESC
     ";
